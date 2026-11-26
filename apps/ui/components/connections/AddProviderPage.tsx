@@ -9,7 +9,7 @@ import { CredentialGuide } from '@/components/services/CredentialGuide'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { PanelScroller } from '@/components/ui/panel-list'
-import { connectMethod, providerGuide, providerPitch, suggestName, type AddableProvider, type GuidedProvider } from '@/lib/engine/ai-sources'
+import { connectMethod, providerGuide, providerPitch, signInProviderOf, suggestName, type AddableProvider, type GuidedProvider } from '@/lib/engine/ai-sources'
 import type { BoxConnection, CreateBoxConnectionInput } from '@/lib/engine/types'
 import { CONNECTION_TOKEN_KEY, DEFAULT_CONNECTION_MODELS } from '@rerun/contracts'
 import { useTranslations } from 'next-intl'
@@ -23,6 +23,8 @@ type AddProviderPageProps = {
     onCreate: (params: CreateBoxConnectionInput) => Promise<CreateConnectionResult>
     onOpen: (connectionId: string) => void
     onRename: (connectionId: string, name: string) => Promise<{ success: boolean; error?: string }>
+    // A sign-in the hub stored on its own (Grok): the connection it landed on, read back.
+    onSignedIn: (connectionId: string) => Promise<BoxConnection | null>
     takenNames: string[]
     // Whether the engine will adopt this one as the workspace default the moment it is plugged in.
     willBecomeBoxDefault: boolean
@@ -31,7 +33,7 @@ type AddProviderPageProps = {
 // Name the connection, hand it a credential. The name is what the model picker shows, so it is the
 // difference between "Claude" twice and "Claude Clement" / "Claude Theo". A plan is named last, once
 // signed in: the connection is created under the suggested name and renamed on Done.
-export function AddProviderPage({ provider, onBack, onCreate, onOpen, onRename, takenNames, willBecomeBoxDefault }: AddProviderPageProps) {
+export function AddProviderPage({ provider, onBack, onCreate, onOpen, onRename, onSignedIn, takenNames, willBecomeBoxDefault }: AddProviderPageProps) {
     const t = useTranslations('connections')
     const tCommon = useTranslations('common')
     const errorText = useErrorText()
@@ -66,6 +68,13 @@ export function AddProviderPage({ provider, onBack, onCreate, onOpen, onRename, 
         }
     }
 
+    const signedIn = async (connectionId: string) => {
+        const connection = await onSignedIn(connectionId)
+        if (!connection) return { success: false, error: t('errors.createFailed') }
+        setCreated(connection)
+        return { success: true }
+    }
+
     const finish = async () => {
         if (!created) return
         const trimmed = name.trim()
@@ -87,7 +96,7 @@ export function AddProviderPage({ provider, onBack, onCreate, onOpen, onRename, 
                 {/* The two plans create the connection from inside their own flow, the moment the token lands,
                     and Done in the last step opens it. */}
                 {isPlan ? (
-                    <PlanConnect provider={method === 'device-codex' ? 'codex' : 'claude'} onKeys={create} surface="add_provider" lastStep={lastStep} />
+                    <PlanConnect provider={signInProviderOf(method)} onKeys={create} onSignedIn={signedIn} target={{ name: suggestedName }} surface="add_provider" lastStep={lastStep} />
                 ) : (
                     <>
                         <Input label={t('name.label')} value={name} onChange={e => setName(e.target.value)} helperText={t('name.helper')} className="h-8" />

@@ -625,7 +625,8 @@
         "useApiKey": "استخدام مفتاح API",
         "plans": {
             "claude": "Claude Pro أو Max",
-            "codex": "ChatGPT Plus أو Pro"
+            "codex": "ChatGPT Plus أو Pro",
+            "grok": "SuperGrok"
         },
         "decline": {
             "cloud": "أفضّل البقاء على أرصدة {brand}",
@@ -644,7 +645,7 @@
             },
             "password": {
                 "label": "لا يرى {brand} كلمة مرورك أبدًا",
-                "description": "توافق على ذلك في صفحة Claude أو OpenAI نفسها، ولا مكان آخر."
+                "description": "توافق عليه في صفحة مزوّدك نفسها، ولا مكان غيرها."
             },
             "unplug": {
                 "label": "افصله متى شئت",

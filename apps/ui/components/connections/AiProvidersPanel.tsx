@@ -46,7 +46,7 @@ import { cn } from '@/lib/utils'
 import { RERUN_CONNECTION_ID } from '@rerun/contracts'
 import { BorderBeam } from '@rerun/ui'
 import { Stripes } from '@rerun/ui/primitives'
-import { shortDate } from '@rerun/i18n/format'
+import { formatList, shortDate } from '@rerun/i18n/format'
 import { useLocale, useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState, type ComponentProps, type ReactNode } from 'react'
 import { toast } from 'sonner'
@@ -76,8 +76,9 @@ export function AiProvidersPanel({
     onInitialAddProviderConsumed?: () => void
 }) {
     const t = useTranslations('connections')
+    const locale = useLocale()
     const errorText = useErrorText()
-    const { connections, boxDefault, backups, opencodeOffered, customOffered, loading, create, update, updateKeys, remove, setDefault, setBackups } = useWorkspaceConnections({ revalidate: true })
+    const { connections, boxDefault, backups, opencodeOffered, customOffered, grokOffered, loading, create, update, updateKeys, signedIn, remove, setDefault, setBackups } = useWorkspaceConnections({ revalidate: true })
     const credit = useRerunCredit()
     const needsPlan = useNeedsPlanToConnect()
     const claudePlanOffered = useClaudePlanOffered()
@@ -113,6 +114,8 @@ export function AiProvidersPanel({
 
     const createFromPage = useCallback((params: Parameters<typeof create>[0]) => create(params, 'add_provider'), [create])
     const rename = useCallback((connectionId: string, name: string) => update(connectionId, { name }), [update])
+    const signedInFromPage = useCallback((connectionId: string) => signedIn(connectionId, 'grok', 'add_provider'), [signedIn])
+    const signedInAgain = useCallback(async (connectionId: string) => ({ success: (await signedIn(connectionId, 'grok', 'reconnect')) !== null }), [signedIn])
 
     const pickDefault = (pick: BoxDefault) =>
         void setDefault(pick).then(result => {
@@ -124,9 +127,8 @@ export function AiProvidersPanel({
             if (!result.success) toast.error(errorText(result, t('errors.backupsFailed')))
         })
 
-    const planPitch = claudePlanOffered
-        ? t(opencodeOffered ? 'panel.pitch.plansWithOpencode' : 'panel.pitch.plans')
-        : t(opencodeOffered ? 'panel.pitch.plansWithoutClaudeWithOpencode' : 'panel.pitch.plansWithoutClaude')
+    const offeredPlans = planProviders(opencodeOffered, { claude: claudePlanOffered, grok: grokOffered })
+    const planPitch = t('panel.pitch.plans', { tools: formatList(offeredPlans.flatMap(provider => PLAN_LABELS[provider] ?? []), locale, 'disjunction') })
     const byKind = (kind: SourceKind) => connections.filter(c => sourceKind(c.provider) === kind)
     const taken = new Set(connections.map(c => c.provider))
 
@@ -135,7 +137,7 @@ export function AiProvidersPanel({
             {page.kind === 'add' && page.provider === 'custom' ? (
                 <AddCustomProviderPage onBack={back} onCreate={createFromPage} onOpen={open} takenNames={connections.map(c => c.name)} willBecomeBoxDefault={willBecomeBoxDefault} />
             ) : page.kind === 'add' ? (
-                <AddProviderPage key={page.provider} provider={page.provider} onBack={back} onCreate={createFromPage} onOpen={open} onRename={rename} takenNames={connections.map(c => c.name)} willBecomeBoxDefault={willBecomeBoxDefault} />
+                <AddProviderPage key={page.provider} provider={page.provider} onBack={back} onCreate={createFromPage} onOpen={open} onRename={rename} onSignedIn={signedInFromPage} takenNames={connections.map(c => c.name)} willBecomeBoxDefault={willBecomeBoxDefault} />
             ) : selected ? (
                 <ConnectionDetail
                     connection={selected}
@@ -146,6 +148,7 @@ export function AiProvidersPanel({
                     onBack={back}
                     onUpdate={update}
                     onUpdateKeys={(id, body) => updateKeys(id, body, 'reconnect')}
+                    onSignedIn={signedInAgain}
                     onDelete={remove}
                     readOnlyReason={readOnlyReason}
                 />
@@ -177,7 +180,7 @@ export function AiProvidersPanel({
                         onAdd={needsPlan ? undefined : add}
                         addDisabledReason={readOnlyReason}
                         pitch={planPitch}
-                        providers={planProviders(opencodeOffered, { claude: claudePlanOffered })}
+                        providers={offeredPlans}
                     />
 
                     <SourceGroup

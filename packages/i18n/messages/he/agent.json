@@ -528,6 +528,11 @@
                 "plan": "ChatGPT Plus או Pro",
                 "hint": "להתחבר עם חשבון ChatGPT שלך",
                 "nudge": "יש לך ChatGPT Plus או Pro?"
+            },
+            "grok": {
+                "plan": "SuperGrok",
+                "hint": "התחברו עם חשבון ה-xAI שלכם",
+                "nudge": "יש לכם SuperGrok?"
             }
         },
         "hints": {
@@ -536,7 +541,8 @@
             "anthropic": "מודלים של Claude",
             "openai": "מודלים של GPT",
             "google": "מודלים של Gemini",
-            "openrouter": "כל המודלים"
+            "openrouter": "כל המודלים",
+            "grok": "SuperGrok"
         },
         "pitchHeading": "לפעול על התוכנית שאתה כבר משלם עליה",
         "connect": "להתחבר",

@@ -19,18 +19,25 @@ type SubscriptionOfferProps = {
     initialProvider?: AddableProvider
     onPick?: (provider: AddableProvider) => void
     onKeys: (provider: AddableProvider, keys: Record<string, string>) => Promise<KeysResult>
+    // A plan the hub stores itself (Grok): the connection it landed on, under the name it suggests.
+    onSignedIn?: (provider: SubscriptionProvider, connectionId: string) => Promise<KeysResult>
+    suggestedName?: (provider: AddableProvider) => string
     onSkip: () => void
     onDone: () => void
     // Whether OpenCode can be offered as a third plan: its flag and the machine's engine both allow it.
     opencodeOffered?: boolean
     claudePlanOffered?: boolean
+    // Whether the machine's engine runs a Grok plan.
+    grokOffered?: boolean
 }
+
+const notStoredHere = async (): Promise<KeysResult> => ({ success: false })
 
 // The left column of the offer. The board beside it is the dialog's aside, and stays put whatever
 // step this column is on.
-export function SubscriptionOffer({ initialStep = 'offer', initialProvider = 'claude', onPick, onKeys, onSkip, onDone, opencodeOffered = false, claudePlanOffered = true }: SubscriptionOfferProps) {
+export function SubscriptionOffer({ initialStep = 'offer', initialProvider = 'claude', onPick, onKeys, onSignedIn = notStoredHere, suggestedName, onSkip, onDone, opencodeOffered = false, claudePlanOffered = true, grokOffered = false }: SubscriptionOfferProps) {
     const [step, setStep] = useState<SubscriptionOfferStep>(initialStep)
-    const [provider, setProvider] = useState<AddableProvider>(initialStep === 'claude' || initialStep === 'codex' ? initialStep : initialProvider)
+    const [provider, setProvider] = useState<AddableProvider>(initialStep === 'claude' || initialStep === 'codex' || initialStep === 'grok' ? initialStep : initialProvider)
 
     const pickPlan = (next: SubscriptionProvider) => {
         onPick?.(next)
@@ -55,6 +62,7 @@ export function SubscriptionOffer({ initialStep = 'offer', initialProvider = 'cl
             {step === 'offer' && (
                 <OfferStep
                     claudePlanOffered={claudePlanOffered}
+                    grokOffered={grokOffered}
                     onPick={pickPlan}
                     onKey={() => setStep('key')}
                     onOpencode={
@@ -68,7 +76,9 @@ export function SubscriptionOffer({ initialStep = 'offer', initialProvider = 'cl
                     onSkip={onSkip}
                 />
             )}
-            {(step === 'claude' || step === 'codex') && <PlanConnectStep provider={step} onBack={() => setStep('offer')} onSkip={onSkip} onKeys={savePlanKeys(step)} onDone={onDone} />}
+            {(step === 'claude' || step === 'codex' || step === 'grok') && (
+                <PlanConnectStep provider={step} onBack={() => setStep('offer')} onSkip={onSkip} onKeys={savePlanKeys(step)} onSignedIn={connectionId => onSignedIn(step, connectionId)} target={{ name: suggestedName?.(step) }} onDone={onDone} />
+            )}
             {step === 'key' && <KeyConnectStep onPick={onPick} onBack={() => setStep('offer')} onSkip={onSkip} onKeys={saveKeys} />}
             {step === 'opencode' && <KeyConnectStep only="opencode" onBack={() => setStep('offer')} onSkip={onSkip} onKeys={saveKeys} />}
             {step === 'connected' && <ConnectedStep provider={provider} onDone={onDone} />}

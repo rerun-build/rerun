@@ -74,7 +74,8 @@
         "unavailable": {
             "opencodeRetired": "No longer offered by OpenCode",
             "codexOutdated": "Codex CLI outdated on this box",
-            "notInChatgptPlan": "Not in your ChatGPT plan"
+            "notInChatgptPlan": "Not in your ChatGPT plan",
+            "notInGrokPlan": "Not in your Grok plan"
         },
         "pricePerMillion": "{input} in · {output} out /M",
         "guide": {
@@ -185,7 +186,9 @@
         "sources.guide.opencode.step2": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
         "sources.guide.opencode.step3": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
         "sources.creditBackManaged": "Completes the sentence \"Credits used up, back ...\" of the mobile app.",
-        "sources.pitch.grok.title": "SuperGrok is the name of xAI's paid Grok plan: keep it as it is."
+        "sources.pitch.grok.title": "SuperGrok is the name of xAI's paid Grok plan: keep it as it is.",
+        "panel.pitch.plans": "{tools} is a list of the coding tools whose plans connect, joined with \"or\" in the reader's language: \"Claude Code, Codex or Grok Build\".",
+        "grok.plans": "Grok Build is xAI's coding agent, SuperGrok a paid Grok plan: product names, keep them as they are."
     },
     "noPlan": {
         "trialText": "Start your free trial to connect your own Claude plan, ChatGPT plan or API key.",
@@ -334,10 +337,7 @@
             "noPlan": "Your subscriptions and API keys"
         },
         "pitch": {
-            "plansWithOpencode": "Already use Claude Code, Codex or OpenCode? Your coworkers can run on your plan.",
-            "plans": "Already use Claude Code or Codex? Your coworkers can run on your plan.",
-            "plansWithoutClaudeWithOpencode": "Already use Codex or OpenCode? Your coworkers can run on your plan.",
-            "plansWithoutClaude": "Already use Codex? Your coworkers can run on your ChatGPT plan.",
+            "plans": "Already use {tools}? Your coworkers can run on your plan.",
             "keysWithCustom": "Pay your provider directly, per token, or run your own model.",
             "keys": "Pay your provider directly, per token."
         },
@@ -457,6 +457,25 @@
             "refusedPlain": "The server refused {model}.",
             "refusedUnnamedDetail": "The server refused this model: {detail}",
             "refusedUnnamed": "The server refused this model."
+        }
+    },
+    "grok": {
+        "codeStep": "Get a code from xAI",
+        "approveStep": "Approve it on xAI",
+        "getCode": "Get code",
+        "gettingCode": "Getting code…",
+        "newCode": "Get a new code",
+        "copyCode": "Copy code",
+        "enterCode": "Enter it on <link>xAI's page</link> and approve. This window picks it up on its own.",
+        "opening": "xAI is opening in a new tab",
+        "plans": "Works with a Grok plan that includes Grok Build, such as SuperGrok.",
+        "remarks": {
+            "connected": "All set!",
+            "starting": "Getting a code",
+            "waiting": "Waiting for xAI",
+            "expired": "That code ran out.",
+            "retry": "Let's try again.",
+            "grabCode": "Grab a code first."
         }
     }
 }

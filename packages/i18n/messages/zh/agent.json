@@ -528,6 +528,11 @@
                 "plan": "ChatGPT Plus 或 Pro",
                 "hint": "使用您的 ChatGPT 账号登录",
                 "nudge": "已有 ChatGPT Plus 或 Pro？"
+            },
+            "grok": {
+                "plan": "SuperGrok",
+                "hint": "使用你的 xAI 账户登录",
+                "nudge": "有 SuperGrok 吗？"
             }
         },
         "hints": {
@@ -536,7 +541,8 @@
             "anthropic": "Claude 模型",
             "openai": "GPT 模型",
             "google": "Gemini 模型",
-            "openrouter": "所有模型"
+            "openrouter": "所有模型",
+            "grok": "SuperGrok"
         },
         "pitchHeading": "使用您已付费的套餐运行",
         "connect": "连接",

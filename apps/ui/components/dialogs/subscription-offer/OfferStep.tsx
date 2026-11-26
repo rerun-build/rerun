@@ -11,7 +11,7 @@ import { OfferArguments } from './offer-arguments'
 import { DeclineButton, OfferFooter } from './offer-footer'
 import { OfferConnect } from './OfferConnect'
 
-export function OfferStep({ claudePlanOffered, onPick, onKey, onOpencode, onSkip }: { claudePlanOffered: boolean; onPick: (provider: SubscriptionProvider) => void; onKey: () => void; onOpencode?: () => void; onSkip: () => void }) {
+export function OfferStep({ claudePlanOffered, grokOffered, onPick, onKey, onOpencode, onSkip }: { claudePlanOffered: boolean; grokOffered: boolean; onPick: (provider: SubscriptionProvider) => void; onKey: () => void; onOpencode?: () => void; onSkip: () => void }) {
     const t = useTranslations('dialogs.subscriptionOffer.offer')
     return (
         <>
@@ -21,7 +21,7 @@ export function OfferStep({ claudePlanOffered, onPick, onKey, onOpencode, onSkip
                 <p className="text-sm text-muted-foreground">{t(claudePlanOffered ? 'description' : 'descriptionWithoutClaude')}</p>
             </DialogHeader>
 
-            <OfferConnect providers={claudePlanOffered ? SUBSCRIPTION_PROVIDERS : SUBSCRIPTION_PROVIDERS.filter(provider => provider !== 'claude')} onPick={onPick} onKey={onKey} onOpencode={onOpencode} />
+            <OfferConnect providers={SUBSCRIPTION_PROVIDERS.filter(provider => (claudePlanOffered || provider !== 'claude') && (grokOffered || provider !== 'grok'))} onPick={onPick} onKey={onKey} onOpencode={onOpencode} />
 
             {/* The arguments are not a third way in: they sit on their own, centred in what the
                 buttons leave, well clear of the group above. The scroll is a guard, not a feature:

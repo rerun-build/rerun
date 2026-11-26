@@ -625,7 +625,8 @@
         "useApiKey": "使用 API 金鑰",
         "plans": {
             "claude": "Claude Pro 或 Max",
-            "codex": "ChatGPT Plus 或 Pro"
+            "codex": "ChatGPT Plus 或 Pro",
+            "grok": "SuperGrok"
         },
         "decline": {
             "cloud": "我想繼續使用 {brand} 點數",
@@ -644,7 +645,7 @@
             },
             "password": {
                 "label": "{brand} 絕不會看到您的密碼",
-                "description": "您只會在 Claude 或 OpenAI 自己的頁面上核准，不會在其他地方。"
+                "description": "您只會在供應商自己的頁面上核准，不會在其他地方。"
             },
             "unplug": {
                 "label": "隨時中斷連結",

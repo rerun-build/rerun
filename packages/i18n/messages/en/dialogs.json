@@ -714,7 +714,8 @@
         "useApiKey": "Use an API key",
         "plans": {
             "claude": "Claude Pro or Max",
-            "codex": "ChatGPT Plus or Pro"
+            "codex": "ChatGPT Plus or Pro",
+            "grok": "SuperGrok"
         },
         "decline": {
             "cloud": "I'd rather stay on {brand} credits",
@@ -733,7 +734,7 @@
             },
             "password": {
                 "label": "{brand} never sees your password",
-                "description": "You approve it on Claude's or OpenAI's own page, and nowhere else."
+                "description": "You approve it on your provider's own page, and nowhere else."
             },
             "unplug": {
                 "label": "Unplug it whenever",

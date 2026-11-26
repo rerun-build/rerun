@@ -7,6 +7,7 @@ import { ProviderIcon } from '@/lib/engine/provider-icons'
 export const PLANS: Record<SubscriptionProvider, { name: string }> = {
     claude: { name: 'Claude' },
     codex: { name: 'ChatGPT' },
+    grok: { name: 'Grok' },
 }
 
 // The providers behind the API key road, shown as a logo strip so the word "key" is not the only

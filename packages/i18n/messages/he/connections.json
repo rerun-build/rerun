@@ -74,7 +74,8 @@
         "unavailable": {
             "opencodeRetired": "OpenCode כבר לא מציעים אותו",
             "codexOutdated": "גרסת Codex CLI ישנה ב-Box הזה",
-            "notInChatgptPlan": "לא כלול במנוי ChatGPT שלך"
+            "notInChatgptPlan": "לא כלול במנוי ChatGPT שלך",
+            "notInGrokPlan": "לא כלול במינוי ה-Grok שלכם"
         },
         "pricePerMillion": "{input} קלט · {output} פלט /M",
         "guide": {
@@ -260,10 +261,7 @@
             "noPlan": "המנויים ומפתחות ה-API שלך"
         },
         "pitch": {
-            "plansWithOpencode": "כבר משתמש ב-Claude Code, Codex או OpenCode? העמיתים שלך יכולים לרוץ על המנוי שלך.",
-            "plans": "כבר משתמש ב-Claude Code או Codex? העמיתים שלך יכולים לרוץ על המנוי שלך.",
-            "plansWithoutClaudeWithOpencode": "כבר משתמש ב-Codex או OpenCode? העמיתים שלך יכולים לרוץ על המנוי שלך.",
-            "plansWithoutClaude": "כבר משתמש ב-Codex? העמיתים שלך יכולים לרוץ על מנוי ChatGPT שלך.",
+            "plans": "כבר משתמשים ב-{tools}? העמיתים שלכם יכולים לפעול על המינוי שלכם.",
             "keysWithCustom": "לשלם ישירות לספק, לפי טוקן, או להריץ מודל משלך.",
             "keys": "לשלם ישירות לספק, לפי טוקן."
         },
@@ -383,6 +381,25 @@
             "refusedPlain": "השרת דחה את {model}.",
             "refusedUnnamedDetail": "השרת דחה את המודל הזה: {detail}",
             "refusedUnnamed": "השרת דחה את המודל הזה."
+        }
+    },
+    "grok": {
+        "codeStep": "קבלו קוד מ-xAI",
+        "approveStep": "אשרו אותו ב-xAI",
+        "getCode": "קבלת קוד",
+        "gettingCode": "מקבלים קוד…",
+        "newCode": "קבלת קוד חדש",
+        "copyCode": "העתקת הקוד",
+        "enterCode": "הזינו אותו ב<link>דף של xAI</link> ואשרו. החלון הזה יזהה זאת לבד.",
+        "opening": "xAI נפתח בכרטיסייה חדשה",
+        "plans": "עובד עם מינוי Grok שכולל את Grok Build, כמו SuperGrok.",
+        "remarks": {
+            "connected": "הכול מוכן!",
+            "starting": "מקבלים קוד",
+            "waiting": "ממתינים ל-xAI",
+            "expired": "תוקף הקוד הזה פג.",
+            "retry": "ננסה שוב.",
+            "grabCode": "קודם קבלו קוד."
         }
     }
 }

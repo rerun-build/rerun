@@ -74,7 +74,8 @@
         "unavailable": {
             "opencodeRetired": "OpenCode 已不再提供",
             "codexOutdated": "此 Box 上的 Codex CLI 版本過舊",
-            "notInChatgptPlan": "不在您的 ChatGPT 方案中"
+            "notInChatgptPlan": "不在您的 ChatGPT 方案中",
+            "notInGrokPlan": "不在您的 Grok 方案中"
         },
         "pricePerMillion": "輸入 {input} · 輸出 {output} /M",
         "guide": {
@@ -260,10 +261,7 @@
             "noPlan": "您的訂閱和 API 金鑰"
         },
         "pitch": {
-            "plansWithOpencode": "已經在使用 Claude Code、Codex 或 OpenCode？您的同事可以使用您的方案執行。",
-            "plans": "已經在使用 Claude Code 或 Codex？您的同事可以使用您的方案執行。",
-            "plansWithoutClaudeWithOpencode": "已經在使用 Codex 或 OpenCode？您的同事可以使用您的方案執行。",
-            "plansWithoutClaude": "已經在使用 Codex？您的同事可以使用您的 ChatGPT 方案執行。",
+            "plans": "已經在使用 {tools}？您的同事可以使用您的方案執行。",
             "keysWithCustom": "直接按 token 付費給供應商，或執行您自己的模型。",
             "keys": "直接按 token 付費給供應商。"
         },
@@ -383,6 +381,25 @@
             "refusedPlain": "伺服器拒絕了 {model}。",
             "refusedUnnamedDetail": "伺服器拒絕了這個模型：{detail}",
             "refusedUnnamed": "伺服器拒絕了這個模型。"
+        }
+    },
+    "grok": {
+        "codeStep": "從 xAI 取得代碼",
+        "approveStep": "在 xAI 上核准",
+        "getCode": "取得代碼",
+        "gettingCode": "正在取得代碼…",
+        "newCode": "取得新代碼",
+        "copyCode": "複製代碼",
+        "enterCode": "在 <link>xAI 頁面</link>上輸入並核准。此視窗會自動偵測。",
+        "opening": "正在新分頁中開啟 xAI",
+        "plans": "適用於包含 Grok Build 的 Grok 方案，例如 SuperGrok。",
+        "remarks": {
+            "connected": "一切就緒！",
+            "starting": "正在取得代碼",
+            "waiting": "正在等待 xAI",
+            "expired": "這組代碼已過期。",
+            "retry": "我們再試一次。",
+            "grabCode": "先取得一組代碼。"
         }
     }
 }

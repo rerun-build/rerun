@@ -18,7 +18,7 @@ import { ContactManagerButton } from '@/components/brand/ContactManagerButton'
 import { useBrand } from '@/components/brand/BrandProvider'
 import { Input } from '@/components/ui/input'
 import { PanelScroller } from '@/components/ui/panel-list'
-import { connectMethod, isCreditUsedUp, sourceKind, type RerunCredit } from '@/lib/engine/ai-sources'
+import { connectMethod, isCreditUsedUp, signInProviderOf, sourceKind, type RerunCredit } from '@/lib/engine/ai-sources'
 import { catalogFor } from '@/lib/engine/models'
 import type { BoxConnection, UpdateBoxConnectionInput } from '@/lib/engine/types'
 import { AlertTriangle, CoinsIcon } from '@/lib/icons'
@@ -43,6 +43,8 @@ type ConnectionDetailProps = {
     onBack: () => void
     onUpdate: (id: string, patch: UpdateBoxConnectionInput) => Promise<MutationResult>
     onUpdateKeys: (id: string, body: { set?: Record<string, string>; remove?: string[] }) => Promise<MutationResult>
+    // A sign-in the hub stored on its own (Grok), on this connection.
+    onSignedIn: (id: string) => Promise<MutationResult>
     onDelete: (id: string) => Promise<DeleteResult>
     // A member reads the connection; every control is held disabled, the reason on top.
     readOnlyReason?: string
@@ -50,7 +52,7 @@ type ConnectionDetailProps = {
 
 // Everything one named credential of the workspace owns. Every edit persists immediately: a moved
 // model is a PATCH, a pasted key is a PATCH, and a failed one says so under the header.
-export function ConnectionDetail({ connection, credit, defaultModel, reconnectRequested = false, onReconnected, onBack, onUpdate, onUpdateKeys, onDelete, readOnlyReason }: ConnectionDetailProps) {
+export function ConnectionDetail({ connection, credit, defaultModel, reconnectRequested = false, onReconnected, onBack, onUpdate, onUpdateKeys, onSignedIn, onDelete, readOnlyReason }: ConnectionDetailProps) {
     const t = useTranslations('connections')
     const errorText = useErrorText()
     const [error, setError] = useState<string | null>(null)
@@ -83,6 +85,18 @@ export function ConnectionDetail({ connection, credit, defaultModel, reconnectRe
         [connection.id, connection.provider, onUpdateKeys, rejected, onReconnected, t]
     )
 
+    const signedInAgain = useCallback(
+        async (id: string) => {
+            const result = await onSignedIn(id)
+            if (result.success && rejected) {
+                onReconnected?.()
+                toast.success(t('detail.signedInAgain'))
+            }
+            return result
+        },
+        [onSignedIn, rejected, onReconnected, t]
+    )
+
     return (
         <div className="flex min-h-0 flex-1 flex-col">
             <DetailHeader source={connection} credit={credit} onBack={onBack} onRename={readOnlyReason ? undefined : name => void patch({ name })} />
@@ -91,7 +105,7 @@ export function ConnectionDetail({ connection, credit, defaultModel, reconnectRe
                 <fieldset disabled={!!readOnlyReason} className="contents space-y-5">
                 {readOnlyReason && <p className="text-xs text-muted-foreground">{t('detail.readOnly', { reason: readOnlyReason })}</p>}
                 {error && <p className="text-[11px] text-destructive">{error}</p>}
-                <SourceAlert connection={connection} credit={credit} reconnectRequested={rejected} onKeys={applyKeys} />
+                <SourceAlert connection={connection} credit={credit} reconnectRequested={rejected} onKeys={applyKeys} onSignedIn={signedInAgain} />
                 {sourceKind(connection.provider) === 'plan' && connection.connected && <PlanLimitsBlock connection={connection} />}
                 {connection.provider === 'opencode' ? (
                     <OpencodeModels connection={connection} defaultModel={defaultModel} onModelsChange={models => void patch({ models })} />
@@ -127,7 +141,9 @@ function AlertBlock({ children }: { children: ReactNode }) {
 }
 
 // Renders nothing while a source works: switching account or key is remove, then add again.
-function SourceAlert({ connection, credit, reconnectRequested, onKeys }: { connection: BoxConnection; credit: RerunCredit; reconnectRequested: boolean; onKeys: (keys: Record<string, string>) => Promise<MutationResult> }) {
+type SourceAlertProps = { connection: BoxConnection; credit: RerunCredit; reconnectRequested: boolean; onKeys: (keys: Record<string, string>) => Promise<MutationResult>; onSignedIn: (id: string) => Promise<MutationResult> }
+
+function SourceAlert({ connection, credit, reconnectRequested, onKeys, onSignedIn }: SourceAlertProps) {
     const t = useTranslations('connections')
     const tCommon = useTranslations('common')
     const errorText = useErrorText()
@@ -176,7 +192,7 @@ function SourceAlert({ connection, credit, reconnectRequested, onKeys }: { conne
                 <AlertBlock>
                     <p className="text-xs">{connection.connected ? t('detail.signInRejected') : t('detail.signInExpired')}</p>
                 </AlertBlock>
-                <PlanConnect provider={method === 'device-codex' ? 'codex' : 'claude'} onKeys={onKeys} surface="reconnect" lastStep={() => ({ title: t('detail.reconnected') })} />
+                <PlanConnect provider={signInProviderOf(method)} onKeys={onKeys} onSignedIn={onSignedIn} target={{ connectionId: connection.id }} surface="reconnect" lastStep={() => ({ title: t('detail.reconnected') })} />
             </div>
         )
     }

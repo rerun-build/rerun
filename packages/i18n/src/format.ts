@@ -127,6 +127,12 @@ export function formatNumber(value: number, locale: string = DEFAULT_LOCALE, opt
     return options?.style === 'currency' && localeDirection(locale) === 'rtl' ? `\u2066${text}\u2069` : text
 }
 
+// "Claude Code, Codex or Grok Build" in the reader's language: names joined the way the language
+// joins them, never with a comma and an "or" glued in English.
+export function formatList(items: string[], locale: string = DEFAULT_LOCALE, type: 'conjunction' | 'disjunction' = 'conjunction'): string {
+    return new Intl.ListFormat(tag(locale, 'en-US'), { type, style: 'long' }).format(items)
+}
+
 const BYTE_UNITS = ['byte', 'kilobyte', 'megabyte', 'gigabyte'] as const
 
 export function formatBytes(bytes: number, locale: string = DEFAULT_LOCALE): string {

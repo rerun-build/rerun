@@ -624,6 +624,11 @@
                 "plan": "ChatGPT Plus or Pro",
                 "hint": "Sign in with your ChatGPT account",
                 "nudge": "Have ChatGPT Plus or Pro?"
+            },
+            "grok": {
+                "plan": "SuperGrok",
+                "hint": "Sign in with your xAI account",
+                "nudge": "Have SuperGrok?"
             }
         },
         "hints": {
@@ -632,7 +637,8 @@
             "anthropic": "Claude models",
             "openai": "GPT models",
             "google": "Gemini models",
-            "openrouter": "Every model"
+            "openrouter": "Every model",
+            "grok": "SuperGrok"
         },
         "pitchHeading": "Run on the plan you already pay for",
         "connect": "Connect",

@@ -37,12 +37,23 @@ export function SubscriptionOfferDialog() {
 // Mounted with the dialog rather than with the app: the connections are only asked for once there
 // is a machine to hold them.
 function ConnectedOffer({ claudePlanOffered, onClose }: { claudePlanOffered: boolean; onClose: () => void }) {
-    const { connections, opencodeOffered, create } = useWorkspaceConnections()
+    const { connections, opencodeOffered, grokOffered, create, signedIn } = useWorkspaceConnections()
+    const nameFor = (provider: AddableProvider) => suggestName(provider, connections.map(connection => connection.name))
 
-    const connect = (provider: AddableProvider, keys: Record<string, string>) => {
-        const takenNames = connections.map(connection => connection.name)
-        return create({ name: suggestName(provider, takenNames), provider, models: DEFAULT_CONNECTION_MODELS[provider], extraModels: [], keys }, 'subscription_offer')
-    }
+    const connect = (provider: AddableProvider, keys: Record<string, string>) => create({ name: nameFor(provider), provider, models: DEFAULT_CONNECTION_MODELS[provider], extraModels: [], keys }, 'subscription_offer')
+    const stored = async (provider: AddableProvider, connectionId: string) => ({ success: (await signedIn(connectionId, provider, 'subscription_offer')) !== null })
 
-    return <SubscriptionOffer onPick={provider => track('connection_cta_clicked', { source: `onboarding_offer_${provider}` })} onKeys={connect} onSkip={onClose} onDone={onClose} opencodeOffered={opencodeOffered} claudePlanOffered={claudePlanOffered} />
+    return (
+        <SubscriptionOffer
+            onPick={provider => track('connection_cta_clicked', { source: `onboarding_offer_${provider}` })}
+            onKeys={connect}
+            onSignedIn={stored}
+            suggestedName={nameFor}
+            onSkip={onClose}
+            onDone={onClose}
+            opencodeOffered={opencodeOffered}
+            claudePlanOffered={claudePlanOffered}
+            grokOffered={grokOffered}
+        />
+    )
 }

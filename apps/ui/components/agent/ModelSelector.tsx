@@ -2,6 +2,7 @@
 
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList, CommandSeparator } from '@/components/ui/command'
 import { DotSpinner } from '@/components/ui/dot-spinner'
+import { useWorkspaceConnections } from '@/hooks/useWorkspaceConnections'
 import { AddProviderItem, SUBSCRIPTION_PROVIDERS, SubscriptionNudge, SubscriptionPitch, type AddableProvider, type SubscriptionProvider } from '@/components/agent/ModelPickerProviders'
 import { useBrand } from '@/components/brand/BrandProvider'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -159,7 +160,8 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
     const hasAvailable = availableGroups.length > 0
     const connectedProviders = useMemo(() => new Set(availableGroups.map(group => group.provider)), [availableGroups])
     const claudePlanOffered = useClaudePlanOffered()
-    const missingSubscriptions = SUBSCRIPTION_PROVIDERS.filter(provider => !connectedProviders.has(provider) && (claudePlanOffered || provider !== 'claude'))
+    const { grokOffered } = useWorkspaceConnections()
+    const missingSubscriptions = SUBSCRIPTION_PROVIDERS.filter(provider => !connectedProviders.has(provider) && (claudePlanOffered || provider !== 'claude') && (grokOffered || provider !== 'grok'))
     const hasOwnConnection = availableGroups.some(group => group.connectionId !== RERUN_CONNECTION_ID)
     // Only when nothing at all was chosen: an override on this conversation is still a choice, and
     // the trigger has to say which model that turn will bill.
@@ -473,7 +475,7 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
                             ))}
                         <CommandSeparator />
                         <CommandGroup>
-                            <AddProviderItem connectedProviders={connectedProviders} claudePlanOffered={claudePlanOffered} onConnect={addProvider} onManage={manage} />
+                            <AddProviderItem connectedProviders={connectedProviders} claudePlanOffered={claudePlanOffered} grokOffered={grokOffered} onConnect={addProvider} onManage={manage} />
                         </CommandGroup>
                     </CommandList>
                 </Command>

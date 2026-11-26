@@ -74,7 +74,8 @@
         "unavailable": {
             "opencodeRetired": "N'est plus proposé par OpenCode",
             "codexOutdated": "Codex CLI pas à jour sur cette box",
-            "notInChatgptPlan": "Pas inclus dans votre forfait ChatGPT"
+            "notInChatgptPlan": "Pas inclus dans votre forfait ChatGPT",
+            "notInGrokPlan": "Pas inclus dans votre abonnement Grok"
         },
         "pricePerMillion": "{input} entrée · {output} sortie /M",
         "guide": {
@@ -260,10 +261,7 @@
             "noPlan": "Vos abonnements et clés API"
         },
         "pitch": {
-            "plansWithOpencode": "Vous utilisez déjà Claude Code, Codex ou OpenCode ? Vos coworkers peuvent tourner sur votre forfait.",
-            "plans": "Vous utilisez déjà Claude Code ou Codex ? Vos coworkers peuvent tourner sur votre forfait.",
-            "plansWithoutClaudeWithOpencode": "Vous utilisez déjà Codex ou OpenCode ? Vos coworkers peuvent tourner sur votre forfait.",
-            "plansWithoutClaude": "Vous utilisez déjà Codex ? Vos coworkers peuvent tourner sur votre forfait ChatGPT.",
+            "plans": "Vous utilisez déjà {tools} ? Vos coworkers peuvent tourner sur votre abonnement.",
             "keysWithCustom": "Payez directement votre fournisseur, au jeton, ou faites tourner votre propre modèle.",
             "keys": "Payez directement votre fournisseur, au jeton."
         },
@@ -383,6 +381,25 @@
             "refusedPlain": "Le serveur a refusé {model}.",
             "refusedUnnamedDetail": "Le serveur a refusé ce modèle : {detail}",
             "refusedUnnamed": "Le serveur a refusé ce modèle."
+        }
+    },
+    "grok": {
+        "codeStep": "Obtenez un code de xAI",
+        "approveStep": "Approuvez-le sur xAI",
+        "getCode": "Obtenir le code",
+        "gettingCode": "Obtention du code…",
+        "newCode": "Obtenir un nouveau code",
+        "copyCode": "Copier le code",
+        "enterCode": "Saisissez-le sur <link>la page de xAI</link> et approuvez. Cette fenêtre le détecte toute seule.",
+        "opening": "xAI s’ouvre dans un nouvel onglet",
+        "plans": "Fonctionne avec un abonnement Grok qui inclut Grok Build, comme SuperGrok.",
+        "remarks": {
+            "connected": "C’est prêt !",
+            "starting": "Obtention d’un code",
+            "waiting": "En attente de xAI",
+            "expired": "Ce code a expiré.",
+            "retry": "On réessaie.",
+            "grabCode": "Commencez par obtenir un code."
         }
     }
 }

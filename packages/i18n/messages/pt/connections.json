@@ -74,7 +74,8 @@
         "unavailable": {
             "opencodeRetired": "Não é mais oferecido pelo OpenCode",
             "codexOutdated": "Codex CLI desatualizado nesta Box",
-            "notInChatgptPlan": "Não incluído no seu plano do ChatGPT"
+            "notInChatgptPlan": "Não incluído no seu plano do ChatGPT",
+            "notInGrokPlan": "Não incluído no seu plano do Grok"
         },
         "pricePerMillion": "{input} entrada · {output} saída /M",
         "guide": {
@@ -260,10 +261,7 @@
             "noPlan": "Suas assinaturas e chaves de API"
         },
         "pitch": {
-            "plansWithOpencode": "Já usa Claude Code, Codex ou OpenCode? Seus coworkers podem rodar no seu plano.",
-            "plans": "Já usa Claude Code ou Codex? Seus coworkers podem rodar no seu plano.",
-            "plansWithoutClaudeWithOpencode": "Já usa Codex ou OpenCode? Seus coworkers podem rodar no seu plano.",
-            "plansWithoutClaude": "Já usa Codex? Seus coworkers podem rodar no seu plano do ChatGPT.",
+            "plans": "Já usa {tools}? Seus coworkers podem rodar no seu plano.",
             "keysWithCustom": "Pague direto ao seu provedor, por token, ou rode seu próprio modelo.",
             "keys": "Pague direto ao seu provedor, por token."
         },
@@ -383,6 +381,25 @@
             "refusedPlain": "O servidor recusou {model}.",
             "refusedUnnamedDetail": "O servidor recusou este modelo: {detail}",
             "refusedUnnamed": "O servidor recusou este modelo."
+        }
+    },
+    "grok": {
+        "codeStep": "Obtenha um código da xAI",
+        "approveStep": "Aprove-o na xAI",
+        "getCode": "Obter código",
+        "gettingCode": "Obtendo código…",
+        "newCode": "Obter um novo código",
+        "copyCode": "Copiar código",
+        "enterCode": "Digite-o na <link>página da xAI</link> e aprove. Esta janela detecta sozinha.",
+        "opening": "A xAI está abrindo em uma nova aba",
+        "plans": "Funciona com um plano do Grok que inclua o Grok Build, como o SuperGrok.",
+        "remarks": {
+            "connected": "Tudo pronto!",
+            "starting": "Obtendo um código",
+            "waiting": "Aguardando a xAI",
+            "expired": "Esse código expirou.",
+            "retry": "Vamos tentar de novo.",
+            "grabCode": "Primeiro obtenha um código."
         }
     }
 }

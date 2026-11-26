@@ -12,7 +12,7 @@ import { PLANS, PROVIDER_GLYPH } from './offer-plans'
 type ConnectedTranslator = ReturnType<typeof useTranslations<'dialogs.subscriptionOffer'>>
 
 function connectedCopy(provider: AddableProvider, t: ConnectedTranslator, tConnections: SourceCopy) {
-    if (provider === 'claude' || provider === 'codex') {
+    if (provider === 'claude' || provider === 'codex' || provider === 'grok') {
         const { name } = PLANS[provider]
         return { title: t('connected.title', { name }), detail: t('connected.planDetail', { name }) }
     }

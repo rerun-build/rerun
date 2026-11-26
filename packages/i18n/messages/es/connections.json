@@ -74,7 +74,8 @@
         "unavailable": {
             "opencodeRetired": "OpenCode ya no lo ofrece",
             "codexOutdated": "Codex CLI desactualizado en esta box",
-            "notInChatgptPlan": "No está en tu plan de ChatGPT"
+            "notInChatgptPlan": "No está en tu plan de ChatGPT",
+            "notInGrokPlan": "No incluido en tu plan de Grok"
         },
         "pricePerMillion": "{input} entrada · {output} salida /M",
         "guide": {
@@ -260,10 +261,7 @@
             "noPlan": "Tus suscripciones y claves API"
         },
         "pitch": {
-            "plansWithOpencode": "¿Ya usas Claude Code, Codex u OpenCode? Tus coworkers pueden funcionar con tu plan.",
-            "plans": "¿Ya usas Claude Code o Codex? Tus coworkers pueden funcionar con tu plan.",
-            "plansWithoutClaudeWithOpencode": "¿Ya usas Codex u OpenCode? Tus coworkers pueden funcionar con tu plan.",
-            "plansWithoutClaude": "¿Ya usas Codex? Tus coworkers pueden funcionar con tu plan de ChatGPT.",
+            "plans": "¿Ya usas {tools}? Tus coworkers pueden funcionar con tu plan.",
             "keysWithCustom": "Paga directamente a tu proveedor, por token, o usa tu propio modelo.",
             "keys": "Paga directamente a tu proveedor, por token."
         },
@@ -383,6 +381,25 @@
             "refusedPlain": "El servidor rechazó {model}.",
             "refusedUnnamedDetail": "El servidor rechazó este modelo: {detail}",
             "refusedUnnamed": "El servidor rechazó este modelo."
+        }
+    },
+    "grok": {
+        "codeStep": "Obtén un código de xAI",
+        "approveStep": "Apruébalo en xAI",
+        "getCode": "Obtener código",
+        "gettingCode": "Obteniendo código…",
+        "newCode": "Obtener un código nuevo",
+        "copyCode": "Copiar código",
+        "enterCode": "Introdúcelo en <link>la página de xAI</link> y apruébalo. Esta ventana lo detecta sola.",
+        "opening": "xAI se está abriendo en una pestaña nueva",
+        "plans": "Funciona con un plan de Grok que incluya Grok Build, como SuperGrok.",
+        "remarks": {
+            "connected": "¡Listo!",
+            "starting": "Obteniendo un código",
+            "waiting": "Esperando a xAI",
+            "expired": "Ese código caducó.",
+            "retry": "Probemos otra vez.",
+            "grabCode": "Primero obtén un código."
         }
     }
 }

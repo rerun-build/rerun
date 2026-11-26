@@ -5,7 +5,7 @@ import { createAiConnectionAction, deleteAiConnectionAction, listAiConnectionsAc
 import { invalidateLoadedAgentContexts } from '@/hooks/useAgentContext'
 import { connectionMethod, trackAiConnectionConnected, trackAiConnectionFailed } from '@/lib/engine/ai-connection-analytics'
 import type { BoxBackupModels, BoxConnection, BoxDefault, CreateBoxConnectionInput, UpdateBoxConnectionInput } from '@/lib/engine/types'
-import { NO_BOX_BACKUPS } from '@rerun/contracts'
+import { NO_BOX_BACKUPS, type Provider } from '@rerun/contracts'
 import type { AiConnectionSurface } from '@rerun/analytics'
 import { track } from '@rerun/analytics/client'
 import { useCallback, useEffect, useSyncExternalStore } from 'react'
@@ -21,10 +21,10 @@ import { useCallback, useEffect, useSyncExternalStore } from 'react'
 // Mutations update the shared list from the connection the engine echoes back, so a rename or a
 // model toggle lands without a second round-trip.
 
-type ConnectionsState = { connections: BoxConnection[]; boxDefault: BoxDefault | null; backups: BoxBackupModels; opencodeOffered: boolean; customOffered: boolean; loaded: boolean }
+type ConnectionsState = { connections: BoxConnection[]; boxDefault: BoxDefault | null; backups: BoxBackupModels; opencodeOffered: boolean; customOffered: boolean; grokOffered: boolean; loaded: boolean }
 
 // A shared constant, since useSyncExternalStore compares snapshots by reference.
-const EMPTY: ConnectionsState = { connections: [], boxDefault: null, backups: NO_BOX_BACKUPS, opencodeOffered: false, customOffered: false, loaded: false }
+const EMPTY: ConnectionsState = { connections: [], boxDefault: null, backups: NO_BOX_BACKUPS, opencodeOffered: false, customOffered: false, grokOffered: false, loaded: false }
 
 let snapshot: ConnectionsState = EMPTY
 const listeners = new Set<() => void>()
@@ -63,7 +63,7 @@ function fetchList({ fresh = false }: { fresh?: boolean } = {}): Promise<void> {
         .then(list => {
             if (asked < lastLanded) return
             lastLanded = asked
-            setState({ connections: list.connections, boxDefault: list.default, backups: list.backups, opencodeOffered: list.opencodeOffered, customOffered: list.customOffered, loaded: true })
+            setState({ connections: list.connections, boxDefault: list.default, backups: list.backups, opencodeOffered: list.opencodeOffered, customOffered: list.customOffered, grokOffered: list.grokOffered, loaded: true })
         })
         .catch(() => {})
         .finally(() => {
@@ -88,7 +88,7 @@ export function refreshWorkspaceConnections(): Promise<void> {
     refreshing = (async () => {
         if (inflight) await inflight
         const list = await refreshAiConnectionsAction()
-        if (list) setState({ connections: list.connections, boxDefault: list.default, backups: list.backups, opencodeOffered: list.opencodeOffered, customOffered: list.customOffered, loaded: true })
+        if (list) setState({ connections: list.connections, boxDefault: list.default, backups: list.backups, opencodeOffered: list.opencodeOffered, customOffered: list.customOffered, grokOffered: list.grokOffered, loaded: true })
     })().finally(() => {
         refreshing = null
     })
@@ -171,6 +171,17 @@ export function useWorkspaceConnections({ revalidate = false }: { revalidate?: b
         [refreshAndReresolve]
     )
 
+    // A sign-in the hub stored itself (Grok): nothing to send, only the list to read again, since the
+    // engine may have adopted it as the default and every agent re-reads what it runs on.
+    const signedIn = useCallback(
+        async (connectionId: string, provider: Provider, surface: AiConnectionSurface): Promise<BoxConnection | null> => {
+            trackAiConnectionConnected(provider, {}, surface)
+            await refreshAndReresolve()
+            return snapshot.connections.find(connection => connection.id === connectionId) ?? null
+        },
+        [refreshAndReresolve]
+    )
+
     // Refetches rather than only dropping the row: the engine releases every agent and automation
     // that named the connection, and clears the default when this was the one holding it.
     const remove = useCallback(
@@ -209,5 +220,5 @@ export function useWorkspaceConnections({ revalidate = false }: { revalidate?: b
         return result
     }, [])
 
-    return { connections: state.connections, boxDefault: state.boxDefault, backups: state.backups, setBackups, opencodeOffered: state.opencodeOffered, customOffered: state.customOffered, loading: !state.loaded, refresh, create, update, updateKeys, remove, setDefault }
+    return { connections: state.connections, boxDefault: state.boxDefault, backups: state.backups, setBackups, opencodeOffered: state.opencodeOffered, customOffered: state.customOffered, grokOffered: state.grokOffered, loading: !state.loaded, refresh, create, update, updateKeys, signedIn, remove, setDefault }
 }

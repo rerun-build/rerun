@@ -625,7 +625,8 @@
         "useApiKey": "API anahtarı kullan",
         "plans": {
             "claude": "Claude Pro veya Max",
-            "codex": "ChatGPT Plus veya Pro"
+            "codex": "ChatGPT Plus veya Pro",
+            "grok": "SuperGrok"
         },
         "decline": {
             "cloud": "{brand} kredileriyle devam edeyim",
@@ -644,7 +645,7 @@
             },
             "password": {
                 "label": "{brand} parolanızı asla görmez",
-                "description": "Onayı Claude'un veya OpenAI'ın kendi sayfasında verirsiniz, başka hiçbir yerde değil."
+                "description": "Bunu yalnızca sağlayıcınızın kendi sayfasında onaylarsınız."
             },
             "unplug": {
                 "label": "İstediğiniz zaman ayırın",

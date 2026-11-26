@@ -11,6 +11,8 @@ import type { TrackStep } from '@/components/connections/plan-connect/ForemanTra
 import { LetsGoButton } from '@/components/connections/plan-connect/step-bits'
 import { useClaudeOAuth } from '@/components/connections/use-claude-oauth'
 import { useCodexDeviceAuth } from '@/components/connections/use-codex-device-auth'
+import { GrokPlanSteps } from '@/components/connections/plan-connect/GrokPlanSteps'
+import { useGrokDeviceAuth, type GrokSignInTarget } from '@/components/connections/use-grok-device-auth'
 
 import { DeclineButton, OfferFooter } from './offer-footer'
 import { PLANS } from './offer-plans'
@@ -21,10 +23,13 @@ type PlanConnectStepProps = {
     onBack: () => void
     onSkip: () => void
     onKeys: (keys: Record<string, string>) => Promise<KeysResult>
+    onSignedIn: (connectionId: string) => Promise<KeysResult>
+    target: GrokSignInTarget
     onDone: () => void
 }
 
 export function PlanConnectStep({ provider, ...props }: PlanConnectStepProps) {
+    if (provider === 'grok') return <GrokPlanConnect {...props} />
     return provider === 'claude' ? <ClaudePlanConnect {...props} /> : <ChatGptPlanConnect {...props} />
 }
 
@@ -46,6 +51,16 @@ function ChatGptPlanConnect({ onBack, onSkip, onKeys, onDone }: ProviderConnectP
     return (
         <PlanConnectFrame provider="codex" connected={auth.phase === 'connected'} onBack={onBack} onSkip={onSkip}>
             <ChatGptPlanSteps auth={auth} lastStep={letsGo('codex', onDone, t)} />
+        </PlanConnectFrame>
+    )
+}
+
+function GrokPlanConnect({ onBack, onSkip, onSignedIn, target, onDone }: ProviderConnectProps) {
+    const t = useTranslations('dialogs.subscriptionOffer.plan')
+    const auth = useGrokDeviceAuth(onSignedIn, 'subscription_offer', target)
+    return (
+        <PlanConnectFrame provider="grok" connected={auth.phase === 'connected'} onBack={onBack} onSkip={onSkip}>
+            <GrokPlanSteps auth={auth} lastStep={letsGo('grok', onDone, t)} />
         </PlanConnectFrame>
     )
 }

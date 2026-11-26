@@ -528,6 +528,11 @@
                 "plan": "ChatGPT Plus veya Pro",
                 "hint": "ChatGPT hesabınızla oturum açın",
                 "nudge": "ChatGPT Plus veya Pro'nuz var mı?"
+            },
+            "grok": {
+                "plan": "SuperGrok",
+                "hint": "xAI hesabınızla giriş yapın",
+                "nudge": "SuperGrok'unuz var mı?"
             }
         },
         "hints": {
@@ -536,7 +541,8 @@
             "anthropic": "Claude modelleri",
             "openai": "GPT modelleri",
             "google": "Gemini modelleri",
-            "openrouter": "Tüm modeller"
+            "openrouter": "Tüm modeller",
+            "grok": "SuperGrok"
         },
         "pitchHeading": "Zaten ödediğiniz planla çalıştırın",
         "connect": "Bağla",

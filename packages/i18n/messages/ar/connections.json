@@ -74,7 +74,8 @@
         "unavailable": {
             "opencodeRetired": "لم يعد OpenCode يوفّره",
             "codexOutdated": "Codex CLI قديم على هذا الـ Box",
-            "notInChatgptPlan": "غير متاح في اشتراك ChatGPT"
+            "notInChatgptPlan": "غير متاح في اشتراك ChatGPT",
+            "notInGrokPlan": "غير مشمول في اشتراك Grok الخاص بك"
         },
         "pricePerMillion": "{input} إدخال · {output} إخراج /مليون",
         "guide": {
@@ -260,10 +261,7 @@
             "noPlan": "اشتراكاتك ومفاتيح API الخاصة بك"
         },
         "pitch": {
-            "plansWithOpencode": "تستخدم Claude Code أو Codex أو OpenCode بالفعل؟ يمكن لزملائك العمل على اشتراكك.",
-            "plans": "تستخدم Claude Code أو Codex بالفعل؟ يمكن لزملائك العمل على اشتراكك.",
-            "plansWithoutClaudeWithOpencode": "تستخدم Codex أو OpenCode بالفعل؟ يمكن لزملائك العمل على اشتراكك.",
-            "plansWithoutClaude": "تستخدم Codex بالفعل؟ يمكن لزملائك العمل على اشتراك ChatGPT.",
+            "plans": "هل تستخدم {tools} بالفعل؟ يمكن لزملائك العمل على اشتراكك.",
             "keysWithCustom": "ادفع لمزوّدك مباشرة، لكل رمز، أو شغّل نموذجك الخاص.",
             "keys": "ادفع لمزوّدك مباشرة، لكل رمز."
         },
@@ -383,6 +381,25 @@
             "refusedPlain": "رفض الخادم {model}.",
             "refusedUnnamedDetail": "رفض الخادم هذا النموذج: {detail}",
             "refusedUnnamed": "رفض الخادم هذا النموذج."
+        }
+    },
+    "grok": {
+        "codeStep": "احصل على رمز من xAI",
+        "approveStep": "وافق عليه في xAI",
+        "getCode": "احصل على الرمز",
+        "gettingCode": "جارٍ الحصول على الرمز…",
+        "newCode": "احصل على رمز جديد",
+        "copyCode": "انسخ الرمز",
+        "enterCode": "أدخله في <link>صفحة xAI</link> ووافق. ستلتقط هذه النافذة ذلك تلقائيًا.",
+        "opening": "يتم فتح xAI في علامة تبويب جديدة",
+        "plans": "يعمل مع اشتراك Grok يشمل Grok Build، مثل SuperGrok.",
+        "remarks": {
+            "connected": "كل شيء جاهز!",
+            "starting": "جارٍ الحصول على رمز",
+            "waiting": "في انتظار xAI",
+            "expired": "انتهت صلاحية هذا الرمز.",
+            "retry": "لنحاول مرة أخرى.",
+            "grabCode": "احصل على رمز أولًا."
         }
     }
 }

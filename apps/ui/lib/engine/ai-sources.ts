@@ -27,16 +27,24 @@ export function sourceKind(provider: string): SourceKind {
 
 // How a provider is connected, and therefore how it is connected again once its credential is
 // turned away. A comparison on the provider name alone sent OpenCode to Claude's sign-in.
-export type ConnectMethod = 'oauth-claude' | 'device-codex' | 'key'
+export type ConnectMethod = 'oauth-claude' | 'device-codex' | 'device-grok' | 'key'
 
 export function connectMethod(provider: string): ConnectMethod {
     if (provider === 'claude') return 'oauth-claude'
     if (provider === 'codex') return 'device-codex'
+    if (provider === 'grok') return 'device-grok'
     return 'key'
 }
 
+const PLAN_OF_METHOD: Record<Exclude<ConnectMethod, 'key'>, 'claude' | 'codex' | 'grok'> = { 'oauth-claude': 'claude', 'device-codex': 'codex', 'device-grok': 'grok' }
+
+// The subscription whose sign-in a connect method runs.
+export function signInProviderOf(method: Exclude<ConnectMethod, 'key'>): 'claude' | 'codex' | 'grok' {
+    return PLAN_OF_METHOD[method]
+}
+
 type PlanWindowCopy = 'session' | 'fiveHour' | 'weekly' | 'monthly' | 'modelWeekly' | 'modelWeeklyUnnamed' | 'monthlyCredit' | 'credit'
-type CliUnavailableCopy = 'opencodeRetired' | 'codexOutdated' | 'notInChatgptPlan'
+type CliUnavailableCopy = 'opencodeRetired' | 'codexOutdated' | 'notInChatgptPlan' | 'notInGrokPlan'
 
 export type SourceCopy = (
     key:
@@ -191,6 +199,7 @@ export function modelName(connectionId: string, model: string, brandName: string
 export function cliUnavailableReason(connection: Pick<BoxConnection, 'provider' | 'cliModels'> & Partial<Pick<BoxConnection, 'providerModels'>>, model: string, t: SourceCopy): string | undefined {
     if (!opencodeServesModel(connection.provider, connection.providerModels, model)) return t('sources.unavailable.opencodeRetired')
     if (cliServesModel(connection.provider, connection.cliModels, model)) return undefined
+    if (connection.provider === 'grok') return t('sources.unavailable.notInGrokPlan')
     return connection.cliModels?.outdated ? t('sources.unavailable.codexOutdated') : t('sources.unavailable.notInChatgptPlan')
 }
 

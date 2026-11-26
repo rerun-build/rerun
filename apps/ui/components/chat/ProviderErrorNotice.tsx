@@ -15,6 +15,9 @@ const ClaudeGlyph = ({ className }: { className?: string }) => <ProviderIcon pro
 const AnthropicGlyph = ({ className }: { className?: string }) => <ProviderIcon provider="anthropic" className={className} />
 const OpenAIGlyph = ({ className }: { className?: string }) => <ProviderIcon provider="openai" className={className} />
 const OpencodeGlyph = ({ className }: { className?: string }) => <ProviderIcon provider="opencode" className={className} />
+const GrokGlyph = ({ className }: { className?: string }) => <ProviderIcon provider="grok" className={className} />
+
+const PLAN_GLYPHS = { claude: ClaudeGlyph, anthropic: AnthropicGlyph, opencode: OpencodeGlyph, grok: GrokGlyph, chatgpt: OpenAIGlyph, openai: OpenAIGlyph } as const
 
 const ICONS: Record<NoticeKind, ComponentType<{ className?: string }>> = {
     usage_limit: GaugeIcon,
@@ -38,7 +41,7 @@ function header(kind: NoticeKind, message: string, fallbackTitle: string, tError
     if (kind !== 'usage_limit') return { title, icon: ICONS[kind] }
     const plan = describeSubscriptionLimit(message).plan
     if (!plan) return { title, icon: ICONS.usage_limit }
-    return { title, icon: plan === 'claude' ? ClaudeGlyph : plan === 'anthropic' ? AnthropicGlyph : plan === 'opencode' ? OpencodeGlyph : OpenAIGlyph }
+    return { title, icon: PLAN_GLYPHS[plan] }
 }
 
 // The dead end this replaces: a raw provider stack, or "A run is already in flight on this

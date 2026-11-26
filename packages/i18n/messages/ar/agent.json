@@ -528,6 +528,11 @@
                 "plan": "ChatGPT Plus أو Pro",
                 "hint": "سجّل الدخول بحساب ChatGPT",
                 "nudge": "لديك ChatGPT Plus أو Pro؟"
+            },
+            "grok": {
+                "plan": "SuperGrok",
+                "hint": "سجّل الدخول بحساب xAI الخاص بك",
+                "nudge": "هل لديك SuperGrok؟"
             }
         },
         "hints": {
@@ -536,7 +541,8 @@
             "anthropic": "نماذج Claude",
             "openai": "نماذج GPT",
             "google": "نماذج Gemini",
-            "openrouter": "كل النماذج"
+            "openrouter": "كل النماذج",
+            "grok": "SuperGrok"
         },
         "pitchHeading": "اعمل على الخطة التي تدفع مقابلها بالفعل",
         "connect": "ربط",

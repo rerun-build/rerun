@@ -74,7 +74,7 @@ export function buildControlCommands(gates: ControlGates, reasons: ControlReason
         command('workspace', 'settings', 'Workspace settings', ['name', 'logo', 'rename', 'delete'], adminReason),
         command('members', 'settings', 'Members', ['invite', 'team', 'seats', 'people', 'roles'], sandboxReason),
         BILLING_ENABLED && !gates.managed && command('billing', 'settings', 'Billing', ['plan', 'subscription', 'invoices', 'payment', 'upgrade', 'credits'], adminReason),
-        command('ai_providers', 'settings', 'AI providers', ['models', 'claude', 'chatgpt', 'openai', 'anthropic', 'api key', 'subscription']),
+        command('ai_providers', 'settings', 'AI providers', ['models', 'claude', 'chatgpt', 'grok', 'openai', 'anthropic', 'api key', 'subscription']),
         command('api_keys', 'settings', 'API keys & MCP', ['token', 'developer', 'mcp client'], apiReason, !gates.apiEntitled && !gates.apiLocked && !gates.managed),
         command('company_brain', 'settings', 'Company Brain', ['knowledge', 'wiki', 'pages', 'context']),
         command('shared_files', 'settings', 'Shared files', ['folder', 'documents', 'uploads']),

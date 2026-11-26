@@ -74,7 +74,8 @@
         "unavailable": {
             "opencodeRetired": "OpenCode artık sunmuyor",
             "codexOutdated": "Bu Box'taki Codex CLI eski",
-            "notInChatgptPlan": "ChatGPT planınızda yok"
+            "notInChatgptPlan": "ChatGPT planınızda yok",
+            "notInGrokPlan": "Grok planınıza dahil değil"
         },
         "pricePerMillion": "{input} giriş · {output} çıkış /M",
         "guide": {
@@ -260,10 +261,7 @@
             "noPlan": "Abonelikleriniz ve API anahtarlarınız"
         },
         "pitch": {
-            "plansWithOpencode": "Zaten Claude Code, Codex veya OpenCode kullanıyor musunuz? Coworker'larınız planınızla çalışabilir.",
-            "plans": "Zaten Claude Code veya Codex kullanıyor musunuz? Coworker'larınız planınızla çalışabilir.",
-            "plansWithoutClaudeWithOpencode": "Zaten Codex veya OpenCode kullanıyor musunuz? Coworker'larınız planınızla çalışabilir.",
-            "plansWithoutClaude": "Zaten Codex kullanıyor musunuz? Coworker'larınız ChatGPT planınızla çalışabilir.",
+            "plans": "Zaten {tools} kullanıyor musunuz? coworker'larınız planınızla çalışabilir.",
             "keysWithCustom": "Sağlayıcınıza token başına doğrudan ödeyin ya da kendi modelinizi çalıştırın.",
             "keys": "Sağlayıcınıza token başına doğrudan ödeyin."
         },
@@ -383,6 +381,25 @@
             "refusedPlain": "Sunucu {model} modelini reddetti.",
             "refusedUnnamedDetail": "Sunucu bu modeli reddetti: {detail}",
             "refusedUnnamed": "Sunucu bu modeli reddetti."
+        }
+    },
+    "grok": {
+        "codeStep": "xAI'den bir kod alın",
+        "approveStep": "xAI'de onaylayın",
+        "getCode": "Kod al",
+        "gettingCode": "Kod alınıyor…",
+        "newCode": "Yeni kod al",
+        "copyCode": "Kodu kopyala",
+        "enterCode": "Kodu <link>xAI sayfasına</link> girin ve onaylayın. Bu pencere bunu kendiliğinden algılar.",
+        "opening": "xAI yeni bir sekmede açılıyor",
+        "plans": "SuperGrok gibi Grok Build içeren bir Grok planıyla çalışır.",
+        "remarks": {
+            "connected": "Her şey hazır!",
+            "starting": "Kod alınıyor",
+            "waiting": "xAI bekleniyor",
+            "expired": "Bu kodun süresi doldu.",
+            "retry": "Tekrar deneyelim.",
+            "grabCode": "Önce bir kod alın."
         }
     }
 }
