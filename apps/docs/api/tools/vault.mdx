@@ -1,12 +1,12 @@
 ---
 title: "Vault"
-description: "Read the accounts, secrets and MCP servers your workspace keeps once for its coworkers, lend them out, rename and delete them."
+description: "Read the accounts, secrets and MCP servers your workspace keeps once for its coworkers, add apps and MCP servers, lend them out, rename and delete them."
 ---
 
 The [Vault](/vault) is where your workspace keeps the accounts and keys its coworkers share: the apps you signed in to, the secrets you added, the MCP servers you registered, and the accounts of paid apps. These tools act with the access of the member who created the key, the same rules as the app: see [Who can do what](/vault#who-can-do-what).
 
 <Warning>
-  No value ever comes out of the Vault, and none goes in. The tools name an entry, say whether it works and who holds it. Adding an entry, signing in to it and typing its credentials happen in the Rerun app, never through the API.
+  No value ever comes out of the Vault, and none goes in. The tools name an entry, say whether it works and who holds it. `add_vault_entry` adds an app or an MCP server without any credential; signing in to it and typing its credentials happen in the Rerun app, never through the API.
 </Warning>
 
 ## list_vault
@@ -19,7 +19,7 @@ Lists everything the Vault holds. Takes no parameter.
 | `entries` | The apps, MCP servers and secrets of the Vault |
 | `paidAccounts` | The accounts of paid apps, like LinkedIn Pro and WhatsApp Pro |
 | `coworkers` | The coworkers the key can see, with `canManage` when it may switch an entry on for them |
-| `canAdd` | Whether the key's member may add to the Vault, in the app |
+| `canAdd` | Whether the key's member may add to the Vault |
 | `isAdmin` | Whether the key's member is an admin |
 
 Each entry carries:
@@ -38,6 +38,44 @@ Each entry carries:
 | `canChange` | Whether the key's member may change it |
 
 A paid account carries its `id`, `slug`, `name`, `account`, `status` (`connected`, `connecting`, `needs_reconnect` or `paused`), `coworkers` and `hiddenCoworkers`.
+
+## add_vault_entry
+
+Adds an app or a custom MCP server to the Vault, lent at once to the coworkers you name, or to every coworker. No credential goes through this tool: the answer is the entry as `list_vault` shows it, and one whose `status` is `needs_auth` (a sign-in) or `needs_config` (a key) waits for the account owner to finish it in the app, in **Vault**.
+
+<ParamField body="kind" type="string" required>
+  `app` for an app of the library, `mcp` for a custom MCP server.
+</ParamField>
+
+<ParamField body="slug" type="string">
+  For `app`: the library slug, from `search_connectors`.
+</ParamField>
+
+<ParamField body="name" type="string">
+  For `mcp`: the name people read, like `Company docs`.
+</ParamField>
+
+<ParamField body="url" type="string">
+  For `mcp`: the https address of a remote server.
+</ParamField>
+
+<ParamField body="command" type="string">
+  For `mcp`: the command the machine starts, instead of a `url`.
+</ParamField>
+
+<ParamField body="args" type="string[]">
+  For `mcp` with a `command`: its arguments.
+</ParamField>
+
+<ParamField body="agentIds" type="string[]">
+  The coworkers to lend it to. Leave it out to keep it in the Vault for later.
+</ParamField>
+
+<ParamField body="sharedWithAll" type="boolean">
+  `true` to give it to every coworker, including the ones added later. Admins only.
+</ParamField>
+
+Lending to a coworker needs **Can manage** on its Box, as in the app. A secret, an MCP server that needs a key in a header and a paid app (LinkedIn Pro, WhatsApp Pro) are added in the app.
 
 ## attach_vault_entry
 

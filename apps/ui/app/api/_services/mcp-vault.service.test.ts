@@ -14,6 +14,8 @@ const mocks = vi.hoisted(() => ({
     attachVaultPaidAccount: vi.fn(),
     detachVaultPaidAccount: vi.fn(),
     dispatchShareTool: vi.fn(),
+    addVaultService: vi.fn(),
+    addVaultMcp: vi.fn(),
 }))
 
 class VaultUnavailableError extends Error {}
@@ -42,6 +44,7 @@ vi.mock('./vault-apps.service', () => ({
     attachVaultPaidAccount: mocks.attachVaultPaidAccount,
     detachVaultPaidAccount: mocks.detachVaultPaidAccount,
 }))
+vi.mock('./vault-install.service', () => ({ addVaultService: mocks.addVaultService, addVaultMcp: mocks.addVaultMcp }))
 vi.mock('./workspace-engine.service', () => ({ NoEngineError }))
 vi.mock('./mcp-shares.service', () => ({ dispatchShareTool: mocks.dispatchShareTool }))
 
@@ -276,5 +279,43 @@ describe('dispatchVaultTool', () => {
 
         await expect(dispatchVaultTool(ADMIN, 'list_agent_shares', {})).resolves.toEqual({ shares: [] })
         expect(mocks.dispatchShareTool).toHaveBeenCalledWith(ADMIN, 'list_agent_shares', {})
+    })
+})
+
+describe('add_vault_entry', () => {
+    const MEMBER: Actor = { kind: 'user', userId: 'member-1', workspaceId: 7, role: 'member', boxScope: 'all' }
+
+    beforeEach(() => {
+        mocks.addVaultService.mockResolvedValue({ status: 'needs_auth', item: { id: 'item-gmail' } })
+        mocks.addVaultMcp.mockResolvedValue({ id: 'item-gmail' })
+    })
+
+    it('adds an app with no value, lent to the coworkers named, and answers the entry as list_vault shows it', async () => {
+        await expect(dispatchVaultTool(MEMBER, 'add_vault_entry', { kind: 'app', slug: 'gmail', agentIds: ['agent-scout'] })).resolves.toMatchObject({ id: 'item-gmail', name: 'Gmail', coworkers: [{ id: 'agent-scout', name: 'Scout' }] })
+        expect(mocks.addVaultService).toHaveBeenCalledWith({ slug: 'gmail', agentIds: ['agent-scout'] }, MEMBER)
+        expect(mocks.shareVaultEntry).not.toHaveBeenCalled()
+    })
+
+    it('adds a custom MCP server and shares it with every coworker when asked', async () => {
+        await dispatchVaultTool(ADMIN, 'add_vault_entry', { kind: 'mcp', name: 'Company docs', url: 'https://docs.acme.test/mcp', sharedWithAll: true })
+        expect(mocks.addVaultMcp).toHaveBeenCalledWith({ name: 'Company docs', url: 'https://docs.acme.test/mcp', command: undefined, args: [], agentIds: [], sharedWithAll: true }, ADMIN)
+        expect(mocks.shareVaultEntry).not.toHaveBeenCalled()
+    })
+
+    it('shares an app with every coworker when asked', async () => {
+        await dispatchVaultTool(ADMIN, 'add_vault_entry', { kind: 'app', slug: 'gmail', sharedWithAll: true })
+        expect(mocks.shareVaultEntry).toHaveBeenCalledWith('item-gmail', true, ADMIN)
+    })
+
+    it('refuses to give an entry to every coworker for a member, before adding it', async () => {
+        await expect(dispatchVaultTool(MEMBER, 'add_vault_entry', { kind: 'mcp', name: 'Company docs', url: 'https://docs.acme.test/mcp', sharedWithAll: true })).rejects.toThrow('Only an admin')
+        expect(mocks.addVaultMcp).not.toHaveBeenCalled()
+        expect(mocks.shareVaultEntry).not.toHaveBeenCalled()
+    })
+
+    it('refuses a kind it does not know and an app without its slug', async () => {
+        await expect(dispatchVaultTool(ADMIN, 'add_vault_entry', { kind: 'secret' })).rejects.toThrow('kind')
+        await expect(dispatchVaultTool(ADMIN, 'add_vault_entry', { kind: 'app' })).rejects.toThrow('slug')
+        expect(mocks.addVaultService).not.toHaveBeenCalled()
     })
 })

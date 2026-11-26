@@ -2,11 +2,12 @@ import 'server-only'
 
 import { vaultAccountLabel } from '@rerun/contracts'
 
-import type { Actor } from '@/app/api/_auth/access'
-import { requireConfirmation, requireString } from '@/lib/mcp/args'
+import { isAdminActor, type Actor } from '@/app/api/_auth/access'
+import { asString, asStringArray, requireConfirmation, requireString } from '@/lib/mcp/args'
 import { dispatchShareTool } from './mcp-shares.service'
 import { attachVaultPaidAccount, detachVaultPaidAccount, vaultPaidAccounts, type VaultPaidAccount } from './vault-apps.service'
 import { attachVaultEntry, deleteVaultEntry, detachVaultEntry, listVault, renameVaultEntry, shareVaultEntry, VaultConflictError, VaultUnavailableError, type VaultCoworker, type VaultEntryView, type VaultListing } from './vault.service'
+import { addVaultMcp, addVaultService } from './vault-install.service'
 import { NoEngineError } from './workspace-engine.service'
 
 const UNAVAILABLE = {
@@ -90,10 +91,29 @@ async function namingTheClash<T>(actor: Actor, write: () => Promise<T>): Promise
 }
 
 // The entry once changed, as list_vault shows it.
-export async function entryAfter(actor: Actor, entryId: string) {
+async function entryAfter(actor: Actor, entryId: string) {
     const vault = await readVault(actor)
     if (!vault.available) return vault
     return vault.entries.find(entry => entry.id === entryId) ?? vault.paidAccounts.find(account => account.id === entryId) ?? null
+}
+
+// Added with the checks of the Vault's own Add page, then left for the user to sign in to: no value
+// ever comes through here.
+export async function addVaultEntry(actor: Actor, args: Record<string, unknown>) {
+    const agentIds = asStringArray(args.agentIds)
+    const kind = asString(args.kind)
+    const sharedWithAll = args.sharedWithAll === true
+    if (sharedWithAll && !isAdminActor(actor)) throw new Error('Only an admin gives an entry to every coworker. Add it for the coworkers you name instead, or ask an admin.')
+    let entryId: string
+    if (kind === 'app') {
+        entryId = (await addVaultService({ slug: requireString(args.slug, 'slug'), agentIds }, actor)).item.id
+        if (sharedWithAll) await shareVaultEntry(entryId, true, actor)
+    } else if (kind === 'mcp') {
+        entryId = (await addVaultMcp({ name: requireString(args.name, 'name'), url: asString(args.url), command: asString(args.command), args: asStringArray(args.args), agentIds, sharedWithAll }, actor)).id
+    } else {
+        throw new Error('kind must be "app" or "mcp".')
+    }
+    return entryAfter(actor, entryId)
 }
 
 async function attachEntry(actor: Actor, args: Record<string, unknown>) {
@@ -150,6 +170,8 @@ export async function dispatchVaultTool(actor: Actor, name: string, args: Record
     switch (name) {
         case 'list_vault':
             return readVault(actor)
+        case 'add_vault_entry':
+            return addVaultEntry(actor, args)
         case 'attach_vault_entry':
             return attachEntry(actor, args)
         case 'detach_vault_entry':

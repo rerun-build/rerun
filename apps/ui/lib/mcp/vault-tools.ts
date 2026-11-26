@@ -1,14 +1,33 @@
 // The Vault half of the account server: the accounts, secrets and MCP servers the workspace keeps
 // once and lends to its coworkers. Same audience and same rule as account-tools.ts: these
 // descriptions are the only documentation the calling model gets. What every tool here shares: no
-// value ever comes out of the Vault and none goes in, so adding an entry or typing its credentials
-// stays in the Rerun app.
+// value ever comes out of the Vault and none goes in, so signing an entry in or typing its
+// credentials stays in the Rerun app.
 export const VAULT_TOOL_DEFS = [
     {
         name: 'list_vault',
         description:
-            "The workspace's Vault: every app account, custom MCP server and secret it keeps once for its coworkers, and the paid app accounts (LinkedIn Pro, WhatsApp Pro). Each entry says whether it works (`status`: \"active\", \"needs_auth\" waiting for a sign-in, \"needs_config\" waiting for a credential), which coworkers hold it, or `sharedWithAll` when every coworker does, and `canChange` when this key may change it. Coworkers this key cannot see are only counted in `hiddenCoworkers`. `coworkers` lists the ones it can see, with `canManage` when it may lend them an entry. No value, variable name or token ever comes out. Adding an entry, signing it in and typing its credentials happen in the Rerun app (workspace menu, Vault), never here. A workspace whose machine keeps no Vault answers available: false; its apps are then connected coworker by coworker with attach_connector.",
+            "The workspace's Vault: every app account, custom MCP server and secret it keeps once for its coworkers, and the paid app accounts (LinkedIn Pro, WhatsApp Pro). Each entry says whether it works (`status`: \"active\", \"needs_auth\" waiting for a sign-in, \"needs_config\" waiting for a credential), which coworkers hold it, or `sharedWithAll` when every coworker does, and `canChange` when this key may change it. Coworkers this key cannot see are only counted in `hiddenCoworkers`. `coworkers` lists the ones it can see, with `canManage` when it may lend them an entry. No value, variable name or token ever comes out. Signing an entry in and typing its credentials happen in the Rerun app (workspace menu, Vault), never here: add_vault_entry adds an app or a custom MCP server without any. A workspace whose machine keeps no Vault answers available: false; its apps are then connected coworker by coworker with attach_connector.",
         inputSchema: { type: 'object', properties: {} },
+    },
+    {
+        name: 'add_vault_entry',
+        description:
+            'Add an entry to the Vault, lent at once to the coworkers you name, or to every coworker. kind "app" adds an app of the Rerun library by its slug (from search_connectors); kind "mcp" adds a custom MCP server, by its https address or by the command the machine starts. No credential ever goes through here. The answer is the entry as list_vault shows it: one whose status is needs_auth (a sign-in) or needs_config (a key) waits on the account owner, who finishes it in the Rerun app (workspace menu, Vault); never ask anyone for the credential yourself. A secret, an API key, a custom MCP server that needs a key in a header, and a paid app (LinkedIn Pro, WhatsApp Pro) are added in the app, not here. Lending to a coworker needs Can manage on its Box.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                kind: { type: 'string', enum: ['app', 'mcp'] },
+                slug: { type: 'string', description: 'For kind app: the library slug.' },
+                name: { type: 'string', description: 'For kind mcp: what people read, like "Company docs".' },
+                url: { type: 'string', description: 'For kind mcp: the https address of a remote server.' },
+                command: { type: 'string', description: 'For kind mcp: the command the machine starts, instead of a url.' },
+                args: { type: 'array', items: { type: 'string' }, description: 'For kind mcp with a command: its arguments.' },
+                agentIds: { type: 'array', items: { type: 'string' }, description: 'The coworkers to lend it to, from list_vault. Leave it out to keep it in the Vault for later.' },
+                sharedWithAll: { type: 'boolean', description: 'True to give it to every coworker, including the ones added later. Admins only.' },
+            },
+            required: ['kind'],
+        },
     },
     {
         name: 'attach_vault_entry',

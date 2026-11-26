@@ -4,9 +4,7 @@ import { isAdminActor, type Actor } from '@/app/api/_auth/access'
 import { workspaceFounderUserId } from '@/app/api/_auth/ownership'
 import { earliestOrganizationStaff } from '@/app/api/_auth/workspace-members'
 import { dispatchAccountTool } from '@/app/api/_services/mcp-account.service'
-import { entryAfter } from '@/app/api/_services/mcp-vault.service'
-import { addVaultMcp, addVaultService } from '@/app/api/_services/vault-install.service'
-import { shareVaultEntry } from '@/app/api/_services/vault.service'
+import { addVaultEntry } from '@/app/api/_services/mcp-vault.service'
 import { dispatchBoxTool } from '@/lib/foreman/box-tools'
 import { dispatchInboxTool } from '@/lib/foreman/inbox-tools'
 import { FOREMAN_ENGINE_HUB_TOOL_NAMES, FOREMAN_ENGINE_ONBOARDING_TOOL_NAMES, accountToolNameOf } from '@/lib/foreman/engine-brief'
@@ -83,25 +81,6 @@ async function saveCompanyWebsite(actor: Actor, args: Record<string, unknown>) {
     const userId = actor.kind === 'user' ? actor.userId : await founderOf(workspaceId)
     const answers = await saveCompanySite({ supabase, workspaceId, userId }, site)
     return { saved: true, url: site.url, company: site.profile, next: `${site.profile ? 'Say in one sentence what you understood of their company.' : 'The site could not be read: say so in one short line, and never invent what they do.'} ${firstCoworkersOffer(answers)}` }
-}
-
-// Added with the checks of the Vault's own Add page, then left for the user to sign in to: no value
-// ever comes through here.
-async function addVaultEntry(actor: Actor, args: Record<string, unknown>) {
-    const agentIds = asStringArray(args.agentIds)
-    const kind = asString(args.kind)
-    const sharedWithAll = args.sharedWithAll === true
-    if (sharedWithAll && !isAdminActor(actor)) throw new Error('Only an admin gives an entry to every coworker. Add it for the coworkers you name instead, or ask an admin.')
-    let entryId: string
-    if (kind === 'app') {
-        entryId = (await addVaultService({ slug: requireString(args.slug, 'slug'), agentIds }, actor)).item.id
-        if (sharedWithAll) await shareVaultEntry(entryId, true, actor)
-    } else if (kind === 'mcp') {
-        entryId = (await addVaultMcp({ name: requireString(args.name, 'name'), url: asString(args.url), command: asString(args.command), args: asStringArray(args.args), agentIds, sharedWithAll }, actor)).id
-    } else {
-        throw new Error('kind must be "app" or "mcp".')
-    }
-    return entryAfter(actor, entryId)
 }
 
 const MAX_INVITES = 10
