@@ -80,7 +80,7 @@ Keep every secret stable once set: changing one invalidates what it already sign
 | `FOREMAN_HUB_TOKEN_SECRET` | Generated | empty | Signs the token the Chief of Staff calls the app with. |
 | `FOREMAN_HUB_TOKEN_REQUIRED` | Optional | `1` in `.env.example` | With `FOREMAN_HUB_TOKEN_SECRET` set, the app refuses a Chief of Staff call without a valid token. `0` lets such a call through and logs it. Leave it at `1`. |
 | `BOARD_IMAGE_SECRET` | Generated | empty | Signs the board images the app captures for sharing and for emails. |
-| `MOBILE_OAUTH_TICKET_SECRET` | Generated | empty | Signs the short-lived context of every OAuth sign-in to an app (catalog apps, MCP servers, Composio, managed sign-in), from the browser, the desktop app or the mobile app, and the Claude and ChatGPT sign-ins started from the mobile app. Without it, those sign-ins fail with "MOBILE_OAUTH_TICKET_SECRET is not configured on this server." |
+| `MOBILE_OAUTH_TICKET_SECRET` | Generated | empty | Signs the short-lived context of every OAuth sign-in to an app (catalog apps, MCP servers, Composio, managed sign-in), from the browser, the desktop app or the mobile app, the Claude and ChatGPT sign-ins started from the mobile app, and the Grok sign-in wherever it is started, the browser included. Without it, those sign-ins fail with "MOBILE_OAUTH_TICKET_SECRET is not configured on this server." |
 | `UNSUBSCRIBE_SECRET` | Generated | empty | Signs the unsubscribe link of notification emails. See [Email](#email). |
 | `PUBLISHED_ACCESS_SECRET` | With `PUBLISH_HOST` | empty | Signs access to published pages. See [Published files and pages](#published-files-and-pages). |
 
