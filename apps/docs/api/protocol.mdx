@@ -137,7 +137,7 @@ A result over 200,000 characters comes back the same way: refused with an `isErr
 
 ### Authentication errors
 
-A key that does not authenticate is the one case that is not JSON-RPC at all: `401 Unauthorized` with a plain text body, before any parsing happens. That covers a missing header, a token that does not start with `rk_`, an unknown or revoked key, a workspace whose subscription is over on Rerun Cloud, and a workspace on [AppSumo Tier 1](/billing#appsumo-tiers). See [Authentication](/api/authentication#errors).
+A key that does not authenticate is the one case that is not JSON-RPC at all: `401 Unauthorized` with a plain text body, before any parsing happens. That covers a missing header, a token that does not start with `rk_`, an unknown or revoked key, and a workspace whose subscription is over on Rerun Cloud. See [Authentication](/api/authentication#errors).
 
 ## Destructive tools
 
