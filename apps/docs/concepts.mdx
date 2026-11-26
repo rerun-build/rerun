@@ -38,6 +38,8 @@ Boxes arrange coworkers, the machine runs them all: the shared folder and the sh
 Rerun backs up the machine of every paid workspace each night: the coworkers, their memories, skills and sessions, the files, the shared database and the Vault. A backup is encrypted and stored away from the machine.
 
 - It is taken during the night of your time zone, at 02:00 UTC until Rerun knows it. The coworkers pause while it is taken, usually less than a minute, and a coworker in the middle of a run is never cut off: the backup waits for the run to end.
+- When your coworkers work through the whole night, the backup is taken the next day, at the first moment none of them is running.
+- A drive a coworker mounts on the machine (pCloud, Google Drive, Dropbox…) is not in the backup: its files stay on that service.
 - Each backup is kept for 7 days, and the one of the night from Saturday to Sunday for 4 weeks.
 - A workspace in its trial or paused is not backed up. A paused workspace is saved once, for 90 days: see [Cancelling](/billing#cancelling).
 - The backups are not in the app. If something went wrong on your machine, write to [help@rerun.build](mailto:help@rerun.build) and we restore it.
