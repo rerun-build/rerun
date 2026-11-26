@@ -1,7 +1,7 @@
 'use client'
 
 import { useChat } from '@ai-sdk/react'
-import { FOREMAN_AGENT_ID, FOREMAN_INTENT_PART, isToolPart, sleep, toolNameOf, type ForemanIntent } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, FOREMAN_INTENT_PART, isToolPart, sleep, toolNameOf, turnOpenerId, type ForemanIntent } from '@rerun/contracts'
 import { DefaultChatTransport, type UIMessage } from 'ai'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
@@ -450,16 +450,16 @@ export function useForemanChat() {
     const regenerate = useCallback(
         (messageId: string) => {
             setRunErrorOf(null)
-            void regenerateEngine({ messageId })
+            void regenerateEngine({ messageId: turnOpenerId(engineLive.current.messages, messageId) ?? messageId })
         },
         [regenerateEngine]
     )
 
     // The failed turn's message is already in the conversation, on screen and on the engine:
-    // regenerating sends it again without a second bubble, dropping whatever partial answer followed.
+    // regenerating from it sends it again without a second bubble, dropping every step that followed.
     const retryLastTurn = useCallback(() => {
         setRunErrorOf(null)
-        void regenerateEngine()
+        void regenerateEngine({ messageId: turnOpenerId(engineLive.current.messages) })
     }, [regenerateEngine])
 
     // A stream being chased is not a failure yet: the error only shows once the chase gave up.

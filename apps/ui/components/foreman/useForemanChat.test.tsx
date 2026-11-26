@@ -12,12 +12,15 @@ const mocks = vi.hoisted(() => ({
     reReadAgentsChangedBy: vi.fn(),
     onFinish: null as ((finish: Finish) => void) | null,
     reconnect: null as (() => RunReconnectTarget | null) | null,
+    engineMessages: [] as { id: string; role: string; parts: unknown[] }[],
+    regenerateEngine: vi.fn(),
 }))
 
 vi.mock('@ai-sdk/react', () => ({
     useChat: (options: { id: string; onFinish?: (finish: Finish) => void }) => {
-        if (options.id.startsWith('engine-')) mocks.onFinish = options.onFinish ?? null
-        return { messages: [], status: 'ready', error: undefined, setMessages: vi.fn(), sendMessage: vi.fn(), addToolResult: vi.fn(), stop: vi.fn(), resumeStream: vi.fn(), clearError: vi.fn(), regenerate: vi.fn() }
+        const engine = options.id.startsWith('engine-')
+        if (engine) mocks.onFinish = options.onFinish ?? null
+        return { messages: engine ? mocks.engineMessages : [], status: 'ready', error: undefined, setMessages: vi.fn(), sendMessage: vi.fn(), addToolResult: vi.fn(), stop: vi.fn(), resumeStream: vi.fn(), clearError: vi.fn(), regenerate: engine ? mocks.regenerateEngine : vi.fn() }
     },
 }))
 vi.mock('@/hooks/useRunReconnect', () => ({
@@ -43,12 +46,14 @@ const UPDATE = { type: 'tool-update_agent', toolName: 'update_agent', toolCallId
 let root: Root | null = null
 
 async function mountChat() {
+    const chat = { current: null as ReturnType<typeof useForemanChat> | null }
     function Chat() {
-        useForemanChat()
+        chat.current = useForemanChat()
         return null
     }
     root = createRoot(document.createElement('div'))
     await act(async () => root!.render(createElement(Chat)))
+    return chat
 }
 
 describe('useForemanChat re-reading the coworkers a turn changed', () => {
@@ -85,5 +90,36 @@ describe('useForemanChat re-reading the coworkers a turn changed', () => {
         act(() => useForemanStore.getState().setEngineRunId('run-1'))
         expect(await mocks.reconnect!()!.fetchMessages()).toEqual(messages)
         expect(mocks.reReadAgentsChangedBy).toHaveBeenCalledWith([UPDATE, answer])
+    })
+})
+
+// A turn read back from the engine is one message per step: aimed at its last step, the SDK's
+// regenerate sends an empty text and the hub answers 400 "Missing message text" (RER-222).
+describe('useForemanChat regenerating a turn read back from the engine', () => {
+    beforeEach(() => {
+        mocks.regenerateEngine.mockReset()
+        mocks.engineMessages = [
+            { id: 'u1', role: 'user', parts: [{ type: 'text', text: 'Install Ubersuggest too' }] },
+            { id: 'u1-step1', role: 'assistant', parts: [] },
+            { id: 'u1-step2', role: 'assistant', parts: [] },
+            { id: 'u1-step3', role: 'assistant', parts: [] },
+        ]
+    })
+    afterEach(() => {
+        act(() => root?.unmount())
+        root = null
+        mocks.engineMessages = []
+    })
+
+    it('retries the failed turn from its user message', async () => {
+        const chat = await mountChat()
+        act(() => chat.current!.retryLastTurn())
+        expect(mocks.regenerateEngine).toHaveBeenCalledWith({ messageId: 'u1' })
+    })
+
+    it('regenerates a step from the user message of its turn', async () => {
+        const chat = await mountChat()
+        act(() => chat.current!.regenerate('u1-step2'))
+        expect(mocks.regenerateEngine).toHaveBeenCalledWith({ messageId: 'u1' })
     })
 })

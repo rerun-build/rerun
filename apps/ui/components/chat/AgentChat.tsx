@@ -81,7 +81,7 @@ import { isClaudePlanOffered, isLifetimePlan } from '@rerun/cloud/billing'
 import { createClient } from '@/supabase/client'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { useChat } from '@ai-sdk/react'
-import { COWORKER_STARTER_SUGGESTIONS, ORGANIZATION_AUTHOR_ID, paidDataSourcesByTurn, RERUN_CONNECTION_ID, runUsesScreen, screenSite } from '@rerun/contracts'
+import { COWORKER_STARTER_SUGGESTIONS, ORGANIZATION_AUTHOR_ID, paidDataSourcesByTurn, RERUN_CONNECTION_ID, runUsesScreen, screenSite, turnOpenerId } from '@rerun/contracts'
 import { track } from '@rerun/analytics/client'
 import { AnimatePresence, motion } from 'motion/react'
 import { DefaultChatTransport } from 'ai'
@@ -893,7 +893,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
 
     // Inline, this arrow would be a new prop on every render and would defeat MessageView's memo
     // for every message of the conversation.
-    const handleRegenerate = useCallback((messageId: string) => regenerate({ messageId }), [regenerate])
+    const handleRegenerate = useCallback((messageId: string) => regenerate({ messageId: turnOpenerId(messagesRef.current, messageId) ?? messageId }), [regenerate])
     const messageFeedback = useMessageFeedback(sessionId)
     const continueInterruptedRun = useCallback(() => sendMessage({ text: t('continueWhereLeftOff') }), [sendMessage, t])
 
@@ -939,13 +939,13 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
         onResumeNow: resumeStalled ? pickTaskBackUp : undefined,
     }
     // The failed turn's message is already in the conversation, on screen and on the engine:
-    // regenerating sends it again without a second bubble, dropping whatever partial answer followed.
+    // regenerating from it sends it again without a second bubble, dropping every step that followed.
     const retryLastTurn = useCallback(() => {
         if (sendingRef.current || status === 'submitted' || status === 'streaming') return
         sendingRef.current = true
         lastSentTextRef.current = null
         lastSendQueuedRef.current = false
-        void regenerate()
+        void regenerate({ messageId: turnOpenerId(messagesRef.current) })
     }, [regenerate, status])
     const canRetry = messages.some(message => message.role === 'user')
 
