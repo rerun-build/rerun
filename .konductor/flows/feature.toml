@@ -15,8 +15,13 @@ attach_issue = true
 prompt = """
 Passe la carte Linear {{issue.identifier}} en In Progress avec le MCP Linear si elle n'y est pas déjà.
 Le ticket complet est dans {{issue.file}}.
-Vérifie que la feature n'existe pas déjà, puis fais un render lab de preview (`app/render/lab/<sujet>`) avec 2 ou 3
-variantes, et donne-moi l'URL et les captures.
+Vérifie que la feature n'existe pas déjà, puis fais un render lab de preview (`cloud/apps/admin/app/render/lab/<sujet>`)
+avec 2 ou 3 variantes, et donne-moi l'URL et les captures.
+Le serveur du lab tourne toujours sur ce Mac, jamais sur deb1 ni Namespace (un tunnel qui se coupe oblige à tout
+relancer), sans poser « Où tester ? » et sans toucher à `remote prefer` : lance en arrière-plan
+`remote run --platform local --no-queue -- 'export ADMIN_PORT=$((CONDUCTOR_PORT + 2)); pnpm cloud env:local >/dev/null 2>&1; [ -f cloud/apps/admin/.env.local ] || cp apps/ui/.env cloud/apps/admin/.env.local; pnpm --dir cloud/apps/admin dev'`,
+puis vérifie avec curl que `http://localhost:<ADMIN_PORT>/render/lab/<sujet>` répond 200 avant de donner l'URL, et
+laisse-le tourner.
 Après chaque version, demande avec AskUserQuestion : « Validé, on planifie » ou « Encore une itération ». Ne termine
 jamais ton tour sans cette question, sauf quand je choisis « Validé, on planifie » : la fin de ton tour lance l'étape suivante.
 """
