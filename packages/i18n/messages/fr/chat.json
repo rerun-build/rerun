@@ -8,6 +8,28 @@
         "notNow": "Plus tard",
         "copiedExclaim": "Copié !"
     },
+    "messageActions": {
+        "edit": "Modifier",
+        "regenerate": "Régénérer",
+        "copy": "Copier",
+        "copyLink": "Copier le lien",
+        "link": "Lien",
+        "delete": "Supprimer",
+        "editHint": "Les réponses après ce message sont remplacées.",
+        "cancel": "Annuler",
+        "send": "Envoyer",
+        "copied": "Message copié",
+        "linkCopied": "Lien copié",
+        "deleted": "Message supprimé",
+        "deleteTitle": "Supprimer ce message ?",
+        "deleteUserDescription": "{name} ne le verra plus non plus. Les réponses restent dans la conversation.",
+        "deleteReplyDescription": "Il disparaît de la conversation, et {name} ne le verra plus non plus.",
+        "voiceNotEditable": "Un message vocal ne peut pas être modifié.",
+        "busy": "Attendez la fin de la réponse avant de modifier un message.",
+        "engineOutdated": "Mettez à jour la machine de ce workspace pour modifier les messages.",
+        "notReady": "Ce message est encore en cours d'enregistrement. Réessayez dans un instant.",
+        "failed": "Le message n'a pas pu être modifié. Réessayez."
+    },
     "sources": {
         "used": "{count, plural, one {# source utilisée} other {# sources utilisées}}"
     },

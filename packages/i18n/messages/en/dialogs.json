@@ -566,6 +566,13 @@
             "closeTab": "Close active tab",
             "sendMessage": "Send message",
             "newLine": "New line",
+            "selectMessage": "Select a message",
+            "editMessage": "Edit the selected message",
+            "regenerateReply": "Regenerate the selected reply",
+            "copyMessage": "Copy the selected message",
+            "copyMessageLink": "Copy a link to the selected message",
+            "deleteMessage": "Delete the selected message",
+            "deselectMessage": "Clear the selection",
             "previousFile": "Previous file",
             "nextFile": "Next file"
         }

@@ -480,6 +480,13 @@
             "closeTab": "Fermer l'onglet actif",
             "sendMessage": "Envoyer le message",
             "newLine": "Nouvelle ligne",
+            "selectMessage": "Sélectionner un message",
+            "editMessage": "Modifier le message sélectionné",
+            "regenerateReply": "Régénérer la réponse sélectionnée",
+            "copyMessage": "Copier le message sélectionné",
+            "copyMessageLink": "Copier un lien vers le message sélectionné",
+            "deleteMessage": "Supprimer le message sélectionné",
+            "deselectMessage": "Annuler la sélection",
             "previousFile": "Fichier précédent",
             "nextFile": "Fichier suivant"
         }

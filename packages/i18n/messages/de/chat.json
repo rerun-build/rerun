@@ -8,6 +8,28 @@
         "notNow": "Nicht jetzt",
         "copiedExclaim": "Kopiert!"
     },
+    "messageActions": {
+        "edit": "Bearbeiten",
+        "regenerate": "Neu generieren",
+        "copy": "Kopieren",
+        "copyLink": "Link kopieren",
+        "link": "Link",
+        "delete": "Löschen",
+        "editHint": "Die Antworten nach dieser Nachricht werden ersetzt.",
+        "cancel": "Abbrechen",
+        "send": "Senden",
+        "copied": "Nachricht kopiert",
+        "linkCopied": "Link kopiert",
+        "deleted": "Nachricht gelöscht",
+        "deleteTitle": "Diese Nachricht löschen?",
+        "deleteUserDescription": "Auch {name} sieht sie dann nicht mehr. Die Antworten bleiben in der Unterhaltung.",
+        "deleteReplyDescription": "Sie verschwindet aus der Unterhaltung, und auch {name} sieht sie nicht mehr.",
+        "voiceNotEditable": "Eine Sprachnachricht kann nicht bearbeitet werden.",
+        "busy": "Warte, bis die Antwort fertig ist, bevor du eine Nachricht änderst.",
+        "engineOutdated": "Aktualisiere die Maschine dieses Workspace, um Nachrichten zu bearbeiten.",
+        "notReady": "Diese Nachricht wird noch gespeichert. Versuch es gleich noch einmal.",
+        "failed": "Die Nachricht konnte nicht geändert werden. Versuch es erneut."
+    },
     "sources": {
         "used": "{count, plural, one {# Quelle} other {# Quellen}} genutzt"
     },

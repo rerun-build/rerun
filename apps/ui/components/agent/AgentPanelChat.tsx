@@ -134,6 +134,8 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
     // even when its tab was already open and scrolled up. Counted per conversation so a tab's count
     // never moves unless it is the one being opened.
     const [arrivals, setArrivals] = useState<Record<string, number>>({})
+    // The message a link to it named, per conversation: selected once it opens.
+    const [focusMessages, setFocusMessages] = useState<Record<string, string>>({})
     const arriveAt = useCallback(
         (sessionId: string) => {
             stay()
@@ -145,6 +147,8 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
     useEffect(() => {
         if (!pendingOpenSession || pendingOpenSession.agentId !== agentId) return
         setKickoffRun({ sessionId: pendingOpenSession.sessionId, runId: pendingOpenSession.runId })
+        const { sessionId: opened, messageId } = pendingOpenSession
+        if (messageId) setFocusMessages(prev => ({ ...prev, [opened]: messageId }))
         arriveAt(pendingOpenSession.sessionId)
         openTab(pendingOpenSession.sessionId, pendingOpenSession.title ?? NEW_THREAD_TITLE)
         clearPendingOpenSession()
@@ -344,6 +348,7 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
                             onSessionCreated={(id) => handleSessionCreated(tab.uid, id)}
                             initialRunId={tab.id && tab.id === kickoffRun?.sessionId ? kickoffRun.runId : null}
                             arrival={tab.id ? arrivals[tab.id] : undefined}
+                            focusMessageId={tab.id ? focusMessages[tab.id] : undefined}
                             setup={isGeneralTab(tab) ? undefined : setup}
                             onSetupSkipped={setup.skip}
                             onOpenInstall={openInstall}

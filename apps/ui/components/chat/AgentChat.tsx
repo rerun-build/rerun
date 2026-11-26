@@ -30,6 +30,7 @@ import { MessageFeedbackDialog } from '@/components/chat/MessageFeedbackDialog'
 import { AuthoredGroup } from '@/components/chat/AuthoredGroup'
 import { ChatTimeSeparator } from '@/components/chat/ChatTimeSeparator'
 import { MessageView } from '@/components/chat/MessageView'
+import { useMessageActions } from '@/components/chat/message-actions/useMessageActions'
 import { ServiceSuggestionBlock } from '@/components/services/ServiceSuggestionBlock'
 import { SpendRequestBlock } from '@/components/chat/spend/SpendRequestBlock'
 import { useMentionComputers } from '@/components/computers/useMentionComputers'
@@ -86,7 +87,7 @@ import { track } from '@rerun/analytics/client'
 import { AnimatePresence, motion } from 'motion/react'
 import { DefaultChatTransport } from 'ai'
 import { useTranslations } from 'next-intl'
-import type { ReactNode } from 'react'
+import type { KeyboardEvent, ReactNode } from 'react'
 import { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { scrollFadeMask, useScrollEdges } from '@rerun/ui/primitives'
 import { toast } from 'sonner'
@@ -115,6 +116,8 @@ type AgentChatProps = {
     // Bumped each time the conversation is opened from somewhere else (a notification, the inbox):
     // it then lands on its latest message, or on the top of the question it is waiting on.
     arrival?: number
+    // A link to one message opened the conversation: it is selected and brought into view.
+    focusMessageId?: string
     mentionAgents?: MentionAgent[]
     // `null` while the agent's skills are not read yet.
     mentionSkills?: { slug: string; name: string; description?: string }[] | null
@@ -142,7 +145,7 @@ type AgentChatProps = {
     aboveComposer?: ReactNode
 }
 
-export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionPending = false, onSessionCreated, initialRunId, arrival = 0, mentionAgents = [], mentionSkills = [], sessionWorking = false, sessionIdle = false, alertPending = false, body, header, suppressEmptyState = false, setup, onSetupSkipped, onOpenInstall, onRunFinished, onSessionInserted, onSessionStatusChange, onMessageSent, onNewConversation, threads, onOpenThread, composerPlaceholder, aboveComposer }: AgentChatProps) {
+export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionPending = false, onSessionCreated, initialRunId, arrival = 0, focusMessageId, mentionAgents = [], mentionSkills = [], sessionWorking = false, sessionIdle = false, alertPending = false, body, header, suppressEmptyState = false, setup, onSetupSkipped, onOpenInstall, onRunFinished, onSessionInserted, onSessionStatusChange, onMessageSent, onNewConversation, threads, onOpenThread, composerPlaceholder, aboveComposer }: AgentChatProps) {
     const t = useTranslations('chat.agentChat')
     const tHitlCue = useTranslations('chat.hitlCue')
     const { workspace, user, organizationStaff } = useSession()
@@ -891,9 +894,33 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
         })()
     }, [attachRunId, initialRunId, active, sessionId, agentId, resumeStream, setMessages, showReplayedRunError])
 
+    // A message edited or a reply asked again: the engine drops the message and what followed, and
+    // the message of the user is sent again in its place.
+    const replayTurn = useCallback(
+        (options: { body: { replaceFrom: string } }) => {
+            if (sendingRef.current || status === 'submitted' || status === 'streaming') return
+            sendingRef.current = true
+            lastSentTextRef.current = null
+            lastSendQueuedRef.current = false
+            void regenerate(options)
+        },
+        [regenerate, status]
+    )
+    const stopFollowing = useCallback(() => conversationRef.current?.stopScroll(), [])
+    const messageActions = useMessageActions({ active, agentId, agentName, sessionId, messages, setMessages, replay: replayTurn, busy: status === 'submitted' || status === 'streaming', rootRef: chatRootRef, stopFollowing, inputRef, focusMessageId, arrival, error, clearError })
     // Inline, this arrow would be a new prop on every render and would defeat MessageView's memo
     // for every message of the conversation.
-    const handleRegenerate = useCallback((messageId: string) => regenerate({ messageId: turnOpenerId(messagesRef.current, messageId) ?? messageId }), [regenerate])
+    const { regenerateReply: handleRegenerate, onComposerKeyDown } = messageActions
+    const composerTextareaProps = useMemo(
+        () => ({
+            ...mentionTextareaProps,
+            onKeyDown: (event: KeyboardEvent<HTMLTextAreaElement>) => {
+                mentionTextareaProps.onKeyDown(event)
+                onComposerKeyDown(event)
+            },
+        }),
+        [mentionTextareaProps, onComposerKeyDown]
+    )
     const messageFeedback = useMessageFeedback(sessionId)
     const continueInterruptedRun = useCallback(() => sendMessage({ text: t('continueWhereLeftOff') }), [sendMessage, t])
 
@@ -1052,7 +1079,8 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
                                     const hitlCall = hitlCallBefore(messages, mi)
                                     const spendReply = hitlCallKind(hitlCall) === 'spend'
                                     const branches = threadBranches(threadRows.after.get(mi))
-                                    const view = (
+                                    const view = messageActions.wrap(
+                                        message,
                                         <MessageView
                                             key={message.id}
                                             message={message}
@@ -1070,7 +1098,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
                                             onSendMessage={sendMessage}
                                             onDraftReply={draftReply}
                                             showQuickReplies={isLast && !showLoader && !pendingHitl && !pendingAlert && displayedError === null}
-                                            onRegenerate={isLast && pendingHitl ? undefined : handleRegenerate}
+                                            onRegenerate={(isLast && pendingHitl) || messageActions.selectedId === message.id ? undefined : handleRegenerate}
                                             onRateMessage={sessionId ? messageFeedback.rate : undefined}
                                             feedbackRating={messageFeedback.votes.get(message.id)?.rating ?? null}
                                             skillProposals={skillProposals.proposals}
@@ -1143,6 +1171,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
                     </div>
                     <ConversationScrollButton pending={pendingCue} />
                 </Conversation>
+                {messageActions.dialog}
                 <MessageFeedbackDialog open={messageFeedback.dialogOpen} rating={messageFeedback.dialogRating} onOpenChange={messageFeedback.onDialogOpenChange} onSubmit={messageFeedback.submitDetails} />
 
                 {mentionMenu && mentionMenuPlace && <div className="absolute" style={mentionMenuPlace}>{mentionMenu}</div>}
@@ -1185,7 +1214,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
                                 </motion.div>
                             ) : (
                                 <motion.div key="composer" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }} className="overflow-hidden pb-px">
-                                    <ChatComposer ref={composerRef} uid={uid} active={active} placeholder={composerPlaceholder} uploadTarget={uploadTarget} status={status} busy={showLoader} onSend={text => sendMessage({ text })} onSent={() => onMessageSentRef.current?.()} onStop={handleStop} onUploadingChange={setUploading} queue={{ text: queued?.text ?? null, pending: stopping, enqueue: enqueueFromComposer, onSendNow: () => void sendQueuedNow(), onDiscard: clearQueued }} gate={{ ready: modelReady, onBlocked: blockSend, hint: modelHint }} modelSlot={<ModelSelector agentId={agentId} conversationId={conversationId} pickerKey={uid} onPicked={handlePicked} onReadyChange={setModelReady} onOwnConnectionChange={setHasOwnConnection} onConnectionChange={setActiveConnectionId} onRefusedModelChange={setRefusedModel} />} contextSlot={contextStats && <Context usedTokens={contextStats.used} maxTokens={contextStats.max ?? modelContextWindow(contextStats.model, contextStats.provider)} usage={contextStats.usage} modelId={contextStats.model} />} textareaRef={inputRef} textareaProps={mentionTextareaProps} mentionTokens={mentionTokens} commands={mentionCommands} />
+                                    <ChatComposer ref={composerRef} uid={uid} active={active} placeholder={composerPlaceholder} uploadTarget={uploadTarget} status={status} busy={showLoader} onSend={text => sendMessage({ text })} onSent={() => onMessageSentRef.current?.()} onStop={handleStop} onUploadingChange={setUploading} queue={{ text: queued?.text ?? null, pending: stopping, enqueue: enqueueFromComposer, onSendNow: () => void sendQueuedNow(), onDiscard: clearQueued }} gate={{ ready: modelReady, onBlocked: blockSend, hint: modelHint }} modelSlot={<ModelSelector agentId={agentId} conversationId={conversationId} pickerKey={uid} onPicked={handlePicked} onReadyChange={setModelReady} onOwnConnectionChange={setHasOwnConnection} onConnectionChange={setActiveConnectionId} onRefusedModelChange={setRefusedModel} />} contextSlot={contextStats && <Context usedTokens={contextStats.used} maxTokens={contextStats.max ?? modelContextWindow(contextStats.model, contextStats.provider)} usage={contextStats.usage} modelId={contextStats.model} />} textareaRef={inputRef} textareaProps={composerTextareaProps} mentionTokens={mentionTokens} commands={mentionCommands} />
                                     <ComposerSubscriptionCta open={!hasOwnConnection} claudePlanOffered={isClaudePlanOffered(workspace)} onClick={connectSubscription} />
                                 </motion.div>
                             )}

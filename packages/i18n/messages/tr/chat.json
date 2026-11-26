@@ -8,6 +8,28 @@
         "notNow": "Şimdi değil",
         "copiedExclaim": "Kopyalandı!"
     },
+    "messageActions": {
+        "edit": "Düzenle",
+        "regenerate": "Yeniden oluştur",
+        "copy": "Kopyala",
+        "copyLink": "Bağlantıyı kopyala",
+        "link": "Bağlantı",
+        "delete": "Sil",
+        "editHint": "Bu mesajdan sonraki yanıtlar değiştirilir.",
+        "cancel": "İptal",
+        "send": "Gönder",
+        "copied": "Mesaj kopyalandı",
+        "linkCopied": "Bağlantı kopyalandı",
+        "deleted": "Mesaj silindi",
+        "deleteTitle": "Bu mesaj silinsin mi?",
+        "deleteUserDescription": "{name} de artık bu mesajı görmeyecek. Yanıtlar konuşmada kalır.",
+        "deleteReplyDescription": "Mesaj konuşmadan kaldırılır ve {name} de artık onu görmez.",
+        "voiceNotEditable": "Sesli mesaj düzenlenemez.",
+        "busy": "Bir mesajı değiştirmeden önce yanıtın bitmesini bekleyin.",
+        "engineOutdated": "Mesajları düzenlemek için bu çalışma alanının makinesini güncelleyin.",
+        "notReady": "Bu mesaj hâlâ kaydediliyor. Birazdan tekrar deneyin.",
+        "failed": "Mesaj değiştirilemedi. Tekrar deneyin."
+    },
     "sources": {
         "used": "{count, plural, one {# kaynak kullanıldı} other {# kaynak kullanıldı}}"
     },

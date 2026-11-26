@@ -480,6 +480,13 @@
             "closeTab": "Aktiven Tab schließen",
             "sendMessage": "Nachricht senden",
             "newLine": "Neue Zeile",
+            "selectMessage": "Nachricht auswählen",
+            "editMessage": "Ausgewählte Nachricht bearbeiten",
+            "regenerateReply": "Ausgewählte Antwort neu generieren",
+            "copyMessage": "Ausgewählte Nachricht kopieren",
+            "copyMessageLink": "Link zur ausgewählten Nachricht kopieren",
+            "deleteMessage": "Ausgewählte Nachricht löschen",
+            "deselectMessage": "Auswahl aufheben",
             "previousFile": "Vorherige Datei",
             "nextFile": "Nächste Datei"
         }

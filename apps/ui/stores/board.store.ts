@@ -124,7 +124,7 @@ type BoardState = {
     boxChoice: CreationRequest | null
     startingFirstAgent: boolean
     pendingSelectAgentId: string | null
-    pendingOpenSession: { agentId: string; sessionId: string; runId: string | null; title?: string } | null
+    pendingOpenSession: { agentId: string; sessionId: string; runId: string | null; title?: string; messageId?: string } | null
     _resizingSpaceId: string | null
     // La Box dont le déplacement s'écrit encore : le realtime ne doit pas la ramener, ni ses agents.
     _movingSpaceId: string | null
@@ -145,7 +145,7 @@ type BoardState = {
     setStartingFirstAgent: (v: boolean) => void
     finalizeAgentCreation: (agentId: string, description?: string, kickoff?: string) => void
     sendPendingKickoff: (agentId?: string) => Promise<{ agentId: string; sessionId: string } | null>
-    setPendingOpenSession: (open: { agentId: string; sessionId: string; runId: string | null; title?: string }) => void
+    setPendingOpenSession: (open: { agentId: string; sessionId: string; runId: string | null; title?: string; messageId?: string }) => void
     clearPendingOpenSession: () => void
     pushPlacement: (pos: GridPosition, spaceId: string | null) => { positions: GridPosition[]; done: boolean } | null
     confirmPlacement: (pos: GridPosition, viewer: BoxViewer) => void
@@ -276,7 +276,7 @@ const initialState = {
     boxChoice: null as CreationRequest | null,
     startingFirstAgent: false,
     pendingSelectAgentId: null as string | null,
-    pendingOpenSession: null as { agentId: string; sessionId: string; runId: string | null; title?: string } | null,
+    pendingOpenSession: null as { agentId: string; sessionId: string; runId: string | null; title?: string; messageId?: string } | null,
     _resizingSpaceId: null,
     _movingSpaceId: null,
     spaceGrants: [] as SpaceGrant[],

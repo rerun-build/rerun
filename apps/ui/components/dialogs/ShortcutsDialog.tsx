@@ -9,7 +9,7 @@ import { useShortcutsStore } from '@/stores/shortcuts.store'
 import { useForemanName } from '@/hooks/useForemanName'
 import { useTranslations } from 'next-intl'
 
-type ShortcutAction = 'controlCenter' | 'askRerun' | 'holdToTalk' | 'searchInPage' | 'newConversation' | 'closeTab' | 'sendMessage' | 'newLine' | 'previousFile' | 'nextFile'
+type ShortcutAction = 'controlCenter' | 'askRerun' | 'holdToTalk' | 'searchInPage' | 'newConversation' | 'closeTab' | 'sendMessage' | 'newLine' | 'selectMessage' | 'editMessage' | 'regenerateReply' | 'copyMessage' | 'copyMessageLink' | 'deleteMessage' | 'deselectMessage' | 'previousFile' | 'nextFile'
 type Shortcut = { keys: string[]; action: ShortcutAction }
 type ShortcutGroup = { title: 'general' | 'chat' | 'files'; shortcuts: Shortcut[] }
 
@@ -31,6 +31,13 @@ function buildGroups(mod: string): ShortcutGroup[] {
                 { keys: [mod, '⌫'], action: 'closeTab' },
                 { keys: ['Enter'], action: 'sendMessage' },
                 { keys: ['Shift', 'Enter'], action: 'newLine' },
+                { keys: ['↑', '↓'], action: 'selectMessage' },
+                { keys: ['E'], action: 'editMessage' },
+                { keys: ['R'], action: 'regenerateReply' },
+                { keys: ['C'], action: 'copyMessage' },
+                { keys: ['L'], action: 'copyMessageLink' },
+                { keys: ['⌫'], action: 'deleteMessage' },
+                { keys: ['Esc'], action: 'deselectMessage' },
             ],
         },
         {

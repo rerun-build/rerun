@@ -24,6 +24,7 @@ type AgentSheetChatProps = {
     onSessionCreated: (id: string) => void
     initialRunId?: string | null
     arrival?: number
+    focusMessageId?: string
     setup?: { pending: boolean; prompt: string; skipped: boolean; sessionId: string | null }
     onSetupSkipped?: () => void
     onOpenInstall?: (sessionId: string) => void
@@ -37,7 +38,7 @@ type AgentSheetChatProps = {
     aboveComposer?: ReactNode
 }
 
-export function AgentSheetChat({ uid, active, agentId, sessionId, sessionPending, onSessionCreated, initialRunId, arrival, setup, onSetupSkipped, onOpenInstall, onRunFinished, onNewConversation, kind, title, threads, onOpenThread, aboveComposer }: AgentSheetChatProps) {
+export function AgentSheetChat({ uid, active, agentId, sessionId, sessionPending, onSessionCreated, initialRunId, arrival, focusMessageId, setup, onSetupSkipped, onOpenInstall, onRunFinished, onNewConversation, kind, title, threads, onOpenThread, aboveComposer }: AgentSheetChatProps) {
     const t = useTranslations('agent')
     const boardAgents = useBoardStore(s => s.agents)
     const spaces = useBoardStore(s => s.spaces)
@@ -110,6 +111,7 @@ export function AgentSheetChat({ uid, active, agentId, sessionId, sessionPending
             onSessionCreated={onSessionCreated}
             initialRunId={initialRunId}
             arrival={arrival}
+            focusMessageId={focusMessageId}
             mentionAgents={mentionAgents}
             mentionSkills={mentionSkills}
             sessionWorking={sessionWorking}

@@ -480,6 +480,13 @@
             "closeTab": "關閉目前分頁",
             "sendMessage": "傳送訊息",
             "newLine": "換行",
+            "selectMessage": "選取訊息",
+            "editMessage": "編輯選取的訊息",
+            "regenerateReply": "重新產生選取的回覆",
+            "copyMessage": "複製選取的訊息",
+            "copyMessageLink": "複製選取訊息的連結",
+            "deleteMessage": "刪除選取的訊息",
+            "deselectMessage": "取消選取",
             "previousFile": "上一個檔案",
             "nextFile": "下一個檔案"
         }

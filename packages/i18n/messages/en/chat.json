@@ -1,5 +1,10 @@
 {
     "_context": {
+        "messageActions.link": "Short label of a toolbar button that copies a link to a chat message.",
+        "messageActions.editHint": "Under the field where the user edits a message they sent: sending it removes every message that came after it and the coworker answers again.",
+        "messageActions.deleteUserDescription": "{name} is the coworker's name. The message deleted is one the user wrote.",
+        "messageActions.deleteReplyDescription": "{name} is the coworker's name. The message deleted is one of the coworker's replies.",
+        "messageActions.engineOutdated": "The machine is the server that runs the workspace's coworkers.",
         "activity.buildingCoworkers": "What the onboarding is doing right now: building several AI coworkers, and how many are done.",
         "activity.runningTool": "What the coworker is doing right now. {tool} is the name of a step, e.g. 'Web Search'.",
         "activity.waitingOn": "The coworker waits for another coworker it called. {name} is that coworker's name.",
@@ -124,6 +129,28 @@
         "continue": "Continue",
         "notNow": "Not now",
         "copiedExclaim": "Copied!"
+    },
+    "messageActions": {
+        "edit": "Edit",
+        "regenerate": "Regenerate",
+        "copy": "Copy",
+        "copyLink": "Copy link",
+        "link": "Link",
+        "delete": "Delete",
+        "editHint": "The replies after this message are replaced.",
+        "cancel": "Cancel",
+        "send": "Send",
+        "copied": "Message copied",
+        "linkCopied": "Link copied",
+        "deleted": "Message deleted",
+        "deleteTitle": "Delete this message?",
+        "deleteUserDescription": "{name} will no longer see it either. The replies stay in the conversation.",
+        "deleteReplyDescription": "It leaves the conversation, and {name} will no longer see it either.",
+        "voiceNotEditable": "A voice message cannot be edited.",
+        "busy": "Wait for the reply to finish before changing a message.",
+        "engineOutdated": "Update the machine of this workspace to edit messages.",
+        "notReady": "This message is still being saved. Try again in a moment.",
+        "failed": "The message could not be changed. Try again."
     },
     "sources": {
         "used": "Used {count, plural, one {# source} other {# sources}}"

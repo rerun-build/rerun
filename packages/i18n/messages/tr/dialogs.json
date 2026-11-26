@@ -480,6 +480,13 @@
             "closeTab": "Etkin sekmeyi kapat",
             "sendMessage": "Mesaj gönder",
             "newLine": "Yeni satır",
+            "selectMessage": "Bir mesaj seç",
+            "editMessage": "Seçili mesajı düzenle",
+            "regenerateReply": "Seçili yanıtı yeniden oluştur",
+            "copyMessage": "Seçili mesajı kopyala",
+            "copyMessageLink": "Seçili mesajın bağlantısını kopyala",
+            "deleteMessage": "Seçili mesajı sil",
+            "deselectMessage": "Seçimi temizle",
             "previousFile": "Önceki dosya",
             "nextFile": "Sonraki dosya"
         }

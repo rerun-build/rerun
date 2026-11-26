@@ -480,6 +480,13 @@
             "closeTab": "إغلاق التبويب النشط",
             "sendMessage": "إرسال الرسالة",
             "newLine": "سطر جديد",
+            "selectMessage": "تحديد رسالة",
+            "editMessage": "تعديل الرسالة المحددة",
+            "regenerateReply": "إعادة إنشاء الرد المحدد",
+            "copyMessage": "نسخ الرسالة المحددة",
+            "copyMessageLink": "نسخ رابط الرسالة المحددة",
+            "deleteMessage": "حذف الرسالة المحددة",
+            "deselectMessage": "إلغاء التحديد",
             "previousFile": "الملف السابق",
             "nextFile": "الملف التالي"
         }

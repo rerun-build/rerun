@@ -1,7 +1,7 @@
 'use client'
 
 import { useBrand } from '@/components/brand/BrandProvider'
-import { isWhiteLabel } from '@rerun/contracts'
+import { isWhiteLabel, MESSAGE_LINK_PARAM, SESSION_LINK_PARAM } from '@rerun/contracts'
 import { confirmTemplatePurchaseAction } from '@rerun/cloud/marketplace.client'
 import { EngineWaitlistDialog } from '@/components/dialogs/EngineWaitlistDialog'
 import { BuilderView } from '@/components/builder/BuilderView'
@@ -304,6 +304,14 @@ export function HomeContent({ initialSpaces = [], initialWorkspaceId = null }: {
         const agentId = searchParams.get('agent')
         if (!agentId || agentLinkOpened.current || !hydrated) return
         agentLinkOpened.current = true
+        // A link copied from a message of a conversation: that conversation opens on that message.
+        const sessionId = searchParams.get(SESSION_LINK_PARAM)
+        if (sessionId) {
+            useBoardStore.getState().openAgentChat(agentId)
+            useBoardStore.getState().setPendingOpenSession({ agentId, sessionId, runId: null, messageId: searchParams.get(MESSAGE_LINK_PARAM) ?? undefined })
+            clearSearchParams('agent', SESSION_LINK_PARAM, MESSAGE_LINK_PARAM)
+            return
+        }
         const tab = searchParams.get('tab')
         useBoardStore.getState().openAgentTab(agentId, AGENT_FOCUS_TABS.includes(tab as AgentFocusTab) ? (tab as AgentFocusTab) : 'chat')
         clearSearchParams('agent', 'tab')

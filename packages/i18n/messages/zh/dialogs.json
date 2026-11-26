@@ -480,6 +480,13 @@
             "closeTab": "关闭当前标签页",
             "sendMessage": "发送消息",
             "newLine": "换行",
+            "selectMessage": "选择消息",
+            "editMessage": "编辑所选消息",
+            "regenerateReply": "重新生成所选回复",
+            "copyMessage": "复制所选消息",
+            "copyMessageLink": "复制所选消息的链接",
+            "deleteMessage": "删除所选消息",
+            "deselectMessage": "清除选择",
             "previousFile": "上一个文件",
             "nextFile": "下一个文件"
         }
