@@ -1,6 +1,6 @@
-import { appendAttachmentsRef, appendVoiceMarker, buildAttachmentsRef, buildVoiceMarker, encodePeaks } from '@rerun/contracts'
+import { appendAttachmentsRef, appendVoiceMarker, buildAttachmentsRef, buildVoiceMarker, encodePeaks, prependQuote } from '@rerun/contracts'
 
-import { userTextOf, voiceOf } from '@/components/chat/message-text'
+import { quoteOf, userTextOf, voiceOf } from '@/components/chat/message-text'
 
 describe('message view', () => {
     it('shows what the person wrote, without the markers the hub reads', () => {
@@ -8,6 +8,16 @@ describe('message view', () => {
         expect(userTextOf({ id: 'u', role: 'user', parts: [{ type: 'text', text: withFiles }] })).toBe('Here is the deck')
         const spoken = appendVoiceMarker('Call them back', buildVoiceMarker({ src: 'chat-uploads/v.m4a', durationMs: 1200, levels: [0.2, 0.4] }))
         expect(userTextOf({ id: 'u', role: 'user', parts: [{ type: 'text', text: spoken }] })).toBe('Call them back')
+    })
+
+    it('reads the passage a reply quotes apart from what the person wrote', () => {
+        const quote = { from: 'Nova', messageId: 'engine-a1', text: '7 are hiring right now' }
+        const reply = { id: 'u', role: 'user' as const, parts: [{ type: 'text' as const, text: prependQuote('Which ones?', quote) }] }
+        expect(quoteOf(reply)).toEqual(quote)
+        expect(userTextOf(reply)).toBe('Which ones?')
+        const spoken = { id: 'u', role: 'user' as const, parts: [{ type: 'text' as const, text: prependQuote(appendVoiceMarker('Call them', buildVoiceMarker({ src: 'chat-uploads/v.m4a', durationMs: 1200, levels: [0.2] })), quote) }] }
+        expect(voiceOf(spoken)?.transcript).toBe('Call them')
+        expect(quoteOf({ id: 'u', role: 'user', parts: [{ type: 'text', text: 'Hello' }] })).toBeNull()
     })
 
     it('reads a voice message from the marker of the message just sent, attachments after it', () => {

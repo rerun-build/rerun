@@ -114,6 +114,8 @@ const SCREENS: { label: string; href: Href }[] = [
     { label: 'Chat, streaming', href: '/lab-chat?tabs=3&active=1&state=streaming' },
     { label: 'Chat, loading', href: '/lab-chat?tabs=3&active=1&state=loading' },
     { label: 'Chat, approval', href: '/lab-chat?tabs=3&active=1&state=approval' },
+    { label: 'Reply by quoting', href: '/lab-quote' },
+    { label: 'Reply by quoting, dark', href: '/lab-quote?scheme=dark' },
     { label: 'Threads, General', href: '/lab-threads' },
     { label: 'Threads, General, dark', href: '/lab-threads?scheme=dark' },
     { label: 'Threads, General with no message yet', href: '/lab-threads?general=empty' },

@@ -1,4 +1,4 @@
-import type { MessageFeedbackRating } from '@rerun/contracts'
+import { plainQuoteOf, type MessageFeedbackRating, type MessageQuote } from '@rerun/contracts'
 import * as Clipboard from 'expo-clipboard'
 import { useMemo, useState, type ReactNode } from 'react'
 import { Pressable, Share, View, type ViewStyle } from 'react-native'
@@ -22,6 +22,7 @@ import { AuthedImage } from './cards/CardParts'
 import { LinkMessageScope } from './link-origin'
 import { Markdown } from './Markdown'
 import { MessageTimeReveal, type MessageStamp } from './MessageTimeReveal'
+import { QuoteCard, SwipeToQuote } from './QuoteReply'
 import { splitIntoBubbles } from './markdown/blocks'
 
 const THUMB = 120
@@ -64,7 +65,8 @@ function ExpandableText({ children }: { children: ReactNode }) {
 // `children` takes the text's place inside the bubble: a voice message draws its player there.
 // `footer` sits under the bubble, outside the tap that brings the time up, so its buttons answer alone.
 // The tap that brings the time up lives inside the right-aligned column, so only the bubble answers it.
-export function UserBubble({ text, media, owner = null, stamp, children, footer }: { text: string; media?: ViewerItem[]; owner?: FileOwner | null; stamp?: MessageStamp; children?: ReactNode; footer?: ReactNode }) {
+// `messageId` lets the bubble be swiped to quote it; `quote` is the passage the message replies to.
+export function UserBubble({ text, media, owner = null, stamp, children, footer, messageId, quote }: { text: string; media?: ViewerItem[]; owner?: FileOwner | null; stamp?: MessageStamp; children?: ReactNode; footer?: ReactNode; messageId?: string; quote?: MessageQuote | null }) {
     const theme = useTheme()
     const t = useTranslations('mobileChat.messages')
     const photos = media?.filter(isImageItem) ?? []
@@ -90,14 +92,18 @@ export function UserBubble({ text, media, owner = null, stamp, children, footer 
                             </AppText>
                         </Pressable>
                     ))}
-                    {(children || text.length > 0) && (
-                        <View style={{ backgroundColor: brand.base, borderRadius: radius.xl, borderBottomRightRadius: 6, borderCurve: 'continuous', paddingHorizontal: children ? spacing.md : spacing.lg, paddingVertical: children ? spacing.sm : spacing.md - 2 }}>
-                            {children ?? (
-                                <ExpandableText>
-                                    <Markdown text={text} surface="brand" owner={owner} shortLinks />
-                                </ExpandableText>
-                            )}
-                        </View>
+                    {(children || text.length > 0 || quote) && (
+                        <SwipeToQuote side="user" messageId={messageId ?? ''} text={text}>
+                            <View style={{ backgroundColor: brand.base, borderRadius: radius.xl, borderBottomRightRadius: 6, borderCurve: 'continuous', paddingHorizontal: children ? spacing.md : spacing.lg, paddingVertical: children ? spacing.sm : spacing.md - 2 }}>
+                                {quote && <QuoteCard quote={quote} />}
+                                {children ??
+                                    (text.length > 0 && (
+                                        <ExpandableText>
+                                            <Markdown text={text} surface="brand" owner={owner} shortLinks />
+                                        </ExpandableText>
+                                    ))}
+                            </View>
+                        </SwipeToQuote>
                     )}
                 </View>
             </MessageTimeReveal>
@@ -117,7 +123,7 @@ export function Action({ symbol, label, onPress, selected }: { symbol: IconName;
 
 // An answer drawn as a stack of bubbles, one per beat, the way the web's `MessageBubbles` cuts it: a
 // code block, a table or an image alone stands bare at full width.
-function AssistantBubbles({ text, streaming, owner }: { text: string; streaming: boolean; owner: FileOwner | null }) {
+function AssistantBubbles({ text, streaming, owner, messageId }: { text: string; streaming: boolean; owner: FileOwner | null; messageId?: string }) {
     const theme = useTheme()
     const bubbles = useMemo(() => splitIntoBubbles(text), [text])
     const frames: Record<'bubble' | 'bare' | 'media', ViewStyle> = {
@@ -127,12 +133,21 @@ function AssistantBubbles({ text, streaming, owner }: { text: string; streaming:
     }
     return (
         <View style={{ alignItems: 'flex-start', gap: BUBBLE_GAP }}>
-            {bubbles.map((bubble, i) => (
+            {bubbles.map((bubble, i) => {
                 // Keyed by position: a stream only ever grows the last bubble or opens a new one after it.
-                <View key={i} style={frames[bubble.frame]}>
-                    <Markdown text={bubble.markdown} streaming={streaming && i === bubbles.length - 1} surface={bubble.frame === 'bubble' ? 'bubble' : 'page'} owner={owner} />
-                </View>
-            ))}
+                const frame = (
+                    <View key={i} style={frames[bubble.frame]}>
+                        <Markdown text={bubble.markdown} streaming={streaming && i === bubbles.length - 1} surface={bubble.frame === 'bubble' ? 'bubble' : 'page'} owner={owner} />
+                    </View>
+                )
+                // A code block or a table scrolls sideways: only a bubble of prose is swiped to quote it.
+                if (bubble.frame !== 'bubble' || !messageId) return frame
+                return (
+                    <SwipeToQuote key={i} side="assistant" messageId={messageId} text={plainQuoteOf(bubble.markdown)}>
+                        {frame}
+                    </SwipeToQuote>
+                )
+            })}
         </View>
     )
 }
@@ -143,7 +158,7 @@ type AnswerActions = {
     onRate?: (rating: MessageFeedbackRating) => void
 }
 
-export function AssistantMessage({ text, showActions, streaming = false, owner = null, actions }: { text: string; showActions: boolean; streaming?: boolean; owner?: FileOwner | null; actions?: AnswerActions }) {
+export function AssistantMessage({ text, showActions, streaming = false, owner = null, actions, messageId }: { text: string; showActions: boolean; streaming?: boolean; owner?: FileOwner | null; actions?: AnswerActions; messageId?: string }) {
     const t = useTranslations('mobileChat.messages')
     const plain = text.replace(/\*\*/g, '')
     const rate = (rating: MessageFeedbackRating) => {
@@ -153,7 +168,7 @@ export function AssistantMessage({ text, showActions, streaming = false, owner =
     return (
         <View style={{ gap: spacing.xs }}>
             <LinkMessageScope text={text}>
-                <AssistantBubbles text={text} streaming={streaming} owner={owner} />
+                <AssistantBubbles text={text} streaming={streaming} owner={owner} messageId={messageId} />
             </LinkMessageScope>
             {showActions && (
                 <View style={{ flexDirection: 'row', marginLeft: -spacing.sm }}>

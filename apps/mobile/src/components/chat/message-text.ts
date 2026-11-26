@@ -1,9 +1,15 @@
-import { attachmentDisplayName, decodePeaks, messageText, parseAttachments, parseVoiceMessage, stripAttachmentsRef, stripVoiceMarker, type VoiceMessage } from '@rerun/contracts'
+import { attachmentDisplayName, decodePeaks, messageText, parseAttachments, parseQuote, parseVoiceMessage, stripAttachmentsRef, stripQuote, stripVoiceMarker, type MessageQuote, type VoiceMessage } from '@rerun/contracts'
 import type { UIMessage } from 'ai'
 
-// What the person sent, without the markers the hub reads: attached paths and the voice recording.
+// What the person sent, without the markers the hub reads: the passage a reply quotes, attached paths
+// and the voice recording.
 export function userTextOf(message: UIMessage): string {
-    return stripAttachmentsRef(stripVoiceMarker(messageText(message))).trim()
+    return stripAttachmentsRef(stripVoiceMarker(stripQuote(messageText(message)))).trim()
+}
+
+// The passage a reply quotes, at the head of its text: the hub keeps it there, metadata or not.
+export function quoteOf(message: UIMessage): MessageQuote | null {
+    return parseQuote(messageText(message))?.quote ?? null
 }
 
 // The files a message carried: from the transcript's metadata, or from the paths its text names.
@@ -20,6 +26,6 @@ type StoredVoice = { transcript: string; src: string; durationMs: number; peaks?
 export function voiceOf(message: UIMessage): VoiceMessage | null {
     const stored = (message.metadata as { voice?: StoredVoice } | undefined)?.voice
     if (stored) return { transcript: stored.transcript, src: stored.src, durationMs: stored.durationMs, peaks: decodePeaks(stored.peaks ?? '') }
-    const text = messageText(message)
+    const text = stripQuote(messageText(message))
     return parseVoiceMessage(parseAttachments(text)?.text ?? text)
 }

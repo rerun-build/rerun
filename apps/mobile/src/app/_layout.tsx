@@ -151,6 +151,7 @@ function App() {
                                             <Stack.Screen name="lab-chat" />
                                             <Stack.Screen name="lab-perf" />
                                             <Stack.Screen name="lab-threads" />
+                                            <Stack.Screen name="lab-quote" />
                                             <Stack.Screen name="lab-message-times" />
                                             <Stack.Screen name="lab-icons" />
                                             <Stack.Screen name="lab-controls" />

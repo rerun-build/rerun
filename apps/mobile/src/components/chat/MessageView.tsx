@@ -20,7 +20,7 @@ import { Sources, type Source } from './cards/Sources'
 import { FileCardView } from './cards/FileCardView'
 import { TableCardView } from './cards/TableCardView'
 import { ApprovalReceipt, CancelledReceipt, McpReceipt, QuestionReceipt, SecretReceipt, ServiceReceipt, SpendReceipt, TakeoverReceipt, FeatureRequestReceipt } from './hitl/Receipts'
-import { attachmentsOf, userTextOf, voiceOf } from './message-text'
+import { attachmentsOf, quoteOf, userTextOf, voiceOf } from './message-text'
 import { InstallDivider, JobEndDivider, ScheduledRunDivider, WebhookRunDivider } from './origins/RunOrigins'
 import { ParagraphSelectable } from './Markdown'
 import { AssistantMessage, UserBubble } from './Messages'
@@ -147,9 +147,10 @@ function MessageViewContent({ message, isLastAssistant, running, settled = false
         const stored = fileOwner ? attachmentsOf(message).map(({ name, path }) => ({ url: ownedFileUrl(fileOwner, path), name })) : []
         const media: ViewerItem[] = local.length > 0 ? local : stored
         const voice = voiceOf(message)
-        if (voice) return <VoiceUserMessage voice={voice} owner={fileOwner} media={media.length ? media : undefined} stamp={stamp} />
-        if (!text && media.length === 0) return null
-        return <UserBubble text={text} media={media.length ? media : undefined} owner={fileOwner} stamp={stamp} />
+        const quote = quoteOf(message)
+        if (voice) return <VoiceUserMessage voice={voice} owner={fileOwner} media={media.length ? media : undefined} stamp={stamp} messageId={message.id} quote={quote} />
+        if (!text && media.length === 0 && !quote) return null
+        return <UserBubble text={text} media={media.length ? media : undefined} owner={fileOwner} stamp={stamp} messageId={message.id} quote={quote} />
     }
 
     const blocks: Block[] = []
@@ -161,7 +162,7 @@ function MessageViewContent({ message, isLastAssistant, running, settled = false
     const subRuns = pairSubRuns(message.parts as { type: string; id?: string; toolCallId?: string; toolName?: string; data?: unknown }[], { settled })
     const flushText = (key: string) => {
         if (!buffer.trim()) return
-        blocks.push({ key, node: <AssistantMessage text={buffer} showActions={false} owner={fileOwner} /> })
+        blocks.push({ key, node: <AssistantMessage text={buffer} showActions={false} owner={fileOwner} messageId={message.id} /> })
         buffer = ''
         blocks.push(...underText)
         underText = []
@@ -263,7 +264,7 @@ function MessageViewContent({ message, isLastAssistant, running, settled = false
 
     const answer = messageText(message)
     const actions = { onRegenerate, rating, onRate: onRate ? (vote: MessageFeedbackRating) => onRate(message.id, vote, answer) : undefined }
-    if (closing.trim().length > 0) blocks.push({ key: 'closing', node: <AssistantMessage text={closing} showActions={isLastAssistant && !running} streaming={isLastAssistant && running} owner={fileOwner} actions={actions} /> })
+    if (closing.trim().length > 0) blocks.push({ key: 'closing', node: <AssistantMessage text={closing} showActions={isLastAssistant && !running} streaming={isLastAssistant && running} owner={fileOwner} actions={actions} messageId={message.id} /> })
     blocks.push(...held)
     for (const card of publishedCards ?? []) blocks.push({ key: `u${card.slug}`, node: <PublishedCardView card={card} coworkerName={coworkerName} /> })
     if (sources.length > 0) blocks.push({ key: 'sources', node: <Sources sources={sources} /> })

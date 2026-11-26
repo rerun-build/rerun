@@ -1,4 +1,4 @@
-import type { VoiceMessage } from '@rerun/contracts'
+import type { MessageQuote, VoiceMessage } from '@rerun/contracts'
 import * as Clipboard from 'expo-clipboard'
 import { useState } from 'react'
 import Animated from 'react-native-reanimated'
@@ -23,10 +23,13 @@ type VoiceUserMessageProps = {
     media?: ViewerItem[]
     stamp?: MessageStamp
     defaultTranscriptOpen?: boolean
+    messageId?: string
+    /** The passage the recording replies to, drawn at the top of the bubble. */
+    quote?: MessageQuote | null
 }
 
 /** A voice message the person sent: the player in the bubble, and under it Transcript and Copy, always shown on a phone. */
-export function VoiceUserMessage({ voice, owner, media, stamp, defaultTranscriptOpen = false }: VoiceUserMessageProps) {
+export function VoiceUserMessage({ voice, owner, media, stamp, defaultTranscriptOpen = false, messageId, quote }: VoiceUserMessageProps) {
     const playback = useVoicePlayback(voice, owner)
     const [open, setOpen] = useState(defaultTranscriptOpen)
     const t = useTranslations('mobileChat.voice')
@@ -59,7 +62,8 @@ export function VoiceUserMessage({ voice, owner, media, stamp, defaultTranscript
     ) : undefined
 
     return (
-        <UserBubble text="" media={media} owner={owner} stamp={stamp} footer={footer}>
+        // The transcript is what a swipe quotes: the player draws in the text's place.
+        <UserBubble text={transcript} media={media} owner={owner} stamp={stamp} footer={footer} messageId={messageId} quote={quote}>
             <VoiceMessageBubble voice={voice} playback={playback} />
         </UserBubble>
     )

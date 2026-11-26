@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { createContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { View } from 'react-native'
+import { Gesture, GestureDetector, type GestureType } from 'react-native-gesture-handler'
 import Animated, { useAnimatedReaction, useAnimatedRef, useAnimatedScrollHandler, useReducedMotion, useSharedValue, type SharedValue } from 'react-native-reanimated'
 import { scheduleOnRN } from 'react-native-worklets'
 
@@ -13,6 +14,9 @@ const EDGE_BUMP = 0.08
 // The page opened is drawn alone while the screen slides in; its neighbours come once it is in place,
 // or as soon as a finger starts to drag.
 const NEIGHBOURS_AFTER_MS = 450
+
+// The pager's own swipe, for a gesture inside a page that must win over it: a bubble swiped to quote it.
+export const PagerGestureContext = createContext<GestureType | null>(null)
 
 const tickOnto = (draft: boolean) => (draft ? Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light) : Haptics.selectionAsync())
 const bumpIntoEdge = () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft)
@@ -31,6 +35,7 @@ type ConversationPagerProps = {
 // drawn stays drawn: coming back to it is instant.
 export function ConversationPager({ pages, activeIndex, progress, onSettle, renderPage }: ConversationPagerProps) {
     const scroll = useAnimatedRef<Animated.ScrollView>()
+    const pagerGesture = useMemo(() => Gesture.Native(), [])
     const reduceMotion = useReducedMotion()
     // `offset` is where the row sits when it mounts or resizes. Fabric moves the native view the
     // moment the `contentOffset` prop changes, so it only follows the layout: a tab picked scrolls on its own.
@@ -118,28 +123,32 @@ export function ConversationPager({ pages, activeIndex, progress, onSettle, rend
             }}
         >
             {size.width > 0 && (
-                <Animated.ScrollView
-                    ref={scroll}
-                    horizontal
-                    pagingEnabled
-                    showsHorizontalScrollIndicator={false}
-                    keyboardDismissMode="on-drag"
-                    keyboardShouldPersistTaps="handled"
-                    scrollsToTop={false}
-                    scrollEventThrottle={16}
-                    contentOffset={RIGHT_TO_LEFT ? undefined : { x: size.offset, y: 0 }}
-                    onContentSizeChange={placePage}
-                    onScroll={onScroll}
-                >
-                    {pages.map((page, index) => {
-                        const onScreen = index === activeIndex
-                        return (
-                            <View key={page.key} accessibilityElementsHidden={!onScreen} importantForAccessibility={onScreen ? 'auto' : 'no-hide-descendants'} style={{ width: size.width, height: size.height, overflow: 'hidden' }}>
-                                {mounted(page, index) && renderPage(page, onScreen)}
-                            </View>
-                        )
-                    })}
-                </Animated.ScrollView>
+                <PagerGestureContext value={pagerGesture}>
+                    <GestureDetector gesture={pagerGesture}>
+                        <Animated.ScrollView
+                            ref={scroll}
+                            horizontal
+                            pagingEnabled
+                            showsHorizontalScrollIndicator={false}
+                            keyboardDismissMode="on-drag"
+                            keyboardShouldPersistTaps="handled"
+                            scrollsToTop={false}
+                            scrollEventThrottle={16}
+                            contentOffset={RIGHT_TO_LEFT ? undefined : { x: size.offset, y: 0 }}
+                            onContentSizeChange={placePage}
+                            onScroll={onScroll}
+                        >
+                            {pages.map((page, index) => {
+                                const onScreen = index === activeIndex
+                                return (
+                                    <View key={page.key} accessibilityElementsHidden={!onScreen} importantForAccessibility={onScreen ? 'auto' : 'no-hide-descendants'} style={{ width: size.width, height: size.height, overflow: 'hidden' }}>
+                                        {mounted(page, index) && renderPage(page, onScreen)}
+                                    </View>
+                                )
+                            })}
+                        </Animated.ScrollView>
+                    </GestureDetector>
+                </PagerGestureContext>
             )}
         </View>
     )

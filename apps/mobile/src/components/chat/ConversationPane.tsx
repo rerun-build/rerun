@@ -1,4 +1,4 @@
-import { RERUN_CONNECTION_ID, appendAttachmentsRef, threadsByMessage, authorIdOf, queuedPreview, runUsesScreen, scrollCueOf, screenSite, shouldFlush, shouldKeepQueued, buildAttachmentsRef, findPendingAlert, findPendingHitl, findUnknownPendingCall, needsHuman, paidDataSourcesByTurn, pendingTakeover, quickRepliesOf, quickReplyDraft, type AgentModels, type AgentView, type SessionStatus } from '@rerun/contracts'
+import { FORMER_MEMBER, QUOTE_FROM_USER, RERUN_CONNECTION_ID, appendAttachmentsRef, authorShortName, prependQuote, threadsByMessage, authorIdOf, queuedPreview, runUsesScreen, scrollCueOf, screenSite, shouldFlush, shouldKeepQueued, buildAttachmentsRef, findPendingAlert, findPendingHitl, findUnknownPendingCall, needsHuman, paidDataSourcesByTurn, pendingTakeover, quickRepliesOf, quickReplyDraft, type AgentModels, type AgentView, type SessionStatus } from '@rerun/contracts'
 import { router, useFocusEffect } from 'expo-router'
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Alert, ScrollView, StyleSheet, View, type ScrollViewInstance } from 'react-native'
@@ -70,6 +70,7 @@ import { useTakeoverRequest } from './screen/useTakeoverRequest'
 import { Suggestions } from './Suggestions'
 import type { ThreadItem } from './threads/general-threads'
 import { Transcript } from './Transcript'
+import { QuoteBanner, QuoteReplyContext, useQuoteReply, type QuoteSide } from './QuoteReply'
 import { useTranscriptWindow } from './transcript-window'
 import { useKeyboardShown } from './useKeyboardShown'
 
@@ -135,6 +136,7 @@ function ConversationPaneBody({ coworker, makeEndpoints, initialSessionId, onSes
     const t = useTranslations('mobileChat.pane')
     const tc = useTranslations('mobileCommon.errors')
     const tComposer = useTranslations('mobileChat.composer')
+    const tQuote = useTranslations('mobileChat.quote')
     const scroll = useRef<ScrollViewInstance>(null)
     // The transcript a conversation opens on is shown already at its end; only what comes after scrolls.
     const shownTranscript = useRef(false)
@@ -186,6 +188,7 @@ function ConversationPaneBody({ coworker, makeEndpoints, initialSessionId, onSes
         placeFold(belowFold.current, height)
     }
     const [scrollTop, setScrollTop] = useState(0)
+    const scrollOffset = useRef(0)
     const [viewport, setViewport] = useState(0)
     const [threadTop, setThreadTop] = useState(0)
     const [screenBox, setScreenBox] = useState<{ y: number; height: number } | null>(null)
@@ -355,12 +358,13 @@ function ConversationPaneBody({ coworker, makeEndpoints, initialSessionId, onSes
             if (message && (await messageActions.sendEdit(message))) setDraft('')
             return
         }
-        if (!message && attachments.length === 0) return
+        if (!message && attachments.length === 0 && !quote) return
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
         if (caller) askForPushOnce(caller).catch(() => {})
         if (attachments.length === 0 || !caller) {
             setDraft('')
-            send(message)
+            setQuote(null)
+            send(prependQuote(message, quote))
             return
         }
         setUploading(true)
@@ -368,7 +372,8 @@ function ConversationPaneBody({ coworker, makeEndpoints, initialSessionId, onSes
             const { paths, files } = await uploadAttachments(caller, coworker.id, attachments)
             setDraft('')
             setAttachments([])
-            send(appendAttachmentsRef(message, buildAttachmentsRef(paths)), files)
+            setQuote(null)
+            send(prependQuote(appendAttachmentsRef(message, buildAttachmentsRef(paths)), quote), files)
         } catch {
             Alert.alert(t('attachFailed'), tc('tryAgainShortly'))
         } finally {
@@ -386,12 +391,14 @@ function ConversationPaneBody({ coworker, makeEndpoints, initialSessionId, onSes
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
                   askForPushOnce(caller).catch(() => {})
                   if (attachments.length === 0) {
-                      send(text)
+                      setQuote(null)
+                      send(prependQuote(text, quote))
                       return
                   }
                   const { paths, files } = await uploadAttachments(caller, coworker.id, attachments)
                   setAttachments([])
-                  send(appendAttachmentsRef(text, buildAttachmentsRef(paths)), files)
+                  setQuote(null)
+                  send(prependQuote(appendAttachmentsRef(text, buildAttachmentsRef(paths)), quote), files)
               },
           }
         : undefined
@@ -446,169 +453,188 @@ function ConversationPaneBody({ coworker, makeEndpoints, initialSessionId, onSes
         if (isForeman || !lastReply) return void chat.regenerate()
         void messageActions.regenerateReply(lastReply.id)
     })
+    // A passage of the person is theirs; one of another member of a shared conversation is named.
+    const quotedAuthorOf = (side: QuoteSide, messageId: string) => {
+        if (side === 'assistant') return coworker.name
+        const message = chat.messages.find(item => item.id === messageId)
+        const authorId = message ? authorIdOf(message) : undefined
+        if (!authorId || authorId === me?.user.id) return QUOTE_FROM_USER
+        return authorShortName(authorOf(authorId) ?? FORMER_MEMBER)
+    }
+    const { quote, setQuote, showSource: showQuoteSource, context: quoteReply } = useQuoteReply({ enabled: !isForeman, authorOf: quotedAuthorOf, scroll, scrollOffset, onLeaveEnd: () => stick(false), focusComposer: () => composer.current?.focus() })
+    // A quote belongs to the conversation it was taken in.
+    const [quoteSession, setQuoteSession] = useState(chat.sessionId)
+    if (quoteSession !== chat.sessionId) {
+        setQuoteSession(chat.sessionId)
+        setQuote(null)
+    }
     const transcript = { messages: chat.messages, busy: chat.busy, agentId: isForeman ? null : coworker.id, coworkerName: coworker.name, fileOwner, hiddenCallId: alert?.toolCallId ?? null, skillProposals, onStopTask: stopTask, onRegenerate: pending ? undefined : regenerate, ratingOf: feedback.ratingOf, onRate: feedback.rate, paidSourcesByTurn, authorOf, startedBy: banner, threadRows, onOpenThread: openThread, onMessageActions: isForeman ? undefined : messageActions.open }
-    const placeholder = pending || unknownCall ? t('answerPlaceholder', { name: coworker.name }) : tComposer(isForeman ? 'placeholderNoSkill' : 'placeholder')
+    const placeholder = pending || unknownCall ? t('answerPlaceholder', { name: coworker.name }) : quote ? tQuote('placeholder') : tComposer(isForeman ? 'placeholderNoSkill' : 'placeholder')
 
     return (
-        <Animated.View style={[{ flex: 1, paddingBottom: LIFTS_BY_SLIDING ? insets.bottom : 0 }, lift]}>
-            <View style={{ flex: 1, justifyContent: 'flex-end' }}>
-                <ScrollView
-                    ref={scroll}
-                    testID="conversation-thread"
-                    style={StyleSheet.absoluteFill}
-                    contentInset={{ top: raisedAtRest }}
-                    scrollIndicatorInsets={{ top: raisedAtRest, bottom: footerHeight }}
-                    keyboardDismissMode="interactive"
-                    keyboardShouldPersistTaps="handled"
-                    scrollEventThrottle={64}
-                    maintainVisibleContentPosition={KEEP_PLACE_ABOVE}
-                    onScroll={({ nativeEvent: { contentSize, contentOffset, layoutMeasurement } }) => {
-                        const below = Math.max(0, contentSize.height - contentOffset.y - layoutMeasurement.height - BLUR_ABOVE_FOOTER)
-                        metrics.current = { content: contentSize.height, viewport: layoutMeasurement.height }
-                        placeFold(below, blockHeight)
-                        // A screen from the top of what is drawn, the stretch before it comes in above.
-                        if (transcriptWindow.hasEarlier && contentOffset.y < layoutMeasurement.height) transcriptWindow.showEarlier()
-                        if (screenInThread) {
-                            setScrollTop(contentOffset.y)
-                            setViewport(layoutMeasurement.height)
-                        }
-                        if (touching.current) stick(below <= AT_BOTTOM)
-                        if (chat.sessionId) rememberPlace(chat.sessionId, stuck.current ? null : below)
-                    }}
-                    onScrollBeginDrag={() => {
-                        touching.current = true
-                    }}
-                    onScrollEndDrag={({ nativeEvent: { velocity } }) => {
-                        if (!velocity?.y) touching.current = false
-                    }}
-                    onMomentumScrollEnd={() => {
-                        touching.current = false
-                    }}
-                    onLayout={event => {
-                        metrics.current = { ...metrics.current, viewport: event.nativeEvent.layout.height }
-                        setViewport(event.nativeEvent.layout.height)
-                    }}
-                    onContentSizeChange={(_, height) => {
-                        if (onScreen && chat.history === 'ready') endTiming('chat open', `${chat.messages.length} messages, ${chat.fresh ? 'from the hub' : 'kept on the phone'}`)
-                        metrics.current = { ...metrics.current, content: height }
-                        if (stuck.current) scroll.current?.scrollToEnd({ animated: shownTranscript.current })
-                        else if (restoring.current !== null && chat.history === 'ready' && metrics.current.viewport > 0) {
-                            scroll.current?.scrollTo({ y: Math.max(0, height - metrics.current.viewport - BLUR_ABOVE_FOOTER - restoring.current), animated: false })
-                            restoring.current = null
-                        }
-                        if (chat.history === 'ready') shownTranscript.current = true
-                    }}
-                    contentContainerStyle={{ flexGrow: 1, justifyContent: empty ? 'center' : 'flex-end', width: '100%', maxWidth: CHAT_COLUMN_MAX_WIDTH, alignSelf: 'center', paddingTop: insets.top + CHAT_HEADER_HEIGHT + spacing.lg, paddingBottom: footerHeight + BLUR_ABOVE_FOOTER, paddingHorizontal: spacing.xl - 4 }}
-                >
-                    {chat.history === 'loading' && <ConversationSkeleton />}
-                    {chat.history === 'error' && (
-                        <View style={{ alignItems: 'center', gap: spacing.md }}>
-                            <AppText variant="callout" tone="muted">
-                                {t('loadFailed')}
-                            </AppText>
-                            <PillButton label={t('retry')} variant="secondary" onPress={chat.retry} />
-                        </View>
-                    )}
-                    {empty && (isForeman ? <ForemanEmptyState onSend={submit} onPrefill={setDraft} /> : <CoworkerEmptyState agentId={coworker.id} mood={moodOf(coworker.status)} asleep={coworker.status === 'offline'} onSend={submit} />)}
-                    {chat.history === 'ready' && !empty && (
-                        // The transcript a conversation opens on is already there; the first bubble of a
-                        // new conversation, sent as the list appears, still rises.
-                        <LayoutAnimationConfig skipEntering={!chat.busy}>
-                            {transcriptWindow.earlier.map(range => (
-                                <View key={range.key} style={{ gap: spacing.xl, marginBottom: spacing.xl }}>
-                                    <Transcript {...transcript} from={range.from} to={range.to} />
-                                </View>
-                            ))}
-                            <View key="recent" style={{ gap: spacing.xl }} onLayout={event => setThreadTop(event.nativeEvent.layout.y)}>
-                                {transcriptWindow.recent && <Transcript {...transcript} from={transcriptWindow.recent.from} to={transcriptWindow.recent.to} />}
-                                {pending && !takeoverPending && (
-                                    <Animated.View key={pending.toolCallId} entering={FadeInDown.duration(280)} onLayout={event => measureBlock(event.nativeEvent.layout.height)}>
-                                        <HitlBlock
-                                            pending={pending}
-                                            agentId={coworker.id}
-                                            coworkerName={coworker.name}
-                                            webUrl={webUrl}
-                                            upload={canAttach && caller ? attachment => uploadChatFile(caller, coworker.id, attachment.uri, attachment.name) : undefined}
-                                            transcribe={caller ? uri => transcribeRecording(caller, uri) : undefined}
-                                            onAnswer={text => send(text)}
-                                            onDismiss={() => {
-                                                setDismissedCallId(pending.toolCallId)
-                                                chat.stop()
-                                            }}
-                                        />
-                                    </Animated.View>
-                                )}
-                                {screenInThread && (
-                                    <Animated.View
-                                        entering={FadeInDown.duration(280)}
-                                        onLayout={event => {
-                                            const { y, height } = event.nativeEvent.layout
-                                            setScreenBox({ y, height })
-                                            if (takeoverPending) measureBlock(height)
-                                        }}
-                                    >
-                                        <ChatScreen status={screen.status} uri={screen.uri} onMessage={screen.onMessage} attachWebView={screen.attachWebView} site={screenSite(chat.messages, takeoverPending ? (pendingTakeover(takeoverPending.input).url ?? null) : null)} takeover={takeover} onTakeControl={takeControl} />
-                                    </Animated.View>
-                                )}
-                                {unknownCall && <UnknownCallBlock call={unknownCall} coworkerName={coworker.name} webUrl={webUrl} />}
-                                {chat.error && <ErrorCard message={chat.error.message} onRetry={chat.regenerate} {...errorActions} />}
-                                {chat.busy && !screenInThread && !stepGroupShowsActivity(chat.messages.at(-1)) && <RunStatus coworker={coworker} phase={phase} />}
+        <QuoteReplyContext value={quoteReply}>
+            <Animated.View style={[{ flex: 1, paddingBottom: LIFTS_BY_SLIDING ? insets.bottom : 0 }, lift]}>
+                <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+                    <ScrollView
+                        ref={scroll}
+                        testID="conversation-thread"
+                        style={StyleSheet.absoluteFill}
+                        contentInset={{ top: raisedAtRest }}
+                        scrollIndicatorInsets={{ top: raisedAtRest, bottom: footerHeight }}
+                        keyboardDismissMode="interactive"
+                        keyboardShouldPersistTaps="handled"
+                        scrollEventThrottle={64}
+                        maintainVisibleContentPosition={KEEP_PLACE_ABOVE}
+                        onScroll={({ nativeEvent: { contentSize, contentOffset, layoutMeasurement } }) => {
+                            scrollOffset.current = contentOffset.y
+                            const below = Math.max(0, contentSize.height - contentOffset.y - layoutMeasurement.height - BLUR_ABOVE_FOOTER)
+                            metrics.current = { content: contentSize.height, viewport: layoutMeasurement.height }
+                            placeFold(below, blockHeight)
+                            // A screen from the top of what is drawn, the stretch before it comes in above.
+                            if (transcriptWindow.hasEarlier && contentOffset.y < layoutMeasurement.height) transcriptWindow.showEarlier()
+                            if (screenInThread) {
+                                setScrollTop(contentOffset.y)
+                                setViewport(layoutMeasurement.height)
+                            }
+                            if (touching.current) stick(below <= AT_BOTTOM)
+                            if (chat.sessionId) rememberPlace(chat.sessionId, stuck.current ? null : below)
+                        }}
+                        onScrollBeginDrag={() => {
+                            touching.current = true
+                        }}
+                        onScrollEndDrag={({ nativeEvent: { velocity } }) => {
+                            if (!velocity?.y) touching.current = false
+                        }}
+                        onMomentumScrollEnd={() => {
+                            touching.current = false
+                        }}
+                        onLayout={event => {
+                            metrics.current = { ...metrics.current, viewport: event.nativeEvent.layout.height }
+                            setViewport(event.nativeEvent.layout.height)
+                        }}
+                        onContentSizeChange={(_, height) => {
+                            if (onScreen && chat.history === 'ready') endTiming('chat open', `${chat.messages.length} messages, ${chat.fresh ? 'from the hub' : 'kept on the phone'}`)
+                            metrics.current = { ...metrics.current, content: height }
+                            if (stuck.current) scroll.current?.scrollToEnd({ animated: shownTranscript.current })
+                            else if (restoring.current !== null && chat.history === 'ready' && metrics.current.viewport > 0) {
+                                scroll.current?.scrollTo({ y: Math.max(0, height - metrics.current.viewport - BLUR_ABOVE_FOOTER - restoring.current), animated: false })
+                                restoring.current = null
+                            }
+                            if (chat.history === 'ready') shownTranscript.current = true
+                        }}
+                        contentContainerStyle={{ flexGrow: 1, justifyContent: empty ? 'center' : 'flex-end', width: '100%', maxWidth: CHAT_COLUMN_MAX_WIDTH, alignSelf: 'center', paddingTop: insets.top + CHAT_HEADER_HEIGHT + spacing.lg, paddingBottom: footerHeight + BLUR_ABOVE_FOOTER, paddingHorizontal: spacing.xl - 4 }}
+                    >
+                        {chat.history === 'loading' && <ConversationSkeleton />}
+                        {chat.history === 'error' && (
+                            <View style={{ alignItems: 'center', gap: spacing.md }}>
+                                <AppText variant="callout" tone="muted">
+                                    {t('loadFailed')}
+                                </AppText>
+                                <PillButton label={t('retry')} variant="secondary" onPress={chat.retry} />
                             </View>
-                        </LayoutAnimationConfig>
+                        )}
+                        {empty && (isForeman ? <ForemanEmptyState onSend={submit} onPrefill={setDraft} /> : <CoworkerEmptyState agentId={coworker.id} mood={moodOf(coworker.status)} asleep={coworker.status === 'offline'} onSend={submit} />)}
+                        {chat.history === 'ready' && !empty && (
+                            // The transcript a conversation opens on is already there; the first bubble of a
+                            // new conversation, sent as the list appears, still rises.
+                            <LayoutAnimationConfig skipEntering={!chat.busy}>
+                                {transcriptWindow.earlier.map(range => (
+                                    <View key={range.key} style={{ gap: spacing.xl, marginBottom: spacing.xl }}>
+                                        <Transcript {...transcript} from={range.from} to={range.to} />
+                                    </View>
+                                ))}
+                                <View key="recent" style={{ gap: spacing.xl }} onLayout={event => setThreadTop(event.nativeEvent.layout.y)}>
+                                    {transcriptWindow.recent && <Transcript {...transcript} from={transcriptWindow.recent.from} to={transcriptWindow.recent.to} />}
+                                    {pending && !takeoverPending && (
+                                        <Animated.View key={pending.toolCallId} entering={FadeInDown.duration(280)} onLayout={event => measureBlock(event.nativeEvent.layout.height)}>
+                                            <HitlBlock
+                                                pending={pending}
+                                                agentId={coworker.id}
+                                                coworkerName={coworker.name}
+                                                webUrl={webUrl}
+                                                upload={canAttach && caller ? attachment => uploadChatFile(caller, coworker.id, attachment.uri, attachment.name) : undefined}
+                                                transcribe={caller ? uri => transcribeRecording(caller, uri) : undefined}
+                                                onAnswer={text => send(text)}
+                                                onDismiss={() => {
+                                                    setDismissedCallId(pending.toolCallId)
+                                                    chat.stop()
+                                                }}
+                                            />
+                                        </Animated.View>
+                                    )}
+                                    {screenInThread && (
+                                        <Animated.View
+                                            entering={FadeInDown.duration(280)}
+                                            onLayout={event => {
+                                                const { y, height } = event.nativeEvent.layout
+                                                setScreenBox({ y, height })
+                                                if (takeoverPending) measureBlock(height)
+                                            }}
+                                        >
+                                            <ChatScreen status={screen.status} uri={screen.uri} onMessage={screen.onMessage} attachWebView={screen.attachWebView} site={screenSite(chat.messages, takeoverPending ? (pendingTakeover(takeoverPending.input).url ?? null) : null)} takeover={takeover} onTakeControl={takeControl} />
+                                        </Animated.View>
+                                    )}
+                                    {unknownCall && <UnknownCallBlock call={unknownCall} coworkerName={coworker.name} webUrl={webUrl} />}
+                                    {chat.error && <ErrorCard message={chat.error.message} onRetry={chat.regenerate} {...errorActions} />}
+                                    {chat.busy && !screenInThread && !stepGroupShowsActivity(chat.messages.at(-1)) && <RunStatus coworker={coworker} phase={phase} />}
+                                </View>
+                            </LayoutAnimationConfig>
+                        )}
+                    </ScrollView>
+                    {floatingShown && (
+                        <FloatingScreen top={insets.top + CHAT_HEADER_HEIGHT + spacing.xs} label={takeover ? t('openBrowser') : t('takeControl')} onTakeControl={takeControl}>
+                            <ScreenMirror frames={screen.frames} />
+                        </FloatingScreen>
                     )}
-                </ScrollView>
-                {floatingShown && (
-                    <FloatingScreen top={insets.top + CHAT_HEADER_HEIGHT + spacing.xs} label={takeover ? t('openBrowser') : t('takeControl')} onTakeControl={takeControl}>
-                        <ScreenMirror frames={screen.frames} />
-                    </FloatingScreen>
-                )}
-                {cue === 'pill' && pending && (
-                    <Animated.View key="pill" entering={RISE_IN} exiting={SINK_OUT} style={{ position: 'absolute', bottom: footerHeight + spacing.md, left: spacing.lg, right: spacing.lg, alignItems: 'center' }} pointerEvents="box-none">
-                        <PendingHitlPill kind={pending.kind} input={pending.input} onJump={jumpToPending} />
-                    </Animated.View>
-                )}
-                {cue === 'arrow' && !chat.error && chat.history === 'ready' && (
-                    <Animated.View key="arrow" entering={RISE_IN} exiting={SINK_OUT} style={{ position: 'absolute', bottom: footerHeight + spacing.md, left: 0, right: 0, alignItems: 'center' }} pointerEvents="box-none">
-                        <ScrollToEndButton onPress={followEnd} />
-                    </Animated.View>
-                )}
+                    {cue === 'pill' && pending && (
+                        <Animated.View key="pill" entering={RISE_IN} exiting={SINK_OUT} style={{ position: 'absolute', bottom: footerHeight + spacing.md, left: spacing.lg, right: spacing.lg, alignItems: 'center' }} pointerEvents="box-none">
+                            <PendingHitlPill kind={pending.kind} input={pending.input} onJump={jumpToPending} />
+                        </Animated.View>
+                    )}
+                    {cue === 'arrow' && !chat.error && chat.history === 'ready' && (
+                        <Animated.View key="arrow" entering={RISE_IN} exiting={SINK_OUT} style={{ position: 'absolute', bottom: footerHeight + spacing.md, left: 0, right: 0, alignItems: 'center' }} pointerEvents="box-none">
+                            <ScrollToEndButton onPress={followEnd} />
+                        </Animated.View>
+                    )}
 
-                <View onLayout={event => setFooterHeight(event.nativeEvent.layout.height)} style={{ gap: spacing.md, width: '100%', maxWidth: CHAT_COLUMN_MAX_WIDTH, alignSelf: 'center', paddingTop: composerReplaced && !alert ? 0 : spacing.sm }}>
-                    {alert && (
-                        <Animated.View entering={FadeInDown.duration(280)} exiting={FadeOutDown.duration(280)} style={{ paddingHorizontal: spacing.md }}>
-                            <AlertWidget
-                                message={alert.message}
-                                onAcknowledge={async () => {
-                                    if (!caller || !chat.sessionId) return
-                                    await acknowledgeAlert(caller, chat.sessionId)
-                                    setAcknowledged(alert.toolCallId ?? alert.message)
-                                    onStatusChange()
-                                }}
-                            />
-                        </Animated.View>
-                    )}
-                    {skillProposals.pinned.map(proposal => (
-                        <Animated.View key={proposal.id} entering={FadeInDown.duration(280)} exiting={FadeOutDown.duration(280)} style={{ paddingHorizontal: spacing.md }}>
-                            <PinnedSkillProposal proposal={proposal} pending={skillProposals.pendingId === proposal.id} onDecide={skillProposals.decide} />
-                        </Animated.View>
-                    ))}
-                    {aboveComposer}
-                    {replies.length > 0 && !draft && !queue.queued && <Suggestions items={replies} onPick={pickReply} />}
-                    {queue.queued && (
-                        <Animated.View entering={FadeInDown.duration(200)} exiting={FadeOutDown.duration(200)} style={{ paddingHorizontal: spacing.md }}>
-                            <QueuedMessagePill text={queue.queued.text} busy={chat.busy} pending={stopping} onSendNow={sendQueuedNow} onDiscard={queue.clear} />
-                        </Animated.View>
-                    )}
-                    {/* The composer's glass goes blank under a parent below full opacity, and when it is laid while
-                        moving: it comes back in place once a block is answered, and only leaves with a slide. */}
-                    {messageActions.editingId && <EditingBanner onCancel={cancelEdit} />}
-                    {!composerReplaced && (
-                        <Animated.View exiting={SlideOutDown.duration(280)} style={{ paddingHorizontal: spacing.md }}>
-                            <Composer ref={composer} value={draft} onChangeText={setDraft} attachments={attachments} onAttachmentsChange={setAttachments} skills={skills} mentionAgents={mentionAgents} mentionComputers={mentionComputers} triggers={isForeman ? FOREMAN_MENTION_TRIGGERS : undefined} onSend={() => submit(draft)} onStop={chat.stop} running={chat.busy || uploading} placeholder={placeholder} model={model} onOpenModel={openModel} canAttach={canAttach && !pending} voice={voice} autoFocus={!initialSessionId && onScreen} onScreen={onScreen} />
-                        </Animated.View>
-                    )}
+                    <View onLayout={event => setFooterHeight(event.nativeEvent.layout.height)} style={{ gap: spacing.md, width: '100%', maxWidth: CHAT_COLUMN_MAX_WIDTH, alignSelf: 'center', paddingTop: composerReplaced && !alert ? 0 : spacing.sm }}>
+                        {alert && (
+                            <Animated.View entering={FadeInDown.duration(280)} exiting={FadeOutDown.duration(280)} style={{ paddingHorizontal: spacing.md }}>
+                                <AlertWidget
+                                    message={alert.message}
+                                    onAcknowledge={async () => {
+                                        if (!caller || !chat.sessionId) return
+                                        await acknowledgeAlert(caller, chat.sessionId)
+                                        setAcknowledged(alert.toolCallId ?? alert.message)
+                                        onStatusChange()
+                                    }}
+                                />
+                            </Animated.View>
+                        )}
+                        {skillProposals.pinned.map(proposal => (
+                            <Animated.View key={proposal.id} entering={FadeInDown.duration(280)} exiting={FadeOutDown.duration(280)} style={{ paddingHorizontal: spacing.md }}>
+                                <PinnedSkillProposal proposal={proposal} pending={skillProposals.pendingId === proposal.id} onDecide={skillProposals.decide} />
+                            </Animated.View>
+                        ))}
+                        {aboveComposer}
+                        {replies.length > 0 && !draft && !queue.queued && <Suggestions items={replies} onPick={pickReply} />}
+                        {queue.queued && (
+                            <Animated.View entering={FadeInDown.duration(200)} exiting={FadeOutDown.duration(200)} style={{ paddingHorizontal: spacing.md }}>
+                                <QueuedMessagePill text={queue.queued.text} busy={chat.busy} pending={stopping} onSendNow={sendQueuedNow} onDiscard={queue.clear} />
+                            </Animated.View>
+                        )}
+                        {/* The composer's glass goes blank under a parent below full opacity, and when it is laid while
+                            moving: it comes back in place once a block is answered, and only leaves with a slide. */}
+                        {messageActions.editingId && <EditingBanner onCancel={cancelEdit} />}
+                        {quote && !messageActions.editingId && !composerReplaced && <QuoteBanner quote={quote} onShowSource={() => showQuoteSource(quote)} onRemove={() => setQuote(null)} />}
+                        {!composerReplaced && (
+                            <Animated.View exiting={SlideOutDown.duration(280)} style={{ paddingHorizontal: spacing.md }}>
+                                <Composer ref={composer} value={draft} onChangeText={setDraft} attachments={attachments} onAttachmentsChange={setAttachments} skills={skills} mentionAgents={mentionAgents} mentionComputers={mentionComputers} triggers={isForeman ? FOREMAN_MENTION_TRIGGERS : undefined} onSend={() => submit(draft)} onStop={chat.stop} running={chat.busy || uploading} placeholder={placeholder} model={model} onOpenModel={openModel} canAttach={canAttach && !pending} voice={voice} autoFocus={!initialSessionId && onScreen} onScreen={onScreen} />
+                            </Animated.View>
+                        )}
+                    </View>
                 </View>
-            </View>
-        </Animated.View>
+            </Animated.View>
+        </QuoteReplyContext>
     )
 }
