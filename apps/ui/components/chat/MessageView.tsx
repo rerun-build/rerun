@@ -441,7 +441,7 @@ function MessageViewInner({ message, isActive = false, settled = false, isLastAs
                 </Suggestions>
             )}
             {message.role === 'assistant' && !isActive && onRegenerate && messageText(message).length > 0 && (
-                <MessageActions className={cn('-mt-1 transition-opacity group-hover:opacity-100 group-[:not(:last-child)]:-mb-4', feedbackRating === null && 'opacity-0')}>
+                <MessageActions data-message-hover-actions="" className={cn('-mt-1 transition-opacity group-hover:opacity-100 group-[:not(:last-child)]:-mb-4', feedbackRating === null && 'opacity-0')}>
                     <CopyAction text={messageText(message)} />
                     <MessageAction tooltip={t('message.regenerate')} onClick={() => onRegenerate(message.id)}>
                         <RefreshCcwIcon className="size-3.5" />

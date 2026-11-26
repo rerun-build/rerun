@@ -24,6 +24,8 @@ type SelectableMessageProps = {
     messageId: string
     isUser: boolean
     selected: boolean
+    // Just let go: the bar folds away while the highlight fades.
+    leaving?: boolean
     items: MessageActionItem[]
     onSelect: () => void
     onAction: (action: MessageAction) => void
@@ -32,7 +34,7 @@ type SelectableMessageProps = {
 
 // One message of the chat as the actions see it: a click or the arrows select it, the bar under it
 // and the menu of a right click (a long press on a touch screen) run the same actions.
-export function SelectableMessage({ messageId, isUser, selected, items, onSelect, onAction, children }: SelectableMessageProps) {
+export function SelectableMessage({ messageId, isUser, selected, leaving = false, items, onSelect, onAction, children }: SelectableMessageProps) {
     const t = useTranslations('chat.messageActions')
     return (
         <ContextMenu>
@@ -40,13 +42,19 @@ export function SelectableMessage({ messageId, isUser, selected, items, onSelect
                 <div
                     data-message-id={messageId}
                     data-selected={selected || undefined}
+                    data-leaving={leaving || undefined}
                     onClick={event => {
                         if (isSelectionClick(event)) onSelect()
                     }}
-                    className={cn('@container group/row relative -mx-2 flex scroll-mt-32 scroll-mb-4 flex-col rounded-xl px-2 py-1 transition-colors', selected ? 'bg-muted/60 ring-1 ring-border' : 'cursor-default hover:bg-muted/30')}
+                    className={cn(
+                        '@container group/row relative -mx-2 flex scroll-mt-32 scroll-mb-4 flex-col rounded-xl px-2 py-1 transition-[color,background-color,box-shadow]',
+                        selected && 'bg-muted/60 ring-1 ring-border',
+                        leaving && 'ring-1 ring-transparent hover:bg-muted/30 duration-200 ease-out [&_[data-message-hover-actions]]:animate-[message-hover-actions-settle_200ms_cubic-bezier(0.4,0,0.2,1)_forwards]',
+                        !selected && !leaving && 'cursor-default hover:bg-muted/30'
+                    )}
                 >
                     {children}
-                    {selected && <MessageSelectionBar items={items} isUser={isUser} onAction={onAction} />}
+                    {(selected || leaving) && <MessageSelectionBar items={items} isUser={isUser} leaving={leaving} onAction={onAction} />}
                 </div>
             </ContextMenuTrigger>
             <ContextMenuContent className="min-w-48">

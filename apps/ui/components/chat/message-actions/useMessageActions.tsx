@@ -9,7 +9,7 @@ import { toast } from 'sonner'
 import { deleteConversationMessageAction, fetchSessionMessages, messageEditsAvailableAction } from '@/app/api/_actions/session.actions'
 import { ConfirmDialog } from '@/components/dialogs/ConfirmDialog'
 import { useErrorText } from '@/hooks/useErrorText'
-import { actionForKey, isSelectableMessage, type MessageAction } from '@/lib/chat/message-actions'
+import { actionForKey, isSelectableMessage, keepsMessageSelection, type MessageAction } from '@/lib/chat/message-actions'
 import { historyCovers } from '@/lib/chat/transcript-reconcile'
 import { isTypingTarget } from '@/lib/typing-target'
 
@@ -53,6 +53,9 @@ function selectable(message: UIMessage): boolean {
     selectableCache.set(message, result)
     return result
 }
+
+// How long the selected message takes to let go: the bar folds away while the highlight fades.
+const RELEASE_MS = 200
 
 function rowOf(root: HTMLElement | null, messageId: string): HTMLElement | null {
     return root?.querySelector<HTMLElement>(`[data-message-id="${CSS.escape(messageId)}"]`) ?? null
@@ -213,8 +216,22 @@ export function useMessageActions({ active, agentId, agentName, sessionId, messa
         }
     }, [deletingId, sessionId, withEngineIds, errorText, setMessages, t])
 
+    const [leavingId, setLeavingId] = useState<string | null>(null)
+    const leavingTimer = useRef<number | undefined>(undefined)
+    useEffect(() => () => window.clearTimeout(leavingTimer.current), [])
+
+    const release = useCallback(() => {
+        if (!selectedId) return
+        window.clearTimeout(leavingTimer.current)
+        setLeavingId(selectedId)
+        setSelectedId(null)
+        leavingTimer.current = window.setTimeout(() => setLeavingId(null), RELEASE_MS)
+    }, [selectedId])
+
     const select = useCallback(
         (messageId: string | null) => {
+            window.clearTimeout(leavingTimer.current)
+            setLeavingId(null)
             setSelectedId(messageId)
             if (!messageId) return
             stopFollowing()
@@ -258,14 +275,14 @@ export function useMessageActions({ active, agentId, agentName, sessionId, messa
                 if (index < 0) return
                 handled()
                 if (index < selectableIds.length - 1) return select(selectableIds[index + 1])
-                setSelectedId(null)
+                release()
                 inputRef.current?.focus()
                 return
             }
             if (index < 0) return
             if (event.key === 'Escape') {
                 handled()
-                return setSelectedId(null)
+                return release()
             }
             const action = actionForKey(event.key)
             const message = messagesRef.current.find(item => item.id === selectedId)
@@ -277,7 +294,30 @@ export function useMessageActions({ active, agentId, agentName, sessionId, messa
         }
         window.addEventListener('keydown', onKeyDown, true)
         return () => window.removeEventListener('keydown', onKeyDown, true)
-    }, [active, editingId, deletingId, selectedId, selectableIds, rootRef, inputRef, select, run])
+    }, [active, editingId, deletingId, selectedId, selectableIds, rootRef, inputRef, select, release, run])
+
+    useEffect(() => {
+        if (!active || !selectedId || editingId || deletingId) return
+        // Folding the bar while the button is still down would lift what is under it and drop its click.
+        let releaseOnUp = false
+        const onPointerDown = (event: PointerEvent) => {
+            if (event.button !== 0 || !(event.target instanceof Element)) return
+            releaseOnUp = !keepsMessageSelection(event.target, rootRef.current)
+        }
+        const onPointerUp = () => {
+            if (!releaseOnUp) return
+            releaseOnUp = false
+            release()
+        }
+        document.addEventListener('pointerdown', onPointerDown, true)
+        document.addEventListener('pointerup', onPointerUp, true)
+        document.addEventListener('pointercancel', onPointerUp, true)
+        return () => {
+            document.removeEventListener('pointerdown', onPointerDown, true)
+            document.removeEventListener('pointerup', onPointerUp, true)
+            document.removeEventListener('pointercancel', onPointerUp, true)
+        }
+    }, [active, selectedId, editingId, deletingId, rootRef, release])
 
     // Once per arrival from a link: the history may land after the conversation opened.
     const [focusedArrival, setFocusedArrival] = useState(0)
@@ -304,7 +344,7 @@ export function useMessageActions({ active, agentId, agentName, sessionId, messa
         const isUser = message.role === 'user'
         const items = messageActionItems({ isUser, changeBlockedReason, editBlockedReason: isUser && !editableTextOf(message) ? t('voiceNotEditable') : undefined })
         return (
-            <SelectableMessage key={message.id} messageId={message.id} isUser={isUser} selected={selectedId === message.id} items={items} onSelect={() => select(selectedId === message.id ? null : message.id)} onAction={action => run(action, message)}>
+            <SelectableMessage key={message.id} messageId={message.id} isUser={isUser} selected={selectedId === message.id} leaving={leavingId === message.id} items={items} onSelect={() => (selectedId === message.id ? release() : select(message.id))} onAction={action => run(action, message)}>
                 {view}
             </SelectableMessage>
         )
