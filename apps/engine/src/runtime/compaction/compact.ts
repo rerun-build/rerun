@@ -196,10 +196,10 @@ export function compactionThreshold(contextWindow: number, provider: Provider): 
     return CLI_PROVIDERS.has(provider) ? ratio : Math.min(ratio, COMPACTION_MAX_TRIGGER_TOKENS)
 }
 
-export async function prepareRunHistory(ctx: RunContext, system: string, override?: ModelOverride, signSenders = false, toolChars = 0): Promise<ModelMessage[]> {
+export async function prepareRunHistory(ctx: RunContext, system: string, override?: ModelOverride, signSenders = false, toolChars = 0, skipMessageId?: string): Promise<ModelMessage[]> {
     const agentId = ctx.agent.id
     const cp = await getLatestCheckpoint(agentId, ctx.sessionId)
-    const rows = await listMessagesAfter(agentId, ctx.sessionId, cp?.throughCreatedAt)
+    const rows = (await listMessagesAfter(agentId, ctx.sessionId, cp?.throughCreatedAt)).filter(row => row.id !== skipMessageId)
     const priorSummary: ModelMessage | null = cp ? (JSON.parse(cp.summaryJson) as ModelMessage) : null
     const live = rows.flatMap(r => {
         const message = withoutQuickRepliesCalls(withoutReasoning({ role: r.role, content: JSON.parse(r.contentJson) } as ModelMessage))

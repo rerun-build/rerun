@@ -59,10 +59,20 @@ export async function listMessages(agentId: string, sessionId: string): Promise<
 }
 
 // Two messages of one turn can share a millisecond, so the insertion order breaks the tie.
-export async function lastMessageId(agentId: string, sessionId: string): Promise<string | undefined> {
+export async function lastMessage(agentId: string, sessionId: string): Promise<MessageRow | undefined> {
     const { db } = await getSystemDb(agentId)
-    const [row] = await db.select({ id: messages.id }).from(messages).where(eq(messages.sessionId, sessionId)).orderBy(desc(messages.createdAt), desc(sql`rowid`)).limit(1)
-    return row?.id
+    const [row] = await db.select().from(messages).where(eq(messages.sessionId, sessionId)).orderBy(desc(messages.createdAt), desc(sql`rowid`)).limit(1)
+    return row
+}
+
+export async function lastMessageId(agentId: string, sessionId: string): Promise<string | undefined> {
+    return (await lastMessage(agentId, sessionId))?.id
+}
+
+export async function deleteMessage(agentId: string, messageId: string): Promise<void> {
+    const { db, client } = await getSystemDb(agentId)
+    await db.delete(messages).where(eq(messages.id, messageId))
+    await client.execute({ sql: 'DELETE FROM messages_fts WHERE message_id = ?', args: [messageId] })
 }
 
 export async function listSessionAuthorIds(agentId: string, sessionId: string): Promise<string[]> {

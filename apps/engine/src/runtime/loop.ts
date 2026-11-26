@@ -29,7 +29,8 @@ import type { LoadedAgent } from '../agents/types.js'
 import { turnOrder } from '../agents/turn-order.js'
 import { answeringModel } from '../agents/rerun-upstream.js'
 import { listAgentIndex, setAgentStatus } from '../db/repos/agents.js'
-import { appendMessage, lastMessageId, lastProviderSwitch, listSessionAuthorIds, setMessageToolCalls } from '../db/repos/messages.js'
+import { appendMessage, deleteMessage, lastMessage, lastMessageId, lastProviderSwitch, listSessionAuthorIds, setMessageToolCalls } from '../db/repos/messages.js'
+import { getLatestCheckpoint } from '../db/repos/checkpoints.js'
 import type { MessageRow } from '../db/schema.js'
 import { isSharedConversation, signText } from './message-authors.js'
 import { bumpRunStep, cancelRun, failRun, finishRun, setRunContext, startRun } from '../db/repos/runs.js'
@@ -100,6 +101,23 @@ const CONTINUE_AFTER_SWITCH = 'The previous model stopped partway through this t
 function continuationTurn(history: ModelMessage[]): ModelMessage[] {
     if (history.at(-1)?.role === 'user') return history
     return [...history, { role: 'user', content: [contextTextPart(CONTINUE_AFTER_SWITCH)] }]
+}
+
+function storedTurnText(row: MessageRow): string | undefined {
+    const [first] = JSON.parse(row.contentJson) as Array<{ type?: string; text?: string }>
+    return first?.type === 'text' ? first.text : undefined
+}
+
+// The user's turn is stored before the model is called and stays there when the call fails with
+// nothing said: Retry sends the same text again, which would then reach the model twice. The row is
+// left out of the history and replaced only when the new turn is stored, so a retry that fails while
+// it prepares still leaves the message in the conversation.
+async function unansweredRepeatId(agentId: string, sessionId: string, userText: string, author: MessageAuthor | undefined): Promise<string | undefined> {
+    const last = await lastMessage(agentId, sessionId)
+    if (!last || last.role !== 'user' || storedTurnText(last) !== userText || last.authorId !== (author?.id ?? null)) return undefined
+    const checkpoint = await getLatestCheckpoint(agentId, sessionId)
+    if (checkpoint && last.createdAt <= checkpoint.throughCreatedAt) return undefined
+    return last.id
 }
 
 export type { RunTrigger }
@@ -587,7 +605,14 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         const sentNames = heldBackMcp ? sentToolNames(tools, heldBackMcp) : undefined
         const sentTools = sentNames ? Object.fromEntries(sentNames.map(name => [name, tools[name]])) : tools
         const toolChars = toolPayloadChars(sentTools)
-        const stored = await prepareRunHistory(ctx, systemText, runOverride, shared, toolChars)
+        const repeatId =
+            !handover && trigger.source === 'chat'
+                ? await unansweredRepeatId(agent.id, sessionId, userText, author).catch(err => {
+                      logger.warn({ err: String(err), agent: agent.id, session: sessionId }, 'reading the unanswered repeat failed')
+                      return undefined
+                  })
+                : undefined
+        const stored = await prepareRunHistory(ctx, systemText, runOverride, shared, toolChars, repeatId)
         const history = repairToolPairs(CLI_PROVIDERS.has(provider) ? stored : withToolResultsInToolMessages(stored))
 
         const [memories, mcpServers] = await Promise.all([memoriesP, mcpServersP, cliAuthP])
@@ -604,7 +629,8 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         const suffix = [recall, shared ? '' : userBlock(author?.name), relayedBlock(author), calledByBlock(trigger), userLanguageBlock(trigger.source === 'chat' ? trigger.userLanguage : undefined), nowBlock()].filter(Boolean).join('\n\n')
         const context = suffix ? [contextTextPart(suffix)] : []
         if (!handover) {
-            appendP = appendMessage(agent.id, sessionId, { role: 'user', content: [{ type: 'text', text: userText }, ...context] }, author)
+            const replaced = repeatId ? deleteMessage(agent.id, repeatId).catch(err => logger.warn({ err: String(err), agent: agent.id, session: sessionId }, 'dropping the unanswered repeat failed')) : Promise.resolve()
+            appendP = replaced.then(() => appendMessage(agent.id, sessionId, { role: 'user', content: [{ type: 'text', text: userText }, ...context] }, author))
             appendP.catch(err => logger.error({ err: String(err), agent: agent.id }, 'append user message failed'))
         }
         ctx.userTurnStored = appendP.catch(() => {})
