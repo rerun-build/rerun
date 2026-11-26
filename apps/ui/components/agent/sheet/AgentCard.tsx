@@ -1,11 +1,11 @@
 'use client'
 
-import { AgentBuddy } from '@rerun/ui/iso-grid'
 import { useTranslations } from 'next-intl'
 import { type ComponentType, type MouseEvent, type ReactNode, useEffect, useRef, useState } from 'react'
 import { agentKindPolicy } from '@rerun/contracts'
 
 import { AgentComputerThumbnail } from '@/components/agent/sheet/AgentComputerThumbnail'
+import { BuddyCustomizer } from '@/components/agent/sheet/BuddyCustomizer'
 import { CoworkerNotificationBell } from '@/components/agent/sheet/CoworkerNotificationBell'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -200,8 +200,10 @@ function CardIdentity({ agent, canRename }: { agent: IsoAgent; canRename: boolea
     }
 
     return (
-        <div className="flex shrink-0 flex-col items-center px-4 pb-3 pt-4">
-            <AgentBuddy agentId={agent.id} mood={mood} size={116} facing="left" closesEyesAtRest />
+        <div className="flex shrink-0 flex-col items-center px-4 pb-3 pt-3">
+            <div className="mb-2 flex">
+                <BuddyCustomizer agent={agent} mood={mood} lockedReason={canRename ? undefined : boxManageReason} />
+            </div>
             {editing ? (
                 <Input
                     ref={inputRef}

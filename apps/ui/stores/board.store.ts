@@ -227,6 +227,11 @@ const supabase = createClient()
 // premier, et son propre kickoff ne partait jamais.
 const kickoffsInFlight = new Map<string, Promise<KickoffResult>>()
 
+// A colour dragged across the picker changes a look many times a second: the board wears each one at
+// once, the server gets the last one when the hand rests. A failure puts back the look from before.
+const LOOK_SAVE_DELAY_MS = 400
+const pendingLookSaves = new Map<string, { timer: ReturnType<typeof setTimeout>; previous: CoworkerLook | null }>()
+
 function deliverKickoff(pending: PendingKickoff): Promise<KickoffResult> {
     const inFlight = kickoffsInFlight.get(pending.agentId)
     if (inFlight) return inFlight
@@ -692,13 +697,19 @@ export const useBoardStore = create<BoardState>((set, get) => ({
     },
 
     setAgentLook: (id, look) => {
-        const previous = get().agents.find(a => a.id === id)?.look ?? null
+        const pending = pendingLookSaves.get(id)
+        if (pending) clearTimeout(pending.timer)
+        const previous = pending ? pending.previous : (get().agents.find(a => a.id === id)?.look ?? null)
         const wear = (worn: CoworkerLook | null) => set(state => ({ agents: state.agents.map(a => (a.id === id ? { ...a, look: worn } : a)) }))
         wear(look)
-        setAgentLookAction(id, look).catch(() => {
-            wear(previous)
-            toast.error(translated('builder.boardToasts.lookFailed'))
-        })
+        const timer = setTimeout(() => {
+            pendingLookSaves.delete(id)
+            setAgentLookAction(id, look).catch(() => {
+                wear(previous)
+                toast.error(translated('builder.boardToasts.lookFailed'))
+            })
+        }, LOOK_SAVE_DELAY_MS)
+        pendingLookSaves.set(id, { timer, previous })
     },
 
     removeAgent: id => {
@@ -1063,10 +1074,15 @@ export const useBoardStore = create<BoardState>((set, get) => ({
     _onAgentUpdate: agent => {
         const { sessions, agentOnlineMap } = get()
         const agentSessions = sessions.filter(s => s.agentId === agent.id)
-        const updated = { ...agent, status: computeAgentStatus(agentSessions, agentOnlineMap[agent.id] ?? true) }
+        const status = computeAgentStatus(agentSessions, agentOnlineMap[agent.id] ?? true)
         // Un changement de statut pendant le déplacement de sa Box porterait encore l'ancienne place.
+        // L'écho d'un look déjà parti ramènerait la couleur d'avant pendant qu'une autre attend d'être envoyée.
         set(state => ({
-            agents: state.agents.map(a => (a.id !== agent.id ? a : state._movingSpaceId && a.spaceId === state._movingSpaceId ? { ...updated, position: a.position, spaceId: a.spaceId } : updated)),
+            agents: state.agents.map(a => {
+                if (a.id !== agent.id) return a
+                const updated = { ...agent, status, ...(pendingLookSaves.has(agent.id) && { look: a.look }) }
+                return state._movingSpaceId && a.spaceId === state._movingSpaceId ? { ...updated, position: a.position, spaceId: a.spaceId } : updated
+            }),
         }))
     },
 

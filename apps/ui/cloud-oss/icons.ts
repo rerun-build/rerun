@@ -227,6 +227,7 @@ import {
     NotebookPen as LucideNotebookPen,
     OctagonXIcon as LucideOctagonXIcon,
     Package as LucidePackage,
+    Paintbrush as LucidePaintbrush,
     Palette as LucidePalette,
     PanelLeftCloseIcon as LucidePanelLeftCloseIcon,
     PanelLeftIcon as LucidePanelLeftIcon,
@@ -576,6 +577,7 @@ export const Newspaper: LucideIcon = LucideNewspaper
 export const NotebookPen: LucideIcon = LucideNotebookPen
 export const OctagonXIcon: LucideIcon = LucideOctagonXIcon
 export const Package: LucideIcon = LucidePackage
+export const PaintbrushIcon: LucideIcon = LucidePaintbrush
 export const Palette: LucideIcon = LucidePalette
 export const PanelLeftCloseIcon: LucideIcon = mirroredInRtl(LucidePanelLeftCloseIcon)
 export const PanelLeftIcon: LucideIcon = mirroredInRtl(LucidePanelLeftIcon)
