@@ -1,5 +1,6 @@
 'use client'
 
+import { BorderBeam } from '@rerun/ui'
 import { useTranslations } from 'next-intl'
 import { useMemo, useState, type ReactNode } from 'react'
 
@@ -38,9 +39,10 @@ function Delta({ now, before }: { now: number; before: number }) {
     )
 }
 
-function Kpi({ label, value, detail, tone }: { label: string; value: ReactNode; detail: ReactNode; tone?: 'warn' }) {
+function Kpi({ label, value, detail }: { label: string; value: ReactNode; detail: ReactNode }) {
     return (
-        <div className={cn('min-w-0 rounded-xl bg-card p-3 ring-1 ring-border', tone === 'warn' && 'ring-amber-500/30')}>
+        <div className="relative min-w-0 rounded-xl bg-card p-3 ring-1 ring-border">
+            <BorderBeam />
             <p className="truncate text-xs text-muted-foreground">{label}</p>
             <p className="mt-1 truncate text-xl font-semibold tracking-tight tabular-nums">{value}</p>
             <div className="mt-1 truncate text-xs text-muted-foreground">{detail}</div>
@@ -55,8 +57,8 @@ export function KpiRow({ totals, previous, format }: { totals: Totals; previous:
         <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
             <Kpi label={t('runs')} value={format.count(totals.runs)} detail={<Delta now={totals.runs} before={previous.runs} />} />
             <Kpi label={t('tokens')} value={t('inOut', { input: format.tokens(totals.input), output: format.tokens(totals.output) })} detail={t('tokensDetail')} />
-            <Kpi label={t('notPriced')} value={format.count(totals.unpriced)} detail={t('notPricedDetail')} tone={totals.unpriced > 0 ? 'warn' : undefined} />
-            <Kpi label={t('notRecorded')} value={format.count(totals.unattributed)} detail={t('notRecordedDetail')} tone={totals.unattributed > 0 ? 'warn' : undefined} />
+            <Kpi label={t('notPriced')} value={format.count(totals.unpriced)} detail={t('notPricedDetail')} />
+            <Kpi label={t('notRecorded')} value={format.count(totals.unattributed)} detail={t('notRecordedDetail')} />
         </div>
     )
 }
