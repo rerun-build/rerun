@@ -3,6 +3,7 @@
 import { Command, CommandGroup, CommandItem, CommandList, CommandSeparator } from '@/components/ui/command'
 import { Popover, PopoverAnchor, PopoverContent } from '@/components/ui/popover'
 import { ProviderIcon } from '@/lib/engine/provider-icons'
+import type { SubscriptionProvider } from '@/lib/engine/subscription-providers'
 import { BrainCircuitIcon, ChevronRightIcon, Settings2Icon } from '@/lib/icons'
 import type { Provider } from '@rerun/contracts'
 import { Badge } from '@rerun/ui/primitives'
@@ -10,9 +11,7 @@ import { useTranslations } from 'next-intl'
 import { useRef, useState } from 'react'
 
 export type AddableProvider = Exclude<Provider, 'rerun'>
-export type SubscriptionProvider = Extract<AddableProvider, 'claude' | 'codex'>
-
-export const SUBSCRIPTION_PROVIDERS: SubscriptionProvider[] = ['claude', 'codex']
+export { SUBSCRIPTION_PROVIDERS, type SubscriptionProvider } from '@/lib/engine/subscription-providers'
 
 // Long enough for the pointer to cross the gap between the row and the submenu, short enough that
 // moving down to another row does not leave the submenu hanging over the list.

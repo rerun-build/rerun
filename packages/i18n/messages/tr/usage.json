@@ -1,0 +1,154 @@
+{
+    "title": "Kullanım",
+    "description": "Her coworker'ın token, model ve harcama verileri, canlı.",
+    "live": "Canlı",
+    "truncated": "Bu dönemin yalnızca en son çalıştırmaları gösteriliyor. Hepsini görmek için daha kısa bir dönem seçin.",
+    "lessThan": "<{amount}",
+    "noPrice": "Fiyat yok",
+    "noPriceHint": "Bu model sağlayıcısı tarafından faturalanır (abonelik, kendi API anahtarınız veya özel bir uç nokta). {brand} token'larını sayar ama fiyatlandıramaz.",
+    "runsCount": "{count, plural, one {# çalıştırma} other {# çalıştırma}}",
+    "coworker": {
+        "gone": "Silinmiş coworker"
+    },
+    "model": {
+        "unknown": "Bilinmeyen model",
+        "subscription": "{model} (abonelik)"
+    },
+    "starter": {
+        "member": "Üye",
+        "formerMember": "Eski üye",
+        "one": {
+            "coworker": "Diğer coworker",
+            "schedule": "Zamanlama",
+            "webhook": "Webhook",
+            "checkin": "Check-in",
+            "job": "Bilgisayar işi",
+            "api": "API",
+            "unknown": "Kaydedilmedi"
+        },
+        "many": {
+            "coworker": "Diğer coworker'lar",
+            "schedule": "Zamanlamalar",
+            "webhook": "Webhook'lar",
+            "checkin": "Check-in'ler",
+            "job": "Bilgisayar işleri",
+            "api": "API",
+            "unknown": "Kaydedilmedi"
+        },
+        "sub": {
+            "coworker": "Devredilen iş",
+            "schedule": "Arkasında kişi yok",
+            "webhook": "Dışarıdan başlatıldı",
+            "checkin": "Chief of Staff kendiliğinden",
+            "job": "Bir bilgisayarda bir iş bitti",
+            "api": "API veya MCP istemcisi",
+            "unknown": "Takipten önceki çalıştırmalar"
+        }
+    },
+    "pricing": {
+        "priced": "Fiyatlandırılmış",
+        "unpriced": "Fiyatlandırılmamış"
+    },
+    "period": {
+        "today": "Bugün",
+        "7d": "Son 7 gün",
+        "30d": "Son 30 gün",
+        "90d": "Son 90 gün",
+        "mtd": "Bu ay",
+        "range": "{from} - {to}",
+        "cancel": "İptal",
+        "apply": "Uygula"
+    },
+    "filters": {
+        "coworkers": "Coworker'lar",
+        "starters": "Başlatan",
+        "models": "Modeller",
+        "pricing": "Maliyet",
+        "export": "CSV dışa aktar",
+        "remove": "Filtreyi kaldır",
+        "clearAll": "Tümünü temizle",
+        "shown": "{shownText} / {totalText} {total, plural, one {çalıştırma} other {çalıştırma}}"
+    },
+    "kpi": {
+        "runs": "Çalıştırmalar",
+        "same": "Öncekiyle aynı",
+        "vsPrevious": "%{percent}<muted>önceki döneme göre</muted>",
+        "tokens": "Girdi · çıktı",
+        "inOut": "{input} · {output}",
+        "tokensDetail": "Okunan ve yazılan token",
+        "notPriced": "Fiyatlandırılmamış",
+        "notPricedDetail": "Abonelik veya özel model",
+        "notRecorded": "Kaydedilmedi",
+        "notRecordedDetail": "Bilinen başlatan yok"
+    },
+    "chart": {
+        "spend": "Harcama",
+        "tokens": "Token",
+        "total": {
+            "cost": "Toplam harcama",
+            "tokens": "Toplam token"
+        },
+        "average": {
+            "hour": "Saatlik ortalama",
+            "day": "Günlük ortalama",
+            "week": "Haftalık ortalama"
+        },
+        "busiest": "{label} · en yoğun",
+        "soFar": "{label} · şu ana kadar",
+        "before": "Önceki: <value></value>",
+        "share": "%{percent}",
+        "delta": "{percent, number, ::sign-always}%",
+        "other": "Diğer",
+        "by": {
+            "coworker": "Coworker'a göre",
+            "starter": "Başlatana göre",
+            "model": "Modele göre"
+        },
+        "granularity": {
+            "hour": "Saatlik",
+            "day": "Günlük",
+            "week": "Haftalık"
+        }
+    },
+    "rankings": {
+        "coworker": "Coworker'a göre",
+        "starter": "Başlatan",
+        "model": "Modele göre"
+    },
+    "coverage": {
+        "unpriced": "{count, plural, one {# çalıştırma, {brand} tarafından fiyatlandırılamayan bir model kullandı (abonelik, kendi anahtarınız veya özel bir uç nokta): token'ları sayılır, maliyeti hariç tutulur.} other {# çalıştırma, {brand} tarafından fiyatlandırılamayan bir model kullandı (abonelik, kendi anahtarınız veya özel bir uç nokta): token'ları sayılır, maliyetleri hariç tutulur.}}",
+        "unattributed": "{count, plural, one {# çalıştırmanın kayıtlı bir başlatanı yok ve hiçbir zaman bir kişiye yansıtılmaz.} other {# çalıştırmanın kayıtlı bir başlatanı yok ve hiçbir zaman bir kişiye yansıtılmaz.}}"
+    },
+    "runs": {
+        "title": "Çalıştırmalar",
+        "search": "Çalıştırma ara",
+        "when": "Zaman",
+        "coworker": "Coworker",
+        "startedBy": "Başlatan",
+        "model": "Model",
+        "input": "Girdi",
+        "output": "Çıktı",
+        "cost": "Maliyet",
+        "running": "Çalışıyor",
+        "inOut": "{input} girdi · {output} çıktı",
+        "none": "Bu filtrelere uyan çalıştırma yok.",
+        "more": "{count} tane daha göster"
+    },
+    "empty": {
+        "short": "Bu dönemde çalıştırma yok."
+    },
+    "error": {
+        "noEngine": {
+            "title": "Henüz makine yok",
+            "description": "Kullanım, çalışma alanının makinesi ilk coworker'ını çalıştırdığında görünür."
+        },
+        "unreachable": {
+            "title": "Kullanım verileri şu an alınamıyor",
+            "description": "Çalışma alanının makinesi yanıt vermedi. Makine geri geldiğinde kendiliğinden yenilenir."
+        },
+        "outdated": {
+            "title": "Kullanım için daha yeni bir makine gerekiyor",
+            "description": "Çalışma alanının makinesi daha eski bir sürümde çalışıyor. Kullanım, makine güncellendiğinde görünür."
+        }
+    }
+}

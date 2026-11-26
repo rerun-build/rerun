@@ -1,0 +1,168 @@
+{
+    "_context": {
+        "title": "Title of the dialog that shows how much every AI coworker of the workspace used: tokens, models and spend, per run.",
+        "live": "Badge next to the title: the numbers refresh on their own while the dialog is open.",
+        "lessThan": "An amount too small to show, such as \"<$0.01\". {amount} is already formatted.",
+        "noPrice": "Badge in place of a cost: the run used a model Rerun cannot price (a subscription billed by its provider, the customer's own API key, a custom endpoint). Never translate as \"free\".",
+        "starter": "Who started a run of a coworker: a person, another coworker, a schedule, a webhook, a check-in of the Chief of Staff, a job on a linked computer, the API.",
+        "starter.many.unknown": "Runs from before the app recorded who started them. Never charged to a person.",
+        "kpi.vsPrevious": "Change against the period of the same length just before. <muted> wraps the muted words.",
+        "chart.before": "In the pill over a bar: the value of the same slot in the previous period. <value> holds the formatted amount.",
+        "chart.busiest": "Header of the chart when nothing is hovered: the day (or hour, week) with the most usage. {label} is a date.",
+        "chart.soFar": "Header when hovering today: the day is not over. {label} is a date.",
+        "coverage": "Warning under the rankings about the runs whose cost or starter is unknown.",
+        "model.subscription": "A model used through a Claude or ChatGPT subscription, billed flat by its provider. {model} is the model name."
+    },
+    "title": "Usage",
+    "description": "Tokens, models and spend of every coworker, as they run.",
+    "live": "Live",
+    "truncated": "Only the most recent runs of this period are shown. Pick a shorter period to see them all.",
+    "lessThan": "<{amount}",
+    "noPrice": "No price",
+    "noPriceHint": "This model is billed by its provider (subscription, your own API key or a custom endpoint). {brand} counts its tokens but cannot price them.",
+    "runsCount": "{count, plural, one {# run} other {# runs}}",
+    "coworker": {
+        "gone": "Deleted coworker"
+    },
+    "model": {
+        "unknown": "Unknown model",
+        "subscription": "{model} (subscription)"
+    },
+    "starter": {
+        "member": "Member",
+        "formerMember": "Former member",
+        "one": {
+            "coworker": "Other coworker",
+            "schedule": "Schedule",
+            "webhook": "Webhook",
+            "checkin": "Check-in",
+            "job": "Computer job",
+            "api": "API",
+            "unknown": "Not recorded"
+        },
+        "many": {
+            "coworker": "Other coworkers",
+            "schedule": "Schedules",
+            "webhook": "Webhooks",
+            "checkin": "Check-ins",
+            "job": "Computer jobs",
+            "api": "API",
+            "unknown": "Not recorded"
+        },
+        "sub": {
+            "coworker": "Delegated work",
+            "schedule": "No person behind it",
+            "webhook": "Started from outside",
+            "checkin": "The Chief of Staff on its own",
+            "job": "A job ended on a computer",
+            "api": "API or MCP client",
+            "unknown": "Runs from before tracking"
+        }
+    },
+    "pricing": {
+        "priced": "Priced",
+        "unpriced": "Not priced"
+    },
+    "period": {
+        "today": "Today",
+        "7d": "Last 7 days",
+        "30d": "Last 30 days",
+        "90d": "Last 90 days",
+        "mtd": "Month to date",
+        "range": "{from} - {to}",
+        "cancel": "Cancel",
+        "apply": "Apply"
+    },
+    "filters": {
+        "coworkers": "Coworkers",
+        "starters": "Started by",
+        "models": "Models",
+        "pricing": "Cost",
+        "export": "Export CSV",
+        "remove": "Remove filter",
+        "clearAll": "Clear all",
+        "shown": "{shownText} of {totalText} {total, plural, one {run} other {runs}}"
+    },
+    "kpi": {
+        "runs": "Runs",
+        "same": "Same as before",
+        "vsPrevious": "{percent}%<muted>vs previous</muted>",
+        "tokens": "Input · output",
+        "inOut": "{input} · {output}",
+        "tokensDetail": "Tokens read and written",
+        "notPriced": "Not priced",
+        "notPricedDetail": "Subscription or custom model",
+        "notRecorded": "Not recorded",
+        "notRecordedDetail": "No known starter"
+    },
+    "chart": {
+        "spend": "Spend",
+        "tokens": "Tokens",
+        "total": {
+            "cost": "Total spend",
+            "tokens": "Total tokens"
+        },
+        "average": {
+            "hour": "Average per hour",
+            "day": "Average per day",
+            "week": "Average per week"
+        },
+        "busiest": "{label} · busiest",
+        "soFar": "{label} · so far",
+        "before": "Before <value></value>",
+        "share": "{percent}%",
+        "delta": "{percent, number, ::sign-always}%",
+        "other": "Other",
+        "by": {
+            "coworker": "By coworker",
+            "starter": "By started by",
+            "model": "By model"
+        },
+        "granularity": {
+            "hour": "Hourly",
+            "day": "Daily",
+            "week": "Weekly"
+        }
+    },
+    "rankings": {
+        "coworker": "By coworker",
+        "starter": "Started by",
+        "model": "By model"
+    },
+    "coverage": {
+        "unpriced": "{count, plural, one {# run used a model {brand} cannot price (subscription, your own key or a custom endpoint): its tokens are counted, its cost is left out.} other {# runs used a model {brand} cannot price (subscription, your own key or a custom endpoint): their tokens are counted, their cost is left out.}}",
+        "unattributed": "{count, plural, one {# run has no recorded starter and is never charged to a person.} other {# runs have no recorded starter and are never charged to a person.}}"
+    },
+    "runs": {
+        "title": "Runs",
+        "search": "Search runs",
+        "when": "When",
+        "coworker": "Coworker",
+        "startedBy": "Started by",
+        "model": "Model",
+        "input": "Input",
+        "output": "Output",
+        "cost": "Cost",
+        "running": "Running",
+        "inOut": "{input} in · {output} out",
+        "none": "No run matches these filters.",
+        "more": "Show {count} more"
+    },
+    "empty": {
+        "short": "No run in this period."
+    },
+    "error": {
+        "noEngine": {
+            "title": "No machine yet",
+            "description": "Usage shows up once the workspace's machine runs its first coworker."
+        },
+        "unreachable": {
+            "title": "Usage is not available right now",
+            "description": "The workspace's machine did not answer. It refreshes on its own as soon as it is back."
+        },
+        "outdated": {
+            "title": "Usage needs a newer machine",
+            "description": "The workspace's machine runs an older version. Usage shows up once it is updated."
+        }
+    }
+}

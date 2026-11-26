@@ -1,0 +1,154 @@
+{
+    "title": "Consommation",
+    "description": "Tokens, modèles et dépenses de chaque coworker, en direct.",
+    "live": "En direct",
+    "truncated": "Seules les exécutions les plus récentes de la période sont affichées. Choisissez une période plus courte pour tout voir.",
+    "lessThan": "<{amount}",
+    "noPrice": "Non tarifé",
+    "noPriceHint": "Ce modèle est facturé par son fournisseur (abonnement, votre propre clé API ou un endpoint personnalisé). {brand} compte ses tokens mais ne peut pas les chiffrer.",
+    "runsCount": "{count, plural, one {# exécution} other {# exécutions}}",
+    "coworker": {
+        "gone": "Coworker supprimé"
+    },
+    "model": {
+        "unknown": "Modèle inconnu",
+        "subscription": "{model} (abonnement)"
+    },
+    "starter": {
+        "member": "Membre",
+        "formerMember": "Ancien membre",
+        "one": {
+            "coworker": "Autre coworker",
+            "schedule": "Planification",
+            "webhook": "Webhook",
+            "checkin": "Check-in",
+            "job": "Tâche d'ordinateur",
+            "api": "API",
+            "unknown": "Non enregistré"
+        },
+        "many": {
+            "coworker": "Autres coworkers",
+            "schedule": "Planifications",
+            "webhook": "Webhooks",
+            "checkin": "Check-ins",
+            "job": "Tâches d'ordinateur",
+            "api": "API",
+            "unknown": "Non enregistré"
+        },
+        "sub": {
+            "coworker": "Travail délégué",
+            "schedule": "Aucune personne derrière",
+            "webhook": "Lancé depuis l'extérieur",
+            "checkin": "Le Chief of Staff de lui-même",
+            "job": "Une tâche terminée sur un ordinateur",
+            "api": "Client API ou MCP",
+            "unknown": "Exécutions d'avant le suivi"
+        }
+    },
+    "pricing": {
+        "priced": "Tarifé",
+        "unpriced": "Non tarifé"
+    },
+    "period": {
+        "today": "Aujourd'hui",
+        "7d": "7 derniers jours",
+        "30d": "30 derniers jours",
+        "90d": "90 derniers jours",
+        "mtd": "Mois en cours",
+        "range": "{from} - {to}",
+        "cancel": "Annuler",
+        "apply": "Appliquer"
+    },
+    "filters": {
+        "coworkers": "Coworkers",
+        "starters": "Lancé par",
+        "models": "Modèles",
+        "pricing": "Coût",
+        "export": "Exporter en CSV",
+        "remove": "Retirer le filtre",
+        "clearAll": "Tout effacer",
+        "shown": "{shownText} sur {totalText} {total, plural, one {exécution} other {exécutions}}"
+    },
+    "kpi": {
+        "runs": "Exécutions",
+        "same": "Comme avant",
+        "vsPrevious": "{percent} %<muted>vs période précédente</muted>",
+        "tokens": "Entrée · sortie",
+        "inOut": "{input} · {output}",
+        "tokensDetail": "Tokens lus et écrits",
+        "notPriced": "Non tarifé",
+        "notPricedDetail": "Abonnement ou modèle personnalisé",
+        "notRecorded": "Non enregistré",
+        "notRecordedDetail": "Origine inconnue"
+    },
+    "chart": {
+        "spend": "Dépenses",
+        "tokens": "Tokens",
+        "total": {
+            "cost": "Dépenses totales",
+            "tokens": "Tokens au total"
+        },
+        "average": {
+            "hour": "Moyenne par heure",
+            "day": "Moyenne par jour",
+            "week": "Moyenne par semaine"
+        },
+        "busiest": "{label} · pic",
+        "soFar": "{label} · jusqu'ici",
+        "before": "Avant <value></value>",
+        "share": "{percent} %",
+        "delta": "{percent, number, ::sign-always} %",
+        "other": "Autre",
+        "by": {
+            "coworker": "Par coworker",
+            "starter": "Par origine",
+            "model": "Par modèle"
+        },
+        "granularity": {
+            "hour": "Par heure",
+            "day": "Par jour",
+            "week": "Par semaine"
+        }
+    },
+    "rankings": {
+        "coworker": "Par coworker",
+        "starter": "Lancé par",
+        "model": "Par modèle"
+    },
+    "coverage": {
+        "unpriced": "{count, plural, one {# exécution a utilisé un modèle que {brand} ne peut pas chiffrer (abonnement, votre propre clé ou un endpoint personnalisé) : ses tokens sont comptés, son coût est laissé de côté.} other {# exécutions ont utilisé un modèle que {brand} ne peut pas chiffrer (abonnement, votre propre clé ou un endpoint personnalisé) : leurs tokens sont comptés, leur coût est laissé de côté.}}",
+        "unattributed": "{count, plural, one {# exécution n'a pas d'origine enregistrée et n'est jamais imputée à une personne.} other {# exécutions n'ont pas d'origine enregistrée et ne sont jamais imputées à une personne.}}"
+    },
+    "runs": {
+        "title": "Exécutions",
+        "search": "Chercher une exécution",
+        "when": "Quand",
+        "coworker": "Coworker",
+        "startedBy": "Lancé par",
+        "model": "Modèle",
+        "input": "Entrée",
+        "output": "Sortie",
+        "cost": "Coût",
+        "running": "En cours",
+        "inOut": "{input} entrée · {output} sortie",
+        "none": "Aucune exécution pour ces filtres.",
+        "more": "Afficher {count} de plus"
+    },
+    "empty": {
+        "short": "Aucune exécution sur la période."
+    },
+    "error": {
+        "noEngine": {
+            "title": "Pas encore de machine",
+            "description": "La consommation s'affiche dès que la machine du workspace lance son premier coworker."
+        },
+        "unreachable": {
+            "title": "Consommation indisponible pour le moment",
+            "description": "La machine du workspace n'a pas répondu. L'affichage se met à jour tout seul dès qu'elle revient."
+        },
+        "outdated": {
+            "title": "La consommation demande une machine à jour",
+            "description": "La machine du workspace tourne sur une version plus ancienne. La consommation s'affiche dès qu'elle est mise à jour."
+        }
+    }
+}

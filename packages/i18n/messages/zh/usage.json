@@ -1,0 +1,154 @@
+{
+    "title": "用量",
+    "description": "每位同事的 token、模型和花费，实时更新。",
+    "live": "实时",
+    "truncated": "仅显示此时间段内最近的运行。选择更短的时间段即可查看全部。",
+    "lessThan": "<{amount}",
+    "noPrice": "未定价",
+    "noPriceHint": "此模型由其提供商计费（订阅、您自己的 API 密钥或自定义端点）。{brand} 会统计其 token，但无法为其定价。",
+    "runsCount": "{count, plural, other {# 次运行}}",
+    "coworker": {
+        "gone": "已删除的同事"
+    },
+    "model": {
+        "unknown": "未知模型",
+        "subscription": "{model}（订阅）"
+    },
+    "starter": {
+        "member": "成员",
+        "formerMember": "前成员",
+        "one": {
+            "coworker": "其他同事",
+            "schedule": "计划任务",
+            "webhook": "Webhook",
+            "checkin": "签到",
+            "job": "电脑任务",
+            "api": "API",
+            "unknown": "未记录"
+        },
+        "many": {
+            "coworker": "其他同事",
+            "schedule": "计划任务",
+            "webhook": "Webhook",
+            "checkin": "签到",
+            "job": "电脑任务",
+            "api": "API",
+            "unknown": "未记录"
+        },
+        "sub": {
+            "coworker": "委派的工作",
+            "schedule": "无人发起",
+            "webhook": "从外部发起",
+            "checkin": "Chief of Staff 自行发起",
+            "job": "电脑上的任务已结束",
+            "api": "API 或 MCP 客户端",
+            "unknown": "开始记录前的运行"
+        }
+    },
+    "pricing": {
+        "priced": "已定价",
+        "unpriced": "未定价"
+    },
+    "period": {
+        "today": "今天",
+        "7d": "最近 7 天",
+        "30d": "最近 30 天",
+        "90d": "最近 90 天",
+        "mtd": "本月至今",
+        "range": "{from} - {to}",
+        "cancel": "取消",
+        "apply": "应用"
+    },
+    "filters": {
+        "coworkers": "同事",
+        "starters": "发起方",
+        "models": "模型",
+        "pricing": "费用",
+        "export": "导出 CSV",
+        "remove": "移除筛选",
+        "clearAll": "全部清除",
+        "shown": "{shownText} / {totalText} {total, plural, other {次运行}}"
+    },
+    "kpi": {
+        "runs": "运行",
+        "same": "与之前持平",
+        "vsPrevious": "{percent}%<muted>较上期</muted>",
+        "tokens": "输入 · 输出",
+        "inOut": "{input} · {output}",
+        "tokensDetail": "读取和写入的 token",
+        "notPriced": "未定价",
+        "notPricedDetail": "订阅或自定义模型",
+        "notRecorded": "未记录",
+        "notRecordedDetail": "发起方未知"
+    },
+    "chart": {
+        "spend": "花费",
+        "tokens": "Token",
+        "total": {
+            "cost": "总花费",
+            "tokens": "总 token 数"
+        },
+        "average": {
+            "hour": "每小时平均",
+            "day": "每日平均",
+            "week": "每周平均"
+        },
+        "busiest": "{label} · 最高",
+        "soFar": "{label} · 截至目前",
+        "before": "之前 <value></value>",
+        "share": "{percent}%",
+        "delta": "{percent, number, ::sign-always}%",
+        "other": "其他",
+        "by": {
+            "coworker": "按同事",
+            "starter": "按发起方",
+            "model": "按模型"
+        },
+        "granularity": {
+            "hour": "按小时",
+            "day": "按天",
+            "week": "按周"
+        }
+    },
+    "rankings": {
+        "coworker": "按同事",
+        "starter": "发起方",
+        "model": "按模型"
+    },
+    "coverage": {
+        "unpriced": "{count, plural, other {# 次运行使用了 {brand} 无法定价的模型（订阅、您自己的密钥或自定义端点）：已统计其 token，费用未计入。}}",
+        "unattributed": "{count, plural, other {# 次运行没有记录发起方，绝不会计入任何人名下。}}"
+    },
+    "runs": {
+        "title": "运行",
+        "search": "搜索运行",
+        "when": "时间",
+        "coworker": "同事",
+        "startedBy": "发起方",
+        "model": "模型",
+        "input": "输入",
+        "output": "输出",
+        "cost": "费用",
+        "running": "运行中",
+        "inOut": "输入 {input} · 输出 {output}",
+        "none": "没有符合这些筛选条件的运行。",
+        "more": "再显示 {count} 项"
+    },
+    "empty": {
+        "short": "此时间段内没有运行。"
+    },
+    "error": {
+        "noEngine": {
+            "title": "暂无机器",
+            "description": "工作区的机器运行第一位同事后，这里就会显示用量。"
+        },
+        "unreachable": {
+            "title": "暂时无法获取用量",
+            "description": "工作区的机器没有响应。恢复后，这里会自动刷新。"
+        },
+        "outdated": {
+            "title": "用量需要更新的机器",
+            "description": "工作区的机器运行的是旧版本。更新后即可查看用量。"
+        }
+    }
+}

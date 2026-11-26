@@ -106,6 +106,7 @@
         "vault": "Vault",
         "vaultSignedOut": "Vault 中有应用已退出登录",
         "computers": "电脑",
+        "usage": "用量",
         "servers": "服务器",
         "billing": "账单",
         "inviteFriends": "邀请好友",

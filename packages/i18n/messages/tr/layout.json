@@ -106,6 +106,7 @@
         "vault": "Vault",
         "vaultSignedOut": "Vault'taki bir uygulamanın oturumu kapalı",
         "computers": "Bilgisayarlar",
+        "usage": "Kullanım",
         "servers": "Sunucular",
         "billing": "Faturalandırma",
         "newWorkspace": "Yeni çalışma alanı",

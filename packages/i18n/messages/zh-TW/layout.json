@@ -106,6 +106,7 @@
         "vault": "Vault",
         "vaultSignedOut": "Vault 中有一個 App 已登出",
         "computers": "電腦",
+        "usage": "用量",
         "servers": "伺服器",
         "billing": "帳務",
         "inviteFriends": "邀請朋友",

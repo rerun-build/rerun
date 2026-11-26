@@ -12,6 +12,7 @@ import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { MarkdownTextarea } from '@/components/ui/markdown-textarea'
+import { downloadBlob } from '@/lib/files/download-blob'
 import { DownloadIcon } from '@/lib/icons'
 import { SkeletonRows } from '@/components/ui/skeleton'
 import { useTranslations } from 'next-intl'
@@ -162,13 +163,4 @@ export function SkillEditor({ agentId, slug, readOnly: readOnlyProp, onDone, onB
             </PanelEditorShell>
         </PanelSteps>
     )
-}
-
-function downloadBlob(blob: Blob, filename: string) {
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = filename
-    a.click()
-    URL.revokeObjectURL(url)
 }

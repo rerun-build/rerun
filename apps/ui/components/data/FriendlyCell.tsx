@@ -2,6 +2,7 @@
 
 import { useLocale, useTranslations } from 'next-intl'
 
+import { initialsOf } from '@/lib/naming/initials'
 import { absoluteDate, capitalize, domainOf, externalHref, isEmpty, parseJson, plainValue, relativeDate, truthy, type ColumnKind, type FriendlyColumn } from '@/lib/data/friendly-columns'
 import {
     AlignLeftIcon,
@@ -77,12 +78,7 @@ const AVATAR_COLORS = [
 export function LetterAvatar({ name, shape = 'circle', className }: { name: string; shape?: 'circle' | 'square'; className?: string }) {
     let hash = 0
     for (const char of name) hash = (hash * 31 + char.charCodeAt(0)) | 0
-    const initials = name
-        .split(/\s+/)
-        .slice(0, 2)
-        .map(word => word.charAt(0))
-        .join('')
-        .toUpperCase()
+    const initials = initialsOf(name)
     return (
         <span
             aria-hidden

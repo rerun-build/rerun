@@ -19,7 +19,7 @@ export const PERIOD_LABELS: Record<PeriodKey, string> = {
 
 type PeriodTiming = { nextRunAt: string | null; runningSince: string | null }
 
-function startOfDay(at: number): number {
+export function startOfDay(at: number): number {
     return new Date(at).setHours(0, 0, 0, 0)
 }
 

@@ -155,6 +155,7 @@
         "vault": "Vault",
         "vaultSignedOut": "An app of the Vault is signed out",
         "computers": "Computers",
+        "usage": "Usage",
         "servers": "Servers",
         "billing": "Billing",
         "inviteFriends": "Invite friends",

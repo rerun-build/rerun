@@ -17,6 +17,7 @@ import { CreditMeter, UpgradePill } from '@rerun/cloud/billing.client'
 import { OrganizationMenuItem } from '@rerun/cloud/organizations.client'
 import { ExpertProfileDialog } from '@/components/dialogs/ExpertProfileDialog'
 import { KnowledgeBaseDialog } from '@/components/dialogs/KnowledgeBaseDialog'
+import { UsageDialog } from '@/components/usage/UsageDialog'
 import { PaidAppDialogs, usePaidAppsStore, AppsMenuSection } from '@rerun/cloud/apps.client'
 import { useEnabledPaidApps } from '@/components/layout/FeatureFlagsProvider'
 import { ComputersDialog } from '@/components/computers/ComputersDialog'
@@ -48,7 +49,7 @@ import { useBrainStore } from '@/stores/brain.store'
 import { useNotificationsStore } from '@/stores/notifications.store'
 import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
 import { useIsWorkspaceAdmin, useSession } from '@/supabase/session/SessionProvider'
-import { BadgeCheck, BellIcon, BrainIcon, ChevronDownIcon, ChevronsUpDownIcon, CreditCardIcon, FlaskConical, GaugeIcon, GridIcon, IdCardIcon, KeyIcon, LayersIcon, Loader2Icon, LockIcon, LockKeyholeIcon, LogOutIcon, MonitorIcon, PlusIcon, ServerIcon, SettingsIcon, ShieldCheckIcon, UserPlus, UserRoundIcon, UsersIcon } from '@/lib/icons'
+import { BadgeCheck, BarChart3Icon, BellIcon, BrainIcon, ChevronDownIcon, ChevronsUpDownIcon, CreditCardIcon, FlaskConical, GaugeIcon, GridIcon, IdCardIcon, KeyIcon, LayersIcon, Loader2Icon, LockIcon, LockKeyholeIcon, LogOutIcon, MonitorIcon, PlusIcon, ServerIcon, SettingsIcon, ShieldCheckIcon, UserPlus, UserRoundIcon, UsersIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { abortWorkspaceSwitch, beginWorkspaceSwitch, enterActiveWorkspace } from '@/lib/workspace/workspace-switch'
 import Link from 'next/link'
@@ -312,6 +313,12 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
                     </DropdownMenuItem>
                 </DisabledWithReason>
             )}
+            <DisabledWithReason allowed={!needsPlan} reason={needsPlanReason}>
+                <DropdownMenuItem disabled={needsPlan} onSelect={() => openWorkspacePanel('usage')} className="gap-2 text-muted-foreground">
+                    <BarChart3Icon className="size-4" />
+                    {t('usage')}
+                </DropdownMenuItem>
+            </DisabledWithReason>
             {apiKeysItem}
             {SERVERS_ENABLED && (
                 <DisabledWithReason allowed={workspaceAdmin} reason={t('adminOnly.servers')}>
@@ -516,6 +523,7 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
                 }}
             />
             <ComputersDialog open={panel === 'computers'} onOpenChange={open => setPanel(open ? 'computers' : null)} />
+            <UsageDialog open={panel === 'usage'} onOpenChange={open => setPanel(open ? 'usage' : null)} />
             <KnowledgeBaseDialog open={panel === 'knowledge_base'} onOpenChange={open => setPanel(open ? 'knowledge_base' : null)} />
             <PaidAppDialogs apps={paidApps} />
             <WorkspacePowerDialog action={powerAction} onOpenChange={open => setPowerAction(open ? powerAction : null)} />

@@ -106,6 +106,7 @@
         "vault": "Vault",
         "vaultSignedOut": "Eine App im Vault ist abgemeldet",
         "computers": "Computer",
+        "usage": "Verbrauch",
         "servers": "Server",
         "billing": "Abrechnung",
         "newWorkspace": "Neuer Workspace",

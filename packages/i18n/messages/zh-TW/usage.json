@@ -1,0 +1,154 @@
+{
+    "title": "用量",
+    "description": "每位同事的 token、模型與花費，即時呈現。",
+    "live": "即時",
+    "truncated": "僅顯示此期間最近的執行。選擇較短的期間即可查看全部。",
+    "lessThan": "<{amount}",
+    "noPrice": "未定價",
+    "noPriceHint": "此模型由其提供者計費（訂閱、您自己的 API 金鑰或自訂端點）。{brand} 會計算其 token，但無法為其定價。",
+    "runsCount": "{count, plural, other {# 次執行}}",
+    "coworker": {
+        "gone": "已刪除的同事"
+    },
+    "model": {
+        "unknown": "未知的模型",
+        "subscription": "{model}（訂閱）"
+    },
+    "starter": {
+        "member": "成員",
+        "formerMember": "前成員",
+        "one": {
+            "coworker": "其他同事",
+            "schedule": "排程",
+            "webhook": "Webhook",
+            "checkin": "定期回報",
+            "job": "電腦工作",
+            "api": "API",
+            "unknown": "未記錄"
+        },
+        "many": {
+            "coworker": "其他同事",
+            "schedule": "排程",
+            "webhook": "Webhooks",
+            "checkin": "定期回報",
+            "job": "電腦工作",
+            "api": "API",
+            "unknown": "未記錄"
+        },
+        "sub": {
+            "coworker": "委派的工作",
+            "schedule": "沒有人發起",
+            "webhook": "從外部啟動",
+            "checkin": "Chief of Staff 自行發起",
+            "job": "電腦上的工作已結束",
+            "api": "API 或 MCP 用戶端",
+            "unknown": "開始記錄前的執行"
+        }
+    },
+    "pricing": {
+        "priced": "已定價",
+        "unpriced": "未定價"
+    },
+    "period": {
+        "today": "今天",
+        "7d": "過去 7 天",
+        "30d": "過去 30 天",
+        "90d": "過去 90 天",
+        "mtd": "本月至今",
+        "range": "{from} - {to}",
+        "cancel": "取消",
+        "apply": "套用"
+    },
+    "filters": {
+        "coworkers": "同事",
+        "starters": "啟動者",
+        "models": "模型",
+        "pricing": "費用",
+        "export": "匯出 CSV",
+        "remove": "移除篩選條件",
+        "clearAll": "全部清除",
+        "shown": "{shownText} / {totalText} {total, plural, other {次執行}}"
+    },
+    "kpi": {
+        "runs": "執行",
+        "same": "與先前相同",
+        "vsPrevious": "{percent}%<muted>較上期</muted>",
+        "tokens": "輸入 · 輸出",
+        "inOut": "{input} · {output}",
+        "tokensDetail": "讀取與寫入的 token",
+        "notPriced": "未定價",
+        "notPricedDetail": "訂閱或自訂模型",
+        "notRecorded": "未記錄",
+        "notRecordedDetail": "啟動者不明"
+    },
+    "chart": {
+        "spend": "花費",
+        "tokens": "Token",
+        "total": {
+            "cost": "總花費",
+            "tokens": "總 token 數"
+        },
+        "average": {
+            "hour": "每小時平均",
+            "day": "每日平均",
+            "week": "每週平均"
+        },
+        "busiest": "{label} · 最高",
+        "soFar": "{label} · 目前為止",
+        "before": "先前 <value></value>",
+        "share": "{percent}%",
+        "delta": "{percent, number, ::sign-always}%",
+        "other": "其他",
+        "by": {
+            "coworker": "依同事",
+            "starter": "依啟動者",
+            "model": "依模型"
+        },
+        "granularity": {
+            "hour": "每小時",
+            "day": "每日",
+            "week": "每週"
+        }
+    },
+    "rankings": {
+        "coworker": "依同事",
+        "starter": "啟動者",
+        "model": "依模型"
+    },
+    "coverage": {
+        "unpriced": "{count, plural, other {# 次執行使用了 {brand} 無法定價的模型（訂閱、您自己的金鑰或自訂端點）：已計算其 token，但未計入費用。}}",
+        "unattributed": "{count, plural, other {# 次執行沒有記錄啟動者，絕不會算在任何人頭上。}}"
+    },
+    "runs": {
+        "title": "執行",
+        "search": "搜尋執行",
+        "when": "時間",
+        "coworker": "同事",
+        "startedBy": "啟動者",
+        "model": "模型",
+        "input": "輸入",
+        "output": "輸出",
+        "cost": "費用",
+        "running": "執行中",
+        "inOut": "輸入 {input} · 輸出 {output}",
+        "none": "沒有符合這些篩選條件的執行。",
+        "more": "再顯示 {count} 個"
+    },
+    "empty": {
+        "short": "此期間沒有執行。"
+    },
+    "error": {
+        "noEngine": {
+            "title": "尚無機器",
+            "description": "工作區的機器執行第一位同事後，這裡就會顯示用量。"
+        },
+        "unreachable": {
+            "title": "目前無法取得用量",
+            "description": "工作區的機器沒有回應。恢復後，這裡會自動重新整理。"
+        },
+        "outdated": {
+            "title": "用量需要較新的機器",
+            "description": "工作區的機器執行的是舊版本。更新後即可查看用量。"
+        }
+    }
+}
