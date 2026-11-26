@@ -9,7 +9,7 @@ Rerun exposes two programmatic surfaces, and only two.
 
 <CardGroup cols={2}>
   <Card title="The MCP server" icon="plug" href="/api/protocol">
-    A single endpoint, `POST https://app.rerun.build/api/mcp/account`, that speaks the Model Context Protocol. It carries 61 tools covering coworkers, team status, skills, memory and files, scheduled tasks, webhook triggers, apps, the Vault, databases, runs, share links and template authoring.
+    A single endpoint, `POST https://app.rerun.build/api/mcp/account`, that speaks the Model Context Protocol. It carries 86 tools covering Boxes, coworkers, team status, skills, memory and files, the Brain, scheduled tasks, webhook triggers, apps, the Vault, databases, runs, conversations and cards, the Chief of Staff, published pages, share links, the template library and template authoring.
   </Card>
   <Card title="Webhook triggers" icon="bolt" href="/api/webhooks">
     A public URL per trigger. Anything that can send an HTTP request can start a coworker run, with no SDK and no key exchange.
@@ -36,7 +36,7 @@ The API was designed for an AI coding assistant sitting next to you. You connect
 
 > Create a coworker that watches our support inbox, writes a daily summary into the shared database, and pings me on Slack when a refund request comes in.
 
-The assistant calls `create_agent`, `upsert_skill`, `upsert_schedule`, `attach_connector` and `send_message` to build and test it. See [Connect a client](/api/connect).
+The assistant calls `create_agent`, `upsert_skill`, `upsert_schedule`, `attach_connector` and `send_message` to build and test it. It can also hand a task to your Chief of Staff with `send_message`, answer the cards your coworkers left waiting, and read what they wrote in the Brain. See [Connect a client](/api/connect).
 
 Everything the API does is also available in the Rerun app. The API exists so you can script it, version it, and repeat it.
 
@@ -48,13 +48,16 @@ An API key belongs to one workspace and acts with the access of the member who c
 
 <Columns cols={2}>
   <Card title="Coworkers" icon="bot" href="/api/tools/agents">
-    `list_spaces` `list_agents` `get_team_status` `get_agent` `create_agent` `update_agent` `delete_agent` `list_ai_connections` `set_default_model`
+    `list_spaces` `create_boxes` `rename_box` `delete_box` `list_agents` `get_team_status` `get_agent` `create_agent` `update_agent` `delete_agent` `list_ai_connections` `set_default_model`
   </Card>
   <Card title="Skills" icon="book" href="/api/tools/skills">
     `list_skills` `get_skill` `read_skill_file` `upsert_skill` `delete_skill`
   </Card>
   <Card title="Memory and files" icon="brain" href="/api/tools/memory-and-files">
-    `write_memory` `upload_workspace_file`
+    `write_memory` `list_memories` `recall_memories` `delete_memory` `upload_workspace_file` `list_files` `read_file`
+  </Card>
+  <Card title="Brain" icon="library" href="/api/tools/brain">
+    `list_brain_pages` `get_brain_page` `write_brain_page` `delete_brain_page`
   </Card>
   <Card title="Scheduled tasks" icon="clock" href="/api/tools/schedules">
     `list_schedules` `upsert_schedule` `run_schedule_now` `delete_schedule`
@@ -63,7 +66,10 @@ An API key belongs to one workspace and acts with the access of the member who c
     `list_triggers` `upsert_trigger` `test_trigger` `rotate_trigger_token` `delete_trigger`
   </Card>
   <Card title="Messages and runs" icon="messages-square" href="/api/tools/runs">
-    `send_message` `list_runs` `get_run`
+    `send_message` `list_runs` `get_run` `cancel_run`
+  </Card>
+  <Card title="Conversations and cards" icon="inbox" href="/api/tools/conversations">
+    `list_conversations` `read_conversation` `search_conversations` `list_pending_cards` `answer_card`
   </Card>
   <Card title="Databases" icon="database" href="/api/tools/databases">
     `list_tables` `db_query` `db_execute` `list_space_tables` `space_db_query` `space_db_execute`
@@ -72,10 +78,16 @@ An API key belongs to one workspace and acts with the access of the member who c
     `search_connectors` `list_connectors` `list_agent_connectors` `attach_connector` `detach_connector`
   </Card>
   <Card title="Vault" icon="vault" href="/api/tools/vault">
-    `list_vault` `attach_vault_entry` `detach_vault_entry` `share_vault_entry` `rename_vault_entry` `delete_vault_entry`
+    `list_vault` `add_vault_entry` `attach_vault_entry` `detach_vault_entry` `share_vault_entry` `rename_vault_entry` `delete_vault_entry`
+  </Card>
+  <Card title="Published pages" icon="globe" href="/api/tools/published-pages">
+    `list_published_pages` `publish_file` `update_published_page` `unpublish_page`
   </Card>
   <Card title="Share links" icon="share-2" href="/api/tools/sharing">
     `plan_agent_share` `create_agent_share` `list_agent_shares` `revoke_agent_share`
+  </Card>
+  <Card title="Template library" icon="layout-grid" href="/api/tools/template-library">
+    `search_template_library` `install_template`
   </Card>
   <Card title="Templates" icon="box" href="/api/tools/templates">
     12 authoring tools, reserved for expert sandbox accounts
@@ -86,10 +98,9 @@ An API key belongs to one workspace and acts with the access of the member who c
 
 Some things are deliberately left to the app, mostly because they involve a secret or a decision that should not be automated. See [Limits and guarantees](/api/limits) for the full list. The short version:
 
-- No credential ever goes through the API. `attach_connector` declares an app, and the account owner finishes the sign-in in the app.
-- No billing, no plan change, no member management, no Box creation.
+- No credential ever goes through the API. `attach_connector` and `add_vault_entry` declare an app, and the account owner finishes the sign-in in the app.
+- No billing, no plan change, no member management.
 - No API key management. You cannot mint or revoke a key over MCP.
-- No reading of a coworker memory or workspace files. `write_memory` and `upload_workspace_file` add to them, nothing reads them back.
 - No template publication. You submit a draft, the Rerun team publishes it.
 
 ## Next steps

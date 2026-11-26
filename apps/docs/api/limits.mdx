@@ -18,10 +18,17 @@ description: "What the API caps, what it refuses, and what it promises."
 | `db_query` and `space_db_query` | 100 rows by default, between 1 and 1000 |
 | `list_connectors` | 60 per page by default, between 1 and 200 |
 | `write_memory` | 100 memories per call, 20,000 characters each |
+| `list_memories` | 50 memories by default, between 1 and 200 |
+| `recall_memories` | 5 memories by default, between 1 and 20 |
 | `upload_workspace_file` | One file per call, 5 MB once decoded |
 | Reference files per skill | 200, 10 MB each, 50 MB per skill including `SKILL.md` |
-| `read_skill_file` | 100,000 characters per page |
-| `get_run` tool call `input` and `result` | 2,000 characters each, the rest replaced by a truncation marker |
+| `read_skill_file` and `read_file` | 100,000 characters per page |
+| `read_conversation` | The last 50 messages by default, between 1 and 200 |
+| `list_conversations` | 200 conversations per page |
+| `search_conversations` | 20 conversations, 8 for a coworker without a query |
+| `write_brain_page` | 60,000 characters of content, a title of 120, 50 sources |
+| `search_template_library` | 20 templates |
+| `get_run` and `read_conversation` tool call `input` and `result` | 2,000 characters each, the rest replaced by a truncation marker |
 | One tool result | 200,000 characters. A larger one is refused with an error asking for a narrower request |
 | Template title | 50 characters |
 | Template meta description | 120 to 155 characters before it can be submitted |
@@ -36,8 +43,11 @@ On Rerun Cloud, plan quotas still apply. `create_agent` succeeds when the worksp
 
 A key reaches one workspace, with the access of the member who created it. Every tool resolves its target through the same ownership check the app uses, so an `agentId` or a `spaceId` from another workspace, or from a Box the key does not reach, comes back as `Coworker not found` or `Box not found`, never as a partial answer. `list_spaces`, `list_agents` and `get_team_status` only list what the key reaches.
 
-- Reading a coworker, talking to it, firing its scheduled tasks and testing its triggers need **Can use** on its Box.
-- Changing it (prompt, skills, memory, files, scheduled tasks, triggers, apps, private database, share links) needs **Can manage**. `create_agent` only places a coworker in a Box the key manages.
+- Reading a coworker (its memory, files, conversations and runs included), talking to it, stopping its runs, firing its scheduled tasks, testing its triggers and publishing its files need **Can use** on its Box.
+- Changing it (prompt, skills, memory, files, scheduled tasks, triggers, apps, private database, share links) needs **Can manage**. `create_agent` only places a coworker in a Box the key manages, and `install_template` only installs into one.
+- Renaming or deleting a Box needs **Can manage** on it. Creating one needs nothing more than a member behind the key.
+- The Brain and the shared folder belong to the workspace: every member reads them, and every member writes the Brain, as in the app.
+- The tools that act in a member's name (`create_boxes`, `write_brain_page`, `answer_card` and `send_message` to the Chief of Staff) refuse a key that acts for the workspace rather than a member, a key made before keys recorded who created them. Create a new key for them.
 - `set_default_model` is for admins only: "Only an admin can change the default model of the workspace."
 - The shared database belongs to the workspace, not to a Box: the `space_db_*` tools only check that the `spaceId` is one of the workspace.
 
@@ -47,21 +57,21 @@ There is no read-only key, no per-coworker key and no per-tool permission. If yo
 
 <AccordionGroup>
   <Accordion title="Accept a secret">
-    `attach_connector` declares an app and stops there. API keys, OAuth sign-ins and passwords are entered by the account owner in the app, and they are stored on your machine, never in the Rerun database. `plan_template_capture` returns credential variable **names** only, never values.
+    `attach_connector` and `add_vault_entry` declare an app or an MCP server and stop there. API keys, OAuth sign-ins and passwords are entered by the account owner in the app, and they are stored on your machine, never in the Rerun database. `plan_template_capture` returns credential variable **names** only, never values.
   </Accordion>
   <Accordion title="Publish a template">
     `submit_template` moves a draft to review. Publishing is the Rerun team's decision. Payout onboarding needs a browser.
   </Accordion>
   <Accordion title="Manage the account">
-    No billing, no plan change, no subscription, no member or invitation management, no workspace creation, no Box creation. Create a Box in the app first.
+    No billing, no plan change, no subscription, no member or invitation management, no workspace creation.
   </Accordion>
   <Accordion title="Manage API keys">
     You cannot mint or revoke a key over MCP. That would let a leaked key extend itself.
   </Accordion>
-  <Accordion title="Read coworker memory or files">
-    The API writes to them and never reads them back. `write_memory` adds memories and `upload_workspace_file` writes one file into the coworker workspace folder, but no tool lists, reads or deletes a memory or a workspace file. The coworker reads them itself, and you read them in the app. See [Memory and files](/api/tools/memory-and-files).
+  <Accordion title="Send memories or files out of the workspace">
+    The API reads a coworker memory and its files, and the shared folder, through the same access as the app. `create_agent_share` is the one place they leave the workspace, and it still never opens them: it can seal them into an archive behind a link, on an explicit `confirm: true`, and hands nothing back to the caller. See [Share link tools](/api/tools/sharing).
 
-    `create_agent_share` is the one place they leave the workspace, and it still never opens them: it can seal them into an archive behind a link, on an explicit `confirm: true`, and hands nothing back to the caller. See [Share link tools](/api/tools/sharing).
+    `read_file` reads text files only. An image, a PDF or any other file is opened in the app.
   </Accordion>
   <Accordion title="Install a shared coworker">
     The API issues share links, it does not consume them. Opening a link, reading the card and placing the copy on a board is a browser flow, and it needs an active plan on the receiving workspace.
@@ -73,10 +83,11 @@ There is no read-only key, no per-coworker key and no per-tool permission. If yo
 
 ## Guarantees
 
-- **Destructive tools ask twice.** Eight tools refuse to run without `confirm: true`, and `create_agent_share` asks the same way before data leaves the workspace. See [Destructive tools](/api/protocol#destructive-tools).
+- **Destructive tools ask twice.** Thirteen tools refuse to run without `confirm: true`, and `create_agent_share` asks the same way before data leaves the workspace. See [Destructive tools](/api/protocol#destructive-tools).
 - **Skills are written atomically.** `upsert_skill` stages the whole folder and swaps it in, so a failed call never leaves a half-written skill.
 - **Multi-statement SQL is transactional.** `db_execute` and `space_db_execute` with `statements` apply all of them or none.
 - **A tool error is readable.** Failures come back as `isError` results with a message written to be acted on, not as an opaque protocol error. See [Errors](/api/protocol#errors).
+- **A stale write is refused.** `write_brain_page` changes a page only against the `hash` it was read at, so it never overwrites a change it did not see.
 - **A partial memory write says so.** `write_memory` keeps the entries that landed and lists the ones that failed, with the reason, in `failed`.
 - **Renaming is safe.** Changing a coworker `name` re-derives its `handle` and rewrites every `@handle` reference in the other coworkers, so their calls keep resolving.
 
