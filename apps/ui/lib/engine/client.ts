@@ -267,15 +267,16 @@ export async function setBoxBackups(conn: EngineConnection, next: BoxBackupModel
     await request(conn, '/connections/backups', { method: 'PUT', body: JSON.stringify(next) }, () => undefined)
 }
 
+// The engine stores a connection, then reads what it serves before it answers: a subscription's own
+// models and limits, a custom endpoint's catalog at its new address. 10 s at worst.
+const CONNECTION_WRITE_TIMEOUT_MS = 20_000
+
 export async function createConnection(conn: EngineConnection, params: CreateBoxConnectionInput): Promise<BoxConnection> {
-    return request(conn, '/connections', { method: 'POST', body: JSON.stringify(params) }, d => boxConnectionSchema.parse(d))
+    return request(conn, '/connections', { method: 'POST', body: JSON.stringify(params), signal: AbortSignal.timeout(CONNECTION_WRITE_TIMEOUT_MS) }, d => boxConnectionSchema.parse(d))
 }
 
-// A custom endpoint's new address is read for its models before the engine answers, 10 s at worst.
-const PATCH_CONNECTION_TIMEOUT_MS = 20_000
-
 export async function patchConnection(conn: EngineConnection, id: string, patch: UpdateBoxConnectionInput): Promise<BoxConnection> {
-    return request(conn, `/connections/${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(patch), signal: AbortSignal.timeout(PATCH_CONNECTION_TIMEOUT_MS) }, d => boxConnectionSchema.parse(d))
+    return request(conn, `/connections/${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(patch), signal: AbortSignal.timeout(CONNECTION_WRITE_TIMEOUT_MS) }, d => boxConnectionSchema.parse(d))
 }
 
 // The probe tries the address as typed and, for a loopback one, the Docker host after it; asking a
@@ -287,7 +288,7 @@ export async function probeCustomEndpoint(conn: EngineConnection, input: CustomP
 }
 
 export async function updateConnectionKeys(conn: EngineConnection, id: string, body: { set?: Record<string, string>; remove?: string[] }): Promise<string[]> {
-    return request(conn, `/connections/${encodeURIComponent(id)}/keys`, { method: 'PATCH', body: JSON.stringify(body) }, d => engineAgentKeysListSchema.parse(d).keys)
+    return request(conn, `/connections/${encodeURIComponent(id)}/keys`, { method: 'PATCH', body: JSON.stringify(body), signal: AbortSignal.timeout(CONNECTION_WRITE_TIMEOUT_MS) }, d => engineAgentKeysListSchema.parse(d).keys)
 }
 
 export async function getConnectionUsage(conn: EngineConnection, id: string): Promise<BoxConnectionUsage> {

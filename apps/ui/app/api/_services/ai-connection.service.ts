@@ -33,6 +33,7 @@ import {
 } from '@/lib/engine/ai-sources'
 import { type ClaudeOAuthStart, buildClaudeAuthorize, exchangeClaudeCode } from '@/lib/engine/claude-oauth'
 import {
+    EngineRequestError,
     createConnection as engineCreateConnection,
     deleteConnection as engineDeleteConnection,
     getConnectionUsage as engineGetConnectionUsage,
@@ -295,14 +296,57 @@ export async function grokKeysWhenApproved(deviceCode: string): Promise<Record<s
     return tokens ? grokKeysFrom(tokens) : null
 }
 
-// xAI has spent the device code by now: a store that fails cannot be polled again into a success. The
-// sign-in is handed back to xAI and the refusal says to start again, unless it already says why (no
-// plan, another provider), which the caller answers as it does everywhere else.
-export async function storeGrokSignIn(workspaceId: number, keys: Record<string, string>, target: { connectionId?: string; name?: string }): Promise<string> {
+type GrokSignInTarget = { connectionId?: string; name?: string }
+
+// The hub's own refusals and the engine's 4xx come before anything is written. Any other failure (a
+// timeout, a 5xx, a machine out of reach, an answer that does not parse) may come after: the engine
+// writes the keys first, then reads the account's models before it answers.
+function refusedBeforeStoring(err: unknown): boolean {
+    return err instanceof NoPlanError || err instanceof ConnectionInputError || (err instanceof EngineRequestError && err.status >= 400 && err.status < 500)
+}
+
+async function grokConnectionIds(workspaceId: number): Promise<Set<string>> {
+    const engine = await findWorkspaceEngine(workspaceId)
+    if (!engine) return new Set()
+    const { connections } = await engineListConnections(engine.conn)
+    return new Set(connections.filter(connection => connection.provider === 'grok').map(connection => connection.id))
+}
+
+type GrokStoreOutcome = { storedOn: string } | 'not-stored' | 'unknown'
+
+// What the machine holds after a store that failed without saying where. A new connection is written
+// the moment the request lands, so a list without it says nothing was stored. Keys sent to an existing
+// connection can still be waiting behind a refresh: only the connection back on its feet is an answer.
+async function grokStoreOutcome(workspaceId: number, target: GrokSignInTarget, before: Set<string> | null): Promise<GrokStoreOutcome> {
+    try {
+        const engine = await findWorkspaceEngine(workspaceId)
+        if (!engine) return 'not-stored'
+        const grok = (await engineListConnections(engine.conn)).connections.filter(connection => connection.provider === 'grok')
+        if (target.connectionId) {
+            const signedInAgain = grok.find(connection => connection.id === target.connectionId && connection.connected && !connection.credentialRejected)
+            return signedInAgain ? { storedOn: signedInAgain.id } : 'unknown'
+        }
+        if (!before) return 'unknown'
+        const added = grok.find(connection => !before.has(connection.id))
+        return added ? { storedOn: added.id } : 'not-stored'
+    } catch {
+        return 'unknown'
+    }
+}
+
+// xAI has spent the device code by now: a store that fails cannot be polled again into a success. A
+// sign-in the machine did not take is handed back to xAI and the refusal says to start again, unless
+// it already says why (no plan, another provider). One the machine did take is a success, whatever
+// its answer became on the way back. Tokens are never revoked while the machine may hold them: a
+// connection signed out under the coworkers it runs is worse than a sign-in nobody holds.
+export async function storeGrokSignIn(workspaceId: number, keys: Record<string, string>, target: GrokSignInTarget): Promise<string> {
+    const before = target.connectionId ? null : await grokConnectionIds(workspaceId).catch(() => null)
     try {
         return await storeSignInKeys(workspaceId, 'grok', keys, target)
     } catch (err) {
-        await revokeGrokKeys(keys)
+        const outcome = refusedBeforeStoring(err) ? 'not-stored' : await grokStoreOutcome(workspaceId, target, before)
+        if (typeof outcome === 'object') return outcome.storedOn
+        if (outcome === 'not-stored') await revokeGrokKeys(keys)
         if (err instanceof NoPlanError || err instanceof ConnectionInputError) throw err
         throw new ConnectionInputError('grokSignInNotStored')
     }
