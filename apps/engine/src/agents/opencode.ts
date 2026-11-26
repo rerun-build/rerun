@@ -2,7 +2,7 @@ import { createAnthropic } from '@ai-sdk/anthropic'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { createOpenAI } from '@ai-sdk/openai'
 import type { LanguageModelMiddleware, wrapLanguageModel } from 'ai'
-import { CONNECTION_TOKEN_KEY, OPENCODE_CREDITS_USED_UP, OPENCODE_GO_LIMIT, OPENCODE_SESSION_HEADER, isFreeOpencodeModel, type OpencodeModel, type OpencodeWire, type PlanLimitWindow, type Provider } from '@rerun/contracts'
+import { CONNECTION_TOKEN_KEY, grokSeesImages, OPENCODE_CREDITS_USED_UP, OPENCODE_GO_LIMIT, OPENCODE_SESSION_HEADER, isFreeOpencodeModel, type OpencodeModel, type OpencodeWire, type PlanLimitWindow, type Provider } from '@rerun/contracts'
 import { forceOpencodeCatalogRefresh, opencodeModel } from '../connections/opencode-catalog.js'
 import { refreshOpencodePlanLimits } from '../connections/opencode-plan-limits.js'
 import { spentPlanWindow } from '../connections/plan-limits.js'
@@ -31,8 +31,10 @@ export function opencodeBehaviour(model: string): OpencodeBehaviour | undefined 
 // never sent its reasoning back.
 export const CHAT_FORMAT_PROVIDERS: ReadonlySet<Provider> = new Set(['rerun', 'openrouter', 'custom'])
 
-// The provider a model behaves like: itself, or for OpenCode the one its wire format belongs to.
+// The provider a model behaves like: itself, for OpenCode the one its wire format belongs to, and
+// for Grok OpenAI's, whose Responses API its subscription's proxy speaks.
 export function behaviourOf(provider: Provider, model: string): Provider {
+    if (provider === 'grok') return 'openai'
     if (provider !== 'opencode') return provider
     return opencodeBehaviour(model) ?? 'openrouter'
 }
@@ -43,6 +45,7 @@ export function behaviourOf(provider: Provider, model: string): Provider {
 // trusted with the images it is handed.
 export function modelSeesImages(provider: Provider, model: string, connection?: LoadedConnection | null): boolean {
     if (provider === 'custom') return connection?.config.vision === true
+    if (provider === 'grok') return grokSeesImages(model)
     if (provider !== 'opencode') return true
     return opencodeModel(model)?.images ?? true
 }

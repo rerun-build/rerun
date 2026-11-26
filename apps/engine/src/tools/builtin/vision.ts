@@ -7,6 +7,7 @@ import { z } from 'zod'
 import { resolveInWorkspace } from '../sandbox.js'
 import { CLI_PROVIDERS, modelFor, type ModelOverride } from '../../agents/providers.js'
 import { modelSeesImages, opencodeVisionModel } from '../../agents/opencode.js'
+import { grokVisionModel } from '../../agents/grok.js'
 import { ensureCliAuth } from '../../connections/cli-auth.js'
 import { deadlineSignal, raceAbort } from '../../lib/abort.js'
 import type { RunContext } from '../../runtime/context.js'
@@ -56,12 +57,14 @@ async function imageMessages(ctx: RunContext, target: string, mediaType: string,
 export const NO_VISION_MODEL =
     'None of the models switched on for this OpenCode connection can read images. Switch one on that can (most Go models do), or go on without the image.'
 
-// The model the run is on, unless it is an OpenCode model that cannot see: then another model of the
-// same connection that can, or null when it has none.
+export const NO_GROK_VISION_MODEL = 'None of the models switched on for this Grok connection can read images. Switch on Grok 4.6 or later, or go on without the image.'
+
+// The model the run is on, unless it is a model that cannot see: then another model of the same
+// connection that can, or null when it has none.
 function visionModelFor(ctx: RunContext): ModelOverride | undefined | null {
     const { provider, model, connection } = ctx.agent.resolved
     if (modelSeesImages(provider, model, connection)) return undefined
-    const seeing = opencodeVisionModel(connection)
+    const seeing = provider === 'grok' ? grokVisionModel(connection) : opencodeVisionModel(connection)
     return seeing ? { model: seeing } : null
 }
 
@@ -86,7 +89,7 @@ export function visionTools(ctx: RunContext, timeoutMs = VISION_TIMEOUT_MS): Too
                     return `Could not read ${imagePath} as an image: ${(e as Error).message}`
                 }
                 const seeing = visionModelFor(ctx)
-                if (seeing === null) return NO_VISION_MODEL
+                if (seeing === null) return ctx.agent.resolved.provider === 'grok' ? NO_GROK_VISION_MODEL : NO_VISION_MODEL
                 const runSignal = ctx.abortSignal ?? abortSignal
                 const signal = deadlineSignal(timeoutMs, runSignal)
                 let release = () => {}

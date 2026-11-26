@@ -36,6 +36,7 @@ import { openrouterReasoningMiddleware, reasoningFetchFor } from './openrouter-r
 import { cacheBreakpointsFetch } from './openrouter-cache.js'
 import { openrouterStreamRetryMiddleware } from './openrouter-stream-retry.js'
 import { opencodeLanguageModel } from './opencode.js'
+import { grokLanguageModel } from './grok.js'
 import { customEndpointFetch } from './custom-endpoint-fetch.js'
 import { opencodeChatReasoningMiddleware, opencodeUsageMiddleware } from './opencode-stream.js'
 import { agentProcessEnv } from './process-env.js'
@@ -457,20 +458,14 @@ function pairFor(agent: LoadedAgent, override?: ModelOverride): { provider: Prov
     return { provider, model: override?.model ?? agent.resolved.model }
 }
 
-// The contracts know Grok before this engine runs it: a connection to it is refused a run rather
-// than sent to a registry that has no such provider.
-class GrokNotRunnableError extends Error {
-    constructor() {
-        super('This engine cannot run Grok yet. Update the engine.')
-        this.name = 'GrokNotRunnableError'
-    }
-}
-
 // For one-shot calls with no tools. Codex resolves to the exec transport here, which spawns per call
 // and exits — nothing to dispose. A run that streams must use `resolveModel` instead.
 export function modelFor(agent: LoadedAgent, override?: ModelOverride, tools?: ToolSet, mcpServers?: McpServer[], options?: CliModelOptions): LanguageModel {
     const { provider, model } = pairFor(agent, override)
-    if (provider === 'grok') throw new GrokNotRunnableError()
+    if (provider === 'grok') {
+        const grok = grokLanguageModel(agent.resolved.connection, model, oneShotSessionId(agent, options))
+        return wrapLanguageModel({ model: grok.model, middleware: grok.middleware })
+    }
     if (provider === 'opencode') {
         const opencode = opencodeLanguageModel(agent.resolved.connection, model, oneShotSessionId(agent, options))
         return wrapLanguageModel({ model: opencode.model, middleware: opencode.middleware })
@@ -523,7 +518,11 @@ export function resolveModel(agent: LoadedAgent, override?: ModelOverride, tools
         const custom = openaiChat(customOptions(agent))
         return { model: wrapLanguageModel({ model: custom.languageModel(model), middleware: [openrouterStreamRetryMiddleware, opencodeChatReasoningMiddleware, replies.middleware, cardTags, guard] }), close: noClose, quickReplies: replies.read }
     }
-    if (provider === 'grok') throw new GrokNotRunnableError()
+    // Grok runs in Rerun's own loop too, on the Responses API of its subscription's proxy.
+    if (provider === 'grok') {
+        const grok = grokLanguageModel(agent.resolved.connection, model, sessionId ?? oneShotSessionId(agent))
+        return { model: wrapLanguageModel({ model: grok.model, middleware: [...grok.middleware, replies.middleware, cardTags, guard] }), close: noClose, quickReplies: replies.read }
+    }
     const middleware = provider === 'google' ? [googleToolSchemaMiddleware, replies.middleware, cardTags, guard] : [replies.middleware, cardTags, guard]
     return { model: wrapLanguageModel({ model: registryFor(agent, tools, mcpServers).languageModel(`${provider}:${model}`), middleware }), close: noClose, quickReplies: replies.read }
 }

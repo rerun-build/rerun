@@ -60,6 +60,7 @@ export function effortProviderOptions(provider: Provider, effort: ReasoningEffor
         case 'anthropic':
             return { anthropic: { effort } }
         case 'openai':
+        case 'grok':
             return { openai: { reasoningEffort: effort, forceReasoning: true } }
         case 'google':
             return { google: { thinkingConfig: { includeThoughts: true, thinkingLevel: effort } } }

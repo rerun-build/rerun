@@ -1,0 +1,95 @@
+event: response.created
+data: {"sequence_number":0,"type":"response.created","response":{"created_at":1795675135,"completed_at":null,"id":"d8e35799-7394-4f00-94e0-7d8cf1f92c97","max_output_tokens":null,"model":"grok-4.6-build","object":"response","output":[],"parallel_tool_calls":true,"previous_response_id":null,"reasoning":{"effort":"low","summary":"detailed"},"temperature":0.7,"text":{"format":{"type":"text"}},"tool_choice":"auto","tools":[{"type":"function","description":"Weather for a city","name":"get_weather","parameters":{"$schema":"http://json-schema.org/draft-07/schema#","type":"object","properties":{"city":{"type":"string"}},"required":["city"],"additionalProperties":false},"strict":null},{"type":"function","description":"Add two numbers","name":"add_numbers","parameters":{"$schema":"http://json-schema.org/draft-07/schema#","type":"object","properties":{"a":{"type":"number"},"b":{"type":"number"}},"required":["a","b"],"additionalProperties":false},"strict":null}],"top_p":0.95,"usage":null,"user":null,"incomplete_details":null,"status":"in_progress","store":false,"metadata":{"system_fingerprint":"fp_ab3963e67bdceabb"},"background":false,"service_tier":"default","truncation":"disabled","top_logprobs":0,"presence_penalty":0.0,"frequency_penalty":0.0,"prompt_cache_key":"219d755d-eb1e-4854-bab2-d61d1201e900","max_tool_calls":null,"safety_identifier":null,"error":null,"instructions":null}}
+
+event: response.in_progress
+data: {"sequence_number":1,"type":"response.in_progress","response":{"created_at":1795675135,"completed_at":null,"id":"d8e35799-7394-4f00-94e0-7d8cf1f92c97","max_output_tokens":null,"model":"grok-4.6-build","object":"response","output":[],"parallel_tool_calls":true,"previous_response_id":null,"reasoning":{"effort":"low","summary":"detailed"},"temperature":0.7,"text":{"format":{"type":"text"}},"tool_choice":"auto","tools":[{"type":"function","description":"Weather for a city","name":"get_weather","parameters":{"$schema":"http://json-schema.org/draft-07/schema#","type":"object","properties":{"city":{"type":"string"}},"required":["city"],"additionalProperties":false},"strict":null},{"type":"function","description":"Add two numbers","name":"add_numbers","parameters":{"$schema":"http://json-schema.org/draft-07/schema#","type":"object","properties":{"a":{"type":"number"},"b":{"type":"number"}},"required":["a","b"],"additionalProperties":false},"strict":null}],"top_p":0.95,"usage":null,"user":null,"incomplete_details":null,"status":"in_progress","store":false,"metadata":{"system_fingerprint":"fp_ab3963e67bdceabb"},"background":false,"service_tier":"default","truncation":"disabled","top_logprobs":0,"presence_penalty":0.0,"frequency_penalty":0.0,"prompt_cache_key":"219d755d-eb1e-4854-bab2-d61d1201e900","max_tool_calls":null,"safety_identifier":null,"error":null,"instructions":null}}
+
+event: response.output_item.added
+data: {"sequence_number":2,"type":"response.output_item.added","item":{"id":"rs_d8e35799-7394-4f00-94e0-7d8cf1f92c97","summary":[],"type":"reasoning","status":"in_progress"},"output_index":0}
+
+event: response.output_item.done
+data: {"sequence_number":3,"type":"response.output_item.done","item":{"id":"rs_d8e35799-7394-4f00-94e0-7d8cf1f92c97","summary":[],"type":"reasoning","status":"completed","encrypted_content":"fy1GbGvs5R4gb2jGcCCfAzjLRmyCy5K20zeP1V3YcQC1FPLyf3p8wij1lroHRotqQlsWEQEV1dqApN159huPpJwdyGfy2thNUfNGOUDowSc0+OxNxUjO9chCyGMB2ZfhKggZ+90QexBYd1+vMifEq/0RIwHg0Q"},"output_index":0}
+
+event: response.output_item.added
+data: {"sequence_number":4,"type":"response.output_item.added","item":{"content":[],"id":"msg_d8e35799-7394-4f00-94e0-7d8cf1f92c97","role":"assistant","type":"message","status":"in_progress"},"output_index":1}
+
+event: response.content_part.added
+data: {"sequence_number":5,"type":"response.content_part.added","content_index":0,"item_id":"msg_d8e35799-7394-4f00-94e0-7d8cf1f92c97","output_index":1,"part":{"type":"output_text","text":"","logprobs":[],"annotations":[]}}
+
+event: response.output_text.delta
+data: {"sequence_number":6,"type":"response.output_text.delta","content_index":0,"delta":"Paris","item_id":"msg_d8e35799-7394-4f00-94e0-7d8cf1f92c97","output_index":1,"logprobs":[]}
+
+: xai-usage {"input_tokens":544,"input_tokens_details":{"cached_tokens":128},"output_tokens":13,"output_tokens_details":{"reasoning_tokens":12},"total_tokens":0,"num_sources_used":0,"num_server_side_tools_used":0,"cost_in_usd_ticks":9740000,"context_details":{"input_tokens":544,"output_tokens":13}}
+
+event: response.output_text.delta
+data: {"sequence_number":7,"type":"response.output_text.delta","content_index":0,"delta":" is","item_id":"msg_d8e35799-7394-4f00-94e0-7d8cf1f92c97","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":8,"type":"response.output_text.delta","content_index":0,"delta":" ","item_id":"msg_d8e35799-7394-4f00-94e0-7d8cf1f92c97","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":9,"type":"response.output_text.delta","content_index":0,"delta":"11","item_id":"msg_d8e35799-7394-4f00-94e0-7d8cf1f92c97","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":10,"type":"response.output_text.delta","content_index":0,"delta":"°","item_id":"msg_d8e35799-7394-4f00-94e0-7d8cf1f92c97","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":11,"type":"response.output_text.delta","content_index":0,"delta":"C","item_id":"msg_d8e35799-7394-4f00-94e0-7d8cf1f92c97","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":12,"type":"response.output_text.delta","content_index":0,"delta":" and","item_id":"msg_d8e35799-7394-4f00-94e0-7d8cf1f92c97","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":13,"type":"response.output_text.delta","content_index":0,"delta":" Lyon","item_id":"msg_d8e35799-7394-4f00-94e0-7d8cf1f92c97","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":14,"type":"response.output_text.delta","content_index":0,"delta":" is","item_id":"msg_d8e35799-7394-4f00-94e0-7d8cf1f92c97","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":15,"type":"response.output_text.delta","content_index":0,"delta":" ","item_id":"msg_d8e35799-7394-4f00-94e0-7d8cf1f92c97","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":16,"type":"response.output_text.delta","content_index":0,"delta":"14","item_id":"msg_d8e35799-7394-4f00-94e0-7d8cf1f92c97","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":17,"type":"response.output_text.delta","content_index":0,"delta":"°","item_id":"msg_d8e35799-7394-4f00-94e0-7d8cf1f92c97","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":18,"type":"response.output_text.delta","content_index":0,"delta":"C","item_id":"msg_d8e35799-7394-4f00-94e0-7d8cf1f92c97","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":19,"type":"response.output_text.delta","content_index":0,"delta":",","item_id":"msg_d8e35799-7394-4f00-94e0-7d8cf1f92c97","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":20,"type":"response.output_text.delta","content_index":0,"delta":" which","item_id":"msg_d8e35799-7394-4f00-94e0-7d8cf1f92c97","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":21,"type":"response.output_text.delta","content_index":0,"delta":" add","item_id":"msg_d8e35799-7394-4f00-94e0-7d8cf1f92c97","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":22,"type":"response.output_text.delta","content_index":0,"delta":" up","item_id":"msg_d8e35799-7394-4f00-94e0-7d8cf1f92c97","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":23,"type":"response.output_text.delta","content_index":0,"delta":" to","item_id":"msg_d8e35799-7394-4f00-94e0-7d8cf1f92c97","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":24,"type":"response.output_text.delta","content_index":0,"delta":" ","item_id":"msg_d8e35799-7394-4f00-94e0-7d8cf1f92c97","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":25,"type":"response.output_text.delta","content_index":0,"delta":"25","item_id":"msg_d8e35799-7394-4f00-94e0-7d8cf1f92c97","output_index":1,"logprobs":[]}
+
+event: response.output_text.delta
+data: {"sequence_number":26,"type":"response.output_text.delta","content_index":0,"delta":".","item_id":"msg_d8e35799-7394-4f00-94e0-7d8cf1f92c97","output_index":1,"logprobs":[]}
+
+event: response.output_text.done
+data: {"sequence_number":27,"type":"response.output_text.done","content_index":0,"item_id":"msg_d8e35799-7394-4f00-94e0-7d8cf1f92c97","output_index":1,"text":"Paris is 11°C and Lyon is 14°C, which add up to 25.","logprobs":[]}
+
+event: response.content_part.done
+data: {"sequence_number":28,"type":"response.content_part.done","content_index":0,"item_id":"msg_d8e35799-7394-4f00-94e0-7d8cf1f92c97","output_index":1,"part":{"type":"output_text","text":"Paris is 11°C and Lyon is 14°C, which add up to 25.","logprobs":[],"annotations":[]}}
+
+event: response.output_item.done
+data: {"sequence_number":29,"type":"response.output_item.done","item":{"content":[{"type":"output_text","text":"Paris is 11°C and Lyon is 14°C, which add up to 25.","logprobs":[],"annotations":[]}],"id":"msg_d8e35799-7394-4f00-94e0-7d8cf1f92c97","role":"assistant","type":"message","status":"completed"},"output_index":1}
+
+event: response.completed
+data: {"sequence_number":30,"type":"response.completed","response":{"created_at":1795675135,"completed_at":1795675136,"id":"d8e35799-7394-4f00-94e0-7d8cf1f92c97","max_output_tokens":null,"model":"grok-4.6-build","object":"response","output":[{"id":"rs_d8e35799-7394-4f00-94e0-7d8cf1f92c97","summary":[],"type":"reasoning","status":"completed","encrypted_content":"fy1GbGvs5R4gb2jGcCCfAzjLRmyCy5K20zeP1V3YcQC1FPLyf3p8wij1lroHRotqQlsWEQEV1dqApN159huPpJwdyGfy2thNUfNGOUDowSc0+OxNxUjO9chCyGMB2ZfhKggZ+90QexBYd1+vMifEq/0RIwHg0Q"},{"content":[{"type":"output_text","text":"Paris is 11°C and Lyon is 14°C, which add up to 25.","logprobs":[],"annotations":[]}],"id":"msg_d8e35799-7394-4f00-94e0-7d8cf1f92c97","role":"assistant","type":"message","status":"completed"}],"parallel_tool_calls":true,"previous_response_id":null,"reasoning":{"effort":"low","summary":"detailed"},"temperature":0.7,"text":{"format":{"type":"text"}},"tool_choice":"auto","tools":[{"type":"function","description":"Weather for a city","name":"get_weather","parameters":{"$schema":"http://json-schema.org/draft-07/schema#","type":"object","properties":{"city":{"type":"string"}},"required":["city"],"additionalProperties":false},"strict":null},{"type":"function","description":"Add two numbers","name":"add_numbers","parameters":{"$schema":"http://json-schema.org/draft-07/schema#","type":"object","properties":{"a":{"type":"number"},"b":{"type":"number"}},"required":["a","b"],"additionalProperties":false},"strict":null}],"top_p":0.95,"usage":{"input_tokens":544,"input_tokens_details":{"cached_tokens":128},"output_tokens":33,"output_tokens_details":{"reasoning_tokens":12},"total_tokens":577,"num_sources_used":0,"num_server_side_tools_used":0,"cost_in_usd_ticks":10940000,"context_details":{"input_tokens":544,"output_tokens":41}},"user":null,"incomplete_details":null,"status":"completed","store":false,"metadata":{"system_fingerprint":"fp_ab3963e67bdceabb"},"background":false,"service_tier":"default","truncation":"disabled","top_logprobs":0,"presence_penalty":0.0,"frequency_penalty":0.0,"prompt_cache_key":"219d755d-eb1e-4854-bab2-d61d1201e900","max_tool_calls":null,"safety_identifier":null,"error":null,"instructions":null}}
+
