@@ -483,11 +483,11 @@ the proxy asks for.
   week is spent, no reading when the answer has another shape.
 - The context window is the 256k the subscription serves.
 - A refusal is rewritten into a sentence the chat knows, never with xAI's body (it names the
-  account's team): the week spent → "Grok weekly limit reached · resets …", an account without the
-  plan → "No Grok subscription on this xAI account" (both send the run to the backups, neither
-  locks a model), a refusal of the allowance the week's reading cannot explain → "Grok usage limit
-  reached", a model not served → "Grok plan does not
-  include" and its id, a `401` after the refresh → "Grok sign-in refused (401)".
+  account's team): the week spent → "Grok weekly limit reached · resets …", an account xAI says has
+  no Grok Build (`hasGrokCodeAccess: false` of `GET /v1/user`) → "No Grok subscription on this xAI account" (both
+  send the run to the backups, neither locks a model), a refusal of the allowance neither explains →
+  "Grok usage limit reached", a model not served → "Grok plan does not include" and its id, a `401`
+  after the refresh → "Grok sign-in refused (401)".
 - Grok 4.5 does not see images: `vision_analyze` asks the first model of the connection that does,
   and the computer tools are not offered on it.
 

@@ -8,7 +8,7 @@ const GROK_ALLOWANCE_REFUSED = 'Grok usage limit reached'
 import { recordCredentialRejected } from '../connections/credential-rejections.js'
 import { refreshGrokPlanLimits } from '../connections/grok-plan-limits.js'
 import { grokFetch, type GrokRequestContext } from '../connections/grok-proxy.js'
-import { readPlanLimits, spentPlanWindow } from '../connections/plan-limits.js'
+import { spentPlanWindow } from '../connections/plan-limits.js'
 import type { LoadedConnection } from '../connections/types.js'
 import { refusalMessageOf, refusalResponse } from '../lib/refusal-body.js'
 
@@ -30,11 +30,33 @@ function weeklyLimit(window: PlanLimitWindow): string {
 
 type RefusalContext = { connection: LoadedConnection; model: string }
 
+const ACCOUNT_READ_TIMEOUT_MS = 8000
+
+// Asked of xAI when a refusal could mean the account has no plan: true only when it answers, in so
+// many words, that the account has no access to Grok Build (`hasGrokCodeAccess: false`, read `true`
+// on a GrokPro account on 2026-11-26). A read that fails or leaves the field out says nothing, and a
+// subscriber is never told to go and subscribe. The token's own `tier` claim is a bare number (1 on
+// that same account) and names no plan.
+async function accountLacksGrokBuild(connection: LoadedConnection): Promise<boolean> {
+    try {
+        const response = await grokFetch({ connection, sessionId: `account-${connection.id}` })(`${GROK_PROXY_BASE_URL}/user`, { signal: AbortSignal.timeout(ACCOUNT_READ_TIMEOUT_MS) })
+        if (!response.ok) {
+            await response.body?.cancel()
+            return false
+        }
+        const account = (await response.json()) as { hasGrokCodeAccess?: unknown } | null
+        return account?.hasGrokCodeAccess === false
+    } catch {
+        return false
+    }
+}
+
 /**
  * What a refusal is stored as, in the sentences the chat knows (`describeSubscriptionLimit`), or
  * null to keep the proxy's own sentence. xAI's own body is never kept for these: it names the
- * account's team. A spent allowance and an account without the plan answer with one sentence, so
- * the week's reading, taken again now, tells them apart.
+ * account's team. A spent allowance and an account without the plan answer with one sentence: the
+ * week's reading, taken again now, says the first, xAI's own word on the account says the second,
+ * and a refusal neither explains names no cause.
  */
 async function rewrittenRefusal(status: number, original: string, { connection, model }: RefusalContext): Promise<string | null> {
     if (status === 401) {
@@ -45,7 +67,7 @@ async function rewrittenRefusal(status: number, original: string, { connection, 
         await refreshGrokPlanLimits(connection)
         const spent = spentPlanWindow(connection.id)
         if (spent) return weeklyLimit(spent)
-        if (NO_SUBSCRIPTION.test(original) && readPlanLimits(connection.id)) return GROK_NO_SUBSCRIPTION
+        if (NO_SUBSCRIPTION.test(original) && (await accountLacksGrokBuild(connection))) return GROK_NO_SUBSCRIPTION
         return GROK_ALLOWANCE_REFUSED
     }
     if ((status === 400 || status === 403 || status === 404) && MODEL_REFUSAL.test(original)) return `${GROK_MODEL_NOT_IN_PLAN} \`${model}\``

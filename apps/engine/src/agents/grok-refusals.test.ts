@@ -18,6 +18,7 @@ const realFetch = globalThis.fetch
 const period = { type: 'USAGE_PERIOD_TYPE_WEEKLY', start: '2026-11-23T14:53:50.529+00:00', end: '2026-11-30T14:53:50.529+00:00' }
 
 let billing: Record<string, unknown>
+let account: () => Response
 let refusal: () => Response
 let calls: string[]
 
@@ -28,12 +29,14 @@ function grokConnection() {
 beforeEach(() => {
     calls = []
     billing = { config: { currentPeriod: period } }
+    account = () => Response.json({ hasGrokCodeAccess: true, subscriptionTier: 'GrokPro' })
     forgetPlanLimits('grokcnx')
     forgetCredentialRejected('grokcnx')
     globalThis.fetch = (async (input: string | URL | Request) => {
         const url = String(input)
         calls.push(url)
         if (url.endsWith('/billing?format=credits')) return Response.json(billing)
+        if (url.endsWith('/v1/user')) return account()
         return refusal()
     }) as typeof fetch
 })
@@ -65,11 +68,25 @@ describe('a Grok refusal', () => {
         expect(readPlanLimits('grokcnx')?.windows[0]?.usedPercent).toBe(100)
     })
 
-    it('reads the same sentence with the week far from spent as an account without the plan, which locks no model', async () => {
+    it('reads the same sentence on an account xAI says has no Grok Build as an account without the plan, which locks no model', async () => {
+        account = () => Response.json({ hasGrokCodeAccess: false })
         billing = { config: { currentPeriod: period, creditUsagePercent: 12 } }
         refusal = () => Response.json({ error: 'You have run out of credits or need a Grok subscription.' }, { status: 403 })
         const error = await runRefused()
         expect(messageOf(error)).toBe('No Grok subscription on this xAI account')
+        expect(classifyProviderError('grok', error)).toBe(RUN_ERROR_CODES.usageLimit)
+    })
+
+    it.each([
+        ['says it has Grok Build', () => Response.json({ hasGrokCodeAccess: true, subscriptionTier: 'GrokPro' })],
+        ['does not say', () => Response.json({ subscriptionTier: 'GrokPro' })],
+        ['cannot be asked', () => new Response('', { status: 503 })],
+    ])('never tells a subscriber there is no subscription: the week not shown spent on an account xAI %s', async (_name, answer) => {
+        account = answer
+        billing = { config: { currentPeriod: period, creditUsagePercent: 99.6 } }
+        refusal = () => Response.json({ error: 'You have run out of credits or need a Grok subscription.' }, { status: 403 })
+        const error = await runRefused()
+        expect(messageOf(error)).toBe('Grok usage limit reached')
         expect(classifyProviderError('grok', error)).toBe(RUN_ERROR_CODES.usageLimit)
     })
 
