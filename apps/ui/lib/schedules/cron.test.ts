@@ -67,6 +67,8 @@ describe('in the reader\'s language', () => {
         expect(humanCron('0 9 * * *', 'de')).toBe('Um 09:00')
         expect(humanCron('0 9 * * *', 'tr')).toBe('Saat 09:00')
         expect(humanCron('0 9 * * *', 'zh')).toMatch(/09:00/)
+        expect(humanCron('0 9 * * *', 'zh-TW')).toMatch(/09:00/)
+        expect(humanCron('0 9 * * *', 'zh-TW')).not.toBe(humanCron('0 9 * * *', 'zh'))
         expect(humanCron('0 9 * * *', 'ar')).not.toBe(humanCron('0 9 * * *', 'en'))
         expect(humanCron('0 9 * * *', 'he')).not.toBe(humanCron('0 9 * * *', 'en'))
     })

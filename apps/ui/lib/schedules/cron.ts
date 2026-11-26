@@ -9,6 +9,7 @@ import 'cronstrue/locales/he'
 import 'cronstrue/locales/pt_BR'
 import 'cronstrue/locales/tr'
 import 'cronstrue/locales/zh_CN'
+import 'cronstrue/locales/zh_TW'
 
 import type { EngineSchedule } from '@/lib/engine/types'
 
@@ -18,7 +19,7 @@ type ScheduleTiming = Pick<EngineSchedule, 'enabled' | 'cron' | 'runAt' | 'timez
 export type ScheduleCopy = (key: `schedule.${'once' | 'onceOn' | 'everyMinutes' | 'everyDay' | 'weekdays' | 'everyWeekday' | 'monthly'}`, values?: Record<string, string>) => string
 
 // Only the packs' languages are loaded: cronstrue/i18n would ship its 30 others to the browser.
-const CRONSTRUE_LOCALES: Record<string, string> = { fr: 'fr', es: 'es', pt: 'pt_BR', de: 'de', tr: 'tr', ar: 'ar', zh: 'zh_CN', he: 'he' }
+const CRONSTRUE_LOCALES: Record<string, string> = { fr: 'fr', es: 'es', pt: 'pt_BR', de: 'de', tr: 'tr', ar: 'ar', zh: 'zh_CN', 'zh-TW': 'zh_TW', he: 'he' }
 
 export function humanCron(cron: string, locale = 'en'): string | null {
     try {

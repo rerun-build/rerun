@@ -12,11 +12,12 @@ import hebrewCommon from '@rerun/i18n/messages/he/common.json'
 import portugueseCommon from '@rerun/i18n/messages/pt/common.json'
 import turkishCommon from '@rerun/i18n/messages/tr/common.json'
 import chineseCommon from '@rerun/i18n/messages/zh/common.json'
+import taiwaneseCommon from '@rerun/i18n/messages/zh-TW/common.json'
 import { NextIntlClientProvider } from 'next-intl'
 
 // This replaces the root layout and its intl provider, so the crash screen brings its own small pack,
 // in the language the page was showing (the `lang` the root layout wrote on <html>).
-const COMMON_PACKS: Record<Locale, Partial<typeof englishCommon>> = { en: englishCommon, fr: frenchCommon, es: spanishCommon, pt: portugueseCommon, de: germanCommon, tr: turkishCommon, ar: arabicCommon, zh: chineseCommon, he: hebrewCommon }
+const COMMON_PACKS: Record<Locale, Partial<typeof englishCommon>> = { en: englishCommon, fr: frenchCommon, es: spanishCommon, pt: portugueseCommon, de: germanCommon, tr: turkishCommon, ar: arabicCommon, zh: chineseCommon, 'zh-TW': taiwaneseCommon, he: hebrewCommon }
 
 export default function GlobalError() {
     // This replaces the root layout, so the theme class next-themes put on <html> would be dropped.

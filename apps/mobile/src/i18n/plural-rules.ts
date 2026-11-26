@@ -19,7 +19,7 @@ function cardinal(locale: Locale, value: number): PluralCategory {
         if (absolute === 1) return 'one'
         return largeRound ? 'many' : 'other'
     }
-    if (locale === 'zh') return 'other'
+    if (locale === 'zh' || locale === 'zh-TW') return 'other'
     if (locale === 'ar') {
         if (!integer) return 'other'
         const hundreds = absolute % 100
@@ -45,6 +45,7 @@ const CARDINAL_CATEGORIES: Partial<Record<Locale, PluralCategory[]>> = {
     ar: ['zero', 'one', 'two', 'few', 'many', 'other'],
     he: ['one', 'two', 'other'],
     zh: ['other'],
+    'zh-TW': ['other'],
 }
 
 const ORDINAL_CATEGORIES: Partial<Record<Locale, PluralCategory[]>> = { en: ['one', 'two', 'few', 'other'], fr: ['one', 'other'] }

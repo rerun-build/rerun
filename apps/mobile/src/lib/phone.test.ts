@@ -31,6 +31,16 @@ describe('phone helpers', () => {
         expect(countryByCode('AC', 'tr').name).toBe('Ascension Adası')
     })
 
+    it('names the countries in Traditional characters, the Taiwan way, for zh-TW', () => {
+        expect(countryByCode('AU', 'zh-TW').name).toBe('澳洲')
+        expect(countryByCode('IT', 'zh-TW').name).toBe('義大利')
+        expect(countryByCode('TW', 'zh-TW').name).toBe('台灣')
+        expect(countryByCode('AC', 'zh-TW').name).toBe('阿森松島')
+        expect(countryByCode('HK', 'zh-TW').name).toBe('香港')
+        expect(countryByCode('MO', 'zh-TW').name).toBe('澳門')
+        expect(countryByCode('AU', 'zh').name).toBe('澳大利亚')
+    })
+
     it('names the countries the Brazilian way, not the European one the ISO table ships', () => {
         expect(countryByCode('IR', 'pt').name).toBe('Irã')
         expect(countryByCode('CD', 'pt').name).toBe('República Democrática do Congo')

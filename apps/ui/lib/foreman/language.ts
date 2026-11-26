@@ -1,4 +1,4 @@
-import { isStableLocale, languageName } from '@rerun/i18n'
+import { isStableLocale, languageName, matchLocale } from '@rerun/i18n'
 
 // The foreman answers in the user's language, and the first turn happens before anyone has typed
 // enough for the model to tell. The browser already says it in Accept-Language, so that is the
@@ -11,6 +11,9 @@ export function preferredLanguage(header: string | null | undefined): string | n
         .find(Boolean)
     if (!tag) return null
 
+    // A language with a pack is named as the packs name it: Chinese with its script.
+    const locale = matchLocale(tag)
+    if (locale) return languageName(locale)
     try {
         return new Intl.DisplayNames(['en'], { type: 'language' }).of(tag.split('-')[0]) ?? null
     } catch {

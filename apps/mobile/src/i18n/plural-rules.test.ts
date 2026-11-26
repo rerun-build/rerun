@@ -12,7 +12,7 @@ describe('PackPluralRules', () => {
 
     it('gives Arabic, Hebrew and Chinese the categories of the platform', () => {
         const numbers = [0, 1, 2, 3, 10, 11, 99, 100, 101, 102, 103, 111, 1000, 1.5, 0.5]
-        for (const locale of ['ar', 'he', 'zh']) {
+        for (const locale of ['ar', 'he', 'zh', 'zh-TW']) {
             const native = new Intl.PluralRules(locale)
             const pack = new PackPluralRules(locale)
             expect(numbers.map(n => pack.select(n))).toEqual(numbers.map(n => native.select(n)))

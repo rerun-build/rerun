@@ -30,10 +30,16 @@ describe('resolveLocale', () => {
         expect(matchLocale('de-CH')).toBe('de')
         expect(matchLocale('tr-TR')).toBe('tr')
         expect(matchLocale('ar-SA')).toBe('ar')
-        expect(matchLocale('zh-TW')).toBe('zh')
-        expect(matchLocale('zh-Hant-HK')).toBe('zh')
         expect(matchLocale('iw-IL')).toBe('he')
         expect(parseAcceptLanguage('*, fr;q=0')).toBeNull()
+    })
+
+    it('tells the two Chinese packs apart by their script', () => {
+        expect(['zh-TW', 'zh_TW', 'zh-Hant', 'zh-Hant-HK', 'zh-HK', 'zh-MO', 'ZH-tw'].map(matchLocale)).toEqual(Array(7).fill('zh-TW'))
+        expect(['zh', 'zh-CN', 'zh-SG', 'zh-Hans', 'zh-Hans-TW', 'zh-Hans-HK'].map(matchLocale)).toEqual(Array(6).fill('zh'))
+        expect(resolveLocale({ acceptLanguage: 'zh-TW,zh;q=0.9,en;q=0.8' })).toBe('zh-TW')
+        expect(resolveLocale({ acceptLanguage: 'zh-CN,zh;q=0.9' })).toBe('zh')
+        expect(resolveLocale({ userLocale: 'zh-TW' })).toBe('zh-TW')
     })
 
     it('names each language in its own words', () => {
@@ -44,18 +50,20 @@ describe('resolveLocale', () => {
         expect(localeNativeName('tr')).toBe('Türkçe')
         expect(localeNativeName('en')).toBe('English')
         expect(localeNativeName('ar')).toBe('العربية')
-        expect(localeNativeName('zh')).toBe('中文')
+        expect(localeNativeName('zh')).toBe('简体中文')
+        expect(localeNativeName('zh-TW')).toBe('繁體中文 (台灣)')
         expect(localeNativeName('he')).toBe('עברית')
     })
 
     it('reads Arabic and Hebrew right to left, and only them', () => {
         expect(localeDirection('ar')).toBe('rtl')
         expect(localeDirection('he')).toBe('rtl')
-        expect(['en', 'fr', 'es', 'pt', 'de', 'tr', 'zh', 'en-XA'].map(localeDirection)).toEqual(Array(8).fill('ltr'))
+        expect(['en', 'fr', 'es', 'pt', 'de', 'tr', 'zh', 'zh-TW', 'en-XA'].map(localeDirection)).toEqual(Array(9).fill('ltr'))
     })
 
     it('names Chinese with its script for a model', () => {
         expect(languageName('zh')).toBe('Simplified Chinese')
+        expect(languageName('zh-TW')).toBe('Traditional Chinese (Taiwan)')
         expect(languageName('ar')).toBe('Arabic')
     })
 })

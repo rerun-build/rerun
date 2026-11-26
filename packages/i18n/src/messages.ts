@@ -15,6 +15,7 @@ const PACKS: Record<Locale, () => Promise<{ default: MessageTree }>> = {
     tr: () => import('../messages/tr/index'),
     ar: () => import('../messages/ar/index'),
     zh: () => import('../messages/zh/index'),
+    'zh-TW': () => import('../messages/zh-TW/index'),
     he: () => import('../messages/he/index'),
 }
 

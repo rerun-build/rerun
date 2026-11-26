@@ -40,6 +40,11 @@
     <p style="font-size: 28px; font-weight: 600; letter-spacing: 6px">{{ .Token }}</p>
     <p>验证码 15 分钟内有效。您也可以在同一台设备上打开此链接：<a href="{{ .ConfirmationURL }}">登录 Rerun</a>。</p>
     <p style="color: #666; font-size: 13px">如果这不是您本人的请求，请忽略此邮件。</p>
+    {{ else if eq .Data.locale "zh-TW" }}
+    <p>您的 Rerun 驗證碼：</p>
+    <p style="font-size: 28px; font-weight: 600; letter-spacing: 6px">{{ .Token }}</p>
+    <p>驗證碼 15 分鐘內有效。您也可以在同一台裝置上開啟此連結：<a href="{{ .ConfirmationURL }}">登入 Rerun</a>。</p>
+    <p style="color: #666; font-size: 13px">如果這不是您本人的要求，請忽略這封郵件。</p>
     {{ else if eq .Data.locale "he" }}
     <div dir="rtl">
     <p>קוד ה-Rerun שלך:</p>

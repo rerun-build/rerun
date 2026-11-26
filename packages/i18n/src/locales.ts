@@ -11,6 +11,7 @@ export const SUPPORTED_LOCALES = {
     tr: 'stable',
     ar: 'stable',
     zh: 'stable',
+    'zh-TW': 'beta',
     he: 'stable',
 } as const satisfies Record<string, LocaleStatus>
 
@@ -58,14 +59,25 @@ export function stableLocales(): Locale[] {
 // Older Android and Java systems still report Hebrew under its withdrawn code.
 const LEGACY_LANGUAGE_CODES: Record<string, Locale> = { iw: 'he' }
 
-// "fr-CA" and "FR" both land on "fr": the packs are per language, never per region. "zh-TW" lands on
-// "zh", the Simplified pack: there is no Traditional one.
+const TRADITIONAL_CHINESE_REGIONS = ['tw', 'hk', 'mo']
+
+// Chinese is the one language with two packs, told apart by its script: "zh-Hant" or a region that
+// writes Traditional characters (Taiwan, Hong Kong, Macau) reads the Taiwan pack, any other "zh" the
+// Simplified one.
+function chinesePack(subtags: string[]): Locale {
+    if (subtags.includes('hant')) return 'zh-TW'
+    if (subtags.includes('hans')) return 'zh'
+    return subtags.some(subtag => TRADITIONAL_CHINESE_REGIONS.includes(subtag)) ? 'zh-TW' : 'zh'
+}
+
+// "fr-CA" and "FR" both land on "fr": the packs are per language, never per region, except Chinese.
 export function matchLocale(tag: string | null | undefined): Locale | null {
     if (!tag) return null
-    const language = tag.trim().split(/[-_]/)[0]?.toLowerCase()
-    if (!language) return null
-    const current = LEGACY_LANGUAGE_CODES[language] ?? language
-    return isLocale(current) ? current : null
+    const [first, ...subtags] = tag.trim().toLowerCase().split(/[-_]/)
+    if (!first) return null
+    const language = LEGACY_LANGUAGE_CODES[first] ?? first
+    if (language === 'zh') return chinesePack(subtags)
+    return isLocale(language) ? language : null
 }
 
 export function parseAcceptLanguage(header: string | null | undefined): Locale | null {
@@ -95,16 +107,22 @@ export function resolveLocale({ userLocale, cookie, acceptLanguage }: { userLoca
     return parseAcceptLanguage(acceptLanguage) ?? DEFAULT_LOCALE
 }
 
+// The two Chinese packs are named by their script, so they read apart in a list.
+const CHINESE_NATIVE_NAMES: Partial<Record<Locale, string>> = { zh: '简体中文', 'zh-TW': '繁體中文 (台灣)' }
+
 // Each language is shown in its own words ("Français", "Español"), so whoever cannot read the
 // current one still finds theirs.
 export function localeNativeName(locale: Locale): string {
+    const chinese = CHINESE_NATIVE_NAMES[locale]
+    if (chinese) return chinese
     const name = new Intl.DisplayNames([locale], { type: 'language' }).of(locale) ?? locale
     return name.charAt(0).toLocaleUpperCase(locale) + name.slice(1)
 }
 
 // The language as the prompts of a model name it ("French"), whatever the language of the reader.
-// Chinese is named with its script, so a model answers in the Simplified characters of the pack.
+// Chinese is named with its script, so a model answers in the characters of the pack.
 export function languageName(locale: string): string {
+    if (locale === 'zh-TW') return 'Traditional Chinese (Taiwan)'
     try {
         return new Intl.DisplayNames(['en'], { type: 'language' }).of(locale === 'zh' ? 'zh-Hans' : locale) ?? locale
     } catch {

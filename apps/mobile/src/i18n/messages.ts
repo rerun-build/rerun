@@ -120,6 +120,21 @@ import zhMobileSettings from '@rerun/i18n/messages/zh/mobileSettings.json'
 import zhMobileSteps from '@rerun/i18n/messages/zh/mobileSteps.json'
 import zhSubRuns from '@rerun/i18n/messages/zh/subRuns.json'
 import zhTools from '@rerun/i18n/messages/zh/tools.json'
+import zhTwChatErrors from '@rerun/i18n/messages/zh-TW/chatErrors.json'
+import zhTwErrors from '@rerun/i18n/messages/zh-TW/errors.json'
+import zhTwMobileAuth from '@rerun/i18n/messages/zh-TW/mobileAuth.json'
+import zhTwMobileCards from '@rerun/i18n/messages/zh-TW/mobileCards.json'
+import zhTwMobileChat from '@rerun/i18n/messages/zh-TW/mobileChat.json'
+import zhTwMobileCommon from '@rerun/i18n/messages/zh-TW/mobileCommon.json'
+import zhTwMobileCoworker from '@rerun/i18n/messages/zh-TW/mobileCoworker.json'
+import zhTwMobileHitl from '@rerun/i18n/messages/zh-TW/mobileHitl.json'
+import zhTwMobileHome from '@rerun/i18n/messages/zh-TW/mobileHome.json'
+import zhTwMobileOnboarding from '@rerun/i18n/messages/zh-TW/mobileOnboarding.json'
+import zhTwMobileProviders from '@rerun/i18n/messages/zh-TW/mobileProviders.json'
+import zhTwMobileSettings from '@rerun/i18n/messages/zh-TW/mobileSettings.json'
+import zhTwMobileSteps from '@rerun/i18n/messages/zh-TW/mobileSteps.json'
+import zhTwSubRuns from '@rerun/i18n/messages/zh-TW/subRuns.json'
+import zhTwTools from '@rerun/i18n/messages/zh-TW/tools.json'
 import heChatErrors from '@rerun/i18n/messages/he/chatErrors.json'
 import heErrors from '@rerun/i18n/messages/he/errors.json'
 import heMobileAuth from '@rerun/i18n/messages/he/mobileAuth.json'
@@ -145,11 +160,12 @@ const german = { chatErrors: deChatErrors, errors: deErrors, mobileAuth: deMobil
 const turkish = { chatErrors: trChatErrors, errors: trErrors, mobileAuth: trMobileAuth, mobileCards: trMobileCards, mobileChat: trMobileChat, mobileCommon: trMobileCommon, mobileCoworker: trMobileCoworker, mobileHitl: trMobileHitl, mobileHome: trMobileHome, mobileOnboarding: trMobileOnboarding, mobileProviders: trMobileProviders, mobileSettings: trMobileSettings, mobileSteps: trMobileSteps, subRuns: trSubRuns, tools: trTools }
 const arabic = { chatErrors: arChatErrors, errors: arErrors, mobileAuth: arMobileAuth, mobileCards: arMobileCards, mobileChat: arMobileChat, mobileCommon: arMobileCommon, mobileCoworker: arMobileCoworker, mobileHitl: arMobileHitl, mobileHome: arMobileHome, mobileOnboarding: arMobileOnboarding, mobileProviders: arMobileProviders, mobileSettings: arMobileSettings, mobileSteps: arMobileSteps, subRuns: arSubRuns, tools: arTools }
 const chinese = { chatErrors: zhChatErrors, errors: zhErrors, mobileAuth: zhMobileAuth, mobileCards: zhMobileCards, mobileChat: zhMobileChat, mobileCommon: zhMobileCommon, mobileCoworker: zhMobileCoworker, mobileHitl: zhMobileHitl, mobileHome: zhMobileHome, mobileOnboarding: zhMobileOnboarding, mobileProviders: zhMobileProviders, mobileSettings: zhMobileSettings, mobileSteps: zhMobileSteps, subRuns: zhSubRuns, tools: zhTools }
+const taiwanese = { chatErrors: zhTwChatErrors, errors: zhTwErrors, mobileAuth: zhTwMobileAuth, mobileCards: zhTwMobileCards, mobileChat: zhTwMobileChat, mobileCommon: zhTwMobileCommon, mobileCoworker: zhTwMobileCoworker, mobileHitl: zhTwMobileHitl, mobileHome: zhTwMobileHome, mobileOnboarding: zhTwMobileOnboarding, mobileProviders: zhTwMobileProviders, mobileSettings: zhTwMobileSettings, mobileSteps: zhTwMobileSteps, subRuns: zhTwSubRuns, tools: zhTwTools }
 const hebrew = { chatErrors: heChatErrors, errors: heErrors, mobileAuth: heMobileAuth, mobileCards: heMobileCards, mobileChat: heMobileChat, mobileCommon: heMobileCommon, mobileCoworker: heMobileCoworker, mobileHitl: heMobileHitl, mobileHome: heMobileHome, mobileOnboarding: heMobileOnboarding, mobileProviders: heMobileProviders, mobileSettings: heMobileSettings, mobileSteps: heMobileSteps, subRuns: heSubRuns, tools: heTools }
 
 export type MobileMessages = typeof english
 
-const PACKS: Record<Locale, Partial<Record<keyof MobileMessages, object>>> = { en: english, fr: french, es: spanish, pt: portuguese, de: german, tr: turkish, ar: arabic, zh: chinese, he: hebrew }
+const PACKS: Record<Locale, Partial<Record<keyof MobileMessages, object>>> = { en: english, fr: french, es: spanish, pt: portuguese, de: german, tr: turkish, ar: arabic, zh: chinese, 'zh-TW': taiwanese, he: hebrew }
 
 const merged = new Map<Locale, MobileMessages>()
 

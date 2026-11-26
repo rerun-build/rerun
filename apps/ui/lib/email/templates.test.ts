@@ -120,7 +120,7 @@ describe('email templates in the reader\'s language', () => {
     })
 
     // A key missing from a pack, or a message the ICU parser refuses, would print its key path.
-    it.each(['fr', 'es', 'pt', 'de', 'tr', 'ar', 'zh', 'he'] as const)('renders every preview in %s with no missing or broken message', async locale => {
+    it.each(['fr', 'es', 'pt', 'de', 'tr', 'ar', 'zh', 'zh-TW', 'he'] as const)('renders every preview in %s with no missing or broken message', async locale => {
         const errors = vi.spyOn(console, 'error').mockImplementation(() => {})
         for (const preview of EMAIL_PREVIEWS) {
             const { html, text } = await renderEmail(React.cloneElement(preview.element as React.ReactElement<{ locale?: string }>, { locale }))

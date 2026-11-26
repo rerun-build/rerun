@@ -19,7 +19,7 @@
    accent/destructive/border/input/ring + radius-sm..xl) : source partagée dans
    @rerun/ui/theme.css. Ici uniquement les tokens spécifiques à apps/ui. */
 @theme inline {
-  --font-sans: var(--font-inter, Inter), var(--font-noto-arabic, "Noto Sans Arabic"), var(--font-noto-hebrew, "Noto Sans Hebrew"), "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Noto Sans SC", sans-serif;
+  --font-sans: var(--font-inter, Inter), var(--font-noto-arabic, "Noto Sans Arabic"), var(--font-noto-hebrew, "Noto Sans Hebrew"), var(--font-han, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Noto Sans SC"), sans-serif;
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -649,4 +649,9 @@ html:has([data-quick-ask], [data-coworker-dock]) body {
 html[data-desktop-shell] :is([data-radix-popper-content-wrapper], [role='dialog'], [role='menu'], [role='listbox'], [data-sonner-toaster]) {
   -webkit-app-region: no-drag;
   app-region: no-drag;
+}
+
+/* Traditional characters take the Taiwan cut of the system fonts, never the mainland glyph shapes. */
+:lang(zh-TW) {
+  --font-han: "PingFang TC", "Noto Sans CJK TC", "Noto Sans TC", "Microsoft JhengHei";
 }

@@ -10,6 +10,7 @@ import portuguese from 'i18n-iso-countries/langs/pt.json'
 import turkish from 'i18n-iso-countries/langs/tr.json'
 import chinese from 'i18n-iso-countries/langs/zh.json'
 import { getLocales } from 'expo-localization'
+import taiwanese from './countries-zh-TW.json'
 import { AsYouType, getCountries, getCountryCallingCode, getExampleNumber, parsePhoneNumberFromString, type CountryCode } from 'libphonenumber-js/min'
 import mobileExamples from 'libphonenumber-js/mobile/examples'
 
@@ -21,6 +22,8 @@ countries.registerLocale(german)
 countries.registerLocale(turkish)
 countries.registerLocale(arabic)
 countries.registerLocale(chinese)
+// i18n-iso-countries only has the Simplified names: these come from the CLDR names of zh-TW.
+countries.registerLocale(taiwanese)
 countries.registerLocale(hebrew)
 
 export type PhoneCountry = { code: CountryCode; name: string; callingCode: string; flag: string }
@@ -40,6 +43,7 @@ const MISSING_NAMES: Record<Locale, Partial<Record<CountryCode, string>>> = {
     tr: { AC: 'Ascension Adası', TA: 'Tristan da Cunha' },
     ar: { AC: 'جزيرة أسنشين', TA: 'تريستان دا كونا' },
     zh: { AC: '阿森松岛', TA: '特里斯坦-达库尼亚' },
+    'zh-TW': { AC: '阿森松島', TA: '特里斯坦達庫尼亞群島' },
     he: { AC: 'האי אסנשן', TA: 'טריסטן דה קונה' },
 }
 

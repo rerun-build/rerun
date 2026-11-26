@@ -1,0 +1,7 @@
+{
+    "ios": {
+        "NSPhotoLibraryUsageDescription": "Rerun 需要存取您的相簿，才能在訊息中附加照片。",
+        "NSCameraUsageDescription": "Rerun 需要使用相機，才能在訊息中附加照片。",
+        "NSMicrophoneUsageDescription": "Rerun 需要使用麥克風來錄製語音訊息。"
+    }
+}

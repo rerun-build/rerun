@@ -8,6 +8,7 @@ import hebrew from "@rerun/i18n/messages/he/emails.json";
 import portuguese from "@rerun/i18n/messages/pt/emails.json";
 import turkish from "@rerun/i18n/messages/tr/emails.json";
 import chinese from "@rerun/i18n/messages/zh/emails.json";
+import taiwanese from "@rerun/i18n/messages/zh-TW/emails.json";
 import { createTranslator } from "use-intl/core";
 
 export type { Locale as EmailLocale };
@@ -21,6 +22,7 @@ const PACKS: Record<Locale, typeof english | Partial<typeof english>> = {
   tr: turkish,
   ar: arabic,
   zh: chinese,
+  "zh-TW": taiwanese,
   he: hebrew,
 };
 
