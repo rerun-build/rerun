@@ -1,0 +1,25 @@
+{
+    "price": {
+        "free": "免費",
+        "monthly": "{amount}/月",
+        "useForFree": "免費使用",
+        "hire": "{count, plural, other {僱用這 # 位同事 · {price}}}",
+        "hireCard": "僱用 · {price}"
+    },
+    "categories": {
+        "agencies": "代理商",
+        "ecommerce": "電子商務",
+        "saas": "SaaS",
+        "sales": "業務銷售",
+        "recruiting": "招募",
+        "real-estate": "不動產",
+        "legal": "法律與法遵",
+        "creators": "創作者",
+        "productivity": "生產力",
+        "other": "其他"
+    },
+    "connectors": {
+        "none": "不需要任何應用程式",
+        "label": "應用程式：{apps}"
+    }
+}

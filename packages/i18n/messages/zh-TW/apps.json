@@ -1,0 +1,219 @@
+{
+    "menu": {
+        "label": "應用程式"
+    },
+    "linkedToRerun": "{provider} 已連結至 {brand}",
+    "slotPrice": {
+        "monthly": "{price}/月",
+        "yearly": "{price}/年"
+    },
+    "blocked": {
+        "notSubscribed": "請先訂閱 {brand}",
+        "paused": "您的工作區已暫停",
+        "trialSlot": "試用期間可使用一個 {provider} 名額。升級方案即可新增更多。",
+        "lifetimeTrialSlot": "免費試用期間可使用一個 {provider} 名額。試用結束後即可新增更多。",
+        "adminOnly": "只有管理員可以管理付費應用程式"
+    },
+    "slots": {
+        "footer": "<b>已使用 {used} / {total, plural, other {# 個名額}}</b>，{description}",
+        "subscriberTrial": "第一個名額在 {date} 前免費，之後為 {price}",
+        "workspaceTrial": "試用期間 $0，之後隨您的方案計費",
+        "paid": "每個 {price}，隨您的方案計費",
+        "lifetime": "每個 {price}，按月計費",
+        "lifetimeTrial": "試用期間免費，之後每個 {price}",
+        "lifetimeEnding": "將於 {date} 到期"
+    },
+    "offer": {
+        "subscriberTrial": {
+            "headline": "免費 {days} 天",
+            "detail": "之後每個帳號 {price}，隨您的方案計費"
+        },
+        "workspaceTrial": {
+            "headline": "試用期間 $0",
+            "detail": "之後每個帳號 {price}，隨您的方案計費"
+        },
+        "lifetimeTrial": {
+            "detail": "之後每個帳號 {price}，按月計費"
+        },
+        "freeSlot": {
+            "headline": "有一個名額正等著您",
+            "detail": "已包含在您的方案中",
+            "detailLifetime": "已包含在您的每月名額中",
+            "detailLifetimeEnding": "您的名額將於 {date} 到期"
+        },
+        "buySlot": {
+            "headline": "每個帳號 {price}",
+            "detail": "加入您的方案，今天依本期剩餘時間計費"
+        },
+        "lifetimeSlot": {
+            "detail": "按月計費，與您的終身方案分開"
+        }
+    },
+    "connectHint": {
+        "reconnect": "以 {label} 重新登入",
+        "subscriberTrial": "免費 {days} 天，之後為 {price}",
+        "workspaceTrial": "試用期間 $0，之後隨您的方案收取 {price}",
+        "default": "您的同事代表您使用的帳號"
+    },
+    "addSlot": {
+        "title": "要新增一個 {provider} 名額嗎？",
+        "description": "{price} 將加入您的方案。今天會依本期剩餘時間向您收費。",
+        "descriptionLifetime": "{price} 將加入您的每月名額。今天會依本月剩餘時間向您收費。",
+        "confirm": "新增名額",
+        "button": "新增名額",
+        "startTrial": "開始免費試用"
+    },
+    "intro": {
+        "connect": "連結 {provider}"
+    },
+    "presentation": {
+        "pitch": {
+            "linkedin": "您的同事會透過您的 LinkedIn 帳號開發潛在客戶，替您撰寫訊息、建立聯繫並持續跟進。",
+            "whatsapp": "您的同事會透過您的 WhatsApp 號碼回覆，替您閱讀對話、回覆並持續跟進。"
+        },
+        "capabilities": {
+            "linkedinMessages": {
+                "title": "訊息與邀請",
+                "text": "在 LinkedIn 的每日限制內寫信給潛在客戶並持續跟進。"
+            },
+            "linkedinSearch": {
+                "title": "搜尋並閱讀個人檔案",
+                "text": "找出合適的人選，並在撰寫訊息前閱讀他們的個人檔案。"
+            },
+            "linkedinReplies": {
+                "title": "收到回覆即啟動",
+                "text": "一有回覆或邀請被接受，同事就會立即開始工作。"
+            },
+            "whatsappReplies": {
+                "title": "回覆與跟進",
+                "text": "以文字、檔案和語音訊息回覆寫信給您的人。"
+            },
+            "whatsappMessages": {
+                "title": "收到訊息即啟動",
+                "text": "一有新訊息，同事就會立即開始工作。"
+            },
+            "whatsappCareful": {
+                "title": "謹慎使用您的號碼",
+                "text": "遵守 WhatsApp 的每日限制，絕不傳訊息給陌生人。"
+            }
+        }
+    },
+    "accounts": {
+        "pausedAlert": "您的工作區已暫停，因此其 {provider} 帳號已登出。請先恢復工作區，再重新連結這些帳號。",
+        "freeSlot": "空名額",
+        "freeSlotHint": {
+            "subscriberTrial": "連結一個帳號，免費 {days} 天",
+            "workspaceTrial": "連結一個帳號，試用期間 $0",
+            "default": "連結一個 {provider} 帳號以使用此名額"
+        },
+        "addAnother": "新增其他帳號",
+        "addAnotherHint": "在您的方案中新增一個 {price} 的名額",
+        "addAnotherHintLifetime": "新增一個 {price} 的名額",
+        "status": {
+            "connected": "就緒",
+            "needsReconnect": "重新登入",
+            "paused": "已暫停",
+            "connecting": "連線中",
+            "disconnected": "已中斷連線"
+        },
+        "summary": {
+            "signedOutWhilePaused": "在工作區暫停期間已登出",
+            "signedOut": "{provider} 已將此帳號登出",
+            "rateLimited": "{provider} 要求放慢速度，暫停一天",
+            "unpaid": "此名額尚未付費",
+            "unused": "尚無同事使用。請在同事的「服務」中選擇它。",
+            "usedBy": "使用者：{names}"
+        },
+        "defaultName": "{provider} 帳號",
+        "reconnect": "重新連結",
+        "resume": "恢復",
+        "disconnectLabel": "中斷連結 {name}",
+        "disconnectTitle": "要中斷連結 {name} 嗎？",
+        "disconnectDescription": "使用此帳號的同事會立即失去 {provider} 工具。在您從「帳單」中移除之前，名額會保留在您的方案中。",
+        "disconnectDescriptionLifetime": "使用此帳號的同事會立即失去 {provider} 工具。在您於此處歸還之前，名額仍屬於您。",
+        "disconnect": "中斷連結",
+        "disconnectTooltip": "中斷連結此帳號",
+        "giveBack": "歸還",
+        "giveBackTitle": "要歸還這個 {provider} 名額嗎？",
+        "giveBackDescription": "從下次續訂起將不再計費，在此之前仍可使用。"
+    },
+    "success": {
+        "connectedIcon": "{provider} 已連結",
+        "title": "{app} 已啟用",
+        "body": "<b>{label}</b> 已連結。請在同事的「服務」中選擇它，讓它開始工作。",
+        "yourAccount": "您的帳號",
+        "done": "完成"
+    },
+    "linkedin": {
+        "method": {
+            "password": "電子郵件與密碼",
+            "cookie": "工作階段 Cookie"
+        },
+        "cookieLabel": "工作階段 Cookie (li_at)",
+        "cookieHelp": "適用於以 Google 或 Apple 登入的帳號。請從瀏覽器複製 linkedin.com 的 li_at Cookie。",
+        "emailLabel": "LinkedIn 電子郵件",
+        "emailPlaceholder": "jane@company.com",
+        "passwordLabel": "LinkedIn 密碼",
+        "passwordPlaceholder": "您的 LinkedIn 密碼",
+        "signInFrom": "登入地區",
+        "signInFromHelp": "LinkedIn 會信任來自您平常工作所在國家的登入。",
+        "searchCountry": "搜尋國家",
+        "noCountry": "找不到國家",
+        "neverStored": "{brand} 絕不會儲存您的密碼或 Cookie。",
+        "connect": "連結",
+        "approval": {
+            "figureLabel": "一支手機顯示登入請求，核准按鍵亮起",
+            "title": "在您的手機上核准",
+            "body": "LinkedIn 已傳送登入請求到您的手機。請開啟 LinkedIn App 並點選<b>是</b>。",
+            "approved": "我已核准",
+            "polling": "正在等待您的核准",
+            "slow": "還沒有動靜？請檢查 LinkedIn App，然後點選下方按鈕。"
+        },
+        "code": {
+            "title": "輸入驗證碼",
+            "description": "{where}的 {length} 位數驗證碼。",
+            "where": {
+                "authenticator": "來自您的驗證器 App",
+                "sentTo": "LinkedIn 傳送到您{sentTo}",
+                "sms": "LinkedIn 以簡訊傳送",
+                "email": "LinkedIn 以電子郵件傳送"
+            },
+            "resend": "傳送新驗證碼",
+            "verify": "驗證"
+        }
+    },
+    "whatsapp": {
+        "connect": {
+            "phoneLabel": "WhatsApp 號碼",
+            "invalidPhone": "這看起來不是完整的電話號碼。",
+            "linkBy": "連結方式",
+            "linkByQr": "用手機掃描這裡顯示的條碼。",
+            "linkByCode": "適用於此頁面正在該手機上開啟時：改為在 WhatsApp 中輸入代碼。",
+            "method": {
+                "qr": "掃描 QR 碼",
+                "code": "輸入代碼"
+            },
+            "linkedDevice": "{brand} 會以已連結裝置的身分加入，就像 WhatsApp Web 一樣。您的手機照常運作。",
+            "submit": "取得代碼"
+        },
+        "link": {
+            "steps": {
+                "open": "在手機上開啟 WhatsApp",
+                "settings": "前往「設定」>「已連結的裝置」>「連結裝置」",
+                "pointQr": "將手機對準這個條碼",
+                "typeCode": "改點選「改用電話號碼連結」，然後輸入這組代碼"
+            },
+            "expiredTitle": "此代碼已過期",
+            "scanTitle": "使用 WhatsApp 掃描",
+            "typeTitle": "在 WhatsApp 中輸入此代碼",
+            "expiredBody": "代碼有效時間為三分鐘。請索取新代碼，然後立即連結手機。",
+            "onPhone": "在 <b>{phone}</b> 的手機上",
+            "waiting": "正在等待手機",
+            "switchToCode": "改為輸入代碼",
+            "switchToQr": "改為掃描 QR 碼",
+            "newCode": "新代碼",
+            "codeLabel": "代碼 {code}",
+            "qrAlt": "用於連結 WhatsApp 的 QR 碼"
+        }
+    }
+}

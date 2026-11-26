@@ -1,0 +1,141 @@
+{
+    "access": {
+        "short": {
+            "public": "公開",
+            "workspace": "工作區",
+            "password": "密碼",
+            "invited": "受邀者"
+        },
+        "hint": {
+            "public": "無需登入",
+            "workspace": "僅限已登入的成員",
+            "password": "訪客只需輸入一次",
+            "invited": "訪客需確認電子郵件"
+        },
+        "label": {
+            "public": "知道連結的任何人",
+            "workspace": "{workspace} 的成員",
+            "password": "知道密碼的任何人",
+            "invited": "僅限您邀請的人"
+        },
+        "anyoneAt": "{domain} 的所有人",
+        "workspaceFallback": "工作區"
+    },
+    "gate": {
+        "madeWith": "使用 {brand} 製作",
+        "locked": "{workspace} 的頁面，已鎖定",
+        "code": "驗證碼",
+        "switchAccount": "切換帳號"
+    },
+    "viewer": {
+        "download": "下載",
+        "report": "檢舉",
+        "updated": "更新於{when}",
+        "slides": "{count, plural, other {# 張投影片}}",
+        "page": "第 {page} 頁",
+        "previousSlide": "上一張投影片",
+        "nextSlide": "下一張投影片"
+    },
+    "csv": {
+        "meta": "{rows, plural, other {# 列}}{truncated, select, true {+} other {}} · {columns, plural, other {# 欄}}",
+        "truncated": "僅顯示前 {rows, plural, other {# 列}}。請下載檔案檢視其餘內容。"
+    },
+    "row": {
+        "more": "更多",
+        "open": "開啟",
+        "copyLink": "複製連結",
+        "shareSettings": "分享設定",
+        "unpublish": "取消發布",
+        "unpublishFailed": "無法取消發布"
+    },
+    "unpublishConfirm": {
+        "title": "要取消發布 {title} 嗎？",
+        "description": "連結會立即失效，所有持有連結的人都無法再開啟。",
+        "confirm": "取消發布"
+    },
+    "panel": {
+        "emptyTitle": "尚未發布任何內容",
+        "emptyDescription": "{agent} 分享的頁面、報告與檔案會顯示在這裡。",
+        "updated": "更新於{when}",
+        "copyLink": "複製連結"
+    },
+    "list": {
+        "filterAll": "全部 {count}",
+        "emptyTitle": "尚未發布任何內容",
+        "emptyDescription": "您的同事分享的頁面、報告與檔案會顯示在這裡。",
+        "fallbackCoworker": "同事"
+    },
+    "chat": {
+        "unpublished": "已取消發布",
+        "updateFailed": "無法更新連結",
+        "copy": "複製",
+        "open": "開啟",
+        "fallbackCoworker": "您的同事",
+        "asksPublic": "{coworker} 想讓知道連結的任何人都能開啟",
+        "keepPrivate": "保持私人",
+        "makePublic": "設為公開",
+        "madePublicByYou": "已由您設為公開",
+        "madePublic": "已設為公開",
+        "keptFor": "僅限 {workspace} 的成員"
+    },
+    "share": {
+        "title": "分享",
+        "description": "誰可以開啟此頁面，以及它能如何使用您的資料。",
+        "updateFailed": "無法更新連結",
+        "unpublishFailed": "無法取消發布",
+        "unpublish": "取消發布",
+        "publicOff": "{workspace} 已關閉此選項",
+        "noEmail": "此伺服器不會寄送電子郵件",
+        "passwordSet": "已設定密碼",
+        "setPassword": "設定密碼",
+        "password": "密碼",
+        "invitePlaceholder": "電子郵件或 @company.com",
+        "invite": "邀請電子郵件或網域",
+        "removeInvite": "移除 {entry}",
+        "copyLink": "複製連結",
+        "copied": "已複製",
+        "data": {
+            "title": "即時資料",
+            "empty": "此頁面顯示的是發布當時的內容。",
+            "addTable": "新增資料表",
+            "rows": "{count, plural, other {# 列}}",
+            "tableMeta": "{owner} · {rows}",
+            "workspace": "工作區",
+            "grant": {
+                "read": {
+                    "label": "可檢視",
+                    "hint": "訪客可即時看到其中的資料列"
+                },
+                "write": {
+                    "label": "可檢視與新增",
+                    "hint": "訪客也能新增與編輯資料列"
+                },
+                "off": {
+                    "label": "無存取權",
+                    "hint": "此頁面無法存取這個資料表"
+                }
+            },
+            "publicWrite": "知道連結的任何人都能在此頁面的資料表中新增資料列。",
+            "updateFailed": "無法變更此頁面對您資料的使用權限",
+            "loadFailed": "無法讀取此工作區的資料表"
+        }
+    },
+    "policy": {
+        "label": "公開連結",
+        "people": {
+            "title": "只有成員本人可以公開連結",
+            "hint": "同事只會為 {workspace} 發布，公開前會先詢問"
+        },
+        "anyone": {
+            "title": "同事可以公開連結",
+            "hint": "由同事自行選擇存取方式"
+        },
+        "never": {
+            "title": "不公開任何內容",
+            "hint": "僅限工作區、密碼與受邀者連結"
+        },
+        "turnOffTitle": "要關閉公開連結嗎？",
+        "turnOffDescription": "{count, plural, other {儲存後，# 個公開連結將改為僅限 {workspace} 的成員開啟。}}",
+        "turnOff": "關閉"
+    }
+}

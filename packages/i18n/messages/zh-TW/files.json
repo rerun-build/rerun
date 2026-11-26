@@ -1,0 +1,97 @@
+{
+    "detail": {
+        "readOnly": "這個檔案為唯讀",
+        "stillLoading": "檔案仍在載入中",
+        "previousFile": "上一個檔案",
+        "nextFile": "下一個檔案",
+        "editNotText": "這裡只能編輯文字檔。",
+        "editTruncated": "這個檔案超過 {limit} 個字元，無法在這裡編輯。請下載它，或請同事編輯。",
+        "editBinary": "這個檔案不是文字檔，在這裡編輯會損壞它。"
+    },
+    "actions": {
+        "truncated": "已截斷",
+        "edit": "編輯",
+        "download": "下載",
+        "deleteFile": "刪除檔案"
+    },
+    "delete": {
+        "title": "要刪除 {name} 嗎？",
+        "file": "檔案會從機器中刪除，此動作無法復原。",
+        "folder": "資料夾及其中所有內容都會從機器中刪除，此動作無法復原。"
+    },
+    "editor": {
+        "unsaved": "未儲存",
+        "cancel": "取消",
+        "noChanges": "沒有要儲存的變更",
+        "save": "儲存變更",
+        "conflictTitle": "{name} 已在 Box 上變更",
+        "conflictDescription": "在您開啟這個檔案後，有人或同事寫入了它。現在儲存會以您的版本取代對方的版本。",
+        "overwrite": "覆寫",
+        "keepTheirs": "保留對方版本",
+        "discardTitle": "要捨棄您的變更嗎？",
+        "discardDescription": "您對 {name} 的編輯尚未儲存。關閉編輯器會捨棄這些編輯。",
+        "discard": "捨棄變更",
+        "keepEditing": "繼續編輯"
+    },
+    "preview": {
+        "noPreview": "這種檔案類型無法預覽",
+        "download": "下載",
+        "readFailed": "無法讀取這個檔案",
+        "showSource": "顯示原始碼",
+        "showRendered": "以頁面顯示"
+    },
+    "publish": {
+        "publish": "發布",
+        "publishPublicly": "公開發布",
+        "publishedLink": "已發布的連結",
+        "publicLink": "公開連結",
+        "open": "開啟",
+        "openPublicLink": "開啟公開連結",
+        "copyLink": "複製連結",
+        "copyPublicLink": "複製公開連結",
+        "shareSettings": "分享設定",
+        "unpublish": "取消發布",
+        "unshare": "停止分享",
+        "unpublishTitle": "要取消發布 {name} 嗎？",
+        "unshareTitle": "要停止分享 {name} 嗎？",
+        "unpublishDescription": "連結會立即失效，對所有持有連結的人都一樣。",
+        "unshareDescription": "公開連結會立即失效，持有連結的人會看到 404。"
+    },
+    "empty": {
+        "title": "空的資料夾",
+        "goUp": "回到上一層"
+    },
+    "grid": {
+        "parentDirectory": "上層資料夾",
+        "openFolder": "開啟資料夾",
+        "open": "開啟",
+        "download": "下載",
+        "rename": "重新命名",
+        "delete": "刪除",
+        "published": "已發布"
+    },
+    "list": {
+        "newName": "新名稱",
+        "dropHere": "將檔案或資料夾拖放到這裡上傳",
+        "name": "名稱",
+        "size": "大小",
+        "type": "類型",
+        "empty": "這裡還沒有任何東西。同事為整個工作區下載、建立或編輯的所有內容都會放在這個資料夾，您拖放到這個頁面的檔案也是。",
+        "actionsFor": "{name} 的動作",
+        "folder": "資料夾",
+        "file": "檔案"
+    },
+    "uploadOutcome": {
+        "allFailed": "上傳失敗",
+        "someFailed": "{total, plural, other {# 個檔案}}中有 {failed} 個上傳失敗",
+        "uploaded": "已上傳 {count, plural, other {# 個檔案}}",
+        "sessionExpired": "您的工作階段已過期。請重新整理頁面後再試一次。",
+        "tooLarge": "這個檔案太大，無法上傳。",
+        "retryLater": "上傳失敗，請稍後重試。",
+        "networkFailed": "上傳失敗，請檢查您的網路連線後重試。",
+        "oversized": "{names}{more, plural, =0 {} other {及另外 # 個檔案}}超過 {limit} MB 的上限{count, plural, other {（共 # 個）}}。",
+        "machineUpdating": "這個工作區的機器剛才正在更新，請重新上傳。",
+        "engineUpdateNeeded": "這個工作區所在的機器需要更新 engine，才能接受超過 {limit} MB 的檔案。它會自動更新，請幾分鐘後再試。",
+        "machineUnreachable": "無法上傳 {name}。您的機器可能無法連線。"
+    }
+}

@@ -1,0 +1,96 @@
+{
+    "title": "電腦",
+    "description": "您自己的電腦，同事可在上面執行指令與長時間工作",
+    "thisComputer": {
+        "heading": "這台電腦",
+        "offer": "讓同事在這裡執行指令與長時間工作",
+        "offerLong": "同事可在這裡執行指令與長時間工作，每個新程式都需經過您的核准",
+        "link": "連結",
+        "inWorkspace": "位於 {workspace}",
+        "pause": "暫停",
+        "pauseHint": "在您恢復之前，這裡不會執行任何工作",
+        "folder": "工作資料夾",
+        "changeFolder": "變更",
+        "unlink": "取消連結這台電腦",
+        "unlinkTitle": "要取消連結這台電腦嗎？",
+        "unlinkBody": "{workspace} 的同事將不再於此執行任何工作。您之後可以再次連結。",
+        "unlinkConfirm": "取消連結",
+        "noKeychain": "此系統沒有鑰匙圈：連結資訊會存放在只有您的帳號能讀取的檔案中。"
+    },
+    "linked": "已連結",
+    "linkFromApp": "請從桌面版 App 連結電腦。",
+    "getTheApp": "下載 App",
+    "lastSeen": "上次上線：{when}",
+    "neverConnected": "尚未連線",
+    "engineNeedsUpdate": "電腦功能將隨此工作區機器的下次更新推出，在此之前會顯示為離線。",
+    "engineUnreachable": "工作區的機器沒有回應：電腦暫時顯示為離線。",
+    "managersOnly": "只有管理員或連結此電腦的人可以變更",
+    "settingsNeedEngine": "工作區的機器回應後即可使用",
+    "empty": {
+        "title": "尚未連結電腦",
+        "body": "同事可在您自己的機器上處理繁重工作：影片、本機模型、您的 GPU。",
+        "getApp": "下載桌面版 App"
+    },
+    "status": {
+        "online": "線上",
+        "busy": "{count, plural, other {# 項工作執行中}}",
+        "paused": "已暫停",
+        "offline": "離線"
+    },
+    "modes": {
+        "ask": {
+            "label": "每次都詢問",
+            "description": "每個指令都需等待您同意"
+        },
+        "remember": {
+            "label": "詢問後記住",
+            "description": "信任某個程式後即永遠允許"
+        },
+        "full": {
+            "label": "完整存取",
+            "description": "不經詢問直接執行，敏感資料夾除外"
+        }
+    },
+    "detail": {
+        "back": "返回電腦列表",
+        "linkedBy": "由 {name} 連結",
+        "offlineSince": "自 {when} 起離線。同事會告知此狀況，而不會執行任何工作。",
+        "neverConnected": "尚未連線。在這台電腦上執行 {brand} App 後即會顯示為線上。",
+        "paused": "已從電腦本身暫停。在該處恢復之前不會執行任何工作。",
+        "approvals": "核准",
+        "commands": "指令",
+        "modeLabel": "核准模式",
+        "unattended": "無人在對話中時",
+        "unattendedHint": "排程、觸發條件、其他同事及工作結束時皆可使用",
+        "alwaysAllowed": "永遠允許",
+        "nothingAllowed": "目前沒有。請在對話中的核准請求上選擇「永遠允許」。",
+        "interpreterWarning": "允許直譯器即等於允許它執行的任何程式碼",
+        "stopAllowing": "停止允許 {label}",
+        "screen": "螢幕",
+        "screenOn": "已開啟。同事可以檢視並操作螢幕，一次一個對話。",
+        "screenOff": "已關閉。只能從這台電腦上的 {brand} App 開啟。",
+        "machine": "機器",
+        "system": "系統",
+        "processor": "處理器",
+        "graphics": "顯示卡",
+        "memory": "記憶體",
+        "folder": "資料夾",
+        "remove": "移除電腦",
+        "removeTitle": "要移除 {name} 嗎？",
+        "removeBody": "同事將不再於其上執行任何工作。它的規則會被清除，之後可從桌面版 App 再次連結。",
+        "removeConfirm": "移除",
+        "jobs": "工作"
+    },
+    "linkDialog": {
+        "title": "連結這台電腦",
+        "description": "此工作區的同事將能在這裡執行指令",
+        "name": "名稱",
+        "handle": "在對話中：<handle></handle>",
+        "everyone": "此工作區的每個人都能透過他們的同事使用它",
+        "approval": "每個新程式都會先請求您的核准",
+        "pauseAnyTime": "可隨時從這裡或系統匣暫停或取消連結",
+        "cancel": "取消",
+        "link": "連結",
+        "linked": "已連結。同事可透過 #{handle} 使用它"
+    }
+}

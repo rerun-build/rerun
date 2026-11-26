@@ -1,0 +1,88 @@
+{
+    "access": {
+        "boxManage": "只有管理員或這個 Box 的負責人可以變更此項目。",
+        "aiProvidersAdminOnly": "只有管理員可以變更 AI 供應商。",
+        "noManagedBox": "您需要一個由您管理的 Box 才能新增同事。請前往 {host} 建立，或詢問管理員。",
+        "boxesFailed": "無法載入您的 Boxes。請稍後再試。",
+        "noBoxYet": "這個工作區還沒有 Box。請前往 {host} 建立。",
+        "foremanAdminOnly": "只有管理員可以變更 Chief of Staff。"
+    },
+    "page": {
+        "loadFailed": "無法載入。請稍後再試。"
+    },
+    "details": {
+        "back": "返回",
+        "more": "更多",
+        "delete": "刪除同事",
+        "edit": "編輯",
+        "files": "檔案",
+        "apps": "App",
+        "routines": "例行工作",
+        "computer": "電腦",
+        "notifications": "通知",
+        "working": "工作中",
+        "idle": "閒置",
+        "off": "已關閉",
+        "none": "無",
+        "appsToConnect": "{count} 個待連結",
+        "appsConnected": "已連結 {count} 個",
+        "filesCount": "{count}",
+        "filesTruncated": "{count}+",
+        "routinesOn": "{count} 個已開啟",
+        "renameTitle": "重新命名",
+        "save": "儲存",
+        "renameFailed": "無法重新命名",
+        "deleteTitle": "要刪除 {name} 嗎？",
+        "deleteMessage": "這會永久刪除這位同事及其資料，且無法復原。",
+        "deleteConfirm": "刪除",
+        "deleteFailed": "無法刪除"
+    },
+    "apps": {
+        "title": "App",
+        "status": {
+            "needsSignIn": "需要登入",
+            "needsSetup": "需要設定",
+            "error": "錯誤"
+        },
+        "connect": "連結",
+        "connectNew": "新帳號",
+        "empty": "還沒有 App。",
+        "askInChat": "在聊天中請 {name} 新增 App。",
+        "connectFailed": "無法連結 {name}"
+    },
+    "files": {
+        "title": "檔案",
+        "media": "媒體",
+        "docs": "文件",
+        "earlier": "更早",
+        "thisMonth": "本月",
+        "open": "開啟 {name}",
+        "fileFallback": "檔案",
+        "noMedia": "沒有媒體",
+        "noDocs": "沒有文件",
+        "emptyHint": "{name} 製作的內容會顯示在這裡。",
+        "truncated": "只顯示最新的檔案。完整內容請在網頁版查看。"
+    },
+    "routines": {
+        "title": "例行工作",
+        "once": "一次，{date}",
+        "webhook": "Webhook",
+        "empty": "還沒有例行工作。",
+        "askInChat": "在聊天中請 {name} 設定一個。",
+        "turnOnFailed": "無法開啟 {name}",
+        "turnOffFailed": "無法關閉 {name}"
+    },
+    "create": {
+        "title": "新增同事",
+        "nameLabel": "名稱",
+        "namePlaceholder": "Scout",
+        "descriptionLabel": "要做什麼？",
+        "descriptionPlaceholder": "找出台中的行銷公司，並為每一家草擬第一封電子郵件",
+        "descriptionHelp": "這是它的第一項任務，它會立刻開始處理。",
+        "boxLabel": "Box",
+        "submit": "建立",
+        "pausedTitle": "{name} 已暫停",
+        "pausedMessage": "您的方案沒有可用的同事名額。請到 rerun.build 開始使用 Pro，即可不限同事數量。",
+        "failed": "無法建立同事"
+    }
+}

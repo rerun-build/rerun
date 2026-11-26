@@ -1,0 +1,57 @@
+{
+    "close": "關閉",
+    "back": "返回",
+    "moreOptions": "更多選項",
+    "deleteConfirmTitle": "{label}？",
+    "command": {
+        "title": "指令面板",
+        "description": "搜尋要執行的指令..."
+    },
+    "combobox": {
+        "placeholder": "選擇一個選項",
+        "placeholderMultiple": "選擇選項",
+        "search": "搜尋…",
+        "empty": "找不到結果",
+        "selected": "已選取",
+        "remove": "移除 {option}",
+        "reorder": "調整 {option} 的順序"
+    },
+    "filter": {
+        "search": "搜尋{label}…",
+        "empty": "沒有符合的項目",
+        "clear": "清除"
+    },
+    "phone": {
+        "code": "國碼，請輸入代碼或國家",
+        "noCountry": "找不到國家"
+    },
+    "powerBars": "能力 {filled}／{max}",
+    "markdown": {
+        "openEditor": "開啟完整編輯器",
+        "done": "完成"
+    },
+    "upload": {
+        "menu": "上傳",
+        "files": "上傳檔案",
+        "folder": "上傳資料夾",
+        "failed": "上傳失敗",
+        "finishing": "即將完成",
+        "waiting": "等待中 · {size}",
+        "progress": "上傳進度",
+        "uploadingFile": "正在上傳 {name}",
+        "totalProgress": "整體上傳進度",
+        "retry": "重試",
+        "cancel": "取消",
+        "cancelAll": "全部取消",
+        "dismiss": "關閉",
+        "headingFailed": "{total} 個檔案中有 {failed} 個上傳失敗",
+        "headingDone": "{count, plural, other {已上傳 # 個檔案}}",
+        "headingUploading": "正在上傳第 {current} 個，共 {total} 個",
+        "more": "+ 還有 {count} 個"
+    },
+    "waveform": {
+        "live": "即時音訊波形",
+        "processing": "正在處理音訊",
+        "idle": "音訊波形閒置中"
+    }
+}

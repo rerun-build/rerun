@@ -1,0 +1,520 @@
+{
+    "close": "關閉",
+    "chat": {
+        "actionApproval": {
+            "title": "需要核准",
+            "previous": "上一個核准",
+            "next": "下一個核准",
+            "decline": "暫時不要",
+            "explain": "說明原因",
+            "approve": "核准",
+            "approved": "已核准"
+        },
+        "alert": {
+            "title": "通知",
+            "markAsRead": "標示為已讀"
+        },
+        "approval": {
+            "title": "需要核准：{label}",
+            "responded": "已回覆：<b>{choice}</b>",
+            "choices": {
+                "once": "允許一次",
+                "session": "本次工作階段",
+                "always": "一律允許",
+                "deny": "拒絕"
+            }
+        },
+        "decline": {
+            "placeholder": "為什麼不要？（選填）",
+            "back": "返回",
+            "confirm": "確認"
+        },
+        "question": {
+            "typeAnswer": "輸入您的回答…",
+            "somethingElse": "其他",
+            "attachFiles": "附加檔案",
+            "dropFiles": "將檔案拖放到這裡即可附加",
+            "record": "用語音回答",
+            "useRecording": "使用這段錄音",
+            "discardRecording": "捨棄錄音",
+            "selectAll": "選取所有適用的項目",
+            "dismiss": "關閉問題",
+            "skip": "略過",
+            "submit": "送出回答",
+            "next": "下一個問題"
+        },
+        "reasoning": {
+            "thinking": "思考中...",
+            "thoughtFor": "思考了 {duration}",
+            "thought": "已思考"
+        },
+        "secret": {
+            "saveFailed": "無法儲存憑證",
+            "titleOne": "需要憑證",
+            "titleMany": "需要憑證",
+            "dismiss": "關閉憑證請求",
+            "storedAs": "儲存為 {key}",
+            "replacePlaceholder": "已儲存。輸入新值即可取代",
+            "placeholder": "貼上值",
+            "whereToFind": "在哪裡可以找到",
+            "storageNote": "以同事變數的形式儲存在您的 engine 上，絕不會傳送給模型。",
+            "vaultNote": "儲存在您工作區的 Vault 中，絕不會傳送給模型。",
+            "skip": "略過",
+            "saving": "儲存中…",
+            "save": "儲存"
+        },
+        "skillProposal": {
+            "remembering": "記住中",
+            "remembered": "已記住",
+            "failed": "無法記住這項內容",
+            "retry": "重試",
+            "dismiss": "關閉",
+            "notRemembered": "未記住",
+            "remember": "記住",
+            "no": "不要",
+            "view": "檢視",
+            "hideDetails": "隱藏詳細資料",
+            "showDetails": "顯示詳細資料"
+        },
+        "steps": {
+            "previous": "上一步",
+            "next": "下一步",
+            "goTo": "前往第 {step} 步"
+        },
+        "table": {
+            "boxDatabase": "Box 資料庫",
+            "coworkerDatabase": "同事資料庫",
+            "rows": "{count, plural, other {# 列}}",
+            "columnsHidden": "部分欄位已隱藏",
+            "groupedBy": "依 {column} 分組",
+            "open": "開啟資料庫",
+            "empty": "尚無任何資料列。",
+            "more": "還有 {count} 張",
+            "rating": "{value} 分（滿分 5 分）"
+        }
+    },
+    "canvas": {
+        "zoomIn": "放大",
+        "zoomOut": "縮小",
+        "recenter": "重新置中",
+        "recenterView": "重新置中檢視"
+    },
+    "consent": {
+        "rejectAll": "全部拒絕",
+        "acceptAll": "全部接受",
+        "region": "Cookie 同意",
+        "title": "Cookie",
+        "short": "我們使用分析用 Cookie。<policy>Cookie 政策</policy>",
+        "long": "我們使用分析用 Cookie 來了解 {brand} 的使用情形。登入、支援聊天及記住您偏好設定所需的 Cookie 一律啟用。<policy>Cookie 政策</policy>"
+    },
+    "experts": {
+        "wizard": {
+            "steps": {
+                "identity": {
+                    "title": "您的身分",
+                    "description": "您的照片、橫幅、名稱及工作方式。"
+                },
+                "about": {
+                    "title": "關於您",
+                    "description": "您所在的地點及從事的工作。"
+                },
+                "pricing": {
+                    "title": "費率與可接案狀態",
+                    "description": "您的可接案狀態及大致費率。"
+                },
+                "expertise": {
+                    "title": "您的專長",
+                    "description": "您使用的技能與語言。選填。"
+                },
+                "links": {
+                    "title": "連結與發布",
+                    "description": "新增您的連結，然後發布個人檔案。"
+                }
+            },
+            "name": "名稱",
+            "namePlaceholder": "例如：Mira Labs",
+            "email": "電子郵件",
+            "emailHelper": "不公開。只有 Rerun 團隊看得到。",
+            "type": "類型",
+            "location": "地點",
+            "locationPlaceholder": "例如：台北",
+            "bio": "簡介",
+            "bioPlaceholder": "您打造什麼，以及協助哪些人。",
+            "availability": "可接案狀態",
+            "budget": "預算",
+            "budgetPlaceholder": "選擇範圍",
+            "skills": "技能",
+            "skillsPlaceholder": "選擇技能",
+            "languages": "語言",
+            "languagesPlaceholder": "選擇語言",
+            "website": "網站",
+            "back": "返回",
+            "continue": "繼續"
+        },
+        "types": {
+            "studio": {
+                "title": "工作室",
+                "description": "為客戶打造方案的代理商或團隊"
+            },
+            "freelancer": {
+                "title": "自由工作者",
+                "description": "獨立作業的個人開發者"
+            },
+            "expert": {
+                "title": "專家",
+                "description": "提供建議與指導的專業人士"
+            }
+        },
+        "availability": {
+            "tooltip": "{label}：{hint}",
+            "available": {
+                "label": "可接案",
+                "hint": "目前接受新案子"
+            },
+            "soon": {
+                "label": "即將可接案",
+                "hint": "近期內開放"
+            },
+            "unavailable": {
+                "label": "無法接案",
+                "hint": "目前檔期已滿"
+            }
+        },
+        "validation": {
+            "nameRequired": "請輸入名稱",
+            "nameTooLong": "名稱太長",
+            "nameInvalid": "名稱不能包含 < 或 >",
+            "emailRequired": "請輸入電子郵件",
+            "emailInvalid": "電子郵件無效",
+            "bioTooLong": "簡介太長",
+            "budgetInvalid": "預算無效",
+            "skillInvalid": "技能無效",
+            "languageInvalid": "語言無效"
+        },
+        "images": {
+            "title": "照片與橫幅",
+            "drop": "放開",
+            "dropBanner": "拖放您的橫幅",
+            "dropPhoto": "拖放您的照片",
+            "upload": "上傳",
+            "uploading": "上傳中…",
+            "changeBanner": "更換橫幅",
+            "uploadPhoto": "上傳照片",
+            "remove": "移除",
+            "notAnImage": "請選擇圖片檔。"
+        },
+        "card": {
+            "location": "地點",
+            "status": "狀態",
+            "links": "連結",
+            "namePlaceholder": "您的名稱",
+            "rolePlaceholder": "Rerun 專家"
+        },
+        "preview": {
+            "hire": "聘請"
+        },
+        "skills": {
+            "agentDesign": "Agent 設計",
+            "workflowAutomation": "工作流程自動化",
+            "ragKnowledgeBases": "RAG 與知識庫",
+            "integrationsApis": "整合與 API",
+            "mcpServers": "MCP 伺服器",
+            "promptEngineering": "提示工程",
+            "dataPipelines": "資料管線",
+            "chatbotsSupport": "聊天機器人與客服",
+            "voiceAgents": "語音 Agent",
+            "leadGenOutreach": "潛在客戶開發與觸及",
+            "crmAutomation": "CRM 自動化",
+            "webScraping": "網頁擷取",
+            "ecommerceAutomation": "電商自動化",
+            "analyticsReporting": "分析與報表",
+            "fineTuning": "微調",
+            "noCodeAutomation": "無程式碼自動化"
+        }
+    },
+    "foreman": {
+        "orbLabel": "詢問您的 Chief of Staff",
+        "tabsLabel": "Chief of Staff",
+        "empty": {
+            "title": "有關工作區的任何問題都可以問",
+            "description": "您的 Chief of Staff 會與您一起建立並執行同事"
+        },
+        "header": {
+            "closeChat": "關閉聊天",
+            "resize": "調整聊天大小"
+        },
+        "tabs": {
+            "assistant": "詢問",
+            "tasks": "任務",
+            "routines": "例行工作",
+            "card": "卡片"
+        },
+        "periods": {
+            "running": "執行中",
+            "morning": "今天上午",
+            "afternoon": "今天下午",
+            "tonight": "今晚",
+            "tomorrow": "明天",
+            "week": "本週",
+            "later": "稍後",
+            "paused": "已暫停"
+        },
+        "routines": {
+            "setupFirst": "請先完成設定",
+            "pause": "暫停 {name}",
+            "resume": "繼續 {name}",
+            "nameLabel": "例行工作名稱",
+            "runningJustNow": "執行中 · <1m",
+            "runningMinutes": "執行中 · {minutes}m",
+            "runningHours": "執行中 · {hours}h",
+            "startsNow": "即將開始",
+            "startsInMinutes": "{minutes}m 後開始",
+            "startsInHours": "{hours}h 後開始"
+        },
+        "agentPicker": {
+            "openTab": "開啟 {name} 的「{tab}」"
+        }
+    },
+    "forms": {
+        "optional": "選填",
+        "hidePassword": "隱藏密碼",
+        "showPassword": "顯示密碼",
+        "select": "請選擇…",
+        "search": "輸入以搜尋…",
+        "noResults": "沒有結果",
+        "dropFile": "將檔案拖放到這裡",
+        "remove": "移除 {item}"
+    },
+    "primitives": {
+        "loading": "載入中",
+        "scrollLeft": "向左捲動",
+        "scrollRight": "向右捲動",
+        "carousel": {
+            "previous": "上一個{label}",
+            "next": "下一個{label}",
+            "goTo": "前往{label} {index}"
+        }
+    },
+    "monitoring": {
+        "metrics": {
+            "count": "次數",
+            "totalTokens": "Token 總數",
+            "inputTokens": "輸入 Token",
+            "outputTokens": "輸出 Token",
+            "cachedInputTokens": "快取 Token",
+            "reasoningTokens": "推理 Token",
+            "cost": "費用",
+            "avgDurationMs": "平均時長",
+            "errorCount": "錯誤",
+            "errorRate": "錯誤率"
+        },
+        "live": "即時",
+        "runStatus": {
+            "running": "執行中",
+            "done": "已完成",
+            "error": "錯誤",
+            "cancelled": "已取消"
+        },
+        "runs": {
+            "emptyTitle": "尚無任何執行",
+            "emptyDescription": "同事的每次執行都會記錄在這裡",
+            "steps": "{count, plural, other {# 個步驟}}",
+            "tokens": "{tokens} 個 Token"
+        },
+        "agentStatus": {
+            "idle": "閒置",
+            "working": "工作中",
+            "error": "錯誤",
+            "waiting_human": "等待真人回覆",
+            "offline": "離線",
+            "empty": "沒有可顯示的同事。"
+        },
+        "chart": {
+            "rowCount": {
+                "runs": "{count} 次執行",
+                "runSteps": "{count} 個執行步驟",
+                "toolCalls": "{count} 次工具呼叫",
+                "sessions": "{count} 個工作階段"
+            },
+            "other": "其他",
+            "loading": "載入中...",
+            "noData": "此期間沒有資料。"
+        },
+        "usage": {
+            "input": "輸入",
+            "output": "輸出",
+            "cached": "快取",
+            "cost": "費用",
+            "tokens": "Token",
+            "totalCost": "總費用",
+            "totalTokens": "Token 總數",
+            "runs": "{count, plural, other {# 次執行}}",
+            "noUsage": "此期間沒有用量。"
+        }
+    },
+    "inbox": {
+        "title": "通知",
+        "resize": "調整通知大小",
+        "close": "關閉通知",
+        "preferences": "偏好設定",
+        "preferencesUnavailable": "這裡無法使用偏好設定",
+        "markAllRead": "全部標示為已讀",
+        "nothingToMark": "沒有需要標示為已讀的項目",
+        "markRead": "標示為已讀",
+        "noUpdates": "沒有更新",
+        "pillLabel": "通知：{summary}",
+        "pillLabelEmpty": "通知：沒有更新",
+        "needsYouRow": "待您處理",
+        "needsYouCount": "{count, plural, other {# 則待您處理}}",
+        "doneCount": "{count, plural, other {# 則已完成}}",
+        "needsYouRich": "{count, plural, other {<b>#</b> 則待您處理}}",
+        "doneRich": "{count, plural, other {<b>#</b> 則已完成}}",
+        "newUpdates": "{count, plural, other {<b>#</b> 則新更新}}",
+        "running": "{count, plural, other {<n>#</n> 項任務執行中}}",
+        "empty": {
+            "title": "沒有待處理的事項",
+            "description": "當同事需要您或完成任務時，通知會出現在這裡。"
+        },
+        "sections": {
+            "needsYou": "待您處理",
+            "headsUps": "提醒",
+            "errors": "錯誤",
+            "done": "已完成"
+        },
+        "sentences": {
+            "awaiting_question": "{agent} 問了您一個問題",
+            "awaiting_approval": "{agent} 需要您的核准",
+            "awaiting_connector": "{agent} 需要連接一個應用程式",
+            "waiting_human": "{agent} 正在等您回覆",
+            "awaiting_ack": "{agent} 有事項提醒您",
+            "error": "{agent} 發生錯誤",
+            "done": "{agent} 已完成執行"
+        }
+    },
+    "richText": {
+        "bold": "粗體",
+        "italic": "斜體",
+        "heading": "標題",
+        "subheading": "副標題",
+        "bulletList": "項目符號清單",
+        "numberedList": "編號清單",
+        "quote": "引言",
+        "inlineCode": "行內程式碼",
+        "codeBlock": "程式碼區塊",
+        "link": "連結",
+        "linkPrompt": "連結網址"
+    },
+    "theme": {
+        "label": "主題",
+        "options": {
+            "system": "跟隨系統",
+            "light": "淺色",
+            "dark": "深色"
+        }
+    },
+    "newAgent": {
+        "create": "建立 {name}",
+        "createCoworker": "建立同事",
+        "apps": "應用程式",
+        "pickedApps": "應用程式：{apps}",
+        "or": "或",
+        "browseTemplates": "瀏覽範本",
+        "job": {
+            "placeholder": "描述這份工作，就像向團隊成員交代任務一樣。",
+            "label": "您的新同事要做什麼？"
+        },
+        "name": {
+            "placeholder": "為您的同事命名",
+            "label": "同事名稱"
+        },
+        "forYou": {
+            "heading": "或從為您挑選的同事開始",
+            "closeToIdea": "與您的想法相近",
+            "otherIdeas": "其他點子"
+        },
+        "appsPicker": {
+            "search": "搜尋應用程式",
+            "all": "全部",
+            "empty": "找不到這個名稱的應用程式。",
+            "limit": "一開始最多可選 {max} 個應用程式，之後同事可以再連接更多。",
+            "categories": {
+                "payments": "付款",
+                "ecommerce": "電商",
+                "crm": "CRM",
+                "marketing": "行銷",
+                "seo": "SEO",
+                "analytics": "分析",
+                "dev": "開發者",
+                "productivity": "生產力",
+                "other": "其他"
+            }
+        },
+        "schedule": {
+            "button": "排程",
+            "readFromDescription": "根據您的描述判斷",
+            "onASchedule": "依排程",
+            "custom": "自訂",
+            "noSchedule": "不排程",
+            "onDemand": "只在我要求時",
+            "timeOfDay": "時間",
+            "presets": {
+                "weekday": {
+                    "label": "每個工作日 9:00",
+                    "detail": "週一至週五"
+                },
+                "monday": {
+                    "label": "每週一 9:00",
+                    "detail": "每週一次"
+                }
+            },
+            "everyDay": "每天 {time}",
+            "everyWeekday": "每個工作日 {time}",
+            "everyDays": "每{days} {time}"
+        }
+    },
+    "isoGrid": {
+        "board": "同事看板",
+        "addBlock": "在這一側新增區塊",
+        "status": {
+            "idle": "閒置",
+            "working": "工作中",
+            "error": "錯誤",
+            "offline": "離線",
+            "waiting_human": "等待您回覆",
+            "disabled": "未啟用",
+            "paused": "已暫停",
+            "restoring": "還原中"
+        },
+        "countdown": {
+            "seconds": "{count}s",
+            "minutes": "{count}m",
+            "hours": "{count}h",
+            "days": "{count}d"
+        },
+        "untitledBox": "未命名的 Box",
+        "boxAria": "Box：{name}",
+        "tileAria": "{name}，{state}{toHandle, plural, =0 {} other {，# 項待處理}}{results, plural, =0 {} other {，# 個新結果}}"
+    },
+    "templateStory": {
+        "states": {
+            "running": "執行中",
+            "approval": "待您處理",
+            "success": "已完成",
+            "done": "已完成"
+        },
+        "approve": "核准",
+        "edit": "編輯"
+    },
+    "tour": {
+        "boxes": {
+            "marketing": "行銷",
+            "sales": "業務",
+            "ops": "營運"
+        },
+        "roles": {
+            "headOfGrowth": "成長主管",
+            "accountExecutive": "業務專員",
+            "operationsSpecialist": "營運專員"
+        }
+    }
+}

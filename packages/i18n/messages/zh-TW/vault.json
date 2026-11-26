@@ -1,0 +1,91 @@
+{
+    "title": "Vault",
+    "description": "登入應用程式一次，再選擇要使用它的同事。",
+    "search": "搜尋 Vault",
+    "noMatch": "沒有相符的結果",
+    "groups": {
+        "apps": "應用程式"
+    },
+    "add": "新增",
+    "emptyTitle": "登入一次，與您的同事共用",
+    "otherApp": "其他應用程式",
+    "row": {
+        "everyone": "所有同事",
+        "everyoneShort": "全部",
+        "unused": "尚無同事使用",
+        "usedBy": "{names}",
+        "usedByMore": "{names} 和其他 {count, plural, other {# 位}}"
+    },
+    "status": {
+        "connected": "已連線",
+        "needsAuth": "已登出",
+        "needsConfig": "尚未設定"
+    },
+    "detail": {
+        "back": "返回 Vault",
+        "signedOut": "已登出：在有人重新登入之前，同事都無法使用 {name}。",
+        "notSetUp": "{name} 尚未設定。",
+        "reconnect": "重新連線",
+        "everyone": "所有同事",
+        "everyoneHint": "之後新增的同事也會取得。",
+        "coworkers": "同事",
+        "noCoworkers": "這個工作區還沒有同事。",
+        "hiddenCoworkers": "{count, plural, other {# 位同事}}在您看不到的 Boxes 中",
+        "variables": "變數",
+        "rename": "重新命名帳號",
+        "accountName": "帳號名稱",
+        "namePlaceholder": "為這個帳號命名"
+    },
+    "delete": {
+        "button": "刪除",
+        "title": "要刪除 {name} 嗎？",
+        "loses": "這些同事將無法再使用它：{names}。",
+        "nobody": "沒有同事使用它。",
+        "confirm": "刪除",
+        "deleted": "已刪除 {name}"
+    },
+    "reasons": {
+        "adminOnly": "只有管理員可以執行此操作",
+        "manageBox": "您沒有管理這位同事的 Box",
+        "manageAny": "您需要管理一個 Box 才能新增到 Vault",
+        "paidAppEveryone": "付費應用程式需逐一附加給每位同事",
+        "updateBox": "您工作區的機器在下次更新後即可重新命名帳號"
+    },
+    "addPage": {
+        "title": "新增到 Vault",
+        "search": "搜尋應用程式",
+        "mcp": "MCP 伺服器",
+        "secret": "密鑰"
+    },
+    "errors": {
+        "changeFailed": "無法儲存變更"
+    },
+    "addSecret": {
+        "name": "名稱",
+        "namePlaceholder": "Stripe 正式金鑰",
+        "variable": "變數",
+        "variableHint": "同事會以這個名稱讀取它。",
+        "variableInvalid": "僅限字母、數字和底線，且不能以數字開頭",
+        "value": "值",
+        "valueHint": "之後不會再顯示。",
+        "add": "新增密鑰"
+    },
+    "addMcp": {
+        "name": "名稱",
+        "namePlaceholder": "公司文件",
+        "target": "位址或指令",
+        "targetHint": "https 位址，或機器要啟動的指令。",
+        "header": "標頭",
+        "headerValue": "值",
+        "variable": "變數",
+        "add": "新增伺服器",
+        "addServers": "新增 {count} 個伺服器",
+        "incomplete": "請為每個伺服器提供名稱，以及位址或指令",
+        "partlyAdded": "{count, plural, other {已新增 # 個伺服器，下一個失敗：{reason}}}"
+    },
+    "paid": {
+        "managedInApp": "它的登入、名額和帳單都在「應用程式」選單的 {provider} 視窗中。",
+        "paused": "已暫停",
+        "connecting": "連線中"
+    }
+}

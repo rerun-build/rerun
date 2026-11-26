@@ -1,0 +1,55 @@
+{
+    "linkOff": {
+        "title": "此連結已失效",
+        "subtitle": "分享者已將它關閉。"
+    },
+    "unsubscribe": {
+        "title": "電子郵件偏好設定",
+        "subtitle": "調整 {brand} 寄給您的電子郵件。無需登入帳號。",
+        "subtitleRuns": "選擇是否讓您的同事寄電子郵件給您。無需登入帳號。",
+        "invalid": "此取消訂閱連結無效或已過期。",
+        "logIn": "登入以管理您的偏好設定"
+    },
+    "publishedView": {
+        "protectedTitle": "受保護的頁面",
+        "protectedDescription": "由 {workspace} 分享。請登入或確認您的電子郵件以開啟。",
+        "publishedBy": "由 {workspace} 的 {agent} 發布",
+        "publishedByUnknown": "由 {workspace} 的一位同事發布",
+        "untitled": "已發布的頁面"
+    },
+    "publishedAuth": {
+        "metaTitle": "開啟頁面",
+        "noAccess": "您沒有存取權限",
+        "signedInAs": "目前以 {email} 登入。此頁面僅供 {workspace} 的成員檢視。",
+        "signedInAsOther": "目前以其他帳號登入。此頁面僅供 {workspace} 的成員檢視。"
+    },
+    "gate": {
+        "open": "開啟",
+        "errors": {
+            "limited": "嘗試次數過多，請稍候幾分鐘。",
+            "password": "密碼錯誤",
+            "code": "驗證碼錯誤或已過期",
+            "email": "請輸入有效的電子郵件"
+        },
+        "password": {
+            "subtitle": "{workspace} 已用密碼保護此頁面",
+            "placeholder": "密碼"
+        },
+        "code": {
+            "title": "請查看您的收件匣",
+            "subtitle": "若 {email} 可以開啟此頁面，驗證碼已寄出",
+            "otherEmail": "使用其他電子郵件"
+        },
+        "email": {
+            "subtitle": "確認您的電子郵件以開啟",
+            "submit": "傳送驗證碼"
+        },
+        "members": {
+            "subtitle": "僅限 {workspace} 的成員",
+            "continue": "以 {brand} 繼續"
+        }
+    },
+    "publishedSite": {
+        "notFound": "找不到頁面"
+    }
+}

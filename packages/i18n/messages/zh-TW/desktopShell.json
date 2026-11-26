@@ -1,0 +1,111 @@
+{
+    "update": {
+        "ready": "Rerun {version} 已準備就緒",
+        "description": "重新啟動 App 即可使用新版本。",
+        "restart": "重新啟動"
+    },
+    "downloads": {
+        "done": "已下載 {filename}",
+        "failed": "無法下載 {filename}",
+        "show": "在資料夾中顯示"
+    },
+    "handoff": {
+        "title": "登入 {app}",
+        "body": "要以 {account} 的身分繼續使用 {app} 嗎？",
+        "continue": "繼續",
+        "switchAccount": "使用其他帳號",
+        "doneTitle": "返回 {app}",
+        "doneBody": "{app} 會自動完成登入。您可以關閉這個分頁。",
+        "codeHint": "如果 {app} 沒有開啟，請將這組代碼貼到 App 中：",
+        "copyCode": "複製代碼",
+        "failed": "無法登入 App。請再試一次。",
+        "invalidTitle": "這個連結已過期",
+        "invalidBody": "請從桌面版 App 重新登入。"
+    },
+    "signIn": {
+        "waitingTitle": "請在瀏覽器中繼續",
+        "waitingBody": "請在開啟的瀏覽器視窗中登入，然後回到這裡。",
+        "reopen": "再次開啟瀏覽器",
+        "pasteCode": "改為貼上代碼",
+        "codeLabel": "瀏覽器提供的代碼",
+        "submit": "登入",
+        "back": "返回",
+        "errors": {
+            "expired": "這組代碼已過期。請重新開始。",
+            "invalid": "這組代碼無效。請重新開始。",
+            "state-mismatch": "這次登入是從其他視窗開始的。請重新開始。",
+            "network": "無法連線到 Rerun。請檢查您的網路連線。",
+            "cancelled": "登入已取消。"
+        }
+    },
+    "settings": {
+        "openAtLogin": "登入時開啟",
+        "openAtLoginMac": "Rerun 會隨 Mac 一起啟動，並顯示在選單列。",
+        "openAtLoginOther": "Rerun 會隨電腦一起啟動，並顯示在通知區域。",
+        "closeToTray": "關閉後繼續執行",
+        "closeToTrayHint": "關閉視窗後，Rerun 會留在通知區域，您仍會收到通知。",
+        "updates": "更新",
+        "version": "Rerun {version}",
+        "checking": "正在檢查更新…",
+        "downloading": "正在下載更新… {percent}%",
+        "updateFailed": "無法檢查更新。",
+        "check": "檢查更新",
+        "restart": "重新啟動以更新至 {version}",
+        "quickAsk": "快速提問",
+        "quickAskHint": "在任何 App 中按 {shortcut}，即可開啟向 Chief of Staff 提問的欄位。",
+        "quickAskOn": "在任何 App 中開啟向 Chief of Staff 提問的欄位。",
+        "quickAskOff": "已關閉。設定快捷鍵即可開啟。",
+        "shortcut": {
+            "record": "設定快捷鍵",
+            "typing": "請按下快捷鍵",
+            "tryAnother": "換一組試試",
+            "recordingHint": "按 Esc 取消，按 ⌫ 關閉",
+            "change": "快捷鍵 {keys}，按一下即可變更",
+            "needsModifier": "請加上輔助鍵，例如 {key}",
+            "reserved": "{keys} 已被{owner, select, spotlight { Spotlight } finder { Finder 搜尋} inputSources {輸入法} appSwitcher { App 切換器} screenshot {螢幕截圖} windowMenu {視窗選單} system {系統} other {所有 App }}使用",
+            "taken": "{keys} 已被其他 App 使用"
+        },
+        "quickAskVoice": "語音快速提問",
+        "quickAskVoiceOn": "在任何 App 中與您的 Chief of Staff 對話。",
+        "coworkerDock": "同事 Dock",
+        "coworkerDockHint": "您的同事會顯示在螢幕邊緣，位於所有 App 上方。"
+    },
+    "openInApp": {
+        "title": "要在 {app} 中開啟這個頁面嗎？",
+        "open": "開啟"
+    },
+    "quickAsk": {
+        "placeholder": "詢問您的 Chief of Staff…",
+        "hint": "按 Enter 傳送，按 Esc 關閉",
+        "send": "傳送",
+        "holdToTalk": "按住 <key>Space</key> 說話",
+        "releaseToSend": "放開即傳送，按 Esc 取消",
+        "sent": "已傳送給您的 Chief of Staff",
+        "nothingHeard": "沒有聽到聲音。請按住 Space 說話。",
+        "transcriptionFailed": "無法轉成文字。請再試一次，或改用輸入。",
+        "micDeniedTitle": "Rerun 聽不到您的聲音",
+        "micDeniedBody": "請在系統設定中允許 Rerun 使用麥克風。",
+        "openSettings": "開啟設定",
+        "typeInstead": "改用輸入",
+        "toggleHint": "按 Enter 傳送，按 Esc 取消",
+        "cancel": "取消"
+    },
+    "server": {
+        "otherServer": "使用其他 Rerun 伺服器"
+    },
+    "coworkerDock": {
+        "newCoworker": "新增同事",
+        "move": "移動",
+        "show": "顯示同事",
+        "resize": "調整大小",
+        "allNotifications": "所有通知",
+        "allCoworkers": "所有同事",
+        "nothingWaiting": "目前沒有待處理的事項。",
+        "openInRerun": "在 Rerun 中開啟",
+        "replyTo": "回覆 {name}",
+        "send": "傳送",
+        "markRead": "標示為已讀",
+        "dismiss": "關閉",
+        "said": "<who>{name}</who> <verb>{status, select, awaiting_question {提出問題} awaiting_approval {需要您同意} done {已完成} error {卡住了} other {需要您處理}}</verb>"
+    }
+}

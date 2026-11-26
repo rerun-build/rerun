@@ -1,0 +1,173 @@
+{
+    "toast": {
+        "close": "關閉通知",
+        "openConversation": "開啟對話",
+        "coworker": "同事",
+        "scheduledTask": "{name} · 排程任務"
+    },
+    "inbox": {
+        "unknownCoworker": "同事",
+        "detail": {
+            "close": "關閉",
+            "back": "返回",
+            "seeAll": "查看全部",
+            "seeAllCount": "查看全部 {count} 則",
+            "markRead": "標示為已讀",
+            "notInList": "這則更新還不在您的清單中",
+            "openConversation": "開啟對話",
+            "noCoworker": "這則更新與任何同事無關",
+            "status": {
+                "error": "錯誤",
+                "awaiting_question": "問題",
+                "awaiting_approval": "核准",
+                "awaiting_ack": "未讀",
+                "done": "已完成",
+                "waiting_human": "等待中"
+            }
+        },
+        "peek": {
+            "close": "關閉",
+            "back": "返回",
+            "openConversation": "開啟對話",
+            "showMore": "顯示更多",
+            "showLess": "顯示較少",
+            "sent": "已傳送給 {agent}",
+            "stale": "這已經有人回答了。",
+            "openToAnswer": "開啟對話以回答。",
+            "busy": "{agent} 仍在工作中，請稍後再試。",
+            "failed": "您的回答未能送出，請再試一次。"
+        },
+        "markAll": {
+            "label": "將通知標示為已讀",
+            "markRead": "{count, plural, other {將 # 則通知標示為已讀}}",
+            "nothingToMark": "沒有可標示的通知",
+            "clearAll": "{count, plural, other {全部清除，包含 # 個請求}}",
+            "confirmTitle": "要清除所有通知嗎？",
+            "confirmDescription": "{count, plural, other {# 個待處理的請求會在未回答的情況下離開收件匣，您的同事會繼續等待。}}",
+            "confirm": "全部清除"
+        },
+        "rowMenu": {
+            "options": "通知選項",
+            "undo": "復原",
+            "unfollow": "停止追蹤其排程任務",
+            "unfollowed": "您已不再追蹤 {name} 的排程任務。",
+            "mute": "將 {name} 設為靜音",
+            "muted": "已將 {name} 設為靜音。",
+            "settings": "通知設定"
+        },
+        "untitledSession": "未命名的工作階段",
+        "reasons": {
+            "mine": "這次執行是您啟動的",
+            "participant": "您在這個對話中",
+            "followed": "您追蹤了 {agentName} 的排程任務",
+            "allActivity": "您會收到 {agentName} 的所有活動",
+            "everything": "您會收到工作區中的每次執行",
+            "workspace": "這與您的工作區有關"
+        }
+    },
+    "settings": {
+        "scopeTitle": "通知我的內容",
+        "recommended": "推薦",
+        "notificationsFor": "{name} 的通知",
+        "scopes": {
+            "everything": {
+                "label": "全部",
+                "detail": "工作區中的每次執行，不論是誰啟動的。"
+            },
+            "mine": {
+                "label": "我的執行與我追蹤的項目",
+                "detail": "我啟動的執行、我參與的對話、我追蹤的同事。"
+            },
+            "needed": {
+                "label": "只在需要我時",
+                "detail": "我的執行中的問題、核准與錯誤。執行完成時不會通知。"
+            },
+            "nothing": {
+                "label": "不通知",
+                "detail": "我自己查看收件匣。"
+            }
+        },
+        "modes": {
+            "default": {
+                "label": "預設",
+                "yourSetting": "您的設定：「{scope}」。"
+            },
+            "everything": {
+                "label": "所有活動",
+                "hint": "每次執行，不論是誰啟動的。"
+            },
+            "muted": {
+                "label": "靜音",
+                "hint": "不通知。看板上仍會顯示。"
+            }
+        },
+        "bell": {
+            "title": "通知我有關 {name} 的內容",
+            "follow": "追蹤其排程任務",
+            "noSchedule": "{name} 還沒有排程任務",
+            "nothingScheduled": "尚無排程。",
+            "scheduled": "{count} 個排程任務，通知方式與您自己的執行相同。",
+            "allSettings": "所有通知設定"
+        },
+        "perCoworker": {
+            "title": "依同事設定",
+            "detail": "也可以從每位同事的鈴鐺圖示設定。",
+            "add": "新增",
+            "allListed": "所有同事都已列出",
+            "empty": "所有同事都遵循上方的規則。",
+            "following": "正在追蹤其排程任務",
+            "alreadyDefault": "{name} 已遵循您的設定",
+            "reset": "重設 {name}"
+        },
+        "channels": {
+            "title": "通知方式",
+            "toast": {
+                "label": "應用程式內的快顯通知",
+                "description": "在 {brand} 開啟時，顯示在收件匣上方。"
+            },
+            "sound": {
+                "label": "音效",
+                "description": "只在同事需要您或發生故障時。",
+                "play": "播放通知音效"
+            },
+            "email": {
+                "label": "電子郵件",
+                "description": "在您離開時需要您處理的事。每個事件一封郵件，每天最多 3 封。"
+            }
+        },
+        "accountEmails": {
+            "title": "帳號郵件",
+            "billing": {
+                "label": "試用與帳單",
+                "description": "試用提醒、帳單通知，以及 AI 帳號或點數導致同事停止工作時的警示。"
+            },
+            "product": {
+                "label": "產品更新",
+                "description": "新功能、使用訣竅與不定期的產品消息。"
+            }
+        },
+        "saveFailed": "無法儲存您的通知設定",
+        "networkError": "網路錯誤"
+    },
+    "emailPreferences": {
+        "coworkerTitle": "同事通知",
+        "email": {
+            "label": "電子郵件",
+            "description": "在您離開時，同事需要您或發生故障。每個事件一封郵件，每天最多 3 封。"
+        },
+        "saveFailed": "無法儲存偏好設定",
+        "saving": "儲存中…",
+        "saved": "所有變更已儲存"
+    },
+    "notices": {
+        "slotsPaused": "您的方案現在有 {slots, plural, other {# 個 {provider} 名額}}，因此 {paused, plural, other {# 個已連結的帳號}}已暫停。請在「帳單」中新增名額以恢復使用。",
+        "workspaceBack": "您的工作區已恢復。請從「設定 → 應用程式」重新連結您的 {provider} 帳號，讓同事可以再次使用。",
+        "trialEndsSoon": "您的免費 {provider} 名額將於 {endsAt, date, long} 結束，之後會成為方案中的付費名額。如果不想保留，請在那之前從「設定 → 應用程式」中斷帳號連結。",
+        "trialEndedPlanInactive": "您的免費 {provider} 名額已結束，而您的方案未啟用，因此{account, select, none {該帳號} other {{account}}}已暫停。請在一週內於「帳單」中新增名額以保留它，否則將中斷連結。",
+        "trialEndedDeclined": "您的免費 {provider} 名額已結束且信用卡遭拒，因此{account, select, none {該帳號} other {{account}}}已暫停。請在一週內於「帳單」中新增名額以保留它，否則將中斷連結。",
+        "rateLimited": "{provider} 要求{account, select, none {您的其中一個帳號} other {{account}}}放慢速度。您的同事在 24 小時內不會使用它，以確保帳號安全。",
+        "signedOut": "{provider} 已將{account, select, none {您的其中一個帳號} other {{account}}}登出。請從「設定 → 應用程式」重新連結，讓同事可以再次使用。",
+        "budgetExhausted": "您本月的 {brand} 點數已用完。在點數重置或您加值之前，使用 {brand} 模型的排程與觸發執行會暫停，同事也無法購買潛在客戶、SEO 或社群資料。",
+        "managedCreditOut": "此工作區的點數已用完。請聯絡 {manager} 取得更多點數：在那之前，排程與觸發執行會暫停，同事也無法購買潛在客戶、SEO 或社群資料。"
+    }
+}

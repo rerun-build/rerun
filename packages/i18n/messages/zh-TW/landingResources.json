@@ -1,0 +1,45 @@
+{
+    "metadata": {
+        "title": "橫幅材質",
+        "description": "為您的 Rerun 專家個人檔案提供免費橫幅材質：下載現成的背景圖，一分鐘內就能加到您的公開專家頁面。"
+    },
+    "banners": {
+        "eyebrow": "專家專用",
+        "title": "橫幅材質",
+        "description": "我們為 Rerun 專家個人檔案使用的一系列流體玻璃材質。可免費下載，隨您自由使用。",
+        "download": "下載",
+        "downloadFile": "下載 {file}",
+        "alts": {
+            "lime-glass-crumple": "明亮的萊姆綠玻璃，皺摺的層疊薄片",
+            "pastel-holographic-knot": "全像粉彩玻璃緞帶打結",
+            "blue-glass-crystal": "電光藍多切面水晶玻璃",
+            "violet-lime-swirl": "紫色與萊姆綠的玻璃漩渦",
+            "crimson-fluid-blob": "光亮的緋紅與洋紅流體團塊",
+            "amber-droplet-blob": "琥珀橘玻璃水滴，光亮的隆起",
+            "amber-chrome-swirl": "橘色與黑色的鉻金屬漩渦",
+            "dark-lime-crumple": "帶有螢光綠紋路的黑色皺摺玻璃",
+            "pastel-iridescent-bloom": "全像粉彩虹彩玻璃綻放",
+            "violet-lime-vortex": "紫色與萊姆綠的玻璃漩渦隧道",
+            "lavender-glass-vortex": "薰衣草紫玻璃漩渦",
+            "violet-lime-crystal": "紫色與綠色的水晶玻璃塊",
+            "pink-swirl-vortex": "桃紅與紅色的玻璃漩渦",
+            "violet-lime-knot": "紫色與萊姆綠的環形結",
+            "lavender-glass-crystal": "薰衣草紫多切面水晶玻璃",
+            "blue-chrome-knot": "藍色鉻金屬環形結",
+            "blue-plasma-smoke": "玻璃上的電光藍電漿煙霧",
+            "violet-iridescent-vortex": "紫色虹彩漩渦",
+            "dark-lime-knot": "發出螢光綠光芒的黑色玻璃結",
+            "pastel-holographic-vortex": "粉彩全像漩渦",
+            "blue-liquid-ripple": "虹彩藍色波紋液態玻璃",
+            "blue-glass-bloom": "鈷藍玻璃荷葉邊花瓣綻放",
+            "blue-chrome-vortex": "藍色鉻金屬玻璃漩渦",
+            "pastel-holographic-smoke": "粉彩全像縷縷煙霧玻璃",
+            "crimson-swirl-vortex": "深紅與洋紅漩渦",
+            "amethyst-crystal-facets": "紫水晶色多切面水晶",
+            "violet-iridescent-crumple": "紫色虹彩皺摺水晶塊",
+            "violet-glossy-bloom": "光亮的紫色玻璃花瓣綻放",
+            "violet-lime-fluid-blob": "紫色與螢光綠的光亮流體團塊",
+            "dark-green-swirl-vortex": "深綠與黑色的光亮漩渦"
+        }
+    }
+}

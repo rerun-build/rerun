@@ -1,0 +1,321 @@
+{
+    "composer": {
+        "attach": "附加",
+        "camera": "相機",
+        "coworkers": "同事",
+        "discardRecording": "捨棄錄音",
+        "files": "檔案",
+        "modelLabel": "模型，{model}",
+        "photos": "照片",
+        "recordVoice": "錄製語音訊息",
+        "removeAttachment": "移除 {name}",
+        "retryRecording": "重新傳送錄音",
+        "send": "傳送",
+        "sendRecording": "傳送錄音",
+        "sendTo": "傳送給 {name}",
+        "skills": "技能",
+        "stop": "停止",
+        "tooLargeBody": "{files}：最多 {megabytes} MB。",
+        "tooLargeTitle": "{count, plural, other {檔案太大}}",
+        "tooManyBody": "最多 {max} 個：{files} 未加入。",
+        "tooManyTitle": "檔案太多",
+        "computers": "電腦",
+        "offline": "離線",
+        "placeholder": "@ 同事，/ 技能，# 電腦",
+        "placeholderNoSkill": "@ 同事，# 電腦",
+        "commands": {
+            "coworker": {
+                "menuLabel": "@ 提及同事",
+                "description": "邀請同事加入這個對話",
+                "empty": "此工作區還沒有其他同事"
+            },
+            "skill": {
+                "menuLabel": "/ 使用技能",
+                "description": "執行同事已學會的操作步驟",
+                "empty": "這位同事還沒有技能"
+            },
+            "computer": {
+                "menuLabel": "# 使用電腦",
+                "description": "讓同事在已連結的電腦上工作",
+                "empty": "尚未連結任何電腦"
+            }
+        }
+    },
+    "desktop": {
+        "connecting": "正在連線到螢幕…",
+        "dropping": "螢幕連線一直中斷，請稍後再試。",
+        "handingBack": "交還中…",
+        "keys": {
+            "delete": "Delete",
+            "return": "Return",
+            "tab": "Tab"
+        },
+        "retry": "重試",
+        "screen": "螢幕",
+        "screenOf": "{name} 的螢幕",
+        "type": "輸入",
+        "typePlaceholder": "在螢幕上輸入",
+        "unreachable": "無法連線到螢幕。"
+    },
+    "empty": {
+        "asleep": "休眠中。傳送訊息即可喚醒。",
+        "loading": "載入中",
+        "pulseCoworkers": "{count, plural, other {# 位同事}}",
+        "pulseWorking": "{count} 位正在工作",
+        "sendToCoworker": "傳送訊息給這位同事",
+        "startTitle": "開始對話",
+        "starters": {
+            "capabilities": "你可以幫我做什麼？",
+            "recentWork": "總結你最近的工作",
+            "projectFiles": "檢查我的專案檔案",
+            "tools": "你可以使用哪些工具？"
+        },
+        "team": {
+            "greeting": "{named, select, yes {嗨，我是 {name}} other {嗨，我是您的 Chief of Staff}}",
+            "greetingNamed": "{named, select, yes {嗨 {firstName}，我是 {name}} other {嗨 {firstName}，我是您的 Chief of Staff}}",
+            "greetingWithTeam": "{greeting}。這是您的團隊。",
+            "emptySubtitle": "您還沒有任何同事。告訴我一份您想交出去的工作，我會建立第一位同事。",
+            "buildPrompt": "幫我建立一位同事，負責",
+            "buildFirst": {
+                "title": "建立我的第一位同事",
+                "description": "用一句話描述這份工作"
+            },
+            "template": {
+                "title": "從範本開始",
+                "description": "適合您產業的現成同事",
+                "send": "給我看適合我業務的範本"
+            },
+            "guide": {
+                "title": "這是怎麼運作的？",
+                "description": "同事、Boxes、例行任務，兩分鐘看懂",
+                "send": "Rerun 是怎麼運作的？"
+            },
+            "checkWorking": {
+                "title": "{name} 正在做什麼？",
+                "description": "正在工作",
+                "send": "{mention} 現在正在做什麼？"
+            },
+            "checkIdle": {
+                "title": "{name} 今天做了什麼？",
+                "description": "查看最近的執行",
+                "send": "{mention} 今天做了什麼？"
+            },
+            "handOff": {
+                "title": "交給 {name} 一項任務",
+                "description": "由我交代並全程追蹤",
+                "prefill": "請 {mention} "
+            },
+            "build": {
+                "title": "建立新同事",
+                "description": "負責團隊中還沒人做的工作"
+            }
+        }
+    },
+    "error": {
+        "connectChatGpt": "連結 ChatGPT",
+        "connectClaude": "連結 Claude",
+        "creditsBody": "您本期的 Rerun 點數已用完。已經在付費使用 Claude 或 ChatGPT 嗎？讓同事改用該方案執行，這裡不會另外收費。",
+        "creditsTitle": "Rerun 點數",
+        "fallbackTitle": "發生錯誤",
+        "reconnect": "重新連結",
+        "switchModel": "切換模型",
+        "tryAgain": "再試一次"
+    },
+    "feedback": {
+        "cancel": "取消",
+        "categories": {
+            "did_not_follow": "沒有遵照我的要求",
+            "incomplete": "回應不完整",
+            "memory": "記憶有問題",
+            "not_factual": "內容與事實不符",
+            "other": "其他",
+            "too_slow": "太慢",
+            "tool_error": "工具或連線錯誤",
+            "ui_bug": "介面錯誤",
+            "wrong_tool": "使用了錯誤的工具或應用程式"
+        },
+        "categoryLabel": "您想回報哪一類問題？",
+        "disclaimer": "送出此回報後，這段對話會分享給 Rerun 團隊，讓我們改善您的同事。",
+        "negativePlaceholder": "這則回應哪裡讓您不滿意？",
+        "negativeTitle": "提供負面意見",
+        "positivePlaceholder": "這則回應哪裡讓您滿意？",
+        "removeFailed": "無法移除您的意見",
+        "saveFailed": "無法儲存您的意見",
+        "skip": "略過",
+        "submit": "送出"
+    },
+    "foreman": {
+        "away": {
+            "none": {
+                "body": "此工作區目前沒有機器。請到 {host} 查看。",
+                "title": "Rerun 未在運作"
+            },
+            "onboarding": {
+                "body": "請到 {host} 完成設定。",
+                "title": "Rerun 正在設定您的工作區"
+            }
+        },
+        "retry": "重試",
+        "role": "您的 Chief of Staff",
+        "unreachableBody": "請檢查網路連線後再試一次。",
+        "unreachableTitle": "無法連線到 Rerun"
+    },
+    "header": {
+        "back": "返回",
+        "closeConversation": "關閉對話",
+        "conversationCount": "{count, plural, other {# 個對話}}",
+        "conversations": "對話",
+        "coworkerDetails": "同事詳細資料",
+        "earlier": "較早",
+        "general": "一般",
+        "identityLabel": "{name}，{title}",
+        "newChat": "新聊天",
+        "newConversation": "新對話",
+        "newThread": "新討論串",
+        "sections": {
+            "needs-you": "需要您處理",
+            "new": "未讀",
+            "running": "執行中"
+        },
+        "threadCount": "{count, plural, other {# 個討論串}}",
+        "threads": "討論串"
+    },
+    "markdown": {
+        "code": "程式碼",
+        "copied": "已複製",
+        "copy": "複製",
+        "draft": "草稿",
+        "image": "圖片"
+    },
+    "messages": {
+        "askRerun": "{named, select, yes {詢問 {name}} other {詢問您的 Chief of Staff}}",
+        "badResponse": "回應不佳",
+        "compacting": "壓縮中",
+        "copy": "複製",
+        "goodResponse": "回應良好",
+        "needsYourAnswer": "需要您回答",
+        "open": "開啟 {name}",
+        "photo": "照片",
+        "regenerate": "重新產生",
+        "replyBelow": "請在下方回覆。",
+        "runningTool": "正在執行 {tool}",
+        "scrollToLatest": "捲動到最新訊息",
+        "sentBy": "由 {name} 傳送",
+        "relayedFor": "{named, select, yes {{name} 代 {person}} other {Chief of Staff 代 {person}}}",
+        "share": "分享",
+        "showLess": "顯示較少",
+        "showMore": "顯示更多",
+        "thinking": "思考中"
+    },
+    "origins": {
+        "copied": "已複製",
+        "copy": "複製",
+        "installComplete": "安裝完成",
+        "installGuideOf": "{name} 安裝指南",
+        "installStarted": "已開始安裝",
+        "noPayload": "沒有酬載",
+        "payload": "酬載",
+        "prompt": "提示詞",
+        "promptOf": "{name} 的提示詞",
+        "scheduledRun": "排程執行",
+        "startedBy": "此工作階段由 <strong>{name}</strong> 啟動",
+        "truncated": "已截斷",
+        "viewDetails": "檢視詳細資料",
+        "viewGuide": "檢視指南",
+        "viewPayload": "檢視酬載",
+        "viewPrompt": "檢視提示詞",
+        "webhookReceived": "已收到 Webhook",
+        "jobEnded": "#{computer} 上的工作已結束",
+        "viewReport": "檢視報告",
+        "reportOf": "#{computer} 回報的內容"
+    },
+    "paidSources": {
+        "count": "{count, plural, other {# 個來源}}",
+        "emailsVerified": "{checked, plural, other {# 個電子郵件}}中已驗證 {valid} 個",
+        "title": "來源"
+    },
+    "pane": {
+        "answerPlaceholder": "回覆 {name}",
+        "attachFailed": "無法附加檔案",
+        "defaultModel": "預設 · {model}",
+        "loadFailed": "無法載入此對話。",
+        "loading": "正在載入對話",
+        "openBrowser": "開啟瀏覽器",
+        "retry": "重試",
+        "stopTaskFailed": "無法停止此任務",
+        "takeControl": "接手控制"
+    },
+    "queued": {
+        "attachmentsOnly": "僅附件",
+        "badge": "已排入佇列",
+        "remove": "移除佇列中的訊息",
+        "sendNow": "立即傳送",
+        "sendNowStops": "立即傳送，會停止目前的執行"
+    },
+    "runPhase": {
+        "label": "{name}：{phase}",
+        "thinking": "思考中",
+        "waking": "喚醒中",
+        "working": "工作中"
+    },
+    "resume": {
+        "continue": "<verb>繼續</verb> <name>{title}</name>",
+        "dismiss": "關閉",
+        "untitled": "新對話"
+    },
+    "screen": {
+        "disconnected": "螢幕已中斷連線",
+        "error": "螢幕無法使用",
+        "handBackFailed": "無法交還瀏覽器",
+        "resize": "調整螢幕大小"
+    },
+    "skillUpdateFailed": "無法更新技能",
+    "takeover": {
+        "closing": "關閉中…",
+        "done": "完成",
+        "openAgain": "再次開啟",
+        "openBrowser": "開啟瀏覽器",
+        "opened": "瀏覽器已在同事的桌面上開啟。完成後請回到這裡。",
+        "opensBrowser": "開啟同事的瀏覽器，由您操作。",
+        "opensSite": "在同事的瀏覽器中開啟 {site}，由您操作。",
+        "privacy": "您登入的內容只會留在您機器上這位同事的瀏覽器中。",
+        "skip": "略過",
+        "skipTakeover": "略過瀏覽器接手"
+    },
+    "threadBranch": {
+        "needs": "需要您處理",
+        "error": "錯誤",
+        "running": "執行中",
+        "open": "開啟討論串 {title}",
+        "opener": {
+            "schedule": "排程執行 · {name}",
+            "trigger": "Webhook · {name}",
+            "askedBy": "由 {name} 提出",
+            "askedByUnknown": "由另一位同事提出",
+            "started": "開啟了一個討論串"
+        }
+    },
+    "voice": {
+        "copyTranscript": "複製逐字稿",
+        "hideTranscript": "隱藏逐字稿",
+        "pause": "暫停",
+        "play": "播放語音訊息",
+        "recording": "錄音中",
+        "seek": "跳轉",
+        "sendFailed": "無法傳送這段錄音。",
+        "sending": "正在傳送錄音",
+        "silent": "這段錄音中聽不到任何聲音。",
+        "transcript": "逐字稿",
+        "waitingForMicrophone": "正在等待麥克風…"
+    },
+    "browser": {
+        "close": "關閉",
+        "reload": "重新載入",
+        "pageActions": "{host} 的動作",
+        "share": "分享",
+        "openInBrowser": "在瀏覽器中開啟",
+        "copyLink": "複製連結",
+        "backToChat": "返回對話",
+        "brand": "Rerun"
+    }
+}

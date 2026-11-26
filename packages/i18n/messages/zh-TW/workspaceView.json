@@ -1,0 +1,74 @@
+{
+    "switch": {
+        "label": "檢視",
+        "board": "看板",
+        "simple": "經典"
+    },
+    "list": {
+        "label": "同事",
+        "search": "搜尋",
+        "empty": "還沒有同事",
+        "newBox": "新增 Box",
+        "emptyBox": "沒有同事",
+        "boxMore": "{name} 的動作"
+    },
+    "tile": {
+        "more": "{name} 的更多選項",
+        "newConversation": "新對話",
+        "allConversations": "所有對話",
+        "card": "同事卡片",
+        "pin": "置頂",
+        "unpin": "取消置頂"
+    },
+    "chat": {
+        "allConversations": "所有對話",
+        "pick": "請從左側選擇一位同事。",
+        "card": "同事卡片"
+    },
+    "line": {
+        "paused": "已暫停",
+        "waiting": "等待您回覆",
+        "error": "發生錯誤",
+        "working": "工作中",
+        "workingOn": "工作中 · {detail}",
+        "asleep": "休眠中",
+        "asleepAbout": "休眠中 · {about}",
+        "you": "您：{message}"
+    },
+    "foreman": {
+        "name": "{named, select, yes {{name}} other {Chief of Staff}}",
+        "line": "有問題儘管問",
+        "card": "{named, select, yes {{name} 的卡片} other {Chief of Staff 卡片}}",
+        "rename": "為您的 Chief of Staff 命名"
+    },
+    "details": {
+        "label": "{name} 的卡片"
+    },
+    "phone": {
+        "pinned": "已置頂",
+        "recent": "最近",
+        "byBox": "依 Box",
+        "section": "{label}，{count}"
+    },
+    "checkins": {
+        "title": "主動巡查",
+        "toggle": "自動主動巡查",
+        "next": "下次巡查：{when}",
+        "waiting": "等待有人先發送訊息",
+        "off": "關閉",
+        "unavailable": "此伺服器已關閉此功能",
+        "switchedOff": "請先開啟主動巡查",
+        "recent": "最近",
+        "runNow": "立即巡查",
+        "started": "正在巡查。只有在有事要說時才會傳訊息給您。",
+        "empty": "還沒有巡查紀錄",
+        "reasons": {
+            "pulse": "每日巡查，沒有需要回報的事",
+            "promise": "依約回來查看，沒有新動態",
+            "manual": "已巡查，沒有需要回報的事"
+        },
+        "failed": "巡查未完成",
+        "running": "巡查中",
+        "stopped": "巡查已停止"
+    }
+}

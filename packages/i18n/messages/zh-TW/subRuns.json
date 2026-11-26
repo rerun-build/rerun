@@ -1,0 +1,30 @@
+{
+    "untitledTask": "子同事 {index}",
+    "untitledAgent": "同事",
+    "trouble": {
+        "stalled": "{count} 個停滯",
+        "failing": "{count} 個持續失敗"
+    },
+    "progress": {
+        "step": "第 {steps} 步",
+        "calls": "{count, plural, =0 {# 次呼叫} other {# 次呼叫}}"
+    },
+    "headline": {
+        "messageSent": "已傳送訊息給 {name}",
+        "calling": "正在呼叫 {name}",
+        "callFailed": "{name} 失敗",
+        "callStopped": "{name} 已停止",
+        "callAnswered": "{name} 已回覆",
+        "building": "正在建立 {name}",
+        "buildFailed": "無法建立 {name}",
+        "built": "已建立 {name}",
+        "buildingTeam": "正在建立您的團隊 · {count, plural, =0 {# 位同事} other {# 位同事}}",
+        "delegating": "正在委派 · {count, plural, =0 {# 項任務} other {# 項任務}}",
+        "doneOfTotal": "已完成 {done}/{total}",
+        "coworkersBuilt": "已建立 {count, plural, =0 {# 位同事} other {# 位同事}}",
+        "openFromBoard": "從看板開啟其中一位",
+        "tasksDone": "已完成 {count, plural, =0 {# 項任務} other {# 項任務}}",
+        "doneAndFailed": "{done} 項完成 · {failed} 項失敗",
+        "doneAndStopped": "{done} 項完成 · {stopped} 項已停止"
+    }
+}

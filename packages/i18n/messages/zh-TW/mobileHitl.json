@@ -1,0 +1,159 @@
+{
+    "actions": {
+        "notNow": "先不要",
+        "explain": "說明原因",
+        "skip": "略過",
+        "connect": "連結",
+        "connectNew": "新帳號",
+        "connecting": "連結中…",
+        "continue": "繼續",
+        "loading": "載入中…",
+        "openOnWeb": "在網頁上開啟",
+        "back": "返回",
+        "confirm": "確認",
+        "send": "傳送",
+        "next": "下一步",
+        "save": "儲存",
+        "saving": "儲存中…"
+    },
+    "pending": {
+        "question": "{count, plural, =0 {有問題待回答} =1 {有問題待回答} other {# 個問題待回答}}",
+        "approval": "{count, plural, =0 {需要核准} =1 {需要核准} other {# 項需要核准}}",
+        "secret": "{count, plural, =0 {需要憑證} =1 {需要憑證} other {需要 # 組憑證}}",
+        "mcpNamed": "登入 {name}",
+        "mcp": "需要登入",
+        "service": "{count, plural, =0 {有應用程式待連結} =1 {有應用程式待連結} other {# 個應用程式待連結}}",
+        "takeover": "輪到您操作螢幕",
+        "jumpTo": "{label}，前往",
+        "spend": "有花費待核准",
+        "computer": "核准在 #{computer} 上執行的指令",
+        "feature": "要傳送給 Rerun 團隊的請求"
+    },
+    "alert": {
+        "label": "通知",
+        "failed": "無法標示為已讀，請再試一次。",
+        "marking": "標示中…",
+        "markAsRead": "標示為已讀"
+    },
+    "approval": {
+        "label": "需要核准",
+        "approved": "已核准",
+        "approve": "核准"
+    },
+    "decline": {
+        "placeholder": "為什麼不要？（選填）",
+        "reason": "原因"
+    },
+    "fallback": {
+        "replyBelow": "在下方回覆，或",
+        "typeOnWeb": "請在網頁版 Rerun 輸入，切勿在此對話中輸入。",
+        "needsYou": "{name} 需要您"
+    },
+    "steps": {
+        "previous": "上一步",
+        "next": "下一步",
+        "goTo": "前往第 {step} 步，共 {count} 步",
+        "position": "{step} / {count}"
+    },
+    "mcp": {
+        "label": "需要登入",
+        "connected": "已連結",
+        "signInNeeded": "需要登入",
+        "unreachable": "無法連線",
+        "customServer": "自訂 MCP 伺服器",
+        "customServerAt": "自訂 MCP 伺服器 · {host}",
+        "signInTo": "登入 {name}",
+        "loadFailed": "無法載入此伺服器。請在網頁上連結，或略過。"
+    },
+    "question": {
+        "dismiss": "關閉問題",
+        "selectAll": "選擇所有符合的項目",
+        "typeAnswer": "輸入您的回答…",
+        "somethingElse": "其他",
+        "yourAnswer": "您的回答",
+        "record": "用語音回答",
+        "useRecording": "使用這段錄音",
+        "discardRecording": "捨棄錄音",
+        "retryRecording": "重新轉錄",
+        "uploadFailed": "無法附加這些檔案，請再試一次。"
+    },
+    "secret": {
+        "labelOne": "需要憑證",
+        "labelMany": "需要憑證",
+        "dismiss": "關閉憑證請求",
+        "storedAs": "儲存為 {key}",
+        "alreadySaved": "已儲存。輸入即可取代",
+        "paste": "貼上值",
+        "whereToFind": "在哪裡找到",
+        "storedNote": "以同事變數的形式儲存在您的 Box 上，絕不會傳送給模型。",
+        "saveFailed": "無法儲存憑證"
+    },
+    "service": {
+        "label": "待連結的應用程式",
+        "loadFailed": "無法載入應用程式。請在網頁上連結，或略過。",
+        "loading": "正在載入應用程式…",
+        "webOnly": "此應用程式需在網頁上選擇帳號。請在網頁上連結，或略過。",
+        "connectFailed": "無法連結應用程式",
+        "connected": "已連結 {name}",
+        "notFound": "目錄中找不到，已略過。",
+        "skipped": "已略過。"
+    },
+    "receipts": {
+        "cancelled": {
+            "question": "您略過了這些問題",
+            "service": "您關閉了應用程式設定",
+            "secret": "您拒絕提供金鑰",
+            "mcp": "您略過了登入",
+            "takeover": "您把瀏覽器交還給同事",
+            "feature": "請求未傳送"
+        },
+        "answer": "回答",
+        "answers": "回答",
+        "answeredCount": "已回答 {answered}／{total}",
+        "skipped": "已略過",
+        "approval": "核准",
+        "approvals": "核准",
+        "approvalCount": "{approved} 項已核准，{declined} 項先不要",
+        "approved": "已核准",
+        "notNow": "先不要",
+        "quotedNote": "「{note}」",
+        "connected": "已連結",
+        "notReconnected": "未重新連結",
+        "notFound": "找不到",
+        "apps": "應用程式",
+        "appsConnected": "已連結 {connected}／{total}",
+        "instead": "{name}（取代 {replaced}）",
+        "keys": "金鑰",
+        "keysStored": "已儲存 {stored}／{total}",
+        "stored": "已儲存",
+        "storedOnBox": "已儲存在 Box 上。同事只看得到名稱。",
+        "mcpServer": "MCP 伺服器",
+        "handedBackOn": "您在 {url} 交還了瀏覽器",
+        "handedBack": "您交還了瀏覽器",
+        "spend": "付費資料",
+        "approvedOnce": "已核准一次",
+        "alwaysAllowed": "一律允許",
+        "featureSent": "已傳送給 Rerun 團隊：{title}"
+    },
+    "spend": {
+        "estimatedTotal": "預估總計",
+        "creditsUnit": "{count, plural, other {點}}",
+        "creditsShort": "只剩 {amount} {count, plural, other {點}}：請在網頁上加值點數，或選擇先不要。",
+        "alwaysAllow": "一律允許",
+        "approveOnce": "核准一次",
+        "addCredits": "加值點數",
+        "alwaysAllowFailed": "無法開啟「無需詢問即可花費」。此次核准仍有效，上限為預估金額。"
+    },
+    "computer": {
+        "runOn": "在 #{computer} 上執行",
+        "filesOn": "使用 #{computer} 上的檔案",
+        "deny": "拒絕",
+        "allow": "允許",
+        "alwaysProgram": "一律允許 {program}",
+        "alwaysFolder": "一律允許此資料夾",
+        "interpreterWarning": "一律允許 {program} 等於允許它執行的任何程式碼",
+        "alwaysFailed": "無法在電腦上保留此規則：僅允許這一次。",
+        "inFolder": "位於 {folder}",
+        "folderNote": "「一律」會允許 {folder} 中的所有檔案"
+    }
+}

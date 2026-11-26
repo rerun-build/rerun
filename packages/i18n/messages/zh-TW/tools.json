@@ -1,0 +1,390 @@
+{
+    "labels": {
+        "shell_exec": "終端機",
+        "fs_read": "讀取檔案",
+        "fs_write": "寫入檔案",
+        "fs_edit": "編輯檔案",
+        "fs_list": "列出檔案",
+        "fs_search": "搜尋檔案",
+        "shared_read": "讀取共用檔案",
+        "shared_write": "寫入共用檔案",
+        "shared_edit": "編輯共用檔案",
+        "shared_list": "列出共用檔案",
+        "shared_search": "搜尋共用檔案",
+        "browser_navigate": "瀏覽網頁",
+        "computer": "使用了它的電腦",
+        "computer_open_app": "開啟了應用程式",
+        "web_fetch": "擷取網頁",
+        "web_search": "網路搜尋",
+        "WebSearch": "網路搜尋",
+        "leads_people_search": "尋找人員",
+        "leads_email_find": "尋找電子郵件",
+        "leads_email_verify": "驗證電子郵件",
+        "leads_phone_find": "尋找電話",
+        "google_serp": "Google 搜尋結果",
+        "google_maps_search": "Google 地圖",
+        "paid_data": "付費資料",
+        "paid_data_catalog": "付費資料目錄",
+        "paid_data_read": "讀取付費資料",
+        "tool_result_read": "讀取完整結果",
+        "download": "下載",
+        "memory_write": "儲存到記憶",
+        "memory_recall": "回想記憶",
+        "brain_search": "搜尋 Brain",
+        "brain_read": "讀取 Brain",
+        "brain_propose": "向 Brain 提議",
+        "brain_write": "寫入 Brain",
+        "brain_delete": "從 Brain 移除",
+        "brain_proposals": "審閱 Brain 變更",
+        "brain_decide": "決定 Brain 變更",
+        "vision_analyze": "分析圖片",
+        "delegate_tasks": "委派任務",
+        "call_agent": "呼叫同事",
+        "team_status": "團隊狀態",
+        "team_list_schedules": "列出同事的排程",
+        "team_list_triggers": "列出同事的觸發條件",
+        "team_list_runs": "列出同事的執行",
+        "team_get_run": "讀取同事的執行",
+        "ai_status": "檢查 AI 供應商",
+        "schedule_list": "列出排程",
+        "schedule_create": "建立排程",
+        "schedule_update": "更新排程",
+        "schedule_delete": "刪除排程",
+        "trigger_list": "列出觸發條件",
+        "trigger_create": "建立觸發條件",
+        "trigger_get": "讀取觸發條件",
+        "trigger_update": "更新觸發條件",
+        "trigger_rotate_token": "更換觸發條件密鑰",
+        "trigger_delete": "刪除觸發條件",
+        "skill_list": "列出技能",
+        "skill_read": "讀取技能",
+        "skill_read_file": "讀取技能檔案",
+        "skill_write_file": "寫入技能檔案",
+        "skill_delete_file": "刪除技能檔案",
+        "skill_create": "建立技能",
+        "skill_import": "匯入技能",
+        "skill_edit": "編輯技能",
+        "skill_update": "更新技能",
+        "skill_delete": "刪除技能",
+        "skill_propose": "技能提案",
+        "soul_update": "更新個性",
+        "verbosity_set": "調整回覆長度",
+        "tool_install": "安裝工具",
+        "mcp_register": "連結整合",
+        "mcp_login": "登入整合",
+        "mcp_login_complete": "完成登入",
+        "mcp_status": "整合狀態",
+        "mcp_search": "尋找工具",
+        "card_table": "顯示表格",
+        "card_file": "顯示檔案",
+        "image_generation": "產生圖片",
+        "table_view_save": "儲存表格檢視",
+        "table_view_delete": "刪除表格檢視",
+        "rerun_hub_service_search": "搜尋應用程式",
+        "rerun_hub_service_details": "應用程式詳細資料",
+        "rerun_hub_service_install": "安裝應用程式",
+        "rerun_hub_service_list_installed": "列出應用程式",
+        "rerun_hub_service_uninstall": "移除應用程式",
+        "rerun_hub_publish_file": "發布檔案",
+        "rerun_hub_unpublish_file": "取消發布檔案",
+        "rerun_hub_list_published": "列出已發布的檔案",
+        "task_complete": "任務完成",
+        "list_spaces": "列出 Boxes",
+        "list_agents": "列出同事",
+        "get_agent": "讀取同事",
+        "create_agent": "建立同事",
+        "update_agent": "更新同事",
+        "delete_agent": "刪除同事",
+        "list_ai_connections": "列出 AI 供應商",
+        "set_default_model": "設定預設模型",
+        "list_skills": "列出技能",
+        "get_skill": "讀取技能",
+        "upsert_skill": "寫入技能",
+        "delete_skill": "刪除技能",
+        "list_schedules": "列出排程任務",
+        "upsert_schedule": "排程任務",
+        "run_schedule_now": "立即執行任務",
+        "delete_schedule": "刪除排程任務",
+        "list_runs": "列出執行",
+        "get_run": "讀取執行",
+        "search_connectors": "搜尋應用程式",
+        "list_agent_connectors": "列出應用程式",
+        "attach_connector": "新增應用程式",
+        "detach_connector": "移除應用程式",
+        "list_vault": "讀取 Vault",
+        "attach_vault_entry": "從 Vault 借出",
+        "detach_vault_entry": "收回至 Vault",
+        "share_vault_entry": "分享 Vault 項目",
+        "rename_vault_entry": "重新命名 Vault 項目",
+        "delete_vault_entry": "刪除 Vault 項目",
+        "add_vault_entry": "新增至 Vault",
+        "open_vault": "開啟 Vault",
+        "send_message": "傳訊息給同事",
+        "list_pending_cards": "讀取您的收件匣",
+        "answer_card": "回覆卡片",
+        "create_boxes": "建立 Boxes",
+        "build_team": "組建團隊",
+        "write_agent": "正在撰寫它的 SOUL 與安裝說明",
+        "rename_box": "重新命名 Box",
+        "delete_box": "刪除 Box",
+        "focus_agent": "開啟同事",
+        "show_agents": "顯示同事",
+        "open_connector_setup": "開啟應用程式設定",
+        "open_settings": "開啟設定",
+        "recenter_board": "重新置中看板",
+        "open_brain_page": "開啟 Brain",
+        "read_attachment": "讀取附件",
+        "search_docs": "搜尋文件",
+        "rerun_hub_search_docs": "搜尋文件",
+        "analyze_website": "讀取網站",
+        "save_company_website": "儲存公司網站",
+        "save_profile": "儲存個人資料",
+        "save_needs": "儲存需求",
+        "list_templates": "瀏覽範本",
+        "propose_plan": "撰寫計畫",
+        "install_template": "安裝範本",
+        "install_shared_agent": "安裝共用同事",
+        "open_template_card": "開啟範本",
+        "start_agent_setup": "移交設定",
+        "open_checkout": "開始試用",
+        "open_template_purchase": "購買範本",
+        "ask_choice": "詢問了使用者",
+        "ask_either": "詢問了使用者",
+        "ask_input": "詢問了使用者",
+        "show_templates": "顯示了範本",
+        "show_plan": "顯示了計畫",
+        "show_starter_pack": "顯示了入門組合",
+        "contact_team": "提供了團隊聯絡方式",
+        "ask_user": "詢問了使用者",
+        "request_approval": "請求了核准",
+        "suggest_service": "建議了應用程式",
+        "request_secret": "請求了憑證",
+        "request_mcp_sign_in": "請您登入 MCP 伺服器",
+        "request_takeover": "請您接手瀏覽器",
+        "request_spend": "請求使用點數",
+        "notify_user": "通知了您",
+        "install_complete": "完成了設定",
+        "remote_computers": "查看了已連結的電腦",
+        "remote_exec": "{program, select, none {在 #{computer} 上執行了指令} other {在 #{computer} 上執行了 {program}}}",
+        "request_computer_access": "請求使用 #{computer}",
+        "remote_job": "在 #{computer} 上檢查了工作",
+        "remote_file_list": "在 #{computer} 上列出了檔案",
+        "remote_file_read": "在 #{computer} 上讀取了檔案",
+        "remote_file_write": "在 #{computer} 上寫入了檔案",
+        "remote_transfer": "與 #{computer} 複製了檔案",
+        "request_feature": "為 {brand} 團隊草擬了需求"
+    },
+    "activities": {
+        "shell_exec": "正在執行指令",
+        "fs_read": "正在讀取檔案",
+        "fs_write": "正在寫入檔案",
+        "fs_edit": "正在編輯檔案",
+        "fs_list": "正在列出檔案",
+        "fs_search": "正在搜尋檔案",
+        "shared_read": "正在讀取共用檔案",
+        "shared_write": "正在寫入共用檔案",
+        "shared_edit": "正在編輯共用檔案",
+        "shared_list": "正在列出共用檔案",
+        "shared_search": "正在搜尋共用檔案",
+        "browser_navigate": "正在瀏覽網頁",
+        "computer": "正在使用它的電腦",
+        "computer_open_app": "正在開啟應用程式",
+        "web_fetch": "正在讀取網頁",
+        "web_search": "正在搜尋網路",
+        "WebSearch": "正在搜尋網路",
+        "leads_people_search": "正在尋找人員",
+        "leads_email_find": "正在尋找電子郵件",
+        "leads_email_verify": "正在驗證電子郵件",
+        "leads_phone_find": "正在尋找電話號碼",
+        "google_serp": "正在搜尋 Google",
+        "google_maps_search": "正在搜尋 Google 地圖",
+        "download": "正在下載",
+        "memory_write": "正在儲存到記憶",
+        "memory_recall": "正在回想記憶",
+        "brain_search": "正在搜尋 Brain",
+        "brain_read": "正在讀取 Brain",
+        "brain_propose": "正在提議 Brain 變更",
+        "brain_write": "正在寫入 Brain",
+        "vision_analyze": "正在查看圖片",
+        "image_generation": "正在產生圖片",
+        "delegate_tasks": "正在委派任務",
+        "call_agent": "正在呼叫同事",
+        "team_status": "正在查看團隊",
+        "team_list_runs": "正在讀取同事的執行",
+        "team_get_run": "正在讀取同事的執行",
+        "ai_status": "正在檢查 AI 供應商",
+        "skill_read": "正在讀取技能",
+        "skill_read_file": "正在讀取技能",
+        "skill_create": "正在建立技能",
+        "skill_edit": "正在編輯技能",
+        "skill_update": "正在更新技能",
+        "mcp_search": "正在尋找工具",
+        "rerun_hub_service_search": "正在搜尋應用程式",
+        "rerun_hub_service_install": "正在安裝應用程式",
+        "list_agents": "正在查看團隊",
+        "create_agent": "正在建立同事",
+        "update_agent": "正在更新同事",
+        "send_message": "正在傳訊息給同事",
+        "list_pending_cards": "正在讀取您的收件匣",
+        "answer_card": "正在回覆卡片",
+        "build_team": "正在組建團隊",
+        "search_docs": "正在搜尋文件",
+        "rerun_hub_search_docs": "正在搜尋文件",
+        "analyze_website": "正在讀取網站",
+        "save_company_website": "正在讀取公司網站",
+        "list_templates": "正在瀏覽範本",
+        "propose_plan": "正在撰寫計畫",
+        "install_template": "正在安裝範本",
+        "remote_computers": "正在查看已連結的電腦",
+        "remote_exec": "{program, select, none {正在 #{computer} 上執行指令} other {正在 #{computer} 上執行 {program}}}"
+    },
+    "paidData": {
+        "people": {
+            "search": "正在尋找人員",
+            "email": {
+                "find": "正在尋找電子郵件",
+                "verify": "正在驗證電子郵件"
+            },
+            "phone": {
+                "find": "正在尋找電話號碼"
+            },
+            "enrich": "正在補充人員資料",
+            "identity": {
+                "resolve": "正在尋找 LinkedIn 個人檔案"
+            }
+        },
+        "companies": {
+            "search": "正在尋找公司",
+            "enrich": "正在補充公司資料",
+            "similar": "正在尋找類似的公司",
+            "jobs": {
+                "search": "正在讀取職缺"
+            },
+            "news": "正在讀取公司新聞"
+        },
+        "google": {
+            "serp": {
+                "organic": "正在讀取 Google 搜尋結果",
+                "maps": "正在搜尋 Google 地圖",
+                "local": "正在讀取在地排名",
+                "news": "正在讀取 Google 新聞"
+            },
+            "keywords": {
+                "volume": "正在查看搜尋量",
+                "ideas": "正在尋找關鍵字靈感",
+                "trends": "正在讀取 Google 搜尋趨勢"
+            }
+        },
+        "ai-search": {
+            "perplexity": {
+                "answer": "正在詢問 Perplexity"
+            }
+        },
+        "web": {
+            "backlinks": {
+                "summary": "正在讀取反向連結",
+                "list": "正在列出反向連結"
+            },
+            "anchors": {
+                "list": "正在讀取錨點文字"
+            },
+            "url": {
+                "metrics": "正在查看網域權威度"
+            }
+        },
+        "linkedin": {
+            "user": {
+                "profile": "正在讀取 LinkedIn",
+                "posts": "正在讀取 LinkedIn 貼文"
+            },
+            "company": {
+                "profile": "正在讀取 LinkedIn"
+            },
+            "post": {
+                "detail": "正在讀取 LinkedIn 貼文",
+                "comments": "正在讀取 LinkedIn 留言",
+                "reactions": "正在讀取 LinkedIn 心情回應"
+            }
+        },
+        "tiktok": {
+            "user": {
+                "profile": "正在讀取 TikTok",
+                "videos": "正在讀取 TikTok 影片"
+            },
+            "search": {
+                "users": "正在搜尋 TikTok",
+                "videos": "正在搜尋 TikTok"
+            },
+            "video": {
+                "detail": "正在讀取 TikTok 影片",
+                "comments": "正在讀取 TikTok 留言"
+            },
+            "comment": {
+                "replies": "正在讀取 TikTok 留言"
+            }
+        },
+        "instagram": {
+            "user": {
+                "profile": "正在讀取 Instagram",
+                "posts": "正在讀取 Instagram 貼文",
+                "reels": "正在讀取 Instagram Reels"
+            },
+            "search": {
+                "users": "正在搜尋 Instagram",
+                "reels": "正在搜尋 Instagram"
+            },
+            "hashtag": {
+                "posts": "正在讀取 Instagram 主題標籤"
+            },
+            "post": {
+                "detail": "正在讀取 Instagram 貼文",
+                "comments": "正在讀取 Instagram 留言"
+            }
+        },
+        "x": {
+            "user": {
+                "profile": "正在讀取 X",
+                "posts": "正在讀取 X 貼文"
+            },
+            "search": {
+                "posts": "正在搜尋 X"
+            },
+            "post": {
+                "comments": "正在讀取 X 回覆"
+            }
+        },
+        "youtube": {
+            "channel": {
+                "profile": "正在讀取 YouTube",
+                "videos": "正在讀取 YouTube 影片"
+            },
+            "search": {
+                "videos": "正在搜尋 YouTube"
+            },
+            "video": {
+                "detail": "正在讀取 YouTube 影片",
+                "comments": "正在讀取 YouTube 留言"
+            }
+        },
+        "facebook": {
+            "user": {
+                "profile": "正在讀取 Facebook",
+                "posts": "正在讀取 Facebook 貼文"
+            },
+            "post": {
+                "comments": "正在讀取 Facebook 留言"
+            }
+        },
+        "reddit": {
+            "subreddit": {
+                "posts": "正在讀取 Reddit"
+            },
+            "post": {
+                "detail": "正在讀取 Reddit"
+            }
+        }
+    },
+    "errors": {
+        "notFound": "找不到工具"
+    }
+}

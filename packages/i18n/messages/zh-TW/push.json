@@ -1,0 +1,13 @@
+{
+    "states": {
+        "done": "已完成",
+        "error": "失敗",
+        "question": "問題",
+        "approval": "需要核准",
+        "connector": "需要應用程式",
+        "info": "更新"
+    },
+    "subtitle": "{source} · {state}",
+    "androidTitle": "{agent} · {subtitle}",
+    "fallbackAgent": "您的同事"
+}

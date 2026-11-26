@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { headlineCaseProblems, isPageTitleKey, metaLengthProblem, renderedLength } from './catalog.mjs'
+import { headlineCaseProblems, isPageTitleKey, metaLengthProblem, renderedLength, targetLocales } from './catalog.mjs'
 
 describe('headlineCaseProblems', () => {
     it('accepts a headline-case title', () => {
@@ -63,5 +63,12 @@ describe('isPageTitleKey', () => {
     it('leaves the headings shown on the page alone', () => {
         expect(isPageTitleKey('landingCommunity.program.hero.title')).toBe(false)
         expect(isPageTitleKey('landingPricing.faq.title')).toBe(false)
+    })
+})
+
+describe('targetLocales', () => {
+    it('reads a locale with a region, written as a quoted key', () => {
+        expect(targetLocales()).toContain('zh-TW')
+        expect(targetLocales()).not.toContain('en')
     })
 })

@@ -1,0 +1,558 @@
+{
+    "installFeedback": {
+        "noLongerAvailable": "「{title}」已無法使用",
+        "buyFailed": "無法購買「{title}」",
+        "alreadyOnBoard": "「{title}」已在您的看板上",
+        "alreadyOnBoardHint": "它的同事會在您上次離開的位置開啟。",
+        "notImported": "無法匯入 {name}。",
+        "inactiveCount": "{count, plural, other {其中 # 位未啟用：您的方案沒有空的同事名額。}}",
+        "landed": "{count, plural, other {「{title}」的 # 位同事已加入您的看板}}",
+        "openOne": "開啟其中一位並開始安裝：它會和您一起連接所需的項目。",
+        "landedInactive": "它以未啟用狀態加入：您的方案沒有空的同事名額。",
+        "agentLanded": "「{name}」已加入您的看板",
+        "openIt": "開啟它並開始安裝：它會和您一起連接所需的項目。",
+        "webhooksMoved": "{count, plural, other {# 個 webhook 已換成新網址：請將您的服務指向副本自己的位址。}}",
+        "schedulesDoubled": "{count, plural, other {# 個排程也會在副本上執行。如果工作不該重複進行，請將其關閉。}}",
+        "copyReady": "它具備原本的一切，已準備好執行。",
+        "prepareBoxFailed": "無法準備您的 Box",
+        "settingUp": "正在設定「{title}」",
+        "settingUpHint": "您的同事稍後就會出現在看板上。",
+        "setUpFailed": "無法設定「{title}」"
+    },
+    "price": {
+        "free": "免費",
+        "monthly": "{amount}/月",
+        "useForFree": "免費使用",
+        "hire": "{count, plural, other {聘請 # 位同事 · {price}}}",
+        "hireCard": "聘請 · {price}",
+        "purchased": "已購買",
+        "expired": "已過期",
+        "install": "安裝",
+        "renew": "續訂"
+    },
+    "connectors": {
+        "none": "不需要任何應用程式",
+        "label": "應用程式：{names}"
+    },
+    "creator": {
+        "templateCount": "{count, plural, other {# 個範本}}",
+        "rerunTeam": "{brand} 團隊",
+        "verified": "已驗證的創作者"
+    },
+    "spotlight": {
+        "viewProfile": "檢視 {name} 的個人檔案",
+        "workWith": "與 {name} 合作",
+        "badge": "本週創作者",
+        "website": "網站",
+        "socialLabel": "{name} 的 {network}",
+        "openTemplate": "開啟範本",
+        "recognizedFor": "代表作"
+    },
+    "about": {
+        "showMore": "顯示更多",
+        "showLess": "顯示較少"
+    },
+    "agentCard": {
+        "comesWith": "隨附內容",
+        "apps": "應用程式",
+        "skills": "技能",
+        "schedules": "排程任務",
+        "webhooks": "Webhooks",
+        "more": "還有 {count} 項"
+    },
+    "detail": {
+        "price": "價格",
+        "coworkers": "同事",
+        "useCases": "使用情境",
+        "alsoDoes": "{coworker}也能做",
+        "apps": "應用程式",
+        "setupTime": "設定時間",
+        "minutes": "{minutes} 分鐘",
+        "category": "類別",
+        "about": "關於",
+        "whatYouNeed": "您需要準備的項目",
+        "carousel": "此範本中的同事",
+        "securityTitle": "安全性",
+        "securityBody": "此範本已移除憑證和私人資料。應用程式匯入時為未連接狀態，請在匯入後授權。",
+        "cancelAnytime": "可隨時從帳單設定中取消。"
+    },
+    "library": {
+        "title": "範本庫",
+        "templates": "範本",
+        "hideDetails": "隱藏詳細資料",
+        "newCoworker": "新同事",
+        "createCoworker": "建立新同事",
+        "viewProfile": "檢視個人檔案",
+        "filters": {
+            "app": "應用程式",
+            "status": "狀態"
+        },
+        "search": {
+            "placeholder": "搜尋範本",
+            "clear": "清除搜尋"
+        },
+        "mode": {
+            "coworkers": "同事",
+            "use-cases": "使用情境"
+        },
+        "nav": {
+            "discover": "探索",
+            "all": "全部"
+        },
+        "heading": {
+            "coworkers": "{count, plural, other {# 位同事}}",
+            "useCases": "{count, plural, other {# 個使用情境}}",
+            "results": "「{query}」的搜尋結果",
+            "discoverEmpty": "您建立的範本會出現在這裡。",
+            "discover": "現成的同事，由實際使用他們的人打造。",
+            "creator": "創作者"
+        },
+        "discover": {
+            "seeAll": "查看全部",
+            "creators": "創作者",
+            "creatorsSubtitle": "範本背後的人。",
+            "allCreators": "所有創作者",
+            "forYou": "為您推薦",
+            "forYouSubtitle": "依據您的產業和使用的應用程式推薦。",
+            "featured": "精選",
+            "featuredSubtitle": "值得優先一看的精選配置。",
+            "justAdded": "最新上架",
+            "justAddedSubtitle": "{brand} 上最新發布的範本。"
+        },
+        "empty": {
+            "filtered": "沒有符合這些篩選條件的範本",
+            "none": "這裡還沒有範本",
+            "selfHosted": "先招募一位同事，再將其儲存為範本。",
+            "cloud": "自己打造，並在 Rerun 上販售。",
+            "become": "成為 Rerun 專家"
+        }
+    },
+    "scratch": {
+        "title": "從頭開始",
+        "description": "不使用範本。為您的同事命名，然後放到格狀看板上。"
+    },
+    "section": {
+        "back": "返回所有範本",
+        "filterBy": "依{title}篩選"
+    },
+    "authoring": {
+        "prefill": "智慧預先填入",
+        "altText": "撰寫替代文字",
+        "content": {
+            "title": "內容",
+            "tagline": "標語",
+            "taglineHelp": "{count}/{limit}，一句話。",
+            "taglinePlaceholder": "找出潛在客戶、撰寫第一封開發信，並持續追蹤直到對方回覆。",
+            "longDescription": "詳細說明",
+            "longDescriptionPlaceholder": "此範本的功能、適合對象，以及執行所需的項目。"
+        },
+        "faq": {
+            "title": "常見問題",
+            "hint": "會顯示在公開頁面上，並以常見問題結構化資料提供給搜尋引擎。",
+            "empty": "還沒有問題。您可以自動預先填入，或手動新增。",
+            "question": "問題",
+            "questionPlaceholder": "我需要連接哪些帳號？",
+            "answer": "回答",
+            "answerPlaceholder": "用兩三句話獨立回答這個問題。",
+            "remove": "移除此問題",
+            "add": "新增問題"
+        },
+        "media": {
+            "title": "媒體",
+            "videoUrl": "影片網址",
+            "videoPlaceholder": "https://youtube.com/watch?v=… 或 Loom 連結",
+            "ogImage": "自訂 OG 圖片",
+            "ogImagePlaceholder": "留空即可自動產生",
+            "ogImageHelp": "只有需要專屬社群卡片時才設定。",
+            "gallery": "圖庫",
+            "galleryHelp": "選填：卡片會改為顯示同事看板。這些圖片用於詳細資訊頁面，第一張為主圖，自動產生的圖片也會放在那裡。請儲存以保留變更。建議填寫替代文字：這些圖片會出現在被搜尋引擎索引的頁面上。",
+            "altCover": "替代文字（封面）",
+            "alt": "替代文字",
+            "cover": "封面",
+            "remove": "移除",
+            "dropOverlay": "放開以加入圖片",
+            "uploading": "上傳中…",
+            "drop": "將圖片拖放到這裡，或按一下選擇"
+        },
+        "meta": {
+            "title": "中繼資料",
+            "titleLabel": "標題",
+            "titlePlaceholder": "外撥業務開發代表",
+            "slug": "網址代稱",
+            "category": "類別",
+            "setupTime": "設定時間（分鐘）",
+            "setupTimeHelp": "會顯示在公開頁面上。請如實反映應用程式的設定時間。",
+            "tags": "標籤",
+            "tagsPlaceholder": "開發, 業務, 自動化",
+            "tagsHelp": "以逗號分隔。用於公開頁面上的篩選。",
+            "metaTitle": "中繼標題",
+            "metaTitlePlaceholder": "{title}，AI 同事範本",
+            "metaTitleDefault": "預設為標題",
+            "metaDescription": "中繼描述",
+            "metaDescriptionHelp": "{count}/{limit}，需介於 {min} 到 {limit} 個字元才能發布。",
+            "metaDescriptionPlaceholder": "用一兩句話描述，供搜尋結果顯示。"
+        }
+    },
+    "capture": {
+        "failedRequest": "請求未成功送出。請檢查您的網路連線後再試一次。",
+        "steps": {
+            "select": {
+                "title": "擷取同事",
+                "description": "選擇要將其資料夾轉成此範本的同事。"
+            },
+            "review": {
+                "title": "安全性檢查",
+                "description": "確認每位同事攜帶的內容，並在擷取前確認。"
+            },
+            "done": {
+                "title": "已擷取",
+                "description": "封存檔已儲存，此範本現在描述的就是這些同事。"
+            }
+        },
+        "stages": {
+            "title": {
+                "title": "為您的範本命名",
+                "description": "您確認後，草稿就會立即儲存。",
+                "points": {
+                    "private": "發布前保持私人",
+                    "signed": "以您的名義署名"
+                }
+            },
+            "select": {
+                "title": "選擇您的同事",
+                "description": "會為同事資料夾的目前狀態建立快照。",
+                "points": {
+                    "snapshot": "是快照，不是連結",
+                    "edits": "之後的編輯只會留在您這邊"
+                }
+            },
+            "review": {
+                "title": "安全性檢查",
+                "description": "在任何內容離開機器之前，機密資訊都會被移除。",
+                "points": {
+                    "env": "清除環境變數值",
+                    "apps": "重設應用程式",
+                    "scan": "掃描檔案和路徑中的機密資訊",
+                    "memories": "不帶走記憶"
+                }
+            },
+            "done": {
+                "title": "擷取",
+                "description": "封存檔會以私人方式儲存，並用來描述此範本。",
+                "points": {
+                    "stored": "安全儲存，無法存取",
+                    "warnings": "事先警告，不留意外"
+                }
+            }
+        },
+        "select": {
+            "emptyTitle": "沒有可擷取的同事",
+            "emptyDescription": "請先在 Box 中建立一位同事，再回到這裡。",
+            "box": "Box",
+            "boxPlaceholder": "選擇包含同事的 Box",
+            "boxFallback": "Box",
+            "coworkers": "同事",
+            "coworkersIn": "{box} 中的同事",
+            "search": "依名稱或代號搜尋",
+            "selected": "已選取 {selected}/{total}",
+            "clear": "清除",
+            "selectAll": "全選",
+            "noMatch": "沒有符合此搜尋的同事。"
+        },
+        "review": {
+            "reviewed": "已檢查 {approved}/{total, plural, other {# 位同事}}",
+            "files": "{kept}/{total} 個檔案，{size}",
+            "tools": "工具",
+            "apps": "應用程式",
+            "skills": "技能",
+            "schedules": "排程",
+            "oneShot": "單次",
+            "webhooks": "Webhooks",
+            "memories": "記憶",
+            "memoriesNote": "已記錄 {count} 筆，預設不會納入封存檔",
+            "removed": "匯出時已移除",
+            "toProvide": "副本需重新提供",
+            "envKeys": "環境變數",
+            "flagged": "已標記的檔案",
+            "flaggedKept": "{total} 個疑似含有憑證的檔案中，仍有 {kept} 個被納入，這些檔案會隨封存檔一起傳送。",
+            "flaggedOut": "{count, plural, other {# 個檔案疑似含有憑證，不會納入封存檔。}}",
+            "install": "安裝",
+            "filesGroup": "檔案",
+            "hideFolder": "隱藏資料夾",
+            "showFolder": "顯示資料夾",
+            "kept": "已保留 {kept}/{total}",
+            "confirm": "我已檢查此同事攜帶的內容",
+            "answerFirst": "請先回答上方的安裝問題。",
+            "writeFirst": "請先撰寫上方的安裝指示。",
+            "flaggedTravel": "{count} 個已標記的檔案會隨封存檔一起傳送。",
+            "nothingSecret": "此清單中沒有不該外流的機密資訊。",
+            "more": "還有 {count} 項"
+        },
+        "tree": {
+            "collapse": "收合",
+            "expand": "展開",
+            "flagged": "{count} 個已標記"
+        },
+        "done": "{count, plural, other {已擷取 # 位同事。}}他們的技能、排程和應用程式現在都會描述此範本。",
+        "panel": {
+            "inspect": "{count, plural, =0 {檢查同事} other {檢查 # 位同事}}",
+            "reviewEach": "請檢查每位同事以啟用擷取（{approved}/{total}）",
+            "back": "返回",
+            "capture": "擷取"
+        },
+        "dialog": {
+            "cancel": "取消",
+            "done": "完成"
+        }
+    },
+    "expert": {
+        "agents": {
+            "title": "同事（{count}）",
+            "empty": "還沒有擷取任何同事。請從您的沙盒擷取一位，讓其他人可以安裝這套配置。",
+            "noRole": "尚無職位",
+            "connectors": "{count, plural, other {# 個連接器}}",
+            "setup": {
+                "guided": "引導式安裝",
+                "none": "無需安裝",
+                "missing": "缺少安裝回答"
+            },
+            "removeTitle": "要移除 {name} 嗎？",
+            "removeDescription": "從其資料夾擷取的封存檔也會一併刪除。若要重新加入此同事，需要再次擷取。",
+            "removeConfirm": "移除",
+            "removeLabel": "移除 {name}",
+            "capture": "從您的沙盒擷取",
+            "removeNote": "移除同事時，也會刪除從其資料夾擷取的封存檔。若要重新加入，需要再次擷取。"
+        },
+        "list": {
+            "newTemplate": "新範本",
+            "emptyTitle": "還沒有範本",
+            "emptyDescription": "描述一次同事配置，我們會在它上架市集前進行審核。"
+        },
+        "row": {
+            "agents": "{count, plural, other {# 位同事}}"
+        },
+        "tabs": {
+            "details": "詳細資料",
+            "pricing": "定價",
+            "media": "媒體",
+            "faq": "常見問題",
+            "agents": "同事"
+        },
+        "dialog": {
+            "title": "我的範本",
+            "description": "從您的沙盒起草範本，然後提交給我們。我們會在上線前進行審核。",
+            "pickTitle": "選擇範本",
+            "pickDescription": "或建立新範本，從您的沙盒擷取同事放入其中。"
+        },
+        "toasts": {
+            "saved": "範本已儲存。",
+            "submitted": "已提交，我們會再與您聯絡。"
+        },
+        "footer": {
+            "requirements": {
+                "title": "標題",
+                "tagline": "標語",
+                "description": "說明",
+                "metaDescription": "{min} 到 {max} 個字元的中繼描述",
+                "agent": "至少一位已擷取的同事",
+                "installAnswers": "每位同事的安裝回答",
+                "payouts": "可接收款項的 Stripe 帳號"
+            },
+            "live": "此範本已在市集上架。如需變更，請聯絡 Rerun 團隊。",
+            "inReview": "我們正在審核此範本。撤回後即可繼續編輯。",
+            "withdraw": "撤回",
+            "completeChecklist": "請先完成檢查清單",
+            "saveFirst": "請先儲存您的變更",
+            "sentBack": "此範本已退回給您",
+            "deleteTitle": "要永久刪除此範本嗎？",
+            "deleteDescription": "此範本、其媒體，以及為它擷取的所有同事都會被移除。此動作無法復原。",
+            "deleteTooltip": "永久刪除此範本",
+            "deleteLabel": "刪除範本",
+            "checklistLabel": "提交檢查清單：已完成 {met}/{total}",
+            "ready": "可以提交",
+            "checklistHint": "範本在我們審核前需要具備的項目。",
+            "setUpPayouts": "設定收款",
+            "save": "儲存",
+            "submit": "提交審核"
+        }
+    },
+    "pricing": {
+        "title": "定價",
+        "models": {
+            "free": "免費",
+            "one_time": "一次性購買",
+            "recurring": "月訂閱"
+        },
+        "helpers": {
+            "free": "任何使用 Rerun 方案的人都能安裝。",
+            "one_time": "只收費一次，買家可永久保留。",
+            "recurring": "每月收費。買家取消後即無法存取。"
+        },
+        "modelHelp": "{helper}買家仍需有效的 Rerun 方案才能安裝範本。",
+        "priceLabel": "價格（美元）",
+        "priceHelp": "最低 {min}。之後變更價格只會套用到新買家。",
+        "payoutsTitle": "尚未啟用收款",
+        "payoutsBody": "您現在可以先儲存這個價格，但在啟用 Stripe 收款之前，付費範本無法提交審核。",
+        "setUpPayouts": "設定收款",
+        "payout": {
+            "yourPrice": "您的價格{recurring, select, true {（每月）} other {}}",
+            "fee": "Rerun 手續費（{fee}）",
+            "earn": "您的收入{recurring, select, true {（每月）} other {}}",
+            "vat": "加值稅會在結帳時另外加在您的價格上，由買家支付，絕不會從您的收入中扣除。無論買家身在何處，您的收入都相同。"
+        }
+    },
+    "payouts": {
+        "expired": "您的設定連結已過期，正在重新開啟 Stripe。",
+        "title": "收款",
+        "subtitle": "您付費範本的收入會匯入的地方。",
+        "yourPrice": "您的價格",
+        "yourPriceValue": "由您為每個範本設定，不含加值稅",
+        "commission": "Rerun 佣金",
+        "schedule": "撥款時程",
+        "scheduleValue": "Stripe 標準時程",
+        "planNote": "買家仍需有效的 Rerun 方案才能安裝範本，因此購買只會解鎖範本本身，不含其他項目。",
+        "states": {
+            "not_started": {
+                "headline": "透過您的範本賺取收入",
+                "body": "Rerun 會從每筆銷售中收取 {fee}。款項會透過 Stripe 匯入您的銀行帳戶。",
+                "cta": "設定收款"
+            },
+            "incomplete": {
+                "headline": "完成您的 Stripe 設定",
+                "body": "Stripe 還需要一些資料才能付款給您。",
+                "cta": "完成設定"
+            },
+            "pending_verification": {
+                "headline": "Stripe 正在驗證您的資料",
+                "body": "這通常只需要幾分鐘。在此期間，您可以繼續起草範本。",
+                "cta": "查看狀態"
+            },
+            "restricted": {
+                "headline": "收款已暫停",
+                "body": "Stripe 已限制此帳戶。您已發布的範本仍會保持上線，但在問題解決之前，沒有人能購買。",
+                "cta": "前往 Stripe 處理"
+            },
+            "ready": {
+                "headline": "您已完成收款設定",
+                "body": "為範本定價，我們審核後就會開始販售。Rerun 會從每筆銷售中收取 {fee}。",
+                "cta": "開啟 Stripe 主控台"
+            }
+        },
+        "stripeReported": "Stripe 回報：{reason}",
+        "terms": "繼續即表示您接受<link>市集創作者條款</link>，包括退款與爭議款項的處理方式。",
+        "sidebar": {
+            "payouts": "收款",
+            "revenue": "營收"
+        },
+        "stateLabels": {
+            "not_started": "尚未設定",
+            "incomplete": "需要處理",
+            "pending_verification": "審核中",
+            "restricted": "受限",
+            "ready": "已就緒"
+        },
+        "requirements": {
+            "business_profile": {
+                "url": "公司網站",
+                "mcc": "您的業務類型"
+            },
+            "external_account": "銀行帳戶",
+            "individual": {
+                "verification": {
+                    "document": "身分證明文件",
+                    "additional_document": "地址證明"
+                },
+                "id_number": "您的身分證字號",
+                "address": {
+                    "line1": "您的地址"
+                },
+                "dob": {
+                    "day": "您的出生日期"
+                }
+            },
+            "tos_acceptance": {
+                "date": "接受 Stripe 條款"
+            }
+        },
+        "saleKinds": {
+            "one_time": "一次性",
+            "recurring": "每月",
+            "refund": "退款"
+        }
+    },
+    "revenue": {
+        "ranges": {
+            "30d": "30 天",
+            "12m": "12 個月",
+            "all": "全部期間"
+        },
+        "noAccountTitle": "尚無收款帳戶",
+        "noAccountDescription": "設定收款即可開始販售您的範本。",
+        "setUpPayouts": "設定收款",
+        "title": "營收",
+        "openDashboard": "開啟 Stripe 主控台",
+        "youEarned": "您的收入",
+        "noSales": "此期間沒有銷售。",
+        "recentSales": "最近的銷售",
+        "date": "日期",
+        "template": "範本",
+        "type": "類型",
+        "sales": "銷售",
+        "gross": "總額",
+        "fee": "Rerun 手續費",
+        "pending": "待撥款",
+        "available": "可立即提領",
+        "subscriptions": "{count, plural, other {# 個有效訂閱}}",
+        "perMonth": "{amount}/月"
+    },
+    "categories": {
+        "agencies": "代理商",
+        "ecommerce": "電子商務",
+        "saas": "SaaS",
+        "sales": "業務銷售",
+        "recruiting": "招募",
+        "real-estate": "不動產",
+        "legal": "法律與法規遵循",
+        "creators": "創作者",
+        "productivity": "生產力",
+        "other": "其他"
+    },
+    "status": {
+        "draft": "草稿",
+        "in_review": "審核中",
+        "published": "已發布",
+        "unlisted": "不公開列出",
+        "archived": "已封存"
+    },
+    "creatorKind": {
+        "studio": "工作室",
+        "freelancer": "自由工作者",
+        "expert": "專家"
+    },
+    "cta": {
+        "place": "{count, plural, other {放置 # 位同事}}",
+        "placeCaption": "{count, plural, other {拖曳到您的看板上，即可開始執行。}}",
+        "trialInstall": "開始免費試用並安裝",
+        "trialThenSubscribe": "開始免費試用，然後以 {price}/月訂閱",
+        "trialThenPay": "開始免費試用，然後支付 {price}",
+        "planInstall": "以 {plan}/月訂閱並安裝",
+        "planThenSubscribe": "以 {plan}/月訂閱，然後以 {price}/月訂閱範本",
+        "planThenPay": "以 {plan}/月訂閱，然後支付 {price}",
+        "subscribe": "以 {price}/月訂閱",
+        "pay": "支付 {price}",
+        "payCaption": "此範本另外計費。",
+        "useTemplate": "使用此範本",
+        "nothingCaptured": "此範本尚未擷取任何同事。",
+        "open": "開啟 {name}",
+        "alreadyOnBoard": "已在您的看板上。",
+        "installAgain": "再次安裝",
+        "sandboxCannotBuy": "請切換到工作區以購買範本。",
+        "trialBilledSeparately": "{terms}此範本另外計費。",
+        "trialUsedBilledSeparately": "您的免費試用已使用過。今天就會收費；此範本另外計費。",
+        "resubscribe": "以 {price}/月重新訂閱",
+        "lapsed": "您的訂閱已結束。此範本安裝的同事已停用。",
+        "billedTo": "由 {workspace} 付款。您的 {brand} 方案已在使用中。",
+        "yours": "您自己的範本，不收費。"
+    },
+    "boardAlt": "{title} 的同事看板"
+}

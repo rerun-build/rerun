@@ -1,0 +1,68 @@
+{
+    "title": "下載 Rerun 桌面版應用程式",
+    "eyebrow": "桌面版應用程式",
+    "headline": "在桌面上使用 Rerun",
+    "description": "您的同事擁有專屬視窗，提供通知、選單列或系統匣圖示，以及「快速提問」。",
+    "mac": "下載 macOS 版",
+    "windows": "下載 Windows 版",
+    "linux": "下載 Linux 版",
+    "allPlatforms": "所有平台",
+    "alternatives": {
+        "macIntel": "下載 Intel 晶片 Mac 版",
+        "macAppleSilicon": "下載 Apple Silicon 晶片 Mac 版",
+        "windowsArm64": "下載 Windows on Arm 版",
+        "windowsX64": "下載 Windows x64 版"
+    },
+    "beta": "Beta",
+    "webApp": "Rerun 也能在瀏覽器中執行：<link>開啟網頁版</link>。",
+    "platforms": {
+        "label": "下載",
+        "title": "macOS、Windows 和 Linux",
+        "mac": {
+            "name": "macOS",
+            "requirements": "macOS 13 或更新版本，支援 Apple Silicon 與 Intel。",
+            "appleSilicon": "Apple Silicon",
+            "intel": "Intel"
+        },
+        "windows": {
+            "name": "Windows",
+            "requirements": "Windows 10 或更新版本，支援 x64 與 Arm。",
+            "warning": "Windows 應用程式尚未簽署。如果 Windows 顯示「Windows 已保護您的電腦」，請按一下「其他資訊」，再按「仍要執行」。",
+            "x64": "x64",
+            "arm64": "Arm"
+        },
+        "linux": {
+            "name": "Linux",
+            "requirements": "x64。AppImage 可在大多數發行版上執行，並會自動更新。",
+            "appImage": "AppImage",
+            "deb": ".deb（Debian、Ubuntu）",
+            "rpm": ".rpm（Fedora、openSUSE）"
+        }
+    },
+    "features": {
+        "label": "應用程式帶來的功能",
+        "title": "Rerun 的一切，一鍵即達",
+        "notifications": {
+            "title": "讓您即時回來的通知",
+            "body": "當您在其他應用程式中時，同事也能立即聯絡到您，按一下就能開啟對話。"
+        },
+        "quickAsk": {
+            "title": "快速提問",
+            "body": "Mac 上按 ⌘⇧Space，Windows 和 Linux 上按 Ctrl+Shift+Space：從任何應用程式向您的 Chief of Staff 提問，答案會在 Rerun 中等您。"
+        },
+        "always": {
+            "title": "持續執行",
+            "body": "關閉視窗後，Rerun 仍會留在選單列或系統匣中，圖示上會顯示等待您處理的項目數量。"
+        }
+    },
+    "section": {
+        "title": "下載 Rerun",
+        "lead": "您的同事在電腦上，也在口袋裡。只要連接一次 ChatGPT、Claude 或 OpenCode，就能隨時隨地掌握他們的進度。",
+        "macMeta": "macOS 13+ · Apple Silicon 與 Intel",
+        "windowsMeta": "Windows 10+ · x64 與 Arm",
+        "linuxMeta": "x64 · AppImage",
+        "iphone": "iPhone",
+        "android": "Android",
+        "phoneMeta": "您的同事就在口袋裡"
+    }
+}

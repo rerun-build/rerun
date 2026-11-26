@@ -1,0 +1,32 @@
+{
+    "session": {
+        "title": "{name} 的桌面",
+        "titleFallback": "桌面",
+        "description": "這位同事工作的螢幕。您在這裡做的事，它之後都看得到。",
+        "takeoverDescription": "您正在使用同事的瀏覽器。等它可以繼續時，請按「完成」。",
+        "takeoverHoldsBrowser": "您同事的瀏覽器已為這項請求開啟。",
+        "clipboardDenied": "您的瀏覽器不允許 {brand} 讀取剪貼簿。",
+        "disconnectedDescription": "與機器的連線已關閉。機器上的內容都沒有遺失。",
+        "reconnect": "重新連線",
+        "tryAgain": "再試一次"
+    },
+    "screen": {
+        "connecting": "正在連線到螢幕...",
+        "unavailable": "目前無法使用螢幕",
+        "wentAway": "螢幕已中斷連線",
+        "resize": "調整螢幕大小"
+    },
+    "notch": {
+        "browser": "瀏覽器",
+        "closeBrowser": "關閉瀏覽器",
+        "files": "檔案",
+        "terminal": "終端機",
+        "paste": "貼上",
+        "done": "完成",
+        "close": "關閉"
+    },
+    "screenCard": {
+        "openBrowser": "開啟瀏覽器",
+        "takeControl": "接手控制"
+    }
+}

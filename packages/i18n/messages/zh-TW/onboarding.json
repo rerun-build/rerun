@@ -1,0 +1,275 @@
+{
+    "metaTitle": "歡迎",
+    "back": "返回",
+    "continue": "繼續",
+    "sector": {
+        "title": "告訴我們您從事什麼工作",
+        "description": "選擇最接近的一項，或搜尋您的行業。",
+        "search": "搜尋您的行業",
+        "placeholder": "搜尋，例如：學生、麵包店…",
+        "more": "查看更多",
+        "use": "使用「{words}」",
+        "notListed": "清單中沒有這個名稱，沒關係：我們會直接採用您的說法。",
+        "panel": {
+            "heading": "您的入門團隊",
+            "anyone": "任何行業",
+            "title": "您的團隊會隨之調整。",
+            "line": "代理商從開發客戶的人開始，商店從分析銷售的人開始，律師事務所從審閱合約的人開始。之後每一位都可以更換。"
+        }
+    },
+    "sectors": {
+        "freelance": {
+            "label": "自由工作者",
+            "keywords": "接案 自由業 個人工作室 獨立 SOHO 外包 一人公司 斜槓"
+        },
+        "agency": {
+            "label": "代理商",
+            "keywords": "工作室 行銷 設計 品牌 網站開發 公關 廣告 數位行銷 整合行銷"
+        },
+        "consulting": {
+            "label": "顧問與教練",
+            "keywords": "顧問 教練 諮詢 講師 導師 培訓"
+        },
+        "creators": {
+            "label": "創作者與媒體",
+            "keywords": "YouTuber Podcast 電子報 網紅 KOL 內容 作家 藝術家 音樂人 攝影師 部落客"
+        },
+        "ecommerce": {
+            "label": "網路商店",
+            "keywords": "電商 網拍 蝦皮 Shopify Amazon Etsy 零售 品牌 代購 一頁式"
+        },
+        "saas": {
+            "label": "軟體與科技",
+            "keywords": "新創 軟體 App SaaS 工程師 開發者 資訊 IT 平台"
+        },
+        "sales": {
+            "label": "業務與 B2B",
+            "keywords": "業務 銷售 業務團隊 業務開發 名單開發 陌生開發 B2B"
+        },
+        "real-estate": {
+            "label": "不動產",
+            "keywords": "房仲 仲介 經紀人 房地產 租屋 房東 包租代管 Airbnb 民宿"
+        },
+        "legal": {
+            "label": "法律與法遵",
+            "keywords": "律師 律師事務所 法務 代書 地政士 公證人 法遵"
+        },
+        "finance": {
+            "label": "會計與財務",
+            "keywords": "會計師 記帳士 記帳 報稅 財務長 CFO 投資 銀行 保險"
+        },
+        "recruiting": {
+            "label": "招募與人資",
+            "keywords": "招募 獵頭 人資 HR 徵才 人力派遣 人才"
+        },
+        "health": {
+            "label": "健康與保健",
+            "keywords": "醫師 牙醫 診所 心理師 物理治療 健身房 瑜珈 健身 美容 美髮 美甲 SPA"
+        },
+        "education": {
+            "label": "教育與培訓",
+            "keywords": "學校 老師 家教 補習班 課程 學院 線上課程"
+        },
+        "hospitality": {
+            "label": "餐飲與旅宿",
+            "keywords": "咖啡廳 酒吧 餐廳 麵包店 飯店 旅館 外燴 活動 婚禮 婚宴"
+        },
+        "trades": {
+            "label": "技術與居家服務",
+            "keywords": "水電 水電工 電工 營造 裝潢 清潔 修繕 維修 園藝 油漆"
+        },
+        "nonprofit": {
+            "label": "非營利組織",
+            "keywords": "協會 NGO 慈善 公益 基金會 教會 社團"
+        },
+        "personal": {
+            "label": "個人使用",
+            "keywords": "自己 個人 生活 興趣 副業 家庭 居家"
+        },
+        "student": {
+            "label": "學生",
+            "keywords": "讀書 學業 學校 大學 研究所 博士 論文 研究 學習"
+        }
+    },
+    "promises": {
+        "briefMeEveryMorning": "每天早上幫我做簡報",
+        "chaseMyUnpaidInvoices": "幫我催收未付款的發票",
+        "keepMyProjectsOnTrack": "讓我的專案按進度進行",
+        "closeMyBooksEveryMonth": "每月幫我結帳",
+        "findMyNextHire": "幫我找到下一位人才",
+        "findOwnersAboutToSell": "找出準備出售的屋主",
+        "runYourRentalsWithoutTheChasing": "輕鬆管理您的出租物件，不必再追著跑",
+        "knowIfADealIsWorthIt": "判斷一筆交易是否值得",
+        "findYourNextClients": "找到您的下一批客戶",
+        "getFoundOnGoogle": "讓客戶在 Google 上找到您",
+        "deliverClientProjectsOnTime": "準時交付客戶專案",
+        "bookMoreDemos": "預約更多產品展示",
+        "saveAccountsBeforeTheyChurn": "在客戶流失前挽留他們",
+        "makeTheNextLaunchLand": "讓下一次發表一舉成功",
+        "bookMoreMeetings": "預約更多會議",
+        "seeThePipelineBeforeYourMondayCall": "週一通話前先掌握銷售管道",
+        "walkIntoEveryMeetingPrepared": "每場會議都準備充分",
+        "knowWhatYourStoreDidThisWeek": "掌握商店本週的表現",
+        "winBackTheAbandonedCarts": "挽回被放棄的購物車",
+        "getTheOrdersOutTheDoor": "把訂單順利出貨",
+        "postEverywhereWithoutDoingItTwice": "一次發文，同步到所有平台",
+        "neverRunOutOfContentIdeas": "內容點子永遠不缺",
+        "turnOneIdeaIntoAFinishedArticle": "把一個點子變成完整的文章",
+        "reviewContractsBeforeYouSign": "簽約前先審閱合約",
+        "stayAuditReady": "隨時做好稽核準備",
+        "buildACaseFileFromAClientMatter": "從客戶案件建立案件卷宗",
+        "findAndScreenYourNextHires": "尋找並篩選您的下一批人才",
+        "onboardEveryNewHireProperly": "妥善帶領每位新進同仁上手",
+        "runPayrollWithoutTheErrors": "零錯誤處理薪資",
+        "keepMyCourseworkOnTrack": "讓我的課業按進度進行"
+    },
+    "team": {
+        "title": "邀請您的團隊",
+        "description": "您的同事為你們所有人工作。",
+        "label": "團隊成員的電子郵件",
+        "placeholder": "name@company.com",
+        "invite": "邀請",
+        "invited": "已邀請",
+        "link": "邀請連結",
+        "copy": "複製",
+        "copied": "已複製",
+        "skip": "暫時略過",
+        "panel": {
+            "title": "一個團隊，服務你們所有人。",
+            "line": "您邀請的每個人都與相同的同事合作，能看到他們完成的工作，也能把工作交給他們。免費邀請您的整個團隊。",
+            "shared": "每位同事都為你們所有人工作",
+            "more": "{count, plural, other {+# 位}}"
+        }
+    },
+    "view": {
+        "title": "您想如何檢視您的團隊？",
+        "description": "選擇一種，隨時都可以切換。",
+        "options": {
+            "simple": {
+                "line": "您的同事以清單呈現，聊天就在旁邊。"
+            },
+            "board": {
+                "line": "您的團隊在 3D 看板上，每個團隊或客戶一個 Box。"
+            }
+        },
+        "perks": {
+            "messaging": "就像通訊 App 一樣",
+            "smallScreen": "小螢幕也很好用",
+            "glance": "一眼看到所有人",
+            "live": "即時觀看他們工作"
+        },
+        "continue": {
+            "simple": "以經典檢視繼續",
+            "board": "以看板繼續"
+        },
+        "hint": "隨時可從工作區選單切換。",
+        "panel": {
+            "simple": {
+                "title": "與您的團隊對話。",
+                "line": "您的同事以清單呈現，聊天就在旁邊，就像您已經在用的通訊 App。"
+            },
+            "board": {
+                "title": "看著他們工作。",
+                "line": "您的同事待在 Boxes 中，每個團隊或客戶一個，您的團隊成員就在他們身旁工作。他們工作時會發光，需要您時會舉手。"
+            },
+            "app": {
+                "growth": "成長",
+                "backOffice": "後勤",
+                "triage": "收件匣分類",
+                "report": "每週報告",
+                "now": "現在",
+                "lines": {
+                    "nova": "您：寄出那兩封。",
+                    "atlas": "今天早上已篩選 14 個潛在客戶",
+                    "iris": "週四的草稿已準備好",
+                    "pico": "正在催收發票 #2214"
+                },
+                "messages": {
+                    "first": "我看過了昨晚收到的 34 封電子郵件。其中九封是報價討論串的回覆，我已擬好回信並放在您的草稿中。",
+                    "second": "寄出 Acme 的那兩封，其他先保留。",
+                    "third": "已寄出。另外七封在 Gmail 中等您處理，我會在早上 9 點進行下一輪。",
+                    "fourth": "你也可以幫我追一下上週那兩份報價嗎？",
+                    "fifth": "完成了，而且已經有一封回覆。我把它放在您收件匣的最上方，另一封如果到週四還沒回音，我會再追蹤。"
+                },
+                "foreman": "與您一起管理工作區",
+                "workspace": "Acme"
+            }
+        }
+    },
+    "trial": {
+        "title": "開始免費試用",
+        "description": "試用一開始，您的同事就會開始工作。",
+        "start": "開始我的免費試用"
+    },
+    "engine": {
+        "title": "正在設定您的工作區",
+        "milestones": {
+            "trial": "正在確認您的試用…",
+            "machine": "正在預留您的機器…",
+            "engine": "正在喚醒您的 Chief of Staff…"
+        },
+        "ready": "一起來打造您的團隊吧。",
+        "greeting": "您好，我是您的 Chief of Staff",
+        "greetingNamed": "{name}，您好，我是您的 Chief of Staff",
+        "failed": "您的機器花費的時間比平常久。",
+        "retry": "再試一次",
+        "enterAnyway": "仍要進入",
+        "enter": "開始吧",
+        "wait": "請稍候"
+    },
+    "showcase": {
+        "connect": {
+            "tab": "您的 AI 方案",
+            "title": "連接您的 AI 訂閱。",
+            "line": "您的同事使用您已付費的 Claude、ChatGPT 或 OpenCode 方案執行。偏好按 token 計費？使用 Anthropic、OpenAI、Google 或 OpenRouter 金鑰，或您自行託管的模型。"
+        },
+        "create": {
+            "tab": "同事",
+            "title": "建立同事。",
+            "line": "將他們連接到您使用的任何應用程式：Gmail、Slack、Notion、HubSpot，以及目錄中的 200 多種應用程式，還有任何具備 API 或 MCP 伺服器的工具，即使從未被列出也可以。",
+            "job": "{when}在 Gmail 中回覆我的客戶郵件，並在 Slack 張貼摘要",
+            "when": "每個工作日 8 點",
+            "schedule": "每個工作日 8:00"
+        },
+        "task": {
+            "tab": "任何任務",
+            "title": "交給他們任何任務。",
+            "line": "用一句話說明。一次就好，或每週一早上九點。",
+            "conversation": "杜拜財務長",
+            "placeholder": "問 {name} 任何問題…",
+            "ask": "找出 30 位杜拜物流公司的財務長，並將他們加入 HubSpot。",
+            "answer": "已找到 30 位財務長並加入 HubSpot。我也在 Gmail 中為每一位擬好了介紹信。",
+            "added": "已在 HubSpot 中",
+            "columns": {
+                "name": "姓名",
+                "company": "公司",
+                "title": "職稱",
+                "status": "狀態"
+            }
+        },
+        "done": {
+            "tab": "完成",
+            "title": "把工作完成。",
+            "line": "他們在夜晚、週末，甚至您的筆電關機時都在工作。",
+            "routine": "早晨收件匣",
+            "instructions": "閱讀未讀郵件、擬好回覆、標記需要我處理的郵件，並在 Slack 張貼摘要。",
+            "answer": "在您起床前就完成了：讀了 34 封郵件、擬了 9 封回覆、1 封需要您處理。摘要已在 Slack 中。",
+            "draftReady": "草稿已準備好",
+            "needsYou": "需要您",
+            "columns": {
+                "from": "寄件者",
+                "subject": "主旨",
+                "status": "狀態"
+            },
+            "subjects": {
+                "invoice": "發票 #2214",
+                "renewal": "續約價格",
+                "delivery": "送貨到里昂",
+                "call": "新手引導通話"
+            }
+        }
+    },
+    "trust": {
+        "users": "<b>{count}+ 位使用者</b>在業務上信賴 {brand}"
+    }
+}

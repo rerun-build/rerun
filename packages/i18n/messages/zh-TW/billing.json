@@ -1,0 +1,958 @@
+{
+    "credits": "{count, plural, other {# 點數}}",
+    "plan": {
+        "billed": {
+            "monthly": "{price}/月",
+            "yearly": "{price}/年"
+        },
+        "yourRenewal": "您的續訂日",
+        "status": {
+            "paymentFailed": "付款失敗",
+            "ends": "{date} 結束",
+            "ending": "即將結束",
+            "monthlyFrom": "{date} 起改為月繳",
+            "active": "使用中"
+        },
+        "summary": {
+            "monthlyRenews": "無限同事 · 按月計費 · {renewal} 續訂",
+            "monthlyEnds": "無限同事 · 按月計費 · {renewal} 結束",
+            "yearlyRenews": "無限同事 · 按年計費 · {renewal} 續訂",
+            "yearlyEnds": "無限同事 · 按年計費 · {renewal} 結束"
+        },
+        "success": {
+            "done": "完成",
+            "paymentReceivedTitle": "已收到付款",
+            "paymentReceivedBody": "您的信用卡已更新，Pro 已重新啟用。",
+            "backOnTitle": "Pro 已恢復",
+            "backOnBody": "您的方案將於 {date} 續訂。"
+        },
+        "cardUpdated": "信用卡已更新",
+        "acceptTerms": "請先接受條款",
+        "pleaseWait": "請稍候",
+        "nextInvoice": "下一張帳單",
+        "overview": {
+            "keepYearlyFailed": "無法保留您的年繳方案",
+            "billed": "計費方式",
+            "billedYearly": "年繳，含稅",
+            "billedMonthly": "月繳，含稅",
+            "from": "{date} 起",
+            "monthlyPrice": "月繳 · {price}",
+            "title": "帳單",
+            "update": "更新",
+            "invoices": "發票",
+            "viewAll": "檢視全部",
+            "creditUsage": "點數用量",
+            "creditsLeft": "剩餘 {credits}",
+            "keepYearly": "保留我的年繳方案",
+            "switchHint": "切換計費方式即可查看新價格。",
+            "cancelPlan": "取消方案",
+            "referFriend": "推薦朋友",
+            "freeMonths": "{count, plural, other {# 個月免費}}",
+            "getFreeMonth": "免費獲得一個月"
+        },
+        "referrals": {
+            "title": "推薦朋友",
+            "pitch": "朋友透過您的連結訂閱時，你們雙方都能免費獲得一個月。",
+            "linkLabel": "您的推薦連結",
+            "copy": "複製",
+            "copied": "已複製",
+            "capped": "已獲得全部 {cap} 個月。您的連結仍會讓朋友獲得一個月。",
+            "freeMonths": "免費月數",
+            "monthsOf": "{earned} / {cap}",
+            "progressLabel": "已獲得 {earned} / {cap} 個免費月",
+            "firstPayment": "於您首次付款時折抵",
+            "friends": "朋友",
+            "empty": "透過您的連結註冊的朋友會顯示在這裡。",
+            "more": "還有 {count} 位",
+            "loadFailed": "無法載入您的推薦紀錄。",
+            "status": {
+                "subscribed": "+1 個月",
+                "trial": "試用中",
+                "signed_up": "已註冊",
+                "canceled": "已取消"
+            }
+        },
+        "change": {
+            "planLabel": "無限同事{slots}",
+            "switchScheduledTitle": "已排定切換",
+            "switchScheduledBody": "您的年繳方案將持續到期滿，月繳將於 {date} 開始。",
+            "changeScheduledTitle": "已排定變更",
+            "changeScheduledBody": "您會保留 {current} 到 {renewal}，之後改為 {next}，價格 {price}。",
+            "planUpdatedTitle": "方案已更新",
+            "planUpdatedBodyMonthly": "{plan}，按月計費。收據已寄到您的電子郵件。",
+            "planUpdatedBodyYearly": "{plan}，按年計費。收據已寄到您的電子郵件。",
+            "switchToMonthly": "改為月繳",
+            "changeToSlots": "{count, plural, other {變更為 <n></n> 個 {provider} 名額}}",
+            "changeAppSlots": "變更您的應用程式名額",
+            "switchToYearly": "改為年繳",
+            "proLineMonthly": "Pro · {plan}，月繳",
+            "proLineYearly": "Pro · {plan}，年繳",
+            "unusedTimeMonthly": "月繳方案的未使用時間",
+            "unusedTimeYearly": "年繳方案的未使用時間",
+            "dueTodayTaxIncluded": "今日應付，含稅",
+            "from": "{date} 起",
+            "until": "至 {date}",
+            "monthlyFrom": "月繳 · <price></price>",
+            "keepMyPlan": "保留我的方案",
+            "confirmAndPay": "確認並付款",
+            "switchOn": "於 {date} 切換",
+            "scheduleFor": "排定於 {date}",
+            "billedNowSlots": "新名額立即計費。月繳將於 {date} 開始。",
+            "slotsReady": "付款完成後，新名額即可使用。",
+            "yearlyStarts": "付款完成後，您的年繳方案即會開始。",
+            "nothingToday": "今天不會收取任何費用。"
+        },
+        "cancelPending": {
+            "endOfPeriod": "您本期結束時",
+            "resumeFailed": "無法恢復您的方案",
+            "title": "Pro 將於 {date} 結束",
+            "body": "在此之前您的同事會繼續工作。之後工作區會暫停，資料保留 90 天。",
+            "none": "無",
+            "resume": "恢復 Pro",
+            "footnote": "恢復後會保留您的方案，並於 {date} 收取 {price}。"
+        },
+        "card": {
+            "notSaved": "無法儲存您的信用卡",
+            "title": "更新您的信用卡",
+            "save": "儲存信用卡",
+            "footnote": "之後的帳單會從這張信用卡扣款。"
+        },
+        "pastDue": {
+            "declinedOn": "您於 {date} 的 {amount} 付款遭拒。",
+            "declined": "您的 {amount} 付款遭拒。",
+            "lastDeclined": "您上一筆付款遭拒。",
+            "paused": "您的工作區已暫停，付款完成後即會恢復。",
+            "keepRunning": "請立即付款，讓您的工作區繼續運作。",
+            "ctaAmount": "更新信用卡並支付 {amount}",
+            "cta": "更新信用卡並付款"
+        },
+        "invoices": {
+            "loadFailed": "無法載入您的發票",
+            "title": "發票",
+            "empty": "尚無發票。",
+            "status": {
+                "draft": "草稿",
+                "open": "未付款",
+                "uncollectible": "無法收款",
+                "void": "已作廢"
+            }
+        },
+        "credit": {
+            "addedTitle": "已新增點數",
+            "addedBody": "{count, plural, other {# 點數}}已加入您的工作區。點數永不過期，您的同事會從中斷處繼續工作。",
+            "title": "購買 {brand} 點數",
+            "eachPack": "每個點數包以 {price} 一次付清，可新增 {count, plural, other {# 點數}}，永不過期。",
+            "packs": "{count, plural, other {# 個點數包}}",
+            "packCredits": "{count, plural, other {# 點數}}，永不過期",
+            "lessAria": "減少一個點數包",
+            "moreAria": "增加一個點數包",
+            "dueBeforeTax": "今日應付，未稅",
+            "buy": "購買點數",
+            "payOnStripe": "在 Stripe 付款",
+            "chargedOnce": "從這張信用卡扣款一次。",
+            "checkoutFootnote": "您會在安全的 Stripe 頁面付款，然後回到這裡。"
+        }
+    },
+    "lifetime": {
+        "badge": "終身",
+        "title": "Rerun 終身方案",
+        "subtitle": "無限同事 · 一次付清，永久擁有",
+        "appsDescription": "為您的同事加上額外的超能力，按月計費，與您的終身方案分開。",
+        "overview": {
+            "deal": "終身方案",
+            "paidOnce": "一次付清",
+            "apps": "應用程式",
+            "aiProviders": "AI 供應商"
+        },
+        "slots": {
+            "oneOnCheckout": "首次付款時一個名額，之後可立即新增更多",
+            "oneDuringTrial": "免費試用期間每個應用程式一個名額",
+            "slotLine": "{count, plural, other {# 個 {provider} 名額}}",
+            "freeThen": "免費 {days} 天，之後為 {price}",
+            "monthlyBill": "應用程式，按月",
+            "billedToday": "今天依本月剩餘時間計費，之後與您的其他名額一起按月計費。",
+            "freeDuringTrial": "試用結束前免費，之後按月計費。",
+            "continueToPayment": "繼續付款",
+            "confirm": "確認",
+            "addedTitle": "已新增名額",
+            "addedBody": "在應用程式中連結帳號，讓名額開始工作。",
+            "scheduledBody": "您歸還的名額在 {date} 前仍可使用，之後即從帳單中移除。"
+        }
+    },
+    "apps": {
+        "title": "應用程式",
+        "description": "為您的同事加上額外的超能力，與您的方案列在同一張帳單上。",
+        "slotsSuffix": "{count, plural, other { + # 個 {provider} 名額}}",
+        "unit": {
+            "monthly": "/月",
+            "yearly": "/年"
+        },
+        "lessReason": {
+            "freeUntil": "{date} 前免費",
+            "loading": "正在載入您的帳號",
+            "disconnectFirst": "請先在 {app} 中中斷連結一個帳號"
+        },
+        "free": "免費",
+        "slots": {
+            "none": "尚無名額",
+            "used": "{total, plural, other {已使用 <used></used> / <n></n> 個名額}}",
+            "count": "{total, plural, other {<n></n> 個名額}}",
+            "lineMonthly": "<slots></slots>，每個 {price}/月",
+            "lineYearly": "<slots></slots>，每個 {price}/年"
+        },
+        "trial": {
+            "free": "<b>1 個名額在 {date} 前免費</b>，之後為 {price}",
+            "withPaid": "{count, plural, other {<trial></trial>，另加 <n></n> 個付費名額}}",
+            "withPaidInUse": "{count, plural, other {<trial></trial>，另加 <n></n> 個付費名額（<inUse></inUse> 個使用中）}}"
+        },
+        "lessAria": "減少一個 {provider} 名額",
+        "moreAria": "增加一個 {provider} 名額",
+        "leaving": "{count, plural, other {# 個名額將於 {date} 移除}}"
+    },
+    "business": {
+        "noAddress": "請先新增信用卡",
+        "title": "公司資訊",
+        "add": "新增",
+        "saved": "公司資訊已儲存",
+        "removeFailed": "無法移除號碼",
+        "removed": "號碼已移除",
+        "noTaxId": "Stripe 不接受 {country} 的稅籍編號。",
+        "nameLabel": "公司名稱",
+        "typeLabel": "類型",
+        "euVat": "歐盟增值稅",
+        "field": {
+            "vat": "增值稅號碼",
+            "taxId": "稅籍編號"
+        },
+        "confirm": {
+            "title": "要移除這個號碼嗎？",
+            "description": "之後的發票將不會顯示此號碼。",
+            "confirm": "移除"
+        },
+        "removeNumber": "移除號碼",
+        "save": "儲存",
+        "footnote": "會顯示在您之後的發票上。",
+        "status": {
+            "verified": "已驗證",
+            "pending": "檢查中",
+            "unverified": "未驗證"
+        }
+    },
+    "dialog": {
+        "title": "帳單",
+        "adminOnly": {
+            "title": "帳單由管理員管理",
+            "description": "請聯絡此工作區的管理員來變更方案或新增點數。",
+            "gotIt": "我知道了"
+        },
+        "error": {
+            "title": "無法載入您的方案",
+            "description": "Stripe 沒有回應。您的訂閱不受影響，請稍後再試。",
+            "retry": "重試"
+        }
+    },
+    "postPayment": {
+        "title": "一切就緒",
+        "ready": {
+            "place": "您的方案已啟用。請將「{title}」放到您的看板上。",
+            "setUp": "您的方案已啟用。準備好設定「{title}」了嗎？",
+            "first": "您的方案已啟用。準備好讓您的第一位同事上工了嗎？"
+        },
+        "finalizing": "正在完成您的訂閱，只需片刻。",
+        "button": {
+            "placeOne": "放置您的同事",
+            "placeMany": "放置您的 {count} 位同事",
+            "placingOne": "正在放置您的同事",
+            "placingMany": "正在放置您的 {count} 位同事",
+            "startOne": "啟動您的同事",
+            "startMany": "啟動您的 {count} 位同事",
+            "startingOne": "正在啟動您的同事",
+            "startingMany": "正在啟動您的 {count} 位同事",
+            "finalizing": "正在完成訂閱"
+        }
+    },
+    "templatePurchase": {
+        "title": "感謝您的購買",
+        "waiting": "正在完成您的購買，只需片刻。",
+        "timeout": "您的付款已完成，但顯示時間比平常久，請稍後重新整理。",
+        "fallbackTitle": "您的範本",
+        "readyOne": "您已擁有「{title}」。準備好放置它的同事了嗎？",
+        "readyMany": "您已擁有「{title}」。準備好放置它的 {count} 位同事了嗎？",
+        "needsPlan": "您已擁有「{title}」。需要有效的 {brand} 方案才能安裝。",
+        "finalizing": "正在完成購買",
+        "close": "關閉",
+        "placeOne": "放置它的同事",
+        "placeMany": "放置 {count} 位同事",
+        "subscribe": "訂閱"
+    },
+    "checkout": {
+        "trialEndFallback": "您的試用結束時",
+        "badge": {
+            "freeTrial": "免費試用",
+            "freeTrialEndsToday": "免費試用 · 今天結束",
+            "freeTrialDaysLeft": "免費試用 · {count, plural, other {剩 # 天}}",
+            "trialDays": "{days} 天免費試用",
+            "complimentary": "免費存取",
+            "paused": "已暫停",
+            "pausedUntil": "已暫停 · 保留至 {date}",
+            "yourCoworker": "您的同事",
+            "parkedMany": "{title} · {count} 位同事"
+        },
+        "timeline": {
+            "today": "今天",
+            "anytime": "隨時",
+            "cancelTitle": "一鍵取消",
+            "noNotice": "無需提前通知",
+            "reminderDayBefore": "前一天提醒",
+            "proStarts": "Pro 開始",
+            "unlimitedCoworkers": "無限同事",
+            "nextInvoice": "下一張帳單",
+            "billedExclVat": "<billed></billed>，未稅",
+            "trialEndsProStarts": "試用結束，Pro 開始",
+            "chargedToday": "今天收取 <billed></billed>，無限同事",
+            "trialRunning": "試用中",
+            "zeroToday": "今天 $0",
+            "trialEnds": "試用結束",
+            "nothingCharged": "不收取任何費用",
+            "reminder": "電子郵件提醒",
+            "reminderDetail": "前一天提醒，讓您從容決定",
+            "firstCharge": "{charge}，在此之前取消則不需付費",
+            "trialStarts": "試用開始",
+            "trialStartsDetail": "今天 $0，{agents} 位同事和 {credits, plural, other {# 點數}}的 AI 用量",
+            "proStartsDetail": "收取 {charge}，無限同事和每月 {credits, plural, other {# 點數}}",
+            "restoreStarts": "開始還原",
+            "restoreDetail": "同事一分鐘內回來",
+            "installs": "開始安裝",
+            "placedCount": "{count, plural, other {已放置 # 位同事}}",
+            "placedOnBoard": "已放到您的看板上"
+        },
+        "variants": {
+            "startTrial": {
+                "title": "開始您的免費試用",
+                "subtitle": "需要信用卡，今天 $0。除非您事先取消，否則將於 {date} 收取 {price}。",
+                "cta": "開始免費試用",
+                "footnote": "今天 $0。在 {date} 前取消即不會收費。"
+            },
+            "trialCardless": {
+                "title": "升級至 Pro",
+                "subtitle": "您在試用期間建立的一切都會保留並繼續運作。",
+                "cta": "結束試用並訂閱"
+            },
+            "trialCard": {
+                "title": "您的免費試用",
+                "subtitle": "今天不需付費。Pro 會在 {date} 自動開始。",
+                "subtitleWithReminder": "今天不需付費。Pro 會在 {date} 自動開始，我們會在前一天寄電子郵件通知您。",
+                "subtitleCancelled": "您已取消試用。您的同事會繼續工作到 {date}，且不會收取任何費用。",
+                "cta": "立即升級至 Pro"
+            },
+            "trialCardPayNow": {
+                "title": "升級至 Pro",
+                "subtitle": "試用期間可執行 {agents} 位同事。立即開始 Pro 即可擁有無限同事，或讓試用於 {date} 自動轉為 Pro。",
+                "cta": "結束試用並立即開始 Pro",
+                "footnote": "這會在今天結束您的免費試用。若今天不想付費，請保留試用：Pro 會在 {date} 自動開始。"
+            },
+            "creditLocked": {
+                "title": "Pro 包含 {brand} 點數",
+                "titleCoworker": "使用 Pro 繼續工作",
+                "subtitle": "您的 {trialCredits, number} 試用點數已用完。Pro 每月包含 {credits, plural, other {# 點數}}，您也可以隨時加購。",
+                "subtitleCoworker": "{coworker} 會從中斷處繼續。",
+                "cta": "結束試用並訂閱",
+                "ctaCoworker": "付款並繼續",
+                "payCta": "支付 {amount} 並繼續",
+                "footnote": "關閉此視窗不會收取任何費用，您的試用維持不變。"
+            },
+            "noPlan": {
+                "title": "訂閱 Pro",
+                "subtitle": "無限同事，單一價格。可隨時取消。",
+                "cta": "訂閱"
+            },
+            "complimentary": {
+                "title": "訂閱 Pro",
+                "subtitle": "您的工作區享有免費存取。訂閱即可額外加購點數。",
+                "cta": "訂閱"
+            },
+            "paused": {
+                "title": "重新啟用 Pro",
+                "subtitle": "您的同事、記憶和檔案已封存，回來時會完全維持您離開時的樣子。",
+                "cta": "重新啟用 Pro"
+            },
+            "template": {
+                "title": "訂閱 Pro 即可安裝",
+                "subtitle": "一切已就緒，您一訂閱就會出現在您的看板上。",
+                "cta": "訂閱"
+            }
+        },
+        "refusal": {
+            "unchanged": "{message} 您的試用維持不變。",
+            "nothingCharged": "{message} 未收取任何費用，您的試用維持不變。"
+        },
+        "usageBack": {
+            "trial": "試用",
+            "back": "返回"
+        },
+        "success": {
+            "plan": "方案",
+            "planValue": "Pro · 無限同事",
+            "nextInvoice": "下一張帳單",
+            "backToBoard": "返回我的看板",
+            "lastDayFallback": "您試用的最後一天",
+            "placeCoworkers": "放置 {count} 位同事",
+            "placeOnBoard": "放到我的看板上",
+            "startCoworker": "啟動我的同事",
+            "paid": {
+                "title": "您已升級為 Pro",
+                "body": "收據已寄到您的電子郵件。"
+            },
+            "cardSaved": {
+                "title": "信用卡已儲存",
+                "body": "您的試用會繼續進行。Pro 將於 {date} 開始，並從這張信用卡收取 {charge}。"
+            },
+            "trialStarted": {
+                "title": "您的試用已開始",
+                "body": "今天不收取任何費用。除非您事先取消，否則將於 {date} 收取 {charge}。",
+                "cta": "建立我的同事"
+            },
+            "restoring": {
+                "title": "歡迎回來",
+                "body": "正在還原您的工作區。您的同事大約一分鐘後就會恢復運作。"
+            },
+            "creditUnlocked": {
+                "body": "{coworker} 已準備好繼續執行任務。收據已寄到您的電子郵件。",
+                "bodyNoCoworker": "您的同事已準備好繼續執行任務。收據已寄到您的電子郵件。",
+                "credits": "點數",
+                "creditsValue": "每月 {credits, plural, other {# 點數}}",
+                "coworkers": "同事",
+                "coworkersValue": "無限",
+                "resume": "繼續任務"
+            }
+        },
+        "pay": {
+            "tryAgain": "再試一次",
+            "trialRefused": "這張信用卡已使用過免費試用",
+            "trialRefusedDescription": "您仍可訂閱，今天即開始計費。",
+            "genericError": "發生錯誤",
+            "acceptTerms": "請先接受條款",
+            "updateFailed": "無法更新您的方案",
+            "stillUpdating": "您的方案仍在更新中",
+            "pleaseWait": "請稍候",
+            "freeFor": "{brand} Pro，免費 {days} 天",
+            "subscribe": "訂閱 {brand} Pro",
+            "dueToday": "今日應付",
+            "perYear": "每年",
+            "perMonth": "每月",
+            "thenPerMonth": "之後每月 <amount></amount>，未稅。",
+            "authorize": "訂閱即表示您授權 Rerun 持續向您收費，直到您取消為止。"
+        },
+        "card": {
+            "exclVat": "未稅，稅額依您的地址計算。",
+            "payLaterFootnote": "立即付款會在今天結束您的免費試用，並表示您授權 Rerun 持續向您收費，直到您取消為止。想先完成試用嗎？<later></later>",
+            "saving": "儲存中…",
+            "payOn": "於 {date} 付款",
+            "payOnLastDay": "於最後一天付款"
+        },
+        "cardOnFile": {
+            "back": "您的試用",
+            "title": "今天開始 Pro",
+            "header": "結束試用，開始 {brand} Pro",
+            "tax": "稅金",
+            "taxFromAddress": "稅金，依您的地址計算",
+            "dueToday": "今日應付",
+            "change": "變更"
+        },
+        "cancelTrial": "取消試用",
+        "referral": {
+            "trial": "試用",
+            "trialValue": "{days, plural, other {免費 # 天}}",
+            "invitedBy": "由 {name} 邀請",
+            "invitedByFriend": "由朋友邀請",
+            "secondMonthFree": "第 2 個月免費"
+        },
+        "trial": {
+            "title": "您的免費試用",
+            "included": "已包含",
+            "includedValue": "{agents} 位同事和 {credits, plural, other {# 點數}}",
+            "slots": "{count, plural, other {{provider} 名額 × #}}",
+            "slotPriceMonthly": "現在 $0，{date} 起每月 {amount}",
+            "slotPriceYearly": "現在 $0，{date} 起每年 {amount}",
+            "ends": "試用結束",
+            "reminder": "電子郵件提醒",
+            "firstCharge": "首次收費",
+            "firstChargeValue": "{date} 收取 <charge></charge>",
+            "cancelBefore": "在 {date} 前取消即不會收費。在此之前您的同事會繼續工作。",
+            "continue": "繼續我的試用"
+        },
+        "trialCancelled": {
+            "resumeFailed": "無法恢復您的試用",
+            "title": "您的試用結束於",
+            "unit": "不收取任何費用",
+            "body": "您已取消試用。在此之前您的同事會繼續工作，且不會收取任何費用。",
+            "resume": "恢復我的試用"
+        },
+        "paneError": "無法開啟付款表單"
+    },
+    "parts": {
+        "interval": {
+            "monthly": "月繳",
+            "yearly": "年繳",
+            "perYear": "<amount></amount>/年",
+            "perMonth": "<amount></amount>/月"
+        },
+        "features": {
+            "runs": "<b>無限次執行</b>，全年無休",
+            "models": "包含<b>智慧模型</b>",
+            "autopilot": "為您的業務提供<b>自動駕駛</b>",
+            "trial": {
+                "agents": "試用期間 <b>{count} 位同事</b>，Pro 無限制",
+                "teammates": "從第一天起就能邀請<b>您的團隊</b>",
+                "credit": "<b>{credits, plural, other {# 點數}}的 AI 用量</b>，之後每月 {monthly, number}"
+            },
+            "pro": {
+                "agents": "<b>無限同事</b>為您工作",
+                "teammates": "邀請<b>所有隊友</b>",
+                "credit": "每月 <b>{credits, plural, other {# 點數}}的 AI 用量</b>"
+            },
+            "lifetime": {
+                "ownAi": "使用<b>您自己的 AI</b> 執行",
+                "credit": "需要時可使用 <b>{brand} 點數</b>"
+            }
+        },
+        "plan": {
+            "title": "Pro 方案",
+            "freeTrialLine": "免費試用，之後無限同事",
+            "unlimited": "無限同事",
+            "billedYearly": "每年收取 <amount></amount>",
+            "billedMonthly": "按月計費",
+            "forDays": "為期 {days} 天",
+            "perMonth": "每月"
+        },
+        "showTestimonial": "顯示 {company}",
+        "quoted": "「{quote}」",
+        "cardOnFile": "已儲存的信用卡",
+        "promo": {
+            "add": "新增優惠碼",
+            "label": "優惠碼",
+            "apply": "套用",
+            "remove": "移除優惠碼"
+        },
+        "backToPlan": "方案",
+        "terms": "我同意<terms>服務條款</terms>，並要求 Rerun 立即開始提供服務。若我是消費者，我的撤回權將在服務開始後終止。",
+        "lifetime": {
+            "title": "終身方案",
+            "line": "無限同事 · 一次付清",
+            "paidOnce": "一次付清",
+            "forGood": "永久擁有"
+        }
+    },
+    "stripe": {
+        "orPayWithCard": "或以信用卡付款",
+        "percentOff": "折抵 {percent}%",
+        "amountOff": "折抵 {amount}"
+    },
+    "perks": {
+        "feature": "功能",
+        "trial": "試用",
+        "pro": "Pro",
+        "rows": {
+            "credits": {
+                "title": "AI 用量",
+                "trial": "{credits, plural, other {# 點數}}，一次性",
+                "pro": "每月 {credits, plural, other {# 點數}}"
+            },
+            "coworkers": {
+                "title": "同事",
+                "trial": "{count} 位啟用",
+                "pro": "無限"
+            },
+            "team": {
+                "title": "隊友",
+                "trial": "僅限您本人",
+                "pro": "邀請您的整個團隊"
+            }
+        },
+        "headlines": {
+            "credits": "{credits, plural, other {# 點數/月}}",
+            "coworkers": "無限同事",
+            "team": "邀請您的團隊"
+        }
+    },
+    "cancel": {
+        "toasts": {
+            "openFailed": "無法開啟取消流程",
+            "remindFailed": "無法設定提醒",
+            "claimFailed": "無法套用優惠",
+            "cancelFailed": "無法取消您的訂閱",
+            "resumeFailed": "無法恢復您的訂閱",
+            "trialResumed": "您的試用已恢復",
+            "subscriptionResumed": "您的訂閱已恢復"
+        },
+        "header": {
+            "goodbyeTitle": "還沒決定嗎？{date} 再決定",
+            "goodbyeTrialDescription": "讓您的試用繼續進行。我們會在首次收費的前一天寄電子郵件給您。",
+            "goodbyePaidDescription": "讓您的同事繼續工作。我們會在收費前一週寄電子郵件給您，屆時您仍可取消。",
+            "sunkTrialTitle": "您的同事已經設定好了",
+            "sunkTrialDescription": "最困難的部分已經完成。現在離開，他們就會停止工作。",
+            "sunkPaidTitle": "您已經為此付費了",
+            "sunkPaidDescription": "無論如何，在 {date} 前都屬於您。未使用的點數也會隨之失效。",
+            "reasonTitle": "您為什麼要離開？",
+            "reasonDescription": "請用您自己的話說明，這能告訴我們該優先改善什麼。",
+            "offerDescription": "您的方案和同事都會完全維持原樣。",
+            "farewellTitle": "您的同事將於 {date} 停止工作",
+            "farewellDescription": "排程將停止觸發，您的工作區也會暫停。",
+            "claimedTitle": "感謝您留下來",
+            "claimedDescription": "您的同事從未停止工作。",
+            "remindedTitle": "我們會在 {date} 提醒您",
+            "remindedDescription": "在此之前一切不變，您的同事會繼續工作。",
+            "cancelledTitle": "已確認取消",
+            "cancelledDescription": "您將不會再被收費。您的同事會工作到 {date}。"
+        },
+        "offerTitle": {
+            "too_expensive": "與其失去您，我們寧願降價",
+            "unused": "再給它一個月",
+            "too_complex": "再花一個月完成設定",
+            "low_quality": "很抱歉讓您失望了",
+            "missing_features": "我們每週都會推出新功能",
+            "switched_service": "在您改用其他服務之前",
+            "other": "在您離開之前"
+        },
+        "comeback": {
+            "coming_back": "我會回來的！",
+            "maybe": "我可能會回來。",
+            "not_coming_back": "應該不會。"
+        },
+        "reason": {
+            "field": "是什麼讓您決定離開？",
+            "placeholder": "一句話就夠了",
+            "comebackField": "您還會再使用 {brand} 嗎？",
+            "missingComment": "請簡短告訴我們您離開的原因",
+            "missingComeback": "請告訴我們您是否會回來",
+            "required": "請簡短告訴我們您離開的原因。",
+            "tooLong": "請控制在 {max, number} 個字元以內。",
+            "notAReason": "這看起來不像是原因。是什麼讓您決定離開？"
+        },
+        "milestones": {
+            "youStay": "您留下",
+            "email": "電子郵件",
+            "reminder": "提醒",
+            "firstCharge": "首次收費",
+            "renewal": "續訂"
+        },
+        "daysLeft": {
+            "trial": "您的試用還剩 <days>{count, plural, other {# 天}}</days>",
+            "paid": "您的方案還剩 <days>{count, plural, other {# 天}}</days>",
+            "runsSoFar": "{count, plural, other {目前已執行 <figure>#</figure> 次}}",
+            "runsThisWeek": "{count, plural, other {本週執行 <figure>#</figure> 次}}"
+        },
+        "offerCard": {
+            "billedOn": "於 {date}"
+        },
+        "offer": {
+            "trialHalf": {
+                "headline": "首月 5 折",
+                "terms": "之後自 {fullFrom} 起每月 {full}。我們會在 {endsOn} 前寄電子郵件給您，在此之前您仍可免費取消。",
+                "claim": "領取 5 折優惠",
+                "claimed": "您的第一張帳單為 {price}，於 {endsOn} 收取，之後每月 {full}。"
+            },
+            "nextMonth": {
+                "headline": "下個月只要 $1",
+                "terms": "之後自 {fullFrom} 起每月 {full}。",
+                "termsWithAddons": "您的加購項目維持每月 {addons}。之後自 {fullFrom} 起每月 {full}。",
+                "claim": "下個月只要 $1",
+                "claimed": "您的下一張帳單為 {price}。自 {fullFrom} 起恢復為每月 {full}。"
+            }
+        },
+        "sunk": {
+            "paidCaption": "本月已付費的部分",
+            "creditsLeft": "剩餘點數",
+            "runsThisMonth": "本月執行次數",
+            "agents": "{count, plural, other {# 位同事}}",
+            "agentsCaption": "已設定、已連結並在工作中",
+            "creditsCaption": "剩餘的 {brand} 點數",
+            "runsSoFar": "目前執行次數",
+            "schedules": "排程"
+        },
+        "remindMe": "於 {date} 提醒我",
+        "keepRunning": "讓我的同事繼續工作",
+        "keepCoworkers": "保留我的同事",
+        "saved": {
+            "title": "保留至 {date}",
+            "description": "記憶、檔案和技能都會保留。在此之前重新訂閱，一切都會回來。"
+        },
+        "done": {
+            "emailTitle": "{date} 寄送電子郵件",
+            "emailTrialDescription": "在首次收費的前一天。如有需要，可從該電子郵件取消。",
+            "emailPaidDescription": "在您的方案於 {date} 續訂的前一週。",
+            "activeTitle": "有效至 {date}",
+            "activeTrialDescription": "您的試用會持續到結束，不會收取任何費用。",
+            "activePaidDescription": "在此之前一切照常運作。",
+            "changedMindTitle": "改變主意了嗎？",
+            "changedMindDescription": "在 {endsOn} 前恢復，一切都不會中斷。之後，您的工作區會保留至 {keptUntil}。"
+        },
+        "buttons": {
+            "resumeTrial": "恢復試用",
+            "resumeSubscription": "恢復訂閱",
+            "done": "完成",
+            "goBack": "返回",
+            "continueToCancel": "繼續取消",
+            "continue": "繼續",
+            "noThanks": "不用了，謝謝",
+            "cancelTrial": "取消試用",
+            "cancelSubscription": "取消訂閱"
+        }
+    },
+    "usage": {
+        "card": {
+            "title": "{brand} 點數",
+            "subtitle": "您的同事在 {brand} 模型和付費資料上的花費",
+            "addCredits": "加購點數",
+            "startProNow": "立即開始 Pro",
+            "usedTrial": "已使用 · 試用點數",
+            "used": "已使用",
+            "usedResets": "已使用 · {date} 重設",
+            "usedOf": "{used} / {whole} 點數",
+            "seeUsage": "查看用量"
+        },
+        "outOfCredits": {
+            "trialTitle": "您的試用點數已用完",
+            "title": "您的點數已用完",
+            "trialDescription": "您的同事無法使用 {brand} 模型或付費資料。Pro 每月包含 {count, plural, other {# 點數}}。",
+            "description": "您的同事無法使用 {brand} 模型或付費資料。",
+            "descriptionUntil": "在 {date} 前，您的同事無法使用 {brand} 模型或付費資料。"
+        },
+        "switch": {
+            "label": "允許花費",
+            "on": "同事可以使用 {brand} 模型和付費資料。",
+            "off": "已暫停。同事無法使用 {brand} 模型或付費資料。"
+        },
+        "kind": {
+            "ai": "AI 模型",
+            "data": "付費資料"
+        },
+        "tier": {
+            "fast": "快速模型",
+            "balanced": "均衡模型",
+            "smart": "智慧模型"
+        },
+        "bar": {
+            "aiSpent": "AI 模型 · {figure} 點數",
+            "dataSpent": "付費資料 · {figure} 點數",
+            "leftThisMonth": "本月剩餘 · {figure} 點數",
+            "left": "剩餘 · {figure} 點數",
+            "topup": "加值，永不過期 · {figure} 點數"
+        },
+        "legendLeft": "剩餘",
+        "calls": "{count, plural, other {# 次呼叫}}",
+        "otherCoworker": "其他",
+        "pace": {
+            "onTopup": "本月點數已用完。同事現在使用您的加值點數，剩餘 {figure}。",
+            "runsOutBeforeTrialEnds": "以目前的速度，您將在 {date} 左右用完，比試用結束早 {days, plural, other {# 天}}。",
+            "runsOutBeforeReset": "以目前的速度，您將在 {date} 左右用完，比重設早 {days, plural, other {# 天}}。"
+        },
+        "pane": {
+            "title": "點數用量",
+            "loadFailed": "無法載入您的點數用量，請稍後再試。",
+            "creditsUsed": "{figure} <muted>點數已使用</muted>",
+            "periodLeft": "{start} 至 {end} · 剩餘 {left}",
+            "perDay": "每日",
+            "pace": "趨勢",
+            "nothingSpentTrial": "本次試用尚無任何花費。",
+            "nothingSpentPeriod": "本期尚無任何花費。",
+            "bySource": "依來源",
+            "byCoworker": "依同事",
+            "latestCharges": "最近的費用"
+        },
+        "chart": {
+            "spentSoFar": "目前已花費 <value>{figure}</value>",
+            "ai": "AI <value>{figure}</value>",
+            "data": "資料 <value>{figure}</value>",
+            "perDay": "每日點數",
+            "paceCaption": "目前的花費，以及照此速度的預估",
+            "monthly": "每月 {figure}",
+            "trialCredits": "試用點數 {figure}",
+            "topup": "+ 加值 {figure}",
+            "credits": "點數 {figure}",
+            "today": "今天",
+            "trialEnds": "{date} 試用結束",
+            "resets": "{date} 重設"
+        },
+        "paidData": {
+            "people": {
+                "search": "個人檔案",
+                "email": {
+                    "find": "工作電子郵件",
+                    "verify": "電子郵件驗證"
+                },
+                "phone": {
+                    "find": "電話號碼"
+                },
+                "enrich": "個人資料",
+                "identity": {
+                    "resolve": "LinkedIn 查詢"
+                }
+            },
+            "companies": {
+                "search": "公司",
+                "enrich": "公司資料",
+                "similar": "相似公司搜尋",
+                "jobs": {
+                    "search": "職缺搜尋"
+                },
+                "news": "公司新聞搜尋"
+            },
+            "google": {
+                "serp": {
+                    "organic": "Google 排名",
+                    "maps": "Google 地圖搜尋",
+                    "local": "在地排名",
+                    "news": "Google 新聞搜尋"
+                },
+                "keywords": {
+                    "volume": "關鍵字搜尋量查詢",
+                    "ideas": "關鍵字建議清單",
+                    "trends": "趨勢圖表"
+                }
+            },
+            "ai-search": {
+                "perplexity": {
+                    "answer": "Perplexity 回答"
+                }
+            },
+            "web": {
+                "backlinks": {
+                    "summary": "反向連結報告",
+                    "list": "反向連結清單"
+                },
+                "anchors": {
+                    "list": "錨點文字清單"
+                },
+                "url": {
+                    "metrics": "權威度查詢"
+                }
+            },
+            "linkedin": {
+                "user": {
+                    "profile": "LinkedIn 個人檔案",
+                    "posts": "LinkedIn 貼文清單"
+                },
+                "company": {
+                    "profile": "LinkedIn 公司專頁"
+                },
+                "post": {
+                    "detail": "LinkedIn 貼文",
+                    "comments": "LinkedIn 留言清單",
+                    "reactions": "LinkedIn 心情回應清單"
+                }
+            },
+            "tiktok": {
+                "user": {
+                    "profile": "TikTok 個人檔案",
+                    "videos": "TikTok 影片清單"
+                },
+                "search": {
+                    "users": "TikTok 帳號搜尋",
+                    "videos": "TikTok 影片搜尋"
+                },
+                "video": {
+                    "detail": "TikTok 影片",
+                    "comments": "TikTok 留言清單"
+                },
+                "comment": {
+                    "replies": "TikTok 回覆清單"
+                }
+            },
+            "instagram": {
+                "user": {
+                    "profile": "Instagram 個人檔案",
+                    "posts": "Instagram 貼文清單",
+                    "reels": "Instagram Reels 清單"
+                },
+                "search": {
+                    "users": "Instagram 帳號搜尋",
+                    "reels": "Instagram Reels 搜尋"
+                },
+                "hashtag": {
+                    "posts": "Instagram 主題標籤搜尋"
+                },
+                "post": {
+                    "detail": "Instagram 貼文",
+                    "comments": "Instagram 留言清單"
+                }
+            },
+            "x": {
+                "user": {
+                    "profile": "X 個人檔案",
+                    "posts": "X 貼文清單"
+                },
+                "search": {
+                    "posts": "X 搜尋"
+                },
+                "post": {
+                    "comments": "X 回覆清單"
+                }
+            },
+            "youtube": {
+                "channel": {
+                    "profile": "YouTube 頻道",
+                    "videos": "YouTube 影片清單"
+                },
+                "search": {
+                    "videos": "YouTube 搜尋"
+                },
+                "video": {
+                    "detail": "YouTube 影片",
+                    "comments": "YouTube 留言清單"
+                }
+            },
+            "facebook": {
+                "user": {
+                    "profile": "Facebook 粉絲專頁",
+                    "posts": "Facebook 貼文清單"
+                },
+                "post": {
+                    "comments": "Facebook 留言清單"
+                }
+            },
+            "reddit": {
+                "subreddit": {
+                    "posts": "Subreddit 動態"
+                },
+                "post": {
+                    "detail": "Reddit 貼文"
+                }
+            }
+        }
+    },
+    "layout": {
+        "pill": {
+            "updatePayment": "更新付款方式",
+            "freeTrial": "免費試用",
+            "upgrade": "升級",
+            "daysLeft": "剩 {count} 天",
+            "underADayLeft": "剩不到 1 天"
+        },
+        "meter": {
+            "trialCredits": "試用點數",
+            "credits": "點數",
+            "noTrialCreditsLeft": "試用點數已用完",
+            "outOfCredits": "點數已用完",
+            "left": "剩餘 {figure}",
+            "ariaUsed": "已使用的 {brand} 點數"
+        }
+    },
+    "creditsBar": {
+        "used": "已使用點數",
+        "resetsOn": "{date} 重設"
+    },
+    "trialOffer": {
+        "limitsDuringTrial": "試用期間可使用 {agents} 位同事和 {credits, plural, other {# 點數}}。",
+        "chargeLine": "需要信用卡，今天 $0。除非您事先取消，否則將於 {date} 收取 {price}。",
+        "cardlessLine": "不需信用卡，今天 $0。請在 {date} 前新增一張，以每月 {price} 繼續使用。",
+        "startTrial": "開始您的 {days} 天免費試用",
+        "subscribe": "訂閱 {price}/月",
+        "billedToday": "今天開始計費，可隨時取消。",
+        "trialUsed": "您已使用過免費試用。今天開始計費，可隨時取消。"
+    },
+    "startPlan": {
+        "trialFailed": "無法開始您的試用",
+        "trialStarted": "試用已開始"
+    }
+}

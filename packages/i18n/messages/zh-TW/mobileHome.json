@@ -1,0 +1,144 @@
+{
+    "title": "同事",
+    "loadFailed": "無法載入您的同事。",
+    "retry": "重試",
+    "empty": "還沒有同事。",
+    "loadingCoworkers": "正在載入同事",
+    "newCoworker": "新增同事",
+    "untitledBox": "未命名的 Box",
+    "teammate": "隊友",
+    "pinned": {
+        "dragToReorder": "拖曳以重新排序",
+        "done": "完成",
+        "unpin": "取消釘選",
+        "details": "同事詳細資料",
+        "edit": "編輯釘選",
+        "unreadLabel": "{name}，未讀"
+    },
+    "row": {
+        "label": "{name}，{line}",
+        "opensConversation": "開啟對話",
+        "pin": "釘選",
+        "unpin": "取消釘選",
+        "pinToTop": "釘選到頂端"
+    },
+    "line": {
+        "paused": "已暫停",
+        "waiting": "正在等您",
+        "error": "發生錯誤",
+        "working": "工作中",
+        "workingOn": "工作中 · {detail}",
+        "asleep": "休眠中",
+        "asleepAbout": "休眠中 · {about}",
+        "you": "您：{message}"
+    },
+    "foreman": {
+        "askAnything": "問什麼都可以"
+    },
+    "header": {
+        "account": "帳號"
+    },
+    "account": {
+        "preferences": "偏好設定",
+        "contactSupport": "聯絡客服",
+        "signOut": "登出",
+        "subscriptionTitle": "請先取消訂閱",
+        "subscriptionMessage": "{workspaces} 仍會續訂。請先在 rerun.build 的「帳單」中取消，再刪除您的帳號。",
+        "deleteTitle": "要刪除您的帳號嗎？",
+        "deleteMessage": "您會離開與他人共用的工作區。只有您一人的工作區會永久停止，連同其中的同事和檔案。此動作無法復原。",
+        "delete": "刪除",
+        "cancel": "取消",
+        "reauthTitle": "請重新登入以刪除帳號",
+        "reauthMessage": "為了您的安全，刪除帳號前需要重新登入。請重新登入後，再從這裡刪除。",
+        "deleteFailedTitle": "無法刪除您的帳號",
+        "deleteFailedMessage": "請稍後再試。",
+        "leaveServerTitle": "要離開 {host} 嗎？",
+        "leaveServerMessage": "您將會登出，Rerun 會重新開啟於 Rerun Cloud。",
+        "leaveServer": "離開"
+    },
+    "workspace": {
+        "untitled": "我的工作區",
+        "menuLabel": "工作區 {name}"
+    },
+    "section": {
+        "label": "{label}，{count}"
+    },
+    "search": {
+        "title": "搜尋",
+        "back": "返回",
+        "placeholder": "搜尋同事和對話",
+        "askRerun": "{named, select, yes {詢問 {name}} other {詢問您的 Chief of Staff}}",
+        "quotedAsk": "「{query}」",
+        "coworkers": "同事",
+        "conversations": "對話",
+        "noCoworker": "沒有這個名字的同事。",
+        "newConversation": "新對話",
+        "hitDetail": "{coworker} · {time}"
+    },
+    "inbox": {
+        "notifications": "通知",
+        "bellLabel": "通知，{count}",
+        "close": "關閉",
+        "settings": "通知設定",
+        "markLabel": "將通知標示為已讀",
+        "markRead": "{count, plural, other {將 # 則通知標示為已讀}}",
+        "nothingToMark": "沒有可標示的通知",
+        "clearAll": "{count, plural, other {全部清除，包含 # 個請求}}",
+        "clearAllTitle": "要清除所有通知嗎？",
+        "clearAllMessage": "{count, plural, other {# 個等待中的請求會在未回覆的情況下離開收件匣，您的同事會繼續等待。}}",
+        "clearAllConfirm": "全部清除",
+        "cancel": "取消",
+        "running": "{count, plural, other {# 個任務執行中}}",
+        "loadFailed": "無法載入您的通知。",
+        "retry": "重試",
+        "emptyTitle": "沒有待處理的事項",
+        "emptyDescription": "當同事需要您或完成任務時，會顯示在這裡。",
+        "undo": "復原",
+        "ok": "確定",
+        "sections": {
+            "needsYou": "需要您處理",
+            "headsUps": "提醒",
+            "errors": "錯誤",
+            "done": "已完成"
+        },
+        "sentences": {
+            "awaiting_question": "{agent} 問了您一個問題",
+            "awaiting_approval": "{agent} 需要您的核准",
+            "awaiting_connector": "{agent} 需要連結一個 App",
+            "waiting_human": "{agent} 正在等您",
+            "awaiting_ack": "{agent} 有事提醒您",
+            "error": "{agent} 發生錯誤",
+            "done": "{agent} 已完成執行"
+        },
+        "row": {
+            "detail": "{agent} · {title}",
+            "label": "{headline}，{detail}",
+            "read": "已讀",
+            "markRead": "標示為已讀",
+            "opensConversation": "開啟對話",
+            "unfollow": "不再追蹤其排程任務",
+            "unfollowed": "您已不再追蹤 {name} 的排程任務。",
+            "mute": "將 {name} 設為靜音",
+            "muted": "已將 {name} 設為靜音。",
+            "settings": "通知設定",
+            "cancel": "取消"
+        }
+    },
+    "widgets": {
+        "headline": {
+            "both": "{waiting, plural, other {# 位需要您}} · {working} 位工作中",
+            "waiting": "{waiting, plural, other {# 位需要您}}",
+            "working": "{working} 位工作中",
+            "none": "全部完成"
+        },
+        "crew": "團隊",
+        "needsYou": "需要您",
+        "atWork": "工作中",
+        "allDone": "全部完成",
+        "you": "您",
+        "stopped": "已停止",
+        "minutes": "{count} 分",
+        "asks": "{name} 在問",
+        "othersAtWork": "另有 {count} 位工作中"
+    }
+}

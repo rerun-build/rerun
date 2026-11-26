@@ -1,0 +1,50 @@
+{
+    "metaTitle": "關於 Rerun：打造您的 AI 同事的公司",
+    "metaDescription": "Rerun 打造在您的 ChatGPT 或 Claude 方案上運作的 AI 同事。開源、可自行架設，由盧森堡的 Reunit SA 營運。",
+    "eyebrow": "關於",
+    "headline": "我們打造的，是我們自己想聘請的同事。",
+    "lede": "Rerun 為團隊提供負責業務、客服、行銷與行政的 AI 同事。他們在您自己的應用程式裡工作，使用您的 ChatGPT 或 Claude 方案、方案內含的點數，或您自己的 API 金鑰。",
+    "mission": {
+        "label": "為什麼選擇 Rerun",
+        "title": "交出的是工作，不是流程。",
+        "first": "大多數 AI 工具要您畫流程圖，或守在聊天視窗前。同事則是直接接下一份工作：讀取團隊寫下的內容，在自己的螢幕上開啟您的應用程式，依排程工作，並在做出任何重大決定前先停下來詢問。",
+        "second": "小團隊應該能在幾分鐘內聘到這樣的幫手，不必額外付費就能邀請所有人，而且就算筆電闔上也能持續運作。"
+    },
+    "principles": {
+        "label": "我們如何打造",
+        "title": "我們堅持的三個選擇。",
+        "items": {
+            "machine": {
+                "title": "每個工作區一台機器",
+                "body": "每個工作區都有一台專屬機器，架設在德國。您的同事日夜在那裡運作，與其他客戶完全分開。"
+            },
+            "openSource": {
+                "title": "開源",
+                "body": "Rerun 以 AGPL-3.0 授權開源。您可以閱讀程式碼、追蹤每一次變更，或架設在自己的伺服器上。"
+            },
+            "yourModel": {
+                "title": "您的模型，您的方案",
+                "body": "同事使用您已付費的 ChatGPT 或 Claude 方案、方案內含的點數，或您自己的 API 金鑰運作。"
+            }
+        }
+    },
+    "company": {
+        "label": "公司",
+        "title": "從盧森堡營運。",
+        "body": "Rerun 由 Reunit SA 打造與營運，這是一家在盧森堡註冊的 société anonyme，地址為 177 Rue de Luxembourg, L-8077 Bertrange。",
+        "founder": "由 <link>Clément Janssens</link> 創立。"
+    },
+    "contact": {
+        "label": "聯絡我們",
+        "title": "與我們聊聊。",
+        "email": "問題、媒體或合作洽詢：<link>help@rerun.build</link>。",
+        "links": {
+            "docs": "說明文件",
+            "brandKit": "品牌素材",
+            "github": "GitHub",
+            "x": "X",
+            "linkedin": "LinkedIn",
+            "discord": "Discord"
+        }
+    }
+}

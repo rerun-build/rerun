@@ -1,0 +1,613 @@
+{
+    "actions": {
+        "copy": "複製",
+        "copied": "已複製",
+        "connect": "連接",
+        "cancel": "取消",
+        "continue": "繼續",
+        "notNow": "暫時不要",
+        "copiedExclaim": "已複製！"
+    },
+    "sources": {
+        "used": "使用了 {count, plural, other {# 個來源}}"
+    },
+    "draft": {
+        "label": "草稿"
+    },
+    "mcpServer": {
+        "failed": "無法連接 {name}",
+        "notAdded": "未新增",
+        "added": "已新增 {name}",
+        "custom": "自訂 MCP 伺服器",
+        "customWithHost": "自訂 MCP 伺服器 · {host}"
+    },
+    "mcpSignIn": {
+        "title": "登入 {name}"
+    },
+    "mentions": {
+        "coworkers": "同事",
+        "skills": "技能",
+        "computers": "電腦",
+        "button": "提及同事、技能或電腦",
+        "coworker": {
+            "action": "提及同事",
+            "description": "邀請同事加入這個對話",
+            "empty": "這個工作區還沒有其他同事"
+        },
+        "skill": {
+            "action": "使用技能",
+            "description": "執行同事已知的已儲存操作指南",
+            "empty": "這位同事還沒有技能"
+        },
+        "computer": {
+            "action": "使用電腦",
+            "description": "讓您的同事在已連結的電腦上工作",
+            "empty": "尚未連結任何電腦"
+        }
+    },
+    "paidSources": {
+        "count": "{count, plural, other {# 個來源}}",
+        "emailsVerified": "已驗證 {checked} 個電子郵件中的 {valid} 個"
+    },
+    "tableCard": {
+        "openDisabledReason": "請從看板開啟這位同事，以瀏覽它的資料庫。"
+    },
+    "conversation": {
+        "emptyTitle": "尚無訊息",
+        "emptyDescription": "開始對話後，訊息就會顯示在這裡",
+        "scrollToLatest": "捲動到最新訊息"
+    },
+    "brainProposal": {
+        "create": "新的 Brain 頁面：{title}",
+        "edit": "Brain 變更：{title}",
+        "description": "已提出待審核。在有人接受之前，不會有任何變更。",
+        "review": "審核"
+    },
+    "attachments": {
+        "attach": "附加檔案",
+        "open": "開啟 {name}",
+        "position": "{current} / {total}",
+        "previous": "上一個附件",
+        "next": "下一個附件",
+        "download": "下載",
+        "waiting": "等待中",
+        "finishing": "即將完成",
+        "progress": "{percent}%",
+        "progressWithEta": "{percent}% · {eta}",
+        "fileFallback": "檔案",
+        "uploading": "正在上傳 {name}",
+        "retryUpload": "重試上傳",
+        "cancelUpload": "取消上傳",
+        "remove": "移除附件",
+        "openMore": "再開啟 {count} 個",
+        "uploadFailed": "上傳失敗",
+        "uploadingProgress": "上傳中 · {percent}%",
+        "retryUploading": "重試上傳 {name}",
+        "removeNamed": "移除 {name}"
+    },
+    "screen": {
+        "openBrowser": "開啟瀏覽器",
+        "takeControl": "接手控制"
+    },
+    "composer": {
+        "link": {
+            "open": "開啟",
+            "unlink": "移除連結"
+        },
+        "subscriptionCta": "已經在付費使用 AI 訂閱了嗎？讓這位同事使用它執行。",
+        "placeholder": "輸入 @ 提及同事、/ 使用技能、# 使用電腦",
+        "placeholderNoSkill": "輸入 @ 提及同事、# 使用電腦",
+        "attachmentsMissing": "部分附件未上傳。傳送前請先移除並重新附加。",
+        "attachmentsFailed": "{count, plural, other {# 個附件上傳失敗。傳送前請重試或移除。}}",
+        "noFiles": "這個聊天目前還無法接收檔案。",
+        "sendFailed": "無法傳送您的訊息",
+        "openEditor": "開啟完整編輯器",
+        "stop": "停止目前的執行",
+        "editor": {
+            "title": "撰寫您的訊息",
+            "description": "有空間整理較長的訊息。按 Enter 會換行。",
+            "hint": "按 Cmd + Enter 傳送",
+            "cancel": "取消",
+            "send": "傳送"
+        }
+    },
+    "message": {
+        "showLess": "顯示較少",
+        "showMore": "顯示更多",
+        "openFile": "開啟 {path}",
+        "branch": {
+            "previous": "上一個分支",
+            "next": "下一個分支",
+            "page": "第 {current} 個，共 {total} 個"
+        },
+        "goodResponse": "回應良好",
+        "badResponse": "回應不佳",
+        "regenerate": "重新產生",
+        "relayedFor": "{named, select, yes {{name} 代 {person} 回覆} other {Chief of Staff 代 {person} 回覆}}"
+    },
+    "installGate": {
+        "title": "設定 {name}",
+        "inProgressTitle": "正在設定 {name}",
+        "inProgressHint": "在另一個對話中",
+        "facts": "{apps, plural, =0 {約 {minutes} 分鐘} other {# 個應用程式 · 約 {minutes} 分鐘}}",
+        "continue": "繼續設定",
+        "installing": "安裝中",
+        "install": "安裝 {name}",
+        "skip": "暫時略過"
+    },
+    "activity": {
+        "thinking": "思考中...",
+        "processing": "正在處理您的請求...",
+        "crafting": "正在撰寫回覆...",
+        "writing": "撰寫中...",
+        "runningTool": "正在執行 {tool}",
+        "waitingOn": "正在等待 {name}",
+        "building": "正在建立 {name}",
+        "buildingCoworkers": "正在建立 {count, plural, other {# 位同事}} · 已完成 {done} 位",
+        "waitingOnSubCoworkers": "正在等待 {count, plural, other {# 位子同事}} · 已完成 {done} 位"
+    },
+    "hitlCue": {
+        "question": "{count, plural, =0 {有問題待回答} other {# 個問題待回答}}",
+        "approval": "{count, plural, =0 {需要核准} other {# 項需要核准}}",
+        "secret": "{count, plural, =0 {需要憑證} other {需要 # 組憑證}}",
+        "mcpNamed": "登入 {name}",
+        "mcp": "需要登入",
+        "service": "{count, plural, =0 {有應用程式待連接} other {# 個應用程式待連接}}",
+        "takeover": "輪到您操作螢幕",
+        "spend": "有支出待核准",
+        "computer": "核准在 #{computer} 上執行指令",
+        "feature": "要傳送給 {brand} 團隊的請求"
+    },
+    "pendingHitl": {
+        "goTo": "{label}，前往查看"
+    },
+    "reasoning": {
+        "thinking": "思考中...",
+        "thought": "想法"
+    },
+    "secretRequest": {
+        "saveFailed": "無法儲存憑證"
+    },
+    "brainChange": {
+        "headline": {
+            "saved": "Brain 已更新：{title}",
+            "created": "新的 Brain 頁面：{title}",
+            "deleted": "已從 Brain 移除：{title}",
+            "accepted": "已接受變更：{title}",
+            "acceptedBy": "已接受 {name} 的變更：{title}",
+            "dismissed": "已略過變更：{title}",
+            "dismissedBy": "已略過 {name} 的變更：{title}"
+        },
+        "notes": {
+            "saved": "已儲存。每位同事從下次執行起都會讀取它。",
+            "deleted": "已不再有同事讀取它。它的歷史記錄會保留。",
+            "accepted": "已儲存。每位同事從下次執行起都會讀取它。",
+            "dismissed": "頁面未變更。"
+        },
+        "undone": "已復原：{title}",
+        "undoneNote": "已恢復為先前的版本。",
+        "undo": "復原",
+        "open": "開啟"
+    },
+    "compaction": {
+        "running": "正在壓縮上下文…",
+        "failed": "上下文壓縮失敗",
+        "done": "上下文已壓縮",
+        "summarized": "{count, plural, other {已摘要 # 則較早的訊息}}",
+        "recovered": "已釋出約 {tokens} 個 token"
+    },
+    "providerSwitch": {
+        "limit": "已達 {plan} 上限 · {model}",
+        "limitUntil": "已達 {plan} 上限 · {model} 至 {time}",
+        "limitUntilDate": "已達 {plan} 上限 · {model} 至 {date} {time}",
+        "back": "{plan} 已重置。已切回 {model}。"
+    },
+    "scheduledRun": {
+        "label": "排程執行",
+        "viewPrompt": "檢視提示詞",
+        "promptTitle": "{name} 提示詞"
+    },
+    "steps": {
+        "count": "{count, plural, other {# 個步驟}}",
+        "countWithFailures": "{count, plural, other {# 個步驟}}，{failed} 個失敗",
+        "failed": "{failed} 個失敗",
+        "thinking": "思考中",
+        "compacting": "壓縮中"
+    },
+    "subRun": {
+        "failuresInARow": "連續失敗 {count} 次",
+        "idle": "閒置 {minutes} 分鐘",
+        "stopTask": "停止這項任務",
+        "stopped": "已停止，已保留部分成果",
+        "stoppedWithRun": "已隨執行一起停止",
+        "failed": "失敗",
+        "earlier": "+{count} 個較早的步驟",
+        "verbs": {
+            "search": "正在搜尋 {summary}",
+            "read": "正在讀取 {summary}",
+            "browse": "正在瀏覽 {summary}",
+            "run": "正在執行 {summary}",
+            "write": "正在寫入 {summary}",
+            "edit": "正在編輯 {summary}"
+        }
+    },
+    "triggerPayload": {
+        "truncated": "已截斷",
+        "empty": "沒有承載資料",
+        "payload": "承載資料"
+    },
+    "voice": {
+        "sendFailed": "無法傳送這段錄音。",
+        "sendFailedHint": "請重試，或捨棄它。",
+        "waitingForMicrophone": "正在等待麥克風...",
+        "microphone": "麥克風...",
+        "transcribing": "轉錄中...",
+        "hideTranscript": "隱藏逐字稿",
+        "transcript": "逐字稿",
+        "copyTranscript": "複製逐字稿",
+        "pause": "暫停",
+        "play": "播放語音訊息",
+        "seek": "跳轉",
+        "record": "錄製語音訊息",
+        "discard": "捨棄",
+        "discardLabel": "捨棄錄音",
+        "retry": "重試",
+        "send": "傳送",
+        "retryLabel": "重新傳送錄音",
+        "sendLabel": "傳送錄音",
+        "unsupported": "此瀏覽器不支援語音訊息。",
+        "microphoneBlocked": "麥克風存取已被封鎖。請在瀏覽器設定中允許，才能錄音。",
+        "noMicrophone": "沒有可用的麥克風。",
+        "startFailed": "無法開始錄音。",
+        "nothingHeard": "這段錄音中聽不到任何聲音。",
+        "voiceMessageFailed": "無法傳送您的語音訊息。",
+        "nothingRecorded": "沒有錄到任何內容。"
+    },
+    "agentInstall": {
+        "started": "已開始安裝",
+        "complete": "安裝完成",
+        "viewGuide": "檢視指南",
+        "guideTitle": "{name} 安裝指南"
+    },
+    "setupEvents": {
+        "notificationSent": "已傳送通知給您",
+        "read": "已讀",
+        "schedulesOn": "{count, plural, other {已開啟 # 個排程}}",
+        "triggersOn": "{count, plural, other {已開啟 # 個觸發器}}",
+        "setUp": "{name} 已設定完成",
+        "setupComplete": "設定完成",
+        "connectedHint": "已連接，同事可以使用",
+        "signInHint": "登入一次，讓同事可以使用",
+        "connected": "已連接",
+        "signIn": "登入"
+    },
+    "takeover": {
+        "opened": "瀏覽器已在您同事的桌面上開啟。完成後請回到這裡。",
+        "opensSite": "在您同事的瀏覽器中開啟 {site}，由您操作。",
+        "opens": "開啟您同事的瀏覽器，由您操作。",
+        "skipLabel": "略過接手瀏覽器",
+        "privacy": "您登入的內容會保留在您機器上這位同事的瀏覽器中。",
+        "openAgain": "再次開啟",
+        "closing": "正在關閉…",
+        "done": "完成",
+        "skip": "略過",
+        "openBrowser": "開啟瀏覽器"
+    },
+    "video": {
+        "play": "播放 {name}",
+        "pause": "暫停 {name}",
+        "previewUnavailable": "無法預覽",
+        "openFullScreen": "以全螢幕開啟 {name}"
+    },
+    "tool": {
+        "error": "錯誤",
+        "output": "輸出",
+        "input": "輸入",
+        "completedIn": "於 {duration} 內完成"
+    },
+    "webhookRun": {
+        "label": "已收到 Webhook",
+        "viewPrompt": "檢視提示詞",
+        "viewPayload": "檢視承載資料",
+        "promptTitle": "{name} 提示詞",
+        "payloadTitle": "{name} 承載資料"
+    },
+    "question": {
+        "tooManyFiles": "最多可附加 {max} 個檔案。有 {rejected} 個未加入。",
+        "uploadsFailed": "{count, plural, other {有 # 個附件無法上傳。回答前請重試或移除。}}"
+    },
+    "queued": {
+        "stopping": "正在停止目前的執行",
+        "badge": "已排入佇列",
+        "attachmentsOnly": "僅有附件",
+        "sendNowStops": "立即傳送，將停止目前的執行",
+        "sendNow": "立即傳送",
+        "sendNowLabel": "立即傳送佇列中的訊息",
+        "remove": "移除",
+        "removeLabel": "移除佇列中的訊息"
+    },
+    "context": {
+        "usedLabel": "已使用的上下文：{percent}%",
+        "title": "上下文",
+        "input": "輸入",
+        "cached": "快取",
+        "reasoning": "推理",
+        "output": "輸出",
+        "total": "總計"
+    },
+    "feedback": {
+        "negativeTitle": "提供負面意見",
+        "positiveTitle": "提供正面意見",
+        "categoryLabel": "您想回報哪種類型的問題？",
+        "categoryPlaceholder": "請選擇…",
+        "detailsLabel": "請提供詳細資訊",
+        "negativePlaceholder": "這則回應有哪裡讓您不滿意？",
+        "positivePlaceholder": "這則回應有哪裡讓您滿意？",
+        "disclaimer": "送出此回報會將這段對話分享給 {brand} 團隊，以便我們改善您的同事。",
+        "cancel": "取消",
+        "submit": "送出",
+        "categories": {
+            "ui_bug": "介面錯誤",
+            "did_not_follow": "沒有依照我的要求",
+            "not_factual": "內容與事實不符",
+            "incomplete": "回應不完整",
+            "wrong_tool": "使用了錯誤的工具或應用程式",
+            "tool_error": "工具或連線錯誤",
+            "too_slow": "太慢",
+            "memory": "記憶相關問題",
+            "other": "其他"
+        },
+        "removeFailed": "無法移除您的意見回饋",
+        "saveFailed": "無法儲存您的意見回饋",
+        "thanks": "感謝您的意見回饋"
+    },
+    "providerError": {
+        "fallbackTitle": "發生錯誤",
+        "runInFlight": "先前啟動的執行仍佔用著這個對話。請停止它以傳送您的訊息。",
+        "stop": {
+            "title": "停止這次執行",
+            "cta": "停止執行",
+            "description": "釋出對話，讓您可以傳送訊息。"
+        },
+        "newConversation": {
+            "title": "開始新的對話",
+            "cta": "新對話",
+            "description": "與這位同事開啟全新的對話。"
+        },
+        "continue": {
+            "title": "繼續執行",
+            "cta": "繼續",
+            "description": "從同事被中斷的地方接續。"
+        },
+        "retry": {
+            "title": "再試一次",
+            "cta": "重試",
+            "description": "再次傳送您的上一則訊息。"
+        },
+        "switch": {
+            "title": "切換到其他模型",
+            "cta": "切換",
+            "descriptionModel": "為這個對話選擇其他模型。",
+            "descriptionConnection": "選擇這個工作區的其他連線。"
+        },
+        "reconnect": {
+            "title": "重新連線",
+            "cta": "重新連線",
+            "description": "在這位同事使用的連線上重新登入。",
+            "descriptionReplaceKey": "在這位同事使用的連線上貼上新的金鑰。"
+        }
+    },
+    "budget": {
+        "title": "{brand} 點數",
+        "paused": {
+            "title": "{brand} 點數已暫停",
+            "body": "在有人恢復之前，您的同事無法使用 {brand} 模型或付費資料。",
+            "actionTitle": "恢復 {brand} 點數",
+            "actionDescription": "支出會立即重新開始。",
+            "cta": "恢復"
+        },
+        "preTrial": {
+            "body": "您已用完新帳號附贈的 {credits}。訂閱後即可解鎖其餘功能。",
+            "actionDescription": "您的同事會繼續工作，可隨時取消。"
+        },
+        "subscribe": {
+            "title": "立即訂閱",
+            "cta": "訂閱",
+            "descriptionTrial": "今天結束您的試用。每月包含 {credits}。",
+            "description": "每月包含 {credits}。"
+        },
+        "topUp": {
+            "title": "加購您的 {brand} 點數",
+            "cta": "加購",
+            "description": "或者等待，下個月就會重置。"
+        },
+        "usedUp": {
+            "noCredit": "這個工作區還沒有 {brand} 點數。",
+            "trial": "您已用完免費試用的 {credits}。",
+            "period": "您已用完本期的 {brand} 點數。"
+        },
+        "ownConnection": {
+            "body": "這個對話使用 {brand} 執行，而您的 {plan} 方案已連接。"
+        },
+        "runOn": "使用 {plan} 執行",
+        "or": "或",
+        "connectProvider": {
+            "body": "已經在付費使用 Claude 或 ChatGPT 了嗎？讓您的同事使用該方案執行，在這裡不需額外付費。",
+            "claude": "連接 Claude",
+            "chatgpt": "連接 ChatGPT"
+        },
+        "subscribeToKeepWorking": "訂閱以讓您的同事繼續工作。",
+        "resetsNextMonth": "下個月就會重置。",
+        "lifetime": {
+            "ownConnection": "您的終身方案使用您自己的 AI 執行，而您的 {plan} 方案已連接。",
+            "connectProvider": "您的終身方案使用您自己的 AI 執行。請新增 API 金鑰或連接 ChatGPT，讓您的同事繼續工作。",
+            "connectProviderWithClaude": "您的終身方案使用您自己的 AI 執行。請新增 API 金鑰，或連接 Claude 或 ChatGPT，讓您的同事繼續工作。",
+            "apiKeyTitle": "使用 API 金鑰",
+            "apiKeyDescription": "Anthropic、OpenAI、Google、OpenRouter 或自訂端點。",
+            "apiKeyCta": "新增金鑰",
+            "body": "您的終身方案使用您自己的 AI 執行。",
+            "connectTitle": "連接您的 AI",
+            "connectDescription": "API 金鑰或 ChatGPT。",
+            "connectDescriptionWithClaude": "API 金鑰、Claude 或 ChatGPT。",
+            "connectCta": "連接"
+        },
+        "trial": {
+            "onPro": "您正在使用 Pro。",
+            "resuming": "您的同事會接續這項任務。",
+            "resumingNamed": "{name} 會接續這項任務。",
+            "title": "試用點數已用完",
+            "stopped": "{name} 已停止。",
+            "continueWithPro": "以 Pro 繼續 · {price}/月",
+            "useMyPlan": "或使用我的方案："
+        }
+    },
+    "receipt": {
+        "status": {
+            "connected": "已連接",
+            "skipped": "已略過",
+            "notReconnected": "未重新連線",
+            "notFound": "找不到",
+            "stored": "已儲存",
+            "approved": "已核准",
+            "notNow": "暫時不要"
+        },
+        "apps": {
+            "title": "應用程式",
+            "meta": "已連接 {connected} 個，共 {total} 個",
+            "insteadOf": "取代 {name}"
+        },
+        "answers": {
+            "title": {
+                "one": "回答",
+                "other": "回答"
+            },
+            "meta": "已回答 {answered} 個，共 {total} 個"
+        },
+        "keys": {
+            "title": "金鑰",
+            "meta": "已儲存 {stored} 個，共 {total} 個",
+            "note": "儲存在 Box 上。同事只會看到名稱。",
+            "vaultNote": "儲存在 Vault 中。Chief of Staff 只會看到名稱。"
+        },
+        "approvals": {
+            "title": {
+                "one": "核准",
+                "other": "核准"
+            },
+            "metaBoth": "{approved} 項已核准，{declined} 項暫時不要",
+            "metaApproved": "{approved} 項已核准",
+            "metaDeclined": "{declined} 項暫時不要"
+        },
+        "mcp": {
+            "title": "MCP 伺服器"
+        },
+        "takeover": {
+            "handedBackOn": "您已在 {url} 交還瀏覽器",
+            "handedBack": "您已交還瀏覽器"
+        },
+        "dismissed": {
+            "service": "您關閉了應用程式設定",
+            "question": "您略過了這些問題",
+            "secret": "您拒絕分享金鑰",
+            "mcp": "您略過了登入",
+            "takeover": "您把瀏覽器交給了同事",
+            "feature": "請求未傳送"
+        },
+        "computer": {
+            "status": {
+                "allowed": "已允許",
+                "always": "一律允許",
+                "denied": "已拒絕"
+            },
+            "screen": "螢幕、滑鼠和鍵盤"
+        }
+    },
+    "agentChat": {
+        "stopFailed": "無法停止目前的執行。您的訊息會在執行結束後傳送。",
+        "selectModel": "請選擇模型以開始：開啟下方的模型選單。",
+        "emptyTitle": "開始對話",
+        "emptyDescription": "傳送訊息給這位同事",
+        "runStoppedResponding": "執行已停止回應。請停止它以傳送其他訊息。",
+        "continueWhereLeftOff": "從你剛才中斷的地方繼續。",
+        "alwaysAllowFailed": "無法開啟「無需詢問即可花費」。這次核准在預估範圍內仍然有效。"
+    },
+    "promptInput": {
+        "tooLarge": "{count, plural, =1 {{names} 檔案過大，無法附加。} =2 {{names} 檔案過大，無法附加。} other {{names} 和其他 {more} 個檔案過大，無法附加。}}",
+        "addFiles": "新增相片或檔案",
+        "takeScreenshot": "擷取螢幕畫面",
+        "noMatchingFiles": "沒有符合可接受類型的檔案。",
+        "tooManyFiles": "最多可附加 {max} 個檔案。有 {rejected} 個未加入。",
+        "uploadFiles": "上傳檔案",
+        "dropFiles": "拖放檔案以附加",
+        "placeholder": "您想了解什麼？",
+        "stop": "停止",
+        "submit": "送出"
+    },
+    "spend": {
+        "estimatedTotal": "預估總計",
+        "creditsUnit": "{count, plural, other {點}}",
+        "creditsLeft": "剩餘 {amount} {count, plural, other {點}}",
+        "creditsMissing": "不足 {amount}",
+        "notNow": "暫時不要",
+        "alwaysAllow": "一律允許",
+        "approveOnce": "核准一次",
+        "addCredits": "加購點數",
+        "receipt": {
+            "approvedOnce": "已核准一次",
+            "alwaysAllowed": "一律允許",
+            "notNow": "暫時不要",
+            "ofTotal": "/ {amount} {count, plural, other {點}}"
+        }
+    },
+    "computerAccess": {
+        "titleCommand": "在 <computer></computer> 上執行指令",
+        "titleCommands": "在 <computer></computer> 上執行 {count} 個指令",
+        "titleScreen": "使用 <computer></computer> 的螢幕",
+        "deny": "拒絕",
+        "allow": "允許",
+        "alwaysAllow": "一律允許 {program}",
+        "interpreterWarning": "一律允許 {program}，等於允許它執行的任何程式碼",
+        "alwaysFailed": "無法在電腦上保留這條規則：已允許這一次。",
+        "titleFiles": "{count, plural, other {使用 <computer></computer> 上的 # 個檔案}}",
+        "alwaysAllowFolder": "一律允許此資料夾",
+        "folderNote": "「一律」會允許 {folder} 中的所有檔案",
+        "inFolder": "位於 {folder}"
+    },
+    "computerJob": {
+        "state": {
+            "running": "執行中",
+            "succeeded": "完成",
+            "failed": "失敗",
+            "stopped": "已停止",
+            "lost": "已中斷",
+            "offline": "電腦離線",
+            "gone": "無法使用"
+        },
+        "stop": "停止",
+        "offlineNote": "它會在那台電腦上繼續執行。電腦恢復連線後，同事就會收到結果。",
+        "lostNote": "執行期間，電腦上的 {brand} 被關閉了。",
+        "goneNote": "已無法讀取這項工作：電腦已被移除，或電腦已不再認得這項工作。"
+    },
+    "jobEnd": {
+        "label": "<computer>#{handle}</computer> 上的工作已結束",
+        "viewReport": "檢視報告",
+        "reportTitle": "#{computer} 回報的內容"
+    },
+    "featureRequest": {
+        "kinds": {
+            "feature": "功能",
+            "bug": "錯誤",
+            "improvement": "改善"
+        },
+        "today": "<strong>目前：</strong>{workaround}",
+        "notNow": "暫時不要",
+        "edit": "編輯",
+        "done": "完成",
+        "send": "傳送給團隊",
+        "titleLabel": "標題",
+        "descriptionLabel": "說明",
+        "sent": "已傳送給 {brand} 團隊：<muted>{title}</muted>",
+        "reviewIt": "檢視",
+        "sendFailed": "無法傳送請求。請再試一次。"
+    }
+}

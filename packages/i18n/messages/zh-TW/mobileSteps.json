@@ -1,0 +1,43 @@
+{
+    "group": {
+        "steps": "{count, plural, other {# 個步驟}}",
+        "stepsWithFailures": "{count, plural, other {# 個步驟}}，{failed} 個失敗",
+        "failed": "{failed} 個失敗"
+    },
+    "tool": {
+        "input": "輸入",
+        "error": "錯誤",
+        "output": "輸出",
+        "completedInMs": "{ms} 毫秒內完成",
+        "completedInSeconds": "{seconds} 秒內完成"
+    },
+    "reasoning": {
+        "thinking": "思考中...",
+        "thought": "思考過程"
+    },
+    "compaction": {
+        "running": "正在壓縮上下文…",
+        "failed": "上下文壓縮失敗",
+        "done": "上下文已壓縮",
+        "summarized": "已摘要 {count} 則較早的訊息",
+        "recovered": "已釋出約 {count} 個 token"
+    },
+    "subRun": {
+        "failures": "{count, plural, other {# 次失敗}}",
+        "idle": "閒置 {minutes} 分鐘",
+        "stop": "停止此任務",
+        "failed": "失敗",
+        "stopped": "已停止，保留部分成果",
+        "stoppedWithRun": "已隨執行一併停止",
+        "earlier": "另有 {count} 個較早的步驟",
+        "verbs": {
+            "web_search": "正在搜尋 {summary}",
+            "web_fetch": "正在讀取 {summary}",
+            "browser_navigate": "正在瀏覽 {summary}",
+            "shell_exec": "正在執行 {summary}",
+            "fs_read": "正在讀取 {summary}",
+            "fs_write": "正在寫入 {summary}",
+            "fs_edit": "正在編輯 {summary}"
+        }
+    }
+}

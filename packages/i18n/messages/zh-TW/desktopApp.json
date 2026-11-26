@@ -1,0 +1,137 @@
+{
+    "menu": {
+        "app": {
+            "about": "關於 {name}",
+            "hide": "隱藏 {name}",
+            "hideOthers": "隱藏其他",
+            "showAll": "顯示全部",
+            "quit": "結束 {name}",
+            "checkForUpdates": "檢查更新…",
+            "changeServer": "變更伺服器…"
+        },
+        "file": {
+            "title": "檔案",
+            "closeWindow": "關閉視窗",
+            "newWindow": "新增視窗"
+        },
+        "edit": {
+            "title": "編輯",
+            "undo": "還原",
+            "redo": "重做",
+            "cut": "剪下",
+            "copy": "拷貝",
+            "paste": "貼上",
+            "pasteAndMatchStyle": "貼上並符合樣式",
+            "delete": "刪除",
+            "selectAll": "全選",
+            "find": "尋找…"
+        },
+        "view": {
+            "title": "顯示方式",
+            "reload": "重新載入",
+            "forceReload": "強制重新載入",
+            "toggleDevTools": "切換開發者工具",
+            "actualSize": "實際大小",
+            "zoomIn": "放大",
+            "zoomOut": "縮小",
+            "toggleFullScreen": "切換全螢幕"
+        },
+        "window": {
+            "title": "視窗",
+            "minimize": "縮到最小",
+            "zoom": "縮放",
+            "front": "將全部移至最前"
+        },
+        "help": {
+            "title": "說明",
+            "docs": "說明文件"
+        }
+    },
+    "offline": {
+        "title": "無法連線到 Rerun",
+        "body": "請檢查您的網路連線。App 會自動重新連線到 {host}。",
+        "unavailable": "{host} 目前沒有回應。App 會自動再試一次。",
+        "retry": "再試一次"
+    },
+    "incompatible": {
+        "title": "請更新 Rerun 以繼續使用",
+        "body": "這個版本的 App 太舊，無法搭配 {host} 使用。",
+        "download": "下載最新版本",
+        "downloading": "正在下載更新… {percent}%",
+        "restart": "重新啟動以更新"
+    },
+    "unload": {
+        "message": "要離開這個頁面嗎？",
+        "detail": "有同事仍在工作中，或有檔案的變更尚未儲存。",
+        "leave": "離開",
+        "stay": "留下"
+    },
+    "find": {
+        "placeholder": "在頁面中尋找",
+        "matches": "{active} / {total}",
+        "noMatches": "沒有結果",
+        "previous": "上一個相符項目",
+        "next": "下一個相符項目",
+        "close": "關閉"
+    },
+    "server": {
+        "title": "連線到您的伺服器",
+        "description": "輸入您使用的 Rerun 伺服器位址。",
+        "label": "伺服器位址",
+        "connect": "連線",
+        "invalid": "請輸入類似 rerun.example.com 的位址。",
+        "unreachable": "這個位址沒有回應。",
+        "notRerun": "這個位址不是 Rerun 伺服器。",
+        "tooOld": "這個伺服器需要 {version} 或更新版本的 App。",
+        "insecure": "這個位址未加密。除非伺服器在這台電腦上執行，否則請使用 https://。",
+        "useRerunCloud": "使用 Rerun Cloud",
+        "cancel": "取消"
+    },
+    "updates": {
+        "upToDate": "您使用的是最新版本",
+        "upToDateDetail": "Rerun {version} 是最新版本。",
+        "failed": "無法檢查更新",
+        "readyToInstall": "Rerun {version} 已可安裝",
+        "readyDetail": "App 會重新啟動以完成更新。",
+        "restartNow": "立即重新啟動",
+        "later": "稍後"
+    },
+    "tray": {
+        "open": "開啟 {name}",
+        "waiting": "{count, plural, other {# 個正在等您}}",
+        "openAtLogin": "登入時開啟",
+        "stillRunning": "{name} 會繼續在這裡執行。請從這個圖示結束它。",
+        "quickAsk": "快速提問",
+        "quickAskVoice": "語音快速提問"
+    },
+    "context": {
+        "addToDictionary": "加入字典",
+        "openLink": "在瀏覽器中開啟連結",
+        "copyLink": "複製連結",
+        "copyImage": "複製圖片",
+        "saveImage": "儲存圖片"
+    },
+    "computer": {
+        "defaultName": "我的電腦",
+        "chooseFolder": "選擇同事工作用的資料夾",
+        "trayOnline": "這台電腦：線上",
+        "trayOffline": "這台電腦：離線",
+        "trayPaused": "這台電腦：已暫停",
+        "trayJobs": "{count, plural, other {這台電腦：# 項工作執行中}}",
+        "pause": "暫停同事使用這台電腦",
+        "resume": "恢復同事使用這台電腦",
+        "quitWithJobs": "{count, plural, other {這台電腦上有 # 項同事的工作正在執行}}",
+        "quitWithJobsDetail": "結束 Rerun 會停止這些工作。若要讓它繼續執行，請改為關閉視窗。",
+        "quitAnyway": "仍要結束",
+        "keepRunning": "繼續執行"
+    },
+    "dock": {
+        "collapse": "收合",
+        "expand": "展開",
+        "moveLeft": "移到左側邊緣",
+        "moveRight": "移到右側邊緣",
+        "hide": "隱藏 Dock",
+        "hideCoworker": "從 Dock 隱藏 {name}",
+        "showInDock": "在 Dock 中顯示"
+    }
+}

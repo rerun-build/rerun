@@ -1,0 +1,248 @@
+{
+    "loading": "載入中...",
+    "theme": "主題",
+    "language": "語言",
+    "signIn": "登入",
+    "purchaseCancelled": "已取消購買",
+    "help": {
+        "label": "說明",
+        "contactSupport": "聯絡客服"
+    },
+    "menu": {
+        "whatsNew": "最新消息",
+        "gettingStarted": "開始使用",
+        "docs": "說明文件",
+        "community": "社群",
+        "shortcuts": "快捷鍵",
+        "installApp": "安裝 App",
+        "desktopApp": "下載桌面版 App",
+        "hireExpert": "聘請專家"
+    },
+    "power": {
+        "menuItem": "重新啟動機器",
+        "cancel": "取消",
+        "failed": "發生錯誤",
+        "restart": {
+            "title": "要重新啟動機器嗎？",
+            "description": "這個工作區的所有同事將有幾分鐘無法使用。",
+            "confirmLabel": "重新啟動",
+            "pending": "正在重新啟動機器…",
+            "success": "已開始重新啟動，機器幾分鐘後就會恢復。"
+        }
+    },
+    "providerStatus": {
+        "headline": {
+            "one": "{providers} 目前發生問題。",
+            "many": "{providers} 目前發生問題。"
+        },
+        "headlineLong": {
+            "one": "{providers} 目前發生問題。您的同事可能會變慢或執行失敗。",
+            "many": "{providers} 目前發生問題。您的同事可能會變慢或執行失敗。"
+        },
+        "viewStatus": "查看狀態",
+        "dismiss": "關閉供應商狀態"
+    },
+    "sidePanel": {
+        "close": "關閉面板",
+        "resize": "調整面板大小"
+    },
+    "paused": {
+        "title": "工作區已暫停。",
+        "paymentFailed": "付款失敗，工作區已暫停。",
+        "saved": "您的同事及其資料都已保留。",
+        "savedUntil": "您的同事及其資料會保留到 {date}。",
+        "updatePayment": "更新付款方式",
+        "subscribe": "訂閱以恢復"
+    },
+    "sandboxArchived": {
+        "title": "沙盒閒置 30 天後已封存。",
+        "requested": "已申請重新啟用。",
+        "declined": "重新啟用的申請未獲核准。",
+        "declinedHint": "如果您認為這是誤判，請與我們聯絡。",
+        "savedUntil": "您的同事及其資料會保留到 {date}。",
+        "expired": "保留的資料已過期，重新啟用後會是一個空的沙盒。",
+        "requestedReason": "我們正在審核您的申請",
+        "request": "申請重新啟用"
+    },
+    "restoring": {
+        "title": "正在還原您的工作區…",
+        "waitingApproved": "重新啟用已核准，您排在第一位。",
+        "waitingPaid": "已收到付款，您排在第一位。",
+        "waitingHint": "幾分鐘內就會自動恢復。",
+        "failed": "您的還原需要我們這邊檢查一下。",
+        "failedApproved": "我們已收到通知，正在手動恢復您的沙盒。",
+        "failedPaid": "已收到付款。我們已收到通知，正在手動恢復您的工作區。",
+        "steps": {
+            "machine": "已分配機器",
+            "machineActive": "正在分配機器",
+            "data": "正在還原您的資料",
+            "agents": "正在喚醒您的同事"
+        }
+    },
+    "workspaceMenu": {
+        "defaultName": "工作區",
+        "summary": {
+            "sandbox": "專家沙盒",
+            "seats": "{count, plural, other {# 個席次}}",
+            "unlimitedSeats": "不限席次",
+            "limits": "{agents} 位同事 · {seats}",
+            "trial": "試用 · {limits}",
+            "lifetime": "終身方案 · {limits}",
+            "limitsUnlimited": "不限同事 · {seats}"
+        },
+        "adminOnly": {
+            "apiKeys": "只有管理員可以管理 API 金鑰",
+            "settings": "只有管理員可以變更工作區設定",
+            "servers": "只有管理員可以管理伺服器",
+            "billing": "只有管理員可以管理帳務"
+        },
+        "needsPlan": "免費試用開始後即可使用",
+        "apiKeys": "API 金鑰與 MCP",
+        "settings": "設定",
+        "members": "成員",
+        "brain": "Brain",
+        "brainProposals": "{count, plural, other {# 項待審核的提案}}",
+        "aiProviders": "AI 供應商",
+        "vault": "Vault",
+        "vaultSignedOut": "Vault 中有一個 App 已登出",
+        "computers": "電腦",
+        "servers": "伺服器",
+        "billing": "帳務",
+        "inviteFriends": "邀請朋友",
+        "freeMonth": "免費一個月",
+        "newWorkspace": "新增工作區",
+        "templates": "範本",
+        "myTemplates": "我的範本",
+        "newTemplate": "新增範本",
+        "expert": "專家",
+        "sandbox": "沙盒",
+        "preparingSandbox": "正在準備沙盒…",
+        "publicProfile": "公開個人檔案",
+        "admin": "管理",
+        "adminPanel": "管理後台",
+        "notifications": "通知",
+        "account": "帳號",
+        "signOut": "登出"
+    },
+    "update": {
+        "reload": "重新載入",
+        "available": {
+            "title": "有新版本可用",
+            "description": "重新載入以取得最新版的 {brand}。"
+        },
+        "required": {
+            "title": "{brand} 已更新",
+            "description": "新版本已上線。請重新載入以繼續。"
+        }
+    },
+    "controlCenter": {
+        "title": "控制中心",
+        "description": "{named, select, yes {前往 AI 代理、設定或對話，或詢問 {name}。} other {前往 AI 代理、設定或對話，或詢問您的 Chief of Staff。}}",
+        "back": "返回",
+        "askRerun": "{named, select, yes {詢問 {name}} other {詢問您的 Chief of Staff}}",
+        "quotedQuery": "「{query}」",
+        "unnamedBox": "未命名的 Box",
+        "pro": "Pro",
+        "boxAgents": "{count, plural, other {# 個 AI 代理}}",
+        "status": {
+            "off": "已關閉",
+            "waiting_human": "需要您處理",
+            "working": "工作中",
+            "error": "錯誤",
+            "offline": "離線"
+        },
+        "headings": {
+            "actions": "動作",
+            "settings": "設定",
+            "agents": "AI 代理",
+            "needsYou": "需要您處理",
+            "recent": "最近",
+            "boxes": "Boxes",
+            "conversations": "對話",
+            "recentConversations": "最近的對話",
+            "assistant": "{named, select, yes {{name}} other {Chief of Staff}}",
+            "open": "開啟",
+            "moveTo": "移至",
+            "bestMatches": "最佳結果"
+        },
+        "agent": {
+            "desktop": "桌面",
+            "desktopDetail": "接管這位同事的螢幕",
+            "move": "移至其他 Box",
+            "notifications": "通知",
+            "notificationsDetail": "這個 AI 代理何時聯絡您"
+        },
+        "placeholder": {
+            "rootAssistant": "{named, select, yes {搜尋或詢問 {name}…} other {搜尋或詢問您的 Chief of Staff…}}",
+            "root": "搜尋工作區中的所有內容…",
+            "agent": "在 {name} 中搜尋…",
+            "agentUnknown": "在這個 AI 代理中搜尋…",
+            "box": "搜尋這個 Box 中的 AI 代理…",
+            "move": "選擇一個 Box…"
+        },
+        "empty": {
+            "box": "這個 Box 中還沒有 AI 代理。",
+            "noMatch": "沒有符合的結果。",
+            "nothingMentions": "這個工作區中沒有任何內容提到「{query}」。"
+        },
+        "notice": {
+            "unavailable": "無法搜尋靈魂、技能、檔案、Brain 和資料表。",
+            "partial": "搜尋提前結束，可能缺少部分結果。"
+        },
+        "hints": {
+            "open": "開啟",
+            "more": "更多",
+            "searchPage": "再按一次 <keys></keys> 即可在頁面中搜尋",
+            "nextSource": "下一個來源"
+        },
+        "commands": {
+            "new_agent": "新增 AI 代理",
+            "browse_templates": "瀏覽範本",
+            "new_box": "新增 Box",
+            "ask_assistant": "{named, select, yes {詢問 {name}} other {詢問您的 Chief of Staff}}",
+            "contact_support": "聯絡客服",
+            "recenter_board": "將看板置中",
+            "toggle_theme_light": "切換為淺色主題",
+            "toggle_theme_dark": "切換為深色主題",
+            "workspace": "工作區設定",
+            "members": "成員",
+            "billing": "帳務",
+            "ai_providers": "AI 供應商",
+            "api_keys": "API 金鑰與 MCP",
+            "company_brain": "公司 Brain",
+            "shared_files": "共用檔案",
+            "account": "帳號",
+            "notifications": "通知",
+            "shortcuts": "鍵盤快捷鍵",
+            "whats_new": "最新消息"
+        },
+        "sources": {
+            "all": "全部",
+            "coworker": "同事",
+            "skill": "技能",
+            "file": "檔案",
+            "brain": "Brain",
+            "table": "資料表",
+            "conversation": "對話"
+        },
+        "hit": {
+            "sourceWhere": "{source} · {where}",
+            "shared": "共用",
+            "soul": "{box} · 靈魂",
+            "skill": "{owner} · SKILL.md",
+            "brainSkill": "Brain · SKILL.md",
+            "file": "{owner}{hasFolder, select, yes { · {folder}} other {}}{hasLine, select, yes { · 第 {line} 行} other {}}",
+            "table": "{hasOwner, select, yes {{owner} · } other {}}{table}{hasRow, select, yes { · 第 {row} 列} other {}}",
+            "conversation": "{agent} · {when}"
+        }
+    },
+    "boxNameSuggestions": "或選擇一個名稱",
+    "dashboard": {
+        "metaTitle": "儀表板",
+        "metaDescription": "您在 {brand} 上的 Boxes 和同事。"
+    },
+    "site": {
+        "title": "{brand} | 讓 AI 幫您完成工作，連睡覺時也不停",
+        "description": "從範本庫挑選一個隨時可用的 AI 代理，或自行打造，連結您的工具，它就會在雲端專屬的私人機器上全年無休地執行。免費試用 {trialDays} 天。"
+    }
+}

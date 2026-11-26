@@ -1,0 +1,329 @@
+{
+    "site": {
+        "title": "Rerun：以您的 ChatGPT 或 Claude 方案執行的 AI 員工",
+        "description": "為業務、客服、行銷和行政聘用 AI 員工。他們使用您的 ChatGPT 或 Claude 方案、內含點數或您的 API 金鑰執行。免費試用 {trialDays} 天。"
+    },
+    "nav": {
+        "items": {
+            "features": "功能",
+            "useCases": "使用案例",
+            "industries": "產業",
+            "templates": "範本",
+            "whiteLabel": "白牌方案",
+            "pricing": "價格",
+            "community": "社群",
+            "resources": "資源"
+        },
+        "features": {
+            "coworkers": {
+                "label": "同事",
+                "description": "交代一件工作，它把完成的成果交回給您。"
+            },
+            "coworker-manager": {
+                "label": "同事管理員",
+                "description": "說出您的需求，它會轉告合適的同事。"
+            },
+            "computer-use": {
+                "label": "電腦操作",
+                "description": "它像真人一樣在您的 App 中工作。"
+            },
+            "tools": {
+                "label": "內含 {count}+ 種工具",
+                "description": "Gmail、Stripe、HubSpot 和任何 MCP 伺服器。"
+            },
+            "human-in-the-loop": {
+                "label": "人工把關",
+                "description": "做任何重要決定前都會先問您。"
+            },
+            "runs-24-7": {
+                "label": "全年無休，在歐洲執行",
+                "description": "夜晚、週末、筆電闔上，它依然在執行。"
+            },
+            "second-brain": {
+                "label": "第二大腦",
+                "description": "它了解您的產品、市場和語氣。"
+            },
+            "workspaces": {
+                "label": "工作區",
+                "description": "一個帳號，每個事業各一個工作區。"
+            },
+            "invite-your-team": {
+                "label": "邀請整個團隊",
+                "description": "所有人都在同一個看板上，不另收費。"
+            },
+            "coworkers-work-together": {
+                "label": "同事彼此協作",
+                "description": "一位找出潛在客戶，下一位寫信給他們。"
+            }
+        },
+        "industries": {
+            "agencies": {
+                "label": "代理商",
+                "description": "開發新業務、交付專案和客戶報告。"
+            },
+            "freelancers": {
+                "label": "自由工作者",
+                "description": "您一直沒空處理的後勤工作。"
+            },
+            "ecommerce": {
+                "label": "電子商務",
+                "description": "訂單、庫存、評價和競爭對手。"
+            },
+            "real-estate": {
+                "label": "房地產",
+                "description": "屋主、詢問、物件刊登和租賃。"
+            },
+            "startups": {
+                "label": "新創公司",
+                "description": "銷售管道、產品發布、指標和客服。"
+            },
+            "saas": {
+                "label": "SaaS",
+                "description": "流失率、意見回饋、版本發布和進站詢問。"
+            },
+            "legal": {
+                "label": "法務與合規",
+                "description": "合約、義務、期限和稽核。"
+            },
+            "recruiting": {
+                "label": "招募與人資",
+                "description": "篩選、面試和候選人後續追蹤。"
+            }
+        },
+        "useCases": {
+            "findLeads": {
+                "label": "尋找潛在客戶",
+                "description": "交叉比對職缺、員工人數和您的 CRM。"
+            },
+            "trackSales": {
+                "label": "追蹤銷售",
+                "description": "每天早上更新營收、銷售管道和試算表。"
+            },
+            "runAds": {
+                "label": "管理您的廣告",
+                "description": "每天檢視支出，暫停虧錢的廣告。"
+            },
+            "watchCompetitors": {
+                "label": "關注競爭對手",
+                "description": "他們的價格、新品發布，以及您的關鍵字缺口。"
+            },
+            "createContent": {
+                "label": "製作內容",
+                "description": "從排名下滑的關鍵字到重新發布的文章。"
+            },
+            "postSocial": {
+                "label": "發布社群貼文",
+                "description": "每天早上一篇貼文，並回覆留言。"
+            },
+            "replyCustomers": {
+                "label": "回覆客戶",
+                "description": "整理未讀對話，並以您的語氣回覆。"
+            },
+            "triageInbox": {
+                "label": "整理收件匣",
+                "description": "加上標籤、擬好回覆，只留兩封給您。"
+            },
+            "prepareMeetings": {
+                "label": "準備會議",
+                "description": "每次通話前，提供對方的簡短資料。"
+            },
+            "trackOrders": {
+                "label": "追蹤訂單",
+                "description": "找出延遲的訂單，搶先通知您的客戶。"
+            }
+        },
+        "community": {
+            "experts": {
+                "label": "專家",
+                "description": "瀏覽經過審核的同事建置專家並聘用他們。"
+            },
+            "discord": {
+                "label": "Discord",
+                "description": "加入社群，即時獲得協助。"
+            }
+        },
+        "resources": {
+            "docs": {
+                "label": "說明文件",
+                "description": "建置、連結並推出您的同事。"
+            },
+            "blog": {
+                "label": "部落格",
+                "description": "產品消息、指南和同事操作手冊。"
+            }
+        },
+        "faq": "常見問題",
+        "solution": "解決方案",
+        "trialCta": "以 $0 開始試用",
+        "openMenu": "開啟選單",
+        "closeMenu": "關閉選單",
+        "menu": "選單",
+        "main": "主選單",
+        "starOnGithub": "在 GitHub 上加星號",
+        "login": "登入",
+        "download": "下載",
+        "openWebApp": "開啟網頁版",
+        "browseAll": {
+            "label": "瀏覽所有範本",
+            "description": "完整範本庫，所有類別盡在一頁。"
+        },
+        "becomeExpert": "成為專家",
+        "startFree": "免費開始",
+        "goToApp": "前往 App",
+        "logo": {
+            "brandKit": "檢視品牌素材",
+            "copy": "複製標誌 (SVG)",
+            "download": "下載標誌"
+        }
+    },
+    "github": {
+        "star": "加星號",
+        "ariaStar": "在 GitHub 上為 Rerun 加星號",
+        "ariaCount": "GitHub 上的 Rerun，{count} 顆星"
+    },
+    "heroCta": "立即免費開始",
+    "finalCta": {
+        "proof": "已有 {count}+ 家企業使用 Rerun",
+        "titleLead": "用您已付費的 <switch></switch>",
+        "titleTail": "方案<mark>聘用同事。</mark>",
+        "steps": {
+            "plug": "接上您的訂閱",
+            "hire": "設定您的同事",
+            "run": "讓同事幫您經營事業"
+        },
+        "step": "{rank}. {label}"
+    },
+    "openSource": {
+        "announce": "Rerun 現已開源<wide>，採用 AGPL-3.0 授權</wide>",
+        "cta": "在 GitHub 上為我們加星號"
+    },
+    "footer": {
+        "ctaTitle": "只要三分鐘，<br></br>就能擁有第一位同事",
+        "ctaButton": "免費開始",
+        "tagline": "讓同事幫您完成工作。建立他們、看著他們工作，並掌握一切。",
+        "productHuntAlt": "Rerun：真正會做事的開源 AI 同事 | Product Hunt",
+        "columns": {
+            "features": "功能",
+            "industries": "產業",
+            "solutions": "解決方案",
+            "compare": "比較",
+            "guides": "指南",
+            "resources": "資源",
+            "legal": "法律"
+        },
+        "resources": {
+            "about": "關於我們",
+            "docs": "說明文件",
+            "github": "GitHub",
+            "pricing": "價格",
+            "support": "支援",
+            "templates": "範本",
+            "compare": "比較",
+            "blog": "部落格",
+            "findExpert": "尋找專家",
+            "becomeExpert": "成為專家",
+            "whatsNew": "最新消息",
+            "brandKit": "品牌素材",
+            "community": "社群",
+            "affiliate": "聯盟行銷計畫",
+            "partnerBadge": "合作夥伴徽章"
+        },
+        "compareLink": "Rerun 與 {name} 比較",
+        "guides": {
+            "aiEmployees": "AI 員工",
+            "smallBusiness": "適合小型企業的 AI 代理",
+            "cost": "AI 員工的成本",
+            "noCode": "無程式碼 AI 代理建置工具",
+            "n8n": "n8n 替代方案",
+            "personal": "個人 AI 代理",
+            "hermes": "Hermes 替代方案"
+        },
+        "legal": {
+            "terms": "服務條款",
+            "refunds": "退款政策",
+            "acceptableUse": "可接受使用政策",
+            "creatorTerms": "創作者條款",
+            "privacy": "隱私權政策",
+            "cookies": "Cookie 政策",
+            "dpa": "資料處理協議"
+        },
+        "copyright": "© {year} Rerun by {legalName}。保留所有權利。",
+        "language": "語言",
+        "categories": {
+            "agencies": "代理商",
+            "ecommerce": "電子商務",
+            "saas": "SaaS",
+            "sales": "業務",
+            "recruiting": "招募",
+            "real-estate": "房地產",
+            "legal": "法務與合規",
+            "creators": "創作者",
+            "productivity": "生產力",
+            "other": "其他"
+        },
+        "cookieSettings": "Cookie 設定"
+    },
+    "discord": "加入我們的 Discord",
+    "tabNudge": {
+        "firstCoworker": "3 分鐘擁有第一位同事",
+        "allDay": "全年無休為您工作的同事",
+        "welcomeGuest": "歡迎回來。只要 3 分鐘就能擁有第一位同事。",
+        "welcomeMember": "歡迎回來。您的同事正在 App 中工作。",
+        "start": "免費開始",
+        "goToApp": "前往 App",
+        "dismiss": "關閉"
+    },
+    "notFound": {
+        "homeAria": "Rerun 首頁",
+        "title": "這個頁面脫稿演出了。",
+        "body": "您要找的頁面不存在或已移動。讓我們帶您回到正軌。",
+        "back": "返回首頁"
+    },
+    "crash": {
+        "title": "發生錯誤。",
+        "body": "此頁面發生非預期的錯誤。重新載入即可從中斷處繼續。",
+        "reload": "重新載入",
+        "back": "返回首頁"
+    },
+    "og": {
+        "default": {
+            "line1": "讓 AI",
+            "line2": "完成您的任務",
+            "accent": "連您睡覺時也不停。"
+        },
+        "experts": {
+            "line1": "聘用最頂尖的",
+            "accent": "AI 專家",
+            "cta": "聘用專家",
+            "hire": "聘用",
+            "badges": {
+                "Studio": "工作室",
+                "Freelancer": "自由工作者",
+                "Expert": "專家"
+            }
+        },
+        "compare": {
+            "vs": "Rerun 對比",
+            "cta": "查看比較"
+        }
+    },
+    "composerPlaceholder": "傳送訊息...",
+    "dialog": {
+        "close": "關閉"
+    },
+    "app": {
+        "download": "下載 App",
+        "appStore": "在 App Store 下載",
+        "playStore": "立即下載 Google Play",
+        "menu": "macOS、Windows 和 Linux",
+        "desktop": "桌面版 App",
+        "mac": "macOS",
+        "windows": "Windows",
+        "linux": "Linux",
+        "appleSilicon": "Apple Silicon",
+        "intel": "Intel",
+        "x64": "x64",
+        "arm64": "Arm",
+        "appImage": "AppImage"
+    }
+}

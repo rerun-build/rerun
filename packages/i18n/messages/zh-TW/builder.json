@@ -1,0 +1,134 @@
+{
+    "contextMenu": {
+        "newCoworker": "新增同事",
+        "openChat": "開啟聊天",
+        "rename": "重新命名",
+        "settings": "設定",
+        "share": "分享",
+        "duplicate": "複製",
+        "moveToBox": "移至 Box",
+        "noOtherBox": "沒有其他由您管理的 Box",
+        "delete": "刪除",
+        "manageAccess": "管理存取權",
+        "boxAccessAdminOnly": "只有管理員可以變更誰能存取 Box",
+        "manageReason": "只有管理員或此 Box 的管理者可以執行此操作",
+        "untitledBox": "未命名的 Box",
+        "thisCoworker": "這位同事"
+    },
+    "toolbar": {
+        "placementPrompt": "點一下格子來放置 {name}",
+        "placementPromptDefault": "點一下格子來放置您的同事",
+        "placementProgress": "第 {current} 位同事，共 {total} 位",
+        "newCoworker": "新增同事",
+        "template": "範本",
+        "create": "建立",
+        "search": "搜尋",
+        "unplaced": "{count} 位未放置"
+    },
+    "isoBoard": {
+        "boxCta": "探索 {name} 範本",
+        "boxCtaFallback": "探索範本",
+        "recruitFirst": "按一下即可招募您的第一位同事",
+        "createBox": "按一下即可建立 Box",
+        "preparingSandbox": "正在準備您的沙盒…",
+        "settingUpTemplate": "正在設定 {title}…",
+        "settingUpCoworker": "正在設定您的同事…",
+        "installTemplate": "按一下即可安裝 {title}",
+        "addBoxOnSide": "在這一側新增 Box"
+    },
+    "discoveries": {
+        "statusDigging": "正在認識 {name}",
+        "statusDone": "{name} 一覽",
+        "found": "找到 {count} 項",
+        "sources": {
+            "website": "您的網站",
+            "domain": "您的網域",
+            "registry": "公開登記資料",
+            "web": "網路"
+        },
+        "teasers": {
+            "profile": "正在讀取 {domain}…",
+            "stack": "正在查看 {domain} 的幕後技術…",
+            "dns": "正在檢查您的電子郵件設定…",
+            "registry": "正在公開登記資料中查詢您…",
+            "site": "正在讀取 {domain} 的每個頁面…",
+            "search": "正在網路上搜尋 {name}…",
+            "linkedinPerson": "正在 LinkedIn 上尋找您…",
+            "linkedinCompany": "正在 LinkedIn 上尋找 {name}…",
+            "googleBusiness": "正在讀取您的 Google 評論…",
+            "catalog": "正在瀏覽 {domain} 的商店…",
+            "synthesis": "正在彙整所有資訊…"
+        },
+        "cards": {
+            "identity": {
+                "title": "找到您了"
+            },
+            "audience": {
+                "title": "您的客群"
+            },
+            "tools": {
+                "title": "我們發現的工具"
+            },
+            "mail": {
+                "title": "您的收件匣",
+                "runsOn": "電子郵件使用 <b>{provider}</b>"
+            },
+            "social": {
+                "title": "您出現的地方"
+            },
+            "brand": {
+                "title": "您的品牌"
+            },
+            "registry": {
+                "title": "登記資料",
+                "since": "成立於 <b>{year}</b>",
+                "people": "<b>{headcount}</b> 人"
+            },
+            "person": {
+                "title": "{firstName}，這是您嗎？"
+            },
+            "linkedin": {
+                "title": "您的 LinkedIn 頁面",
+                "followers": "位追蹤者",
+                "team": "位團隊成員"
+            },
+            "reviews": {
+                "title": "顧客怎麼說",
+                "count": "<n>{count}</n> 則 Google 評論"
+            },
+            "products": {
+                "title": "您銷售的產品"
+            },
+            "competitors": {
+                "title": "您的競爭對手"
+            },
+            "customers": {
+                "title": "現有客戶"
+            },
+            "brain": {
+                "title": "公司 Brain",
+                "pages": "您的同事開始工作前會閱讀的 {count, plural, other {# 個頁面}}",
+                "productsAndCompetitors": "+ {products, plural, other {# 項產品}}、{competitors, plural, other {# 個競爭對手}}",
+                "productsOnly": "+ {products, plural, other {# 項產品}}",
+                "competitorsOnly": "+ {competitors, plural, other {# 個競爭對手}}"
+            }
+        }
+    },
+    "boardToasts": {
+        "createdInactive": "已建立「{name}」，但尚未啟用",
+        "createdInactiveHint": "您的方案沒有空出的同事名額。請從同事面板啟用。",
+        "addFailed": "無法新增這位同事",
+        "lookFailed": "無法變更這位同事的外觀",
+        "duplicateFailed": "無法複製這位同事",
+        "importFailed": "無法匯入這個範本",
+        "importInterrupted": "匯入已中斷",
+        "importInterruptedHint": "再次匯入前，請先檢查您的機器。",
+        "moveAgentFailed": "無法移動這位同事",
+        "moveBoxFailed": "無法移動這個 Box",
+        "deleteBoxFailed": "無法刪除這個 Box",
+        "checkConnection": "請檢查您的網路連線，然後再試一次。",
+        "shareLinkGone": "這個分享連結已無法使用",
+        "prepareBoxFailed": "無法準備您的 Box",
+        "startCoworkerFailed": "無法啟動您的同事"
+    }
+}

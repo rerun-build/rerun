@@ -1,0 +1,100 @@
+{
+    "browser": {
+        "tableNotFound": "找不到資料表",
+        "deleteRowsFailed": "無法刪除資料列",
+        "saveRowFailed": "無法儲存這一列",
+        "deleteTableFailed": "無法刪除資料表",
+        "purgeTableFailed": "無法清空資料表",
+        "addViewFailed": "無法新增這個檢視",
+        "deleteViewFailed": "無法刪除這個檢視",
+        "unavailable": "資料庫無法使用",
+        "tryAgain": "再試一次",
+        "rowCount": "{count, plural, other {{total} 列}}",
+        "rowCountFound": "{count, plural, other {找到 {total} 列}}",
+        "noRows": "沒有資料列",
+        "noSearchMatch": "沒有符合搜尋的資料列。",
+        "tableEmpty": "這個資料表是空的。"
+    },
+    "pagination": {
+        "count": "總數 <value>{count}</value>",
+        "rowsPerPage": "每頁列數",
+        "perPage": "每頁 {size} 列",
+        "range": "{range}，共 {total} 列",
+        "firstPage": "第一頁",
+        "previousPage": "上一頁",
+        "nextPage": "下一頁",
+        "lastPage": "最後一頁"
+    },
+    "toolbar": {
+        "selected": "{count, plural, other {已選取 # 列}}",
+        "deleteRowTitle": "要刪除這一列嗎？",
+        "deleteRowsTitle": "要刪除 {count} 列嗎？",
+        "deleteRowDescription": "這一列會從資料表中永久移除，且無法復原。",
+        "deleteRowsDescription": "這些資料列會從資料表中永久移除，且無法復原。",
+        "delete": "刪除",
+        "clearSelection": "清除選取",
+        "search": "搜尋",
+        "searchRows": "搜尋資料列",
+        "clearSearch": "清除搜尋",
+        "tableActions": "資料表動作",
+        "export": "匯出",
+        "purgeTable": "清空資料表",
+        "deleteTable": "刪除資料表"
+    },
+    "viewBar": {
+        "allRows": "所有資料列",
+        "viewOptions": "{name} 的選項",
+        "editView": "編輯檢視",
+        "deleteView": "刪除檢視",
+        "addView": "新增檢視",
+        "addNewView": "新增檢視",
+        "expand": "展開",
+        "deleteViewTitle": "要刪除檢視「{name}」嗎？",
+        "deleteViewDescription": "只會刪除這個檢視，資料表中的資料列不受影響。"
+    },
+    "layouts": {
+        "table": "表格",
+        "list": "清單",
+        "gallery": "圖庫",
+        "board": "看板"
+    },
+    "table": {
+        "selectAllRows": "選取此頁所有資料列",
+        "selectRow": "選取資料列",
+        "sources": "來源"
+    },
+    "cell": {
+        "yes": "是",
+        "no": "否"
+    },
+    "board": {
+        "moveFailed": "無法移動這一列",
+        "unavailable": "看板無法使用",
+        "showMore": "再顯示 {count} 個"
+    },
+    "sources": {
+        "verdicts": {
+            "verified": {
+                "label": "已驗證",
+                "detail": "信箱存在"
+            },
+            "unconfirmed": {
+                "label": "未確認",
+                "detail": "無法確認信箱"
+            },
+            "invalid": {
+                "label": "無效",
+                "detail": "信箱不存在"
+            }
+        },
+        "openSource": "開啟來源",
+        "verified": "已驗證",
+        "row": "資料列",
+        "cellLabel": "來源：{names}"
+    },
+    "shared": {
+        "emptyTitle": "還沒有共用資料表",
+        "emptyDescription": "工作區的每位同事都會讀寫這個資料庫。當他們需要共同的紀錄（目錄、佇列、多位同事一起處理的清單），就會在這裡建立資料表，您隨時都能瀏覽。",
+        "unreachable": "無法連線到這個工作區的機器。"
+    }
+}

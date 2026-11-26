@@ -1,0 +1,355 @@
+{
+    "welcome": {
+        "title": "嗨，準備好交辦您的第一項任務了嗎？",
+        "preparing": "正在準備您的工作區..."
+    },
+    "header": {
+        "closeDisabled": "完成設定後即可關閉對話",
+        "move": "移動",
+        "moveChat": "移動對話視窗",
+        "position": {
+            "dockLeft": "停靠左側",
+            "dockRight": "停靠右側",
+            "float": "浮動"
+        },
+        "newConversation": "新對話",
+        "conversations": "對話"
+    },
+    "threads": {
+        "general": "一般",
+        "back": "返回「一般」",
+        "untitled": "新對話"
+    },
+    "history": {
+        "title": "對話",
+        "close": "關閉",
+        "empty": "尚無討論串。"
+    },
+    "resize": "調整對話視窗大小",
+    "modelPill": {
+        "hubReason": "此對話一律使用 {brand} Balanced 執行"
+    },
+    "nextSteps": {
+        "turnOn": "啟用我的同事",
+        "yourInstallStarted": "您的同事已開始安裝",
+        "installStarted": "{name} 已開始安裝",
+        "startInstallingMine": "開始安裝我的同事",
+        "startInstalling": "開始安裝 {name}",
+        "startTrial": "開始免費試用",
+        "startPlan": "開始我的方案",
+        "starting": "啟動中…",
+        "openChat": "開啟對話",
+        "installFailed": "無法開始安裝"
+    },
+    "notification": {
+        "title": "{named, select, yes {{name}} other {Chief of Staff}}",
+        "waiting": "{named, select, yes {{name} 正在等您。} other {您的 Chief of Staff 正在等您。}}"
+    },
+    "dock": {
+        "tooltip": "{named, select, yes {搜尋或詢問 {name}} other {搜尋或詢問您的 Chief of Staff}} <key>{shortcut}</key>",
+        "failedReply": "這次出了點問題。"
+    },
+    "nudge": {
+        "approval": "需要您的核准",
+        "question": "需要您的回答",
+        "more": "還有 {count} 則",
+        "review": "查看",
+        "answer": "回答",
+        "later": "稍後"
+    },
+    "reply": {
+        "open": "開啟對話",
+        "dismiss": "關閉"
+    },
+    "voice": {
+        "listening": "聆聽中 · 放開 Space 鍵即可傳送",
+        "transcribing": "轉錄中...",
+        "nothingHeard": "這段錄音中沒有聽到任何聲音。",
+        "sendFailed": "無法傳送您的語音訊息。"
+    },
+    "pill": {
+        "prompts": {
+            "lastNight": "昨晚執行了什麼？",
+            "failedRun": "那次執行為什麼失敗？",
+            "newCoworker": "幫我建立一位新同事"
+        },
+        "ask": "{named, select, yes {詢問 {name}} other {詢問您的 Chief of Staff}}",
+        "send": "傳送"
+    },
+    "routines": {
+        "resumeFailed": "無法恢復 {name}",
+        "pauseFailed": "無法暫停 {name}",
+        "renameFailed": "無法重新命名 {name}",
+        "runFailed": "無法執行 {name}",
+        "started": "{name} 已開始",
+        "emptyTitle": "尚無例行工作",
+        "emptyDescription": "請同事按排程做某件事（例如每日報告、每週摘要），它就會顯示在這裡。",
+        "unknownCoworker": "未知的同事",
+        "options": "{name} 選項",
+        "rename": "重新命名",
+        "edit": "編輯",
+        "runNow": "立即執行"
+    },
+    "ownEntry": "我知道我需要什麼",
+    "ownEntryPlaceholder": "我知道我需要什麼…",
+    "gettingStarted": {
+        "title": "開始使用",
+        "hide": "隱藏",
+        "pillLabel": "開始使用：已完成 {done} / {total}",
+        "steps": {
+            "phone": {
+                "title": "驗證您的手機號碼",
+                "description": "保護您的帳號，並透過 WhatsApp 或簡訊接收同事的消息。"
+            },
+            "first_agent": {
+                "title": "建立您的第一位同事",
+                "description": "在您不在時也持續工作的隊友。"
+            },
+            "ai_provider": {
+                "title": "接上您的 AI 訂閱方案",
+                "description": "Claude、ChatGPT、Gemini 或您自己的 API 金鑰。"
+            },
+            "invite": {
+                "title": "邀請隊友",
+                "description": "與您的工作夥伴分享您的同事。"
+            },
+            "schedule": {
+                "title": "排程週期性任務",
+                "description": "讓您的一位同事自動執行。"
+            },
+            "payment_method": {
+                "title": "新增付款方式",
+                "description": "讓您的同事在試用結束後繼續工作。今天不會收取任何費用。"
+            }
+        },
+        "reward": {
+            "grantedTitle": "已為您的試用延長 {days} 天",
+            "grantedDescription": "您的工作區已全部設定完成。好好享受額外的時間吧。",
+            "claimingTitle": "正在為您的試用延長 {days} 天",
+            "claimingDescription": "請稍候。",
+            "doneTitle": "您的工作區已全部設定完成",
+            "doneDescription": "您的同事現在可以自行執行了。",
+            "lockedTitle": "再獲得 {days} 天免費試用",
+            "lockedDescription": "完成上方 {total} 個步驟，還剩 {remaining} 個。"
+        },
+        "prompts": {
+            "first_agent": "幫我建立我的第一位同事",
+            "ai_provider": "幫我連結我的 Claude 或 ChatGPT 訂閱方案，或 API 金鑰",
+            "invite": "幫我邀請隊友加入我的工作區",
+            "schedule": "為我的一位同事排程週期性任務"
+        }
+    },
+    "contact": {
+        "defaultSummary": "我在設定第一位同事時卡住了，需要協助。",
+        "sentWithEmail": "已傳送給 {brand} 團隊。他們會在對話中及透過 {email} 回覆您。",
+        "sent": "已傳送給 {brand} 團隊。他們會在對話中回覆您。",
+        "openChat": "開啟對話",
+        "stillStuck": "還是卡住了嗎？團隊成員可以協助您。",
+        "send": "傳送給團隊",
+        "title": "與 {brand} 的人員聯絡",
+        "description": "這則訊息會連同您的帳號資訊傳送給團隊，他們會在對話中回覆您。",
+        "notNow": "現在不要"
+    },
+    "template": {
+        "skipped": "已略過",
+        "buildingElse": "正在建立其他內容",
+        "installing": "正在安裝此範本",
+        "install": "安裝此範本",
+        "buildElse": "幫我建立別的",
+        "buildElseDescription": "這些都不合適。請根據我告訴您的內容來設計。",
+        "notNow": "現在不要",
+        "somethingCustom": "自訂內容",
+        "label": "範本",
+        "agents": "{count, plural, other {# 位同事}}"
+    },
+    "question": {
+        "fallback": "一個問題",
+        "skipped": "已略過",
+        "neither": "都不是",
+        "typed": "已在對話中回答"
+    },
+    "plan": {
+        "defaultTitle": "您的第一位同事",
+        "skipped": "已略過",
+        "confirmed": "已確認",
+        "askedChanges": "已要求修改",
+        "goesAfter": "<label>目標：</label>{need}",
+        "thisWeek": "您本週會獲得的成果",
+        "previousBox": "上一個 Box",
+        "nextBox": "下一個 Box",
+        "build": "建立我的同事",
+        "change": "修改內容",
+        "standingBy": "待命中",
+        "lifeWorking": "處理中",
+        "lifeDelivered": "已交付給您",
+        "scene": {
+            "planned": "{name}，規劃中",
+            "plannedBox": "規劃中的 Box"
+        }
+    },
+    "starterPack": {
+        "title": "您的入門團隊",
+        "subtitle": "最多選擇 {max} 位。每位上到您的看板後，都會與您一起完成設定。",
+        "fullTitle": "您的試用可執行 {max} 位同事",
+        "fullDescription": "移除一位即可改選這位。其他同事可在您訂閱方案後加入。",
+        "pickAtLeastOne": "請至少選擇一位",
+        "hireOne": "聘用這位",
+        "hireMany": "聘用這 {count} 位",
+        "progress": "已選擇 {count} / {max}",
+        "picked": "已選擇",
+        "trialFull": "試用名額已滿",
+        "pick": "選擇"
+    },
+    "agentTabs": {
+        "chat": "對話",
+        "actions": "待處理",
+        "services": "應用程式",
+        "mcp": "MCP",
+        "skills": "技能",
+        "data": "資料庫",
+        "memories": "知識",
+        "files": "檔案",
+        "published": "已發布",
+        "scheduled": "例行工作",
+        "triggers": "觸發條件",
+        "tools": "能力",
+        "monitoring": "監控",
+        "logs": "紀錄",
+        "setup": "安裝",
+        "settings": "設定"
+    },
+    "arrival": {
+        "youPicked": "您選擇了",
+        "by": "作者：{name}",
+        "gestures": {
+            "account": "帳號",
+            "trial": "免費試用",
+            "template": "範本",
+            "installed": "已安裝"
+        },
+        "headings": {
+            "account": {
+                "title": "讓 {name} 開始工作",
+                "description": "建立您的帳號，{name} 就會為您安裝好。不需填寫設定表單，也不必先回答問題。"
+            },
+            "phone": {
+                "title": "最後一個步驟",
+                "description": "新增您的手機號碼，接下來就是 {name}。"
+            },
+            "trial": {
+                "title": "試用 {name} {days} 天",
+                "description": "您的試用一開始，{name} 就會立即安裝。"
+            },
+            "purchase": {
+                "title": "取得 {name}",
+                "description": "您的試用已開始。此範本另有價格，付款後會立即安裝。"
+            },
+            "installing": {
+                "title": "正在安裝 {name}",
+                "description": "這裡不需任何操作，不到一分鐘即可完成。"
+            }
+        }
+    },
+    "teamPulse": {
+        "coworkers": "{count, plural, other {# 位同事}}",
+        "working": "{count} 位正在工作"
+    },
+    "trialGate": {
+        "plan": "開始您的方案以繼續使用。",
+        "trial": "開始您的免費試用以繼續使用。",
+        "talk": "與團隊聯絡"
+    },
+    "trial": {
+        "badge": {
+            "cardless": "不需信用卡",
+            "card_trial": "{days} 天免費試用",
+            "paid": "已使用過免費試用"
+        },
+        "titleTrial": "開始您的 {days} 天免費試用",
+        "titlePlan": "開始您的方案",
+        "pitchPaidInstall": "{subject} 會在之後立即安裝。可隨時從工作區取消。",
+        "pitchPaidTeam": "您的團隊會在之後立即建立。可隨時從工作區取消。",
+        "pitchCardInstall": "需要信用卡，今天 $0。除非您事先取消，否則將於 {date} 收取 {price}。{subject} 會在之後立即安裝。",
+        "pitchCardTeam": "需要信用卡，今天 $0。除非您事先取消，否則將於 {date} 收取 {price}。您的團隊會在之後立即建立。",
+        "pitchCardlessInstall": "不需信用卡，今天 $0。請在 {date} 前新增一張，以每月 {price} 繼續使用。{subject} 會在之後立即安裝。",
+        "pitchCardlessTeam": "不需信用卡，今天 $0。請在 {date} 前新增一張，以每月 {price} 繼續使用。您的團隊會在之後立即建立。",
+        "includes": "您的試用包含 {agents} 位同事和 {credits, plural, other {# 點數}}。",
+        "thenPay": "之後此範本為 {price}，另行計費。",
+        "dueToday": "今日應付",
+        "withCard": "使用信用卡",
+        "dueOn": "於 {date}",
+        "then": "之後",
+        "perMonth": "/月",
+        "today": "今天",
+        "todayInstall": "您的試用開始，{subject} 隨即安裝。",
+        "todayTeam": "您的試用開始，您的團隊隨即建立。",
+        "reminder": "我們會寄電子郵件通知您，絕不會在您不知情時結束。",
+        "chargeCardless": "新增信用卡即可以每月 {price} 繼續使用。若未新增，您的同事會停止工作，且不會收取任何費用。",
+        "chargeCard": "將向您新增的信用卡收取 {price}，之後每月收取。在此之前取消則不會收取任何費用。",
+        "startingTrial": "正在開始您的試用…",
+        "opening": "開啟中…",
+        "startAndInstall": "開始試用並安裝",
+        "startTrial": "開始我的免費試用",
+        "startPlan": "開始我的方案"
+    },
+    "checkout": {
+        "started": "試用已開始",
+        "cardUsed": "此信用卡已用於試用",
+        "startPlan": "開始我的方案",
+        "pending": "仍在等待 Stripe",
+        "notStarted": "試用尚未開始。開始前無法建立任何內容。",
+        "startTrial": "開始免費試用"
+    },
+    "purchase": {
+        "owned": "{title} 已屬於您",
+        "recurring": "按月計費",
+        "oneTime": "一次性購買",
+        "billedTo": "向 {name} 收費，與您的 {brand} 方案分開。付款完成後即會安裝。",
+        "billedToWorkspace": "向您的工作區收費，與您的 {brand} 方案分開。付款完成後即會安裝。",
+        "dueToday": "今日應付",
+        "perMonth": "/月",
+        "opening": "開啟中…",
+        "subscribe": "訂閱 {price}",
+        "pay": "支付 {price}"
+    },
+    "teamEmptyState": {
+        "greeting": "{named, select, yes {嗨，我是 {name}} other {嗨，我是您的 Chief of Staff}}",
+        "greetingNamed": "{named, select, yes {嗨 {firstName}，我是 {name}} other {嗨 {firstName}，我是您的 Chief of Staff}}",
+        "greetingWithTeam": "{greeting}。這是您的團隊。",
+        "emptySubtitle": "您還沒有任何同事。告訴我您想交辦的工作，我會建立第一位。",
+        "buildPrompt": "幫我建立一位同事，負責 ",
+        "buildFirst": {
+            "title": "建立我的第一位同事",
+            "description": "用一句話描述這份工作"
+        },
+        "template": {
+            "title": "從範本開始",
+            "description": "適合您產業的現成同事",
+            "send": "顯示適合我業務的範本"
+        },
+        "guide": {
+            "title": "這是如何運作的？",
+            "description": "同事、Boxes、例行工作，兩分鐘了解",
+            "send": "{brand} 是如何運作的？"
+        },
+        "checkWorking": {
+            "title": "{name} 正在做什麼？",
+            "description": "正在工作",
+            "send": "{mention} 現在正在做什麼？"
+        },
+        "checkIdle": {
+            "title": "{name} 今天做了什麼？",
+            "description": "查看它最近的執行紀錄",
+            "send": "{mention} 今天做了什麼？"
+        },
+        "handOff": {
+            "title": "交辦任務給 {name}",
+            "description": "我會向它說明並全程跟進",
+            "prefill": "請 {mention} "
+        },
+        "build": {
+            "title": "建立新同事",
+            "description": "處理團隊中還沒有人做的工作"
+        }
+    }
+}

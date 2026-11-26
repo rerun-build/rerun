@@ -1,0 +1,80 @@
+{
+    "intake": {
+        "steps": {
+            "company": {
+                "title": "您公司的網站是什麼？",
+                "description": "我們會讀取網站，了解您賣什麼、賣給誰。"
+            },
+            "industry": {
+                "title": "您從事哪個行業？",
+                "description": "這決定我們在您的看板上畫出哪些團隊。"
+            },
+            "role": {
+                "title": "您在那裡負責什麼？",
+                "description": "這決定我們先為您打造誰。"
+            },
+            "name": {
+                "title": "最後一題：您的名字是？",
+                "description": "這樣我們才不是在跟一個工作區說話。"
+            }
+        },
+        "progress": "第 {current} 題，共 {total} 題",
+        "website": {
+            "label": "公司網站",
+            "placeholder": "acme.com",
+            "none": "我沒有網站"
+        },
+        "industry": {
+            "placeholder": "您的行業"
+        },
+        "industries": {
+            "agencies": "代理商",
+            "ecommerce": "電子商務",
+            "saas": "SaaS",
+            "sales": "業務銷售",
+            "recruiting": "招募",
+            "real-estate": "房地產",
+            "legal": "法律與法遵",
+            "creators": "創作者",
+            "productivity": "生產力",
+            "other": "其他"
+        },
+        "role": {
+            "placeholder": "成長部門主管"
+        },
+        "name": {
+            "placeholder": "志明"
+        },
+        "back": "返回",
+        "next": "下一步",
+        "continue": "繼續",
+        "saveFailed": "無法儲存，請再試一次。"
+    },
+    "setup": {
+        "starting": {
+            "title": "正在設定您的工作區",
+            "body": "正在喚醒您的 Chief of Staff…"
+        },
+        "failed": {
+            "title": "沒有成功",
+            "body": "沒有任何東西遺失。請稍後再試。"
+        },
+        "blocked": {
+            "title": "這個工作區無法在這裡啟動",
+            "body": "請到 {host} 完成設定。"
+        },
+        "tryAgain": "再試一次"
+    },
+    "waitlist": {
+        "title": "我們目前已滿載",
+        "body": "所有機器都已被使用。您已加入候補名單：您的回答已儲存，一有機器空出來，這裡就會自動開啟。"
+    },
+    "noPlan": {
+        "title": "這個工作區已暫停",
+        "body": "請從上方選單切換工作區或帳號。"
+    },
+    "update": {
+        "title": "需要更新",
+        "body": "這個版本已不再支援。"
+    }
+}

@@ -1,0 +1,168 @@
+{
+    "sheet": {
+        "back": "返回",
+        "close": "關閉"
+    },
+    "badge": {
+        "creditsUsedUp": "點數已用完",
+        "signInAgain": "重新登入",
+        "keyRejected": "金鑰遭拒",
+        "keyMissing": "缺少金鑰",
+        "ready": "就緒"
+    },
+    "usage": {
+        "agentsFallBack": "{agents} 將改用工作區的預設模型。",
+        "automationsFallBack": "{count, plural, other {# 個自動化}}將改用工作區的預設模型。",
+        "agentsAndAutomationsFallBack": "{agents} 與 {count, plural, other {# 個自動化}}將改用工作區的預設模型。",
+        "holdsDefault": "它是工作區的預設模型，將被清除：所有未選擇模型的同事都會改用 Rerun。",
+        "nothingRuns": "憑證已移除，沒有任何工作使用它執行。"
+    },
+    "list": {
+        "title": "AI 供應商",
+        "notAnswering": "此工作區的機器沒有回應，請稍後再試。",
+        "defaultModel": "預設模型",
+        "included": "已包含",
+        "subscriptions": "您的訂閱方案",
+        "subscriptionsPitch": "已經在用 Claude Code 或 Codex？您的同事可以使用您的方案執行。",
+        "addSubscription": "新增訂閱方案",
+        "apiKeys": "您的 API 金鑰",
+        "apiKeysPitch": "直接按 token 付費給您的供應商。",
+        "addApiKey": "新增 API 金鑰",
+        "via": "透過 {name}",
+        "creditsUsedUpPickModel": "Rerun 點數已用完，將於 {backOn} 恢復，因此沒有自訂模型的同事已暫停。請選擇其他模型讓他們繼續工作。",
+        "creditsUsedUpAddSource": "Rerun 點數已用完，將於 {backOn} 恢復，因此沒有自訂模型的同事已暫停。請新增方案或 API 金鑰讓他們繼續工作。",
+        "defaultBroken": "沒有自訂模型的同事已停止。請修正 {name} 或選擇其他模型。",
+        "signInAgain": "重新登入",
+        "addKey": "新增金鑰"
+    },
+    "add": {
+        "addSubscription": "新增訂閱方案",
+        "addApiKey": "新增 API 金鑰",
+        "addProvider": "新增供應商",
+        "subscriptions": "訂閱方案",
+        "apiKeys": "API 金鑰"
+    },
+    "defaultModel": {
+        "title": "預設模型",
+        "changeFailed": "無法變更預設模型"
+    },
+    "detail": {
+        "name": "名稱",
+        "removeButton": "移除 {name}",
+        "saveFailed": "儲存失敗",
+        "renameTitle": "重新命名",
+        "renameMessage": "會顯示在每位同事的模型選擇器中。",
+        "keySaveFailed": "無法儲存憑證",
+        "removeTitle": "要移除 {name} 嗎？",
+        "removeConfirm": "移除",
+        "deleteFailed": "無法刪除連線"
+    },
+    "credit": {
+        "title": "本月點數",
+        "percent": "{percent}%",
+        "usedUp": "使用 Rerun 執行的同事已暫停，直到點數於 {backOn} 恢復。請選擇其他預設模型讓他們繼續工作。",
+        "included": "隨您的 Rerun 方案提供。不需金鑰，也不需任何設定。"
+    },
+    "reconnect": {
+        "signInRejected": "此登入遭拒。使用它的同事已停止，直到您重新登入。",
+        "signInExpired": "此登入已過期。使用它的同事已停止，直到您重新登入。",
+        "signInAgain": "重新登入",
+        "keyRejected": "此金鑰遭拒。使用它的同事已停止，直到您貼上新的金鑰。",
+        "keyMissing": "尚未提供金鑰。使用它的同事已停止，直到您貼上金鑰。",
+        "keyLabel": "API 金鑰",
+        "keyPlaceholder": "貼上您的金鑰",
+        "save": "儲存"
+    },
+    "planUsage": {
+        "title": "方案用量",
+        "empty": "此方案下次執行後，用量會顯示在這裡。",
+        "percent": "{percent}%"
+    },
+    "models": {
+        "title": "您的同事可以使用",
+        "enabledCount": "{enabled} / {total}",
+        "lockDefault": "預設模型",
+        "lockCustom": "自訂模型。請在下方移除。",
+        "lockLast": "同事至少需要此來源的一個模型。"
+    },
+    "baseUrl": {
+        "label": "自訂 Base URL",
+        "help": "將請求傳送到您自己的 OpenRouter 相容路由器",
+        "save": "儲存"
+    },
+    "customModels": {
+        "title": "自訂模型",
+        "remove": "移除",
+        "addLabel": "新增模型",
+        "addHelp": "任何 OpenRouter 模型 ID，例如 x-ai/grok-4。",
+        "add": "新增"
+    },
+    "apiKey": {
+        "name": "名稱",
+        "keyLabel": "API 金鑰",
+        "keyPlaceholder": "貼上您的金鑰",
+        "connect": "連線"
+    },
+    "modelSheet": {
+        "close": "關閉",
+        "title": "選擇模型",
+        "notAnswering": "此工作區的機器沒有回應，請稍後再試。",
+        "workspaceDefault": "工作區預設",
+        "addProvider": "新增供應商"
+    },
+    "ending": {
+        "coworkersStart": "您的同事已重新開始工作",
+        "nameIt": "為它命名",
+        "connectionName": "連線名稱",
+        "nameHelp": "會顯示在每位同事的模型選擇器中。",
+        "saving": "儲存中…",
+        "done": "完成"
+    },
+    "claude": {
+        "claudeTokenIsApiKey": "這是 Anthropic API 金鑰。請改為新增 Anthropic (API) 連線。",
+        "claudeTokenIsCode": "這是來自 Claude 的代碼。請先點選「Get token」，再將代碼貼在這裡。",
+        "approve": "在 Claude 上核准 Rerun",
+        "open": "開啟 Claude",
+        "openAgain": "再次開啟 Claude",
+        "pasteStep": "貼上代碼",
+        "codeLabel": "來自 Claude 的代碼",
+        "checking": "正在檢查代碼…",
+        "paste": "貼上",
+        "connect": "連線"
+    },
+    "chatgpt": {
+        "allowStep": "在 ChatGPT 中允許以代碼登入",
+        "openSettings": "開啟 ChatGPT 設定",
+        "alreadyOn": "已經開啟了",
+        "adminSwitches": "您的 ChatGPT 管理員會為整個工作區開啟此功能。",
+        "onPlusOrPro": "我使用 Plus 或 Pro",
+        "onBusiness": "使用 ChatGPT Business 或 Enterprise？",
+        "enterStep": "在 OpenAI 上輸入代碼",
+        "copied": "已複製",
+        "copyAdminMessage": "複製一則訊息給他們",
+        "adminMessage": "您好！可以請您在我們的 ChatGPT 工作區設定中開啟「Device code authorization for Codex」嗎？我需要它來將我的 ChatGPT 方案連結到 Rerun。",
+        "copyCode": "複製代碼",
+        "openOpenAI": "開啟 OpenAI",
+        "enterHint": "請在 OpenAI 的頁面輸入並核准，此畫面會自動偵測。",
+        "gettingCode": "正在取得代碼…",
+        "getNewCode": "取得新代碼",
+        "getCode": "取得代碼",
+        "stuck": {
+            "expiredAdmin": "代碼已過期。您的管理員可能尚未允許以代碼登入。",
+            "errorAdmin": "OpenAI 的頁面出現錯誤？您的管理員可能尚未允許以代碼登入。",
+            "expiredSetting": "代碼已過期。以代碼登入可能仍未開啟：請在 <link>Settings → Security</link> 中開啟，然後取得新代碼。",
+            "errorSetting": "OpenAI 的頁面出現錯誤？以代碼登入可能仍未開啟：請在 <link>Settings → Security</link> 中開啟，然後再次輸入代碼。"
+        }
+    },
+    "connect": {
+        "renameFailed": "無法重新命名連線",
+        "startFailed": "無法開始連線",
+        "notSignedIn": "尚未登入",
+        "createFailed": "無法建立連線"
+    },
+    "oauth": {
+        "unfinished": "登入未完成，請再試一次。",
+        "authorizationFailed": "授權失敗",
+        "startFailed": "無法開始登入"
+    }
+}

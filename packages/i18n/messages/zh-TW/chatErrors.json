@@ -1,0 +1,80 @@
+{
+    "generic": "發生錯誤。請再次傳送您的訊息。",
+    "modelAtCapacity": {
+        "title": "模型已滿載",
+        "message": "這個模型目前沒有空位。請稍後再試，或選擇其他模型。"
+    },
+    "opencodePrivacy": {
+        "title": "被您的 OpenCode 設定封鎖",
+        "region": "您的 OpenCode 帳號只允許託管在歐洲和美國的模型。請在 OpenCode console 的 Privacy 中選擇 Global，或選擇其他模型。",
+        "training": "您的 OpenCode 帳號會拒絕以收到的內容進行訓練的模型。請在 OpenCode console 的 Privacy 中允許這類模型，或選擇其他模型。"
+    },
+    "anthropicKeyNotScoped": {
+        "title": "Anthropic 金鑰未綁定工作區",
+        "message": "這把金鑰可用於其 Anthropic 組織的所有工作區。請在 Anthropic Console 中於單一工作區內建立金鑰，然後重新連線。"
+    },
+    "titles": {
+        "budget": "{brand} 點數已用完",
+        "unauthorized": "連線已登出",
+        "overloaded": "供應商負載過高",
+        "context_window": "對話過長",
+        "provider_error": "模型無法回覆",
+        "thinking_replay": "無法繼續執行",
+        "interrupted": "執行已中斷",
+        "run_in_flight": "這個對話仍在進行中",
+        "session_gone": "無法使用此對話"
+    },
+    "messages": {
+        "budget": "本期的 {brand} 點數已用完。請加購點數，或等待每月重置。",
+        "unauthorized": "這個連線需要重新登入，同事才能執行。",
+        "overloaded": "供應商目前負載過高。請稍後再試。",
+        "context_window": "這個對話已超出模型的容量，再次傳送也會遇到相同的限制。請改用上下文視窗更大的模型，或開始新的對話。",
+        "provider_error": "模型供應商拒絕了這項請求，再次傳送也會得到相同的回應。請改用其他模型以繼續。",
+        "thinking_replay": "引擎重播這一輪的方式遭到模型供應商拒絕。這是引擎的錯誤，不是模型的問題：更換模型也沒有幫助。請再試一次，如果持續發生，請更新引擎。",
+        "interrupted": "執行在完成前就被中斷了。",
+        "session_gone": "這位同事已無法存取這個對話，因此訊息未傳送。請開始新的對話以繼續。"
+    },
+    "limits": {
+        "titles": {
+            "usageLimit": "已達使用上限",
+            "modelUnavailable": "無法使用 {model}",
+            "anyModelUnavailable": "無法使用模型",
+            "modelNotInPlan": "您的 {plan} 方案不含 {model}",
+            "anyModelNotInPlan": "您的 {plan} 方案不含此模型",
+            "credits": "{plan} 使用點數已用完",
+            "spend": "已達 {plan} 支出上限",
+            "window": "已達 {plan} {window, select, weekly {每週} other {每月}}上限",
+            "model": "已達 {plan} {model} 上限",
+            "claudeSession": "已達 {plan} 工作階段上限",
+            "usage": "已達 {plan} 使用上限",
+            "opencodeCredits": "OpenCode 點數已用完",
+            "opencodeNoGo": "沒有 OpenCode Go 訂閱",
+            "opencodeWindow": "已達 OpenCode Go {window, select, weekly {每週} other {每月}}上限",
+            "opencode": "已達 OpenCode Go 上限",
+            "openaiCredits": "OpenAI API 點數已用完",
+            "anthropicCredits": "Anthropic API 點數已用完"
+        },
+        "messages": {
+            "openaiCredits": "您的 OpenAI API 帳號已沒有點數。請在 platform.openai.com 加值，或將這位同事切換到其他模型。",
+            "anthropicCredits": "您的 Anthropic API 帳號已沒有點數。請在 Anthropic Console 的 Billing 中加值，或將這位同事切換到其他模型。",
+            "chatgptCredits": "您的 ChatGPT 工作區已沒有點數。請在 ChatGPT 中加值或請擁有者加值，或將這位同事切換到其他模型。",
+            "chatgptSpend": "您的 ChatGPT 工作區已達支出上限。擁有者可以調高上限；在此期間，請將這位同事切換到其他模型。",
+            "opencodeCredits": "Console 點數已用完。請在 opencode.ai 加值，或選擇 Go 模型以繼續。",
+            "opencodeNoGo": "這把 OpenCode 金鑰沒有有效的 Go 訂閱，因此所有 Go 模型都會被拒絕，包括免費模型。請訂閱 OpenCode Go，或選擇 Console 模型或其他供應商。",
+            "opencodeWindowResets": "您的 OpenCode Go 方案已達{window, select, weekly {每週} monthly {每月} other {5 小時}}上限。上限將於 {resetsAt} 重置；在那之前，請改用 Console 模型或其他供應商。",
+            "opencodeWindow": "您的 OpenCode Go 方案已達{window, select, weekly {每週} monthly {每月} other {5 小時}}上限。在重置之前，請改用 Console 模型或其他供應商。",
+            "modelUnavailable": "這個連線無法執行 {model}。請選擇其他模型以繼續。",
+            "anyModelUnavailable": "這個連線無法執行此模型。請選擇其他模型以繼續。",
+            "modelNotInPlan": "您的 {plan} 方案不含 {model}。請選擇其他模型以繼續。",
+            "anyModelNotInPlan": "您的 {plan} 方案不含此模型。請選擇其他模型以繼續。",
+            "usageLimit": "此訂閱已達使用上限。請改用其他模型，或等待上限重置。",
+            "credits": "您的 {plan} 方案已用完使用點數。請選擇方案內含的模型以繼續。",
+            "spend": "您的組織已達每月 {plan} 支出上限。管理員可以調高上限；在此期間，請將這位同事切換到其他模型。",
+            "weeklyResets": "您的 {plan} 方案已達每週上限。上限將於 {resetsAt} 重置；在那之前，請將這位同事切換到其他模型。",
+            "weekly": "您的 {plan} 方案已達每週上限。在新的一週開始前，請將這位同事切換到其他模型。",
+            "model": "您的 {plan} 方案已達 {model} 上限。其他 {plan} 模型仍可執行：請切換到其中一個。",
+            "sessionResets": "您的 {plan} 方案已用完目前的使用時段。額度將於 {resetsAt} 恢復；在此期間，請將這位同事切換到其他模型。",
+            "session": "您的 {plan} 方案已用完目前的使用時段。額度會自動恢復；在此期間，請將這位同事切換到其他模型。"
+        }
+    }
+}

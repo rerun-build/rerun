@@ -1,0 +1,143 @@
+{
+    "preferences": {
+        "title": "偏好設定",
+        "close": "關閉",
+        "yourAccount": "您的帳號",
+        "workspace": "工作區",
+        "aiProviders": "AI 供應商",
+        "appearance": "外觀",
+        "appearanceSystem": "跟隨系統",
+        "appearanceLight": "淺色",
+        "appearanceDark": "深色",
+        "coworkers": "同事",
+        "groupRecent": "最近",
+        "groupByBox": "依 Box",
+        "openLinksIn": "連結開啟方式",
+        "linksBrowser": "瀏覽器",
+        "linksRerun": "Rerun",
+        "language": "語言",
+        "notifications": "通知",
+        "pushOff": "推播已關閉",
+        "support": "支援",
+        "contactSupport": "聯絡支援團隊",
+        "privacy": "隱私權政策",
+        "terms": "服務條款",
+        "about": "關於",
+        "version": "版本",
+        "environment": "環境",
+        "signOut": "登出",
+        "deleteAccount": "刪除帳號",
+        "server": "伺服器"
+    },
+    "notifications": {
+        "title": "通知",
+        "saveFailed": "無法儲存",
+        "tryAgainShortly": "請稍後再試。",
+        "loadFailed": "無法載入您的設定，請稍後再試。",
+        "push": {
+            "label": "推播通知",
+            "off": "關閉",
+            "turnOn": "開啟",
+            "openSettings": "{platform, select, android {開啟 Android 設定} other {開啟 iOS 設定}}",
+            "footnote": "{platform, select, android {開啟推播前，以下通知都不會傳到這支手機。} other {開啟推播前，以下通知都不會傳到這支 iPhone。}}"
+        },
+        "channels": {
+            "messages": {
+                "name": "同事訊息",
+                "description": "當同事需要您或有話要說時。"
+            },
+            "silent": {
+                "name": "已完成的任務",
+                "description": "當同事完成任務時，不發出聲音。"
+            },
+            "crew": {
+                "name": "工作中的團隊",
+                "description": "誰正在工作、誰需要您，進行期間會固定在最上方。"
+            }
+        },
+        "scopeTitle": "通知我以下內容",
+        "recommended": "建議",
+        "scopes": {
+            "everything": {
+                "label": "全部",
+                "detail": "工作區中的每一次執行，不論由誰啟動。"
+            },
+            "mine": {
+                "label": "我的執行與我追蹤的內容",
+                "detail": "我啟動的執行、我參與的對話、我追蹤的同事。"
+            },
+            "needed": {
+                "label": "只在需要我時",
+                "detail": "我的執行中的問題、核准與錯誤。執行完成時不會通知。"
+            },
+            "nothing": {
+                "label": "不通知",
+                "detail": "我會自己查看收件匣。"
+            }
+        },
+        "email": {
+            "label": "電子郵件",
+            "footnote": "在您離開時有事需要您處理。每個事件一封，每天最多 3 封。"
+        },
+        "perCoworker": {
+            "title": "個別同事",
+            "add": "新增同事",
+            "pickTitle": "這位同事的每一次執行都會通知您",
+            "cancel": "取消",
+            "empty": "所有同事都依照上方的規則。",
+            "detail": "也可在每位同事的詳細資料中設定。",
+            "rowLabel": "{name}，{value}",
+            "followsTasks": "追蹤任務",
+            "yourSetting": "您的設定"
+        },
+        "accountEmails": {
+            "title": "帳號電子郵件",
+            "billing": "試用與帳單",
+            "product": "產品更新"
+        },
+        "modes": {
+            "default": {
+                "label": "預設",
+                "hint": "依照您的設定。"
+            },
+            "everything": {
+                "label": "所有活動",
+                "hint": "每一次執行，不論由誰啟動。"
+            },
+            "muted": {
+                "label": "靜音",
+                "hint": "不通知。看板上仍會顯示。"
+            }
+        },
+        "coworker": {
+            "title": "通知我關於 {name} 的內容",
+            "yourSetting": "您的設定",
+            "quotedScope": "「{scope}」",
+            "follow": "追蹤其排程任務",
+            "nothingScheduled": "尚無排程。",
+            "scheduled": "{count} 個排程任務，會像您自己的執行一樣通知您。",
+            "reachYou": "會像您自己的執行一樣通知您。",
+            "tasksTitle": "排程任務",
+            "tasksFailed": "無法載入其任務，請稍後再試。",
+            "taskSwitch": "通知我關於 {name} 的內容",
+            "muted": "{name} 已靜音。"
+        },
+        "actions": {
+            "approve": "核准",
+            "deny": "拒絕",
+            "answer": "回答",
+            "reply": "回覆",
+            "open": "開啟",
+            "replyPlaceholder": "您的回答",
+            "send": "傳送"
+        },
+        "receipts": {
+            "approve": "已核准。{agent} 正在處理。",
+            "deny": "已拒絕。{agent} 不會執行。",
+            "reply": "已傳送。{agent} 正在處理。",
+            "failed": "未傳送：{reason}",
+            "signedOut": "請開啟 Rerun 重新登入。",
+            "fallbackAgent": "您的同事"
+        }
+    }
+}

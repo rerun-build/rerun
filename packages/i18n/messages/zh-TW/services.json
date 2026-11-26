@@ -1,0 +1,154 @@
+{
+    "appAccount": {
+        "addAccount": "新增帳號",
+        "connectTitle": "連結 {provider} 帳號",
+        "connectHint": "整個工作區只需連結一次，之後任何同事都能使用這個帳號。",
+        "connect": "連結 {provider}",
+        "actsAs": "代表帳號",
+        "accountName": "{provider} 帳號",
+        "selected": "這位同事會以這個帳號執行動作",
+        "lastAccount": "解除安裝 {app} 即可移除這位同事的最後一個帳號",
+        "appAccount": "{app} 帳號",
+        "needsAttention": "{app} 中有需要處理的事項",
+        "wakeWhen": "在以下情況喚醒這位同事",
+        "wakeWhenAccount": "在以下情況透過 {account} 喚醒這位同事",
+        "done": "完成",
+        "timing": {
+            "rightAway": "立即",
+            "everyFewHours": "每隔幾小時檢查一次"
+        },
+        "unavailable": "這個工作區目前還無法使用 {app}。",
+        "wakeEvents": {
+            "message_received": "收到訊息",
+            "accepted_invitation": "邀請被接受",
+            "invitation_received": "收到邀請"
+        }
+    },
+    "authMethod": {
+        "label": {
+            "oauth": "登入",
+            "key": "API 金鑰",
+            "stdio": "本機",
+            "app": "工作區帳號",
+            "other": "連結"
+        },
+        "description": {
+            "oauth": "透過安全的彈出視窗登入。",
+            "key": "貼上服務提供的 API 金鑰。",
+            "stdio": "在您的引擎上本機執行。",
+            "app": "選擇已連結到工作區的帳號。",
+            "other": "不需要憑證。"
+        }
+    },
+    "connect": {
+        "authorizationFailed": "授權失敗",
+        "startFailed": "無法開始連結",
+        "startOAuthFailed": "無法開始 OAuth",
+        "connectedAs": "已以 {account} 連結",
+        "connected": "已連結",
+        "retry": "重試",
+        "secureTitle": "安全連線",
+        "secureBody": "這個連線由我們信任的合作夥伴處理。",
+        "waiting": "正在等待授權…",
+        "connect": "連結"
+    },
+    "credentialGuide": {
+        "title": "如何取得您的 {label}"
+    },
+    "customMcp": {
+        "custom": "自訂",
+        "connect": "連結",
+        "edit": "編輯 {name}",
+        "remove": "移除 {name}",
+        "removeTitle": "要移除 {name} 嗎？",
+        "removeDescription": "同事將失去這個伺服器提供的所有工具，登入資訊也會被清除。",
+        "removeConfirm": "移除",
+        "status": {
+            "connected": "已連結 · {count, plural, other {# 個工具}}",
+            "needsAuth": "需要登入",
+            "unreachable": "無法連線",
+            "noAnswer": "伺服器沒有回應。"
+        }
+    },
+    "requestApp": {
+        "required": "請描述您需要的 App",
+        "sent": "已送出申請。謝謝，我們會盡快研究。",
+        "title": "申請 App",
+        "description": "告訴我們您需要哪個 App，以及您打算如何使用。其餘的交給我們。",
+        "placeholder": "描述您需要的 App…",
+        "cancel": "取消",
+        "send": "送出申請"
+    },
+    "alternatives": {
+        "label": "也支援"
+    },
+    "configForm": {
+        "configured": "已設定 {name}",
+        "connectTitle": "連結 {name}",
+        "signInOAuth": "登入 {name}，讓您的 AI 代理可以使用。",
+        "signInManaged": "使用 {name} 登入，讓您的 AI 代理可以使用。{brand} 會為您處理連結。",
+        "setUp": "設定 {name}",
+        "authentication": "驗證",
+        "backToMethods": "返回連結方式",
+        "connecting": "連結中…",
+        "connect": "連結",
+        "installing": "安裝中…",
+        "chooseAccount": "選擇帳號",
+        "install": "安裝",
+        "noTarget": "這個服務需要登入，但沒有傳回連結目標。",
+        "missingFields": "仍有必填欄位尚未填寫。"
+    },
+    "fields": {
+        "selectPlaceholder": "請選擇…"
+    },
+    "installed": {
+        "title": "已安裝 {name}",
+        "nextTurn": "下一輪即可使用：{tools}"
+    },
+    "list": {
+        "emptyTitle": "找不到 App",
+        "emptyDescription": "找不到符合您搜尋條件的 App。",
+        "request": "申請 App",
+        "installed": "已安裝",
+        "addAccount": "新增帳號",
+        "needsSignIn": "需要登入",
+        "needsSetup": "需要設定",
+        "removeApp": "移除 App",
+        "finishSetup": "完成設定",
+        "install": "安裝"
+    },
+    "suggestion": {
+        "loading": "正在載入建議的 App…",
+        "loadFailed": "無法載入 {name}。",
+        "notFoundSkipped": "目錄中找不到，已略過。",
+        "notNow": "稍後再說",
+        "connect": "連結",
+        "cancel": "取消",
+        "connected": "已連結 {name}",
+        "reconnect": "重新連結",
+        "notFound": "目錄中找不到。",
+        "skipped": "已略過。",
+        "skip": "略過",
+        "finish": "完成",
+        "nextApp": "下一個 App",
+        "fromVault": "已在 Vault 中",
+        "useAccount": "使用 {label}",
+        "connectNew": "新帳號"
+    },
+    "signInPopup": {
+        "connecting": "正在連結 {name}…",
+        "connected": "已連結。您可以關閉這個視窗。",
+        "connectedAs": "已以 {account} 連結。您可以關閉這個視窗。"
+    },
+    "categories": {
+        "payments": "金流",
+        "ecommerce": "電子商務",
+        "crm": "CRM",
+        "marketing": "行銷",
+        "seo": "SEO",
+        "analytics": "分析",
+        "dev": "開發者",
+        "productivity": "生產力",
+        "other": "其他"
+    }
+}

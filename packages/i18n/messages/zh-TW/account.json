@@ -1,0 +1,93 @@
+{
+    "title": "帳號",
+    "tabs": {
+        "profile": {
+            "label": "個人資料",
+            "description": "您的照片與名稱，也就是團隊成員看到的樣子。"
+        },
+        "signIn": {
+            "label": "登入方式",
+            "description": "您可用來登入此帳號的方式。"
+        },
+        "language": {
+            "label": "語言",
+            "description": "{brand} 與您溝通時使用的語言。"
+        },
+        "desktop": {
+            "label": "桌面應用程式",
+            "description": "Rerun 應用程式在這台電腦上的運作方式。"
+        },
+        "delete": {
+            "label": "刪除帳號",
+            "description": "永久關閉您的 {brand} 帳號。"
+        }
+    },
+    "language": {
+        "field": "語言",
+        "automatic": "自動",
+        "automaticHint": "跟隨您的瀏覽器：{language}。",
+        "failed": "無法變更語言，請再試一次。"
+    },
+    "profile": {
+        "photo": "照片",
+        "photoHelp": "會顯示給團隊成員，出現在您的訊息與游標旁。",
+        "dropPhoto": "拖放您的照片",
+        "changePhoto": "更換照片",
+        "uploadPhoto": "上傳照片",
+        "removePhoto": "移除",
+        "name": "名稱",
+        "namePlaceholder": "例如：Ada Lovelace",
+        "save": "儲存",
+        "notAnImage": "請選擇圖片檔案。",
+        "nameUpdated": "名稱已更新",
+        "failed": "發生錯誤，請再試一次。"
+    },
+    "signIn": {
+        "email": {
+            "title": "電子郵件",
+            "empty": "尚未連結。新增後即可透過寄到收件匣的驗證碼登入。"
+        },
+        "phone": {
+            "title": "電話",
+            "empty": "尚未連結。新增號碼後即可透過 WhatsApp 或簡訊收到的驗證碼登入。",
+            "otherAccount": "此號碼已用於登入另一個 {brand} 帳號。請更換號碼，才能以電話登入此帳號。"
+        },
+        "change": "變更",
+        "add": "新增",
+        "connect": "連結",
+        "disconnect": "中斷連結",
+        "connected": "已連結",
+        "notConnected": "尚未連結。",
+        "onlyMethod": "{provider} 是此帳號唯一連結的登入方式。",
+        "disconnectTitle": "要中斷與 {provider} 的連結嗎？",
+        "disconnectDescription": "您將無法再以 {provider} 登入此帳號。其他登入方式仍可正常使用。",
+        "linkError": {
+            "identityTaken": "此 {provider} 帳號已用於登入另一個 {brand} 帳號。",
+            "denied": "未連結 {provider}。",
+            "failed": "無法連結 {provider}，請再試一次。"
+        }
+    },
+    "delete": {
+        "consequences": {
+            "shared": {
+                "title": "共用的工作區",
+                "description": "您會離開所有與團隊成員共用的工作區。他們會保留工作區，以及其中的同事與檔案。"
+            },
+            "own": {
+                "title": "您自己的工作區",
+                "description": "只有您一人的工作區會永久停止：其中的同事會被關閉，機器及其檔案也會一併刪除。"
+            },
+            "signIn": {
+                "title": "登入",
+                "description": "您會在所有裝置上登出。您的電子郵件、Google 帳號與電話號碼將會釋出，日後可以重新註冊。"
+            }
+        },
+        "blocker": {
+            "current": "其訂閱仍會續訂。刪除帳號前，請先到「帳單」取消訂閱。",
+            "other": "其訂閱仍會續訂。刪除帳號前，請切換到此工作區並到「帳單」取消訂閱。",
+            "openBilling": "開啟帳單"
+        },
+        "submit": "刪除帳號",
+        "failed": "無法刪除您的帳號。"
+    }
+}

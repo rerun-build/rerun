@@ -1,0 +1,100 @@
+{
+    "start": {
+        "title": "歡迎使用 Rerun",
+        "continueWithApple": "使用 Apple 繼續",
+        "continueWithGoogle": "使用 Google 繼續",
+        "continueWithPhone": "使用手機號碼繼續",
+        "continueWithEmail": "使用電子郵件繼續",
+        "or": "或",
+        "welcome": "歡迎使用 Rerun",
+        "ownServer": "使用您自己的伺服器",
+        "useCloud": "使用 Rerun Cloud"
+    },
+    "back": "返回",
+    "phone": {
+        "title": "您的手機號碼",
+        "unsupportedCountry": "我們目前還無法傳送驗證碼到這個國家。",
+        "consent": "繼續即表示您同意 Rerun 透過 WhatsApp 或簡訊與您聯絡。",
+        "sendByWhatsapp": "透過 WhatsApp 傳送",
+        "sendBySms": "透過簡訊傳送",
+        "countryLabel": "國家：{name}",
+        "numberLabel": "手機號碼"
+    },
+    "email": {
+        "title": "使用電子郵件繼續",
+        "label": "電子郵件",
+        "placeholder": "you@company.com",
+        "send": "傳送驗證碼"
+    },
+    "code": {
+        "title": "輸入驗證碼",
+        "sentByPhone": "已透過 {channel} 傳送至 {number}",
+        "sentByEmail": "已傳送至 {email}",
+        "fieldLabel": "驗證碼",
+        "continue": "繼續",
+        "resendIn": "{seconds} 秒後可重新傳送",
+        "resend": "重新傳送驗證碼",
+        "switchChannel": "改用 {channel} 傳送",
+        "differentNumber": "使用其他號碼",
+        "differentEmail": "使用其他電子郵件"
+    },
+    "country": {
+        "search": "搜尋",
+        "searchLabel": "搜尋國家"
+    },
+    "errors": {
+        "generic": "發生錯誤，請再試一次。",
+        "offline": "無法連線至 Rerun。請檢查您的網路連線後再試一次。",
+        "session": "無法開啟您的工作階段，請再試一次。",
+        "apple": "無法使用 Apple 登入，請再試一次。",
+        "google": "無法使用 Google 登入，請再試一次。",
+        "phone": {
+            "taken": "此號碼已用於登入另一個 Rerun 帳號。",
+            "same_number": "這已經是您帳號的號碼。",
+            "not_required": "您的手機號碼已經驗證過了。",
+            "too_soon": "驗證碼已在傳送中，請稍候再要求新的驗證碼。",
+            "too_many": "此號碼要求的驗證碼過多，請稍後再試。",
+            "invalid_number": "請輸入有效的手機號碼。",
+            "unsupported_country": "我們目前還無法傳送驗證碼到這個國家。請改用電子郵件或 Google。",
+            "undeliverable": "無法將驗證碼傳送到此號碼。請試試另一個管道，或改用電子郵件或 Google。",
+            "blocked": "無法傳送驗證碼到此號碼。請改用電子郵件或 Google。",
+            "rate_limited": "此號碼的嘗試次數過多，請稍後再試。",
+            "wrong_code": "驗證碼錯誤或已過期。",
+            "expired": "驗證碼已過期，請要求新的驗證碼。",
+            "unavailable": "無法連線到您的手機。請再試一次，或改用另一個管道。",
+            "busy": "手機登入目前忙碌中。請改用電子郵件或 Google。",
+            "captcha_failed": "無法確認您不是機器人，請再試一次。",
+            "signed_out": "請先建立您的帳號。"
+        },
+        "email": {
+            "invalid_email": "請輸入有效的電子郵件",
+            "captcha_failed": "無法確認您不是機器人，請再試一次。",
+            "blocked_domain": "不接受此電子郵件網域。請使用其他地址。",
+            "too_many": "您的網路已建立過多帳號，請稍後再試。",
+            "too_many_codes": "您的網路要求的驗證碼過多，請稍後再試。",
+            "unavailable": "無法傳送您的驗證碼，請再試一次。",
+            "rate_limited": "此地址要求的驗證碼過多，請稍後再試。",
+            "wrong_code": "驗證碼錯誤或已過期。"
+        }
+    },
+    "consent": {
+        "title": "您的同事由 AI 驅動",
+        "body": "為了完成您的任務，Rerun 會將您的訊息、相片、語音訊息、檔案和網站傳送給 AI 供應商：透過 OpenRouter 的 OpenAI、Anthropic 和 Google，以及您自行連結的任何供應商。",
+        "noTraining": "Rerun 的供應商不會使用您的資料來訓練模型。",
+        "privacy": "隱私權政策",
+        "notNow": "暫時不要",
+        "agree": "同意並繼續"
+    },
+    "server": {
+        "title": "您的 Rerun 伺服器",
+        "address": "伺服器位址",
+        "connect": "連線",
+        "problems": {
+            "invalid": "請輸入您 Rerun 伺服器的位址。",
+            "insecure": "在區域網路以外請使用 https://。",
+            "unreachable": "無法連線至此伺服器。",
+            "not-rerun": "此位址不是 Rerun 伺服器。",
+            "outdated": "請更新此 Rerun 伺服器，才能從 App 使用。"
+        }
+    }
+}

@@ -1,0 +1,35 @@
+{
+    "time": {
+        "today": "今天",
+        "yesterday": "昨天",
+        "now": "剛剛",
+        "minutesAgo": "{count} 分",
+        "hoursAgo": "{count} 小時",
+        "daysAgo": "{count} 天"
+    },
+    "actions": {
+        "close": "關閉",
+        "cancel": "取消",
+        "done": "完成",
+        "share": "分享",
+        "update": "更新"
+    },
+    "errors": {
+        "tryAgainShortly": "請稍後再試。",
+        "generic": "發生錯誤，請再試一次。",
+        "requestFailed": "請求失敗（{status}）",
+        "uploadFailed": "上傳失敗（{status}）"
+    },
+    "unread": "未讀",
+    "viewer": {
+        "shareFailed": "無法分享此檔案",
+        "noPreview": "此檔案無法預覽。請分享以在其他應用程式中開啟。",
+        "position": "{index} / {total}"
+    },
+    "vault": {
+        "fromVault": "已在 Vault 中",
+        "useAccount": "使用 {label}",
+        "manageBox": "您不是這位同事所屬 Box 的管理者",
+        "lendFailed": "無法使用此帳號"
+    }
+}

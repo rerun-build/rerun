@@ -1,0 +1,40 @@
+{
+    "contact": "聯絡 {manager}",
+    "removeAsk": "請 {manager} 移除成員",
+    "templateUnavailable": "此工作區無法使用",
+    "paused": {
+        "title": "此工作區已暫停。",
+        "body": "請聯絡 {manager} 以恢復使用。",
+        "reason": "此工作區已暫停。請聯絡 {manager}。",
+        "coworker": "聯絡 {manager} 後，{name} 會從停下的地方繼續。"
+    },
+    "restoring": {
+        "waiting": "此工作區排在第一位。",
+        "failed": "我們已收到通知，正在手動恢復。"
+    },
+    "credit": {
+        "title": "點數",
+        "providedBy": "由 {manager} 提供",
+        "outTitle": "點數已用完",
+        "out": "請聯絡 {manager} 取得更多點數。",
+        "outOwnPlan": "請聯絡 {manager} 取得更多點數，或改用您已連結的 {plan} 方案執行。",
+        "outOwnAi": "請聯絡 {manager} 取得更多點數，或讓同事改用您自己的 AI 執行。",
+        "usedUp": "點數已用完。請聯絡 {manager}。",
+        "usage": "已使用 {percent}% 的點數",
+        "detailUsedUp": "使用這些點數執行的同事已暫停。請聯絡 {manager} 取得更多點數，或選擇其他預設模型讓他們繼續工作。",
+        "detailIncluded": "由 {manager} 提供。無需金鑰，也不用設定。",
+        "defaultPick": "點數已用完，沒有專屬模型的同事已暫停。請聯絡 {manager}，或選擇其他模型讓他們繼續工作。",
+        "defaultAdd": "點數已用完，沒有專屬模型的同事已暫停。請聯絡 {manager}，或新增方案或 API 金鑰讓他們繼續工作。"
+    },
+    "host": {
+        "noAccess": {
+            "title": "您沒有存取權限",
+            "body": "{email} 在這裡沒有工作區。請向 {brand} 索取邀請。",
+            "bodyUnnamed": "此帳號在這裡沒有工作區。請向 {brand} 索取邀請。"
+        },
+        "unavailable": {
+            "title": "{brand} 目前無法使用",
+            "body": "請稍後再回來。"
+        }
+    }
+}

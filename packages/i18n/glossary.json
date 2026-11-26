@@ -2,12 +2,12 @@
     "_doc": "Terms the translation keeps fixed. `keep` stays as written in every language; `translations` imposes a word per language; `tone` is the register of each language.",
     "keep": ["Rerun", "Rerun Cloud", "Rerun Max", "Chief of Staff", "Box", "Boxes", "Pro", "Max", "Google", "WhatsApp", "LinkedIn", "Slack", "Stripe", "Vault"],
     "translations": {
-        "coworker": { "fr": "coworker", "es": "coworker", "pt": "coworker", "de": "Coworker", "tr": "coworker (suffixes after an apostrophe: coworker'ınız, coworker'lar)", "ar": "زميل", "zh": "同事", "he": "עמית" },
-        "coworkers": { "fr": "coworkers", "es": "coworkers", "pt": "coworkers", "de": "Coworker", "tr": "coworker'lar", "ar": "زملاء", "zh": "同事", "he": "עמיתים" },
-        "workspace": { "fr": "workspace", "es": "workspace", "pt": "workspace", "de": "Workspace", "tr": "çalışma alanı", "ar": "مساحة العمل", "zh": "工作区", "he": "סביבת העבודה" },
-        "credit": { "fr": "crédit", "es": "crédito", "pt": "crédito", "de": "Guthaben (a balance), Credit / Credits (a count: \"500 Credits\")", "tr": "kredi", "ar": "رصيد (a balance), رصيد / أرصدة (a count: \"500 رصيد\")", "zh": "积分", "he": "קרדיט / קרדיטים" },
-        "skill": { "fr": "skill", "es": "skill", "pt": "skill", "de": "Skill", "tr": "skill (suffixes after an apostrophe: skill'ler)", "ar": "مهارة", "zh": "技能", "he": "מיומנות" },
-        "run": { "fr": "exécution", "es": "ejecución", "pt": "execução", "de": "Ausführung", "tr": "çalıştırma", "ar": "تشغيل", "zh": "运行", "he": "הרצה" }
+        "coworker": { "fr": "coworker", "es": "coworker", "pt": "coworker", "de": "Coworker", "tr": "coworker (suffixes after an apostrophe: coworker'ınız, coworker'lar)", "ar": "زميل", "zh": "同事", "zh-TW": "同事", "he": "עמית" },
+        "coworkers": { "fr": "coworkers", "es": "coworkers", "pt": "coworkers", "de": "Coworker", "tr": "coworker'lar", "ar": "زملاء", "zh": "同事", "zh-TW": "同事", "he": "עמיתים" },
+        "workspace": { "fr": "workspace", "es": "workspace", "pt": "workspace", "de": "Workspace", "tr": "çalışma alanı", "ar": "مساحة العمل", "zh": "工作区", "zh-TW": "工作區", "he": "סביבת העבודה" },
+        "credit": { "fr": "crédit", "es": "crédito", "pt": "crédito", "de": "Guthaben (a balance), Credit / Credits (a count: \"500 Credits\")", "tr": "kredi", "ar": "رصيد (a balance), رصيد / أرصدة (a count: \"500 رصيد\")", "zh": "积分", "zh-TW": "點數", "he": "קרדיט / קרדיטים" },
+        "skill": { "fr": "skill", "es": "skill", "pt": "skill", "de": "Skill", "tr": "skill (suffixes after an apostrophe: skill'ler)", "ar": "مهارة", "zh": "技能", "zh-TW": "技能", "he": "מיומנות" },
+        "run": { "fr": "exécution", "es": "ejecución", "pt": "execução", "de": "Ausführung", "tr": "çalıştırma", "ar": "تشغيل", "zh": "运行", "zh-TW": "執行", "he": "הרצה" }
     },
     "tone": {
         "fr": "Vouvoiement. Short, plain product French as in a SaaS app. No anglicisms beyond the glossary.",
@@ -17,6 +17,7 @@
         "tr": "Siz, as Turkish SaaS products write. Short, plain product Turkish; a foreign product name takes its suffix after an apostrophe (Slack'e). Never glue a case suffix onto an ICU argument ({name}'e): rephrase so the argument stands alone. No anglicisms beyond the glossary.",
         "ar": "Modern Standard Arabic, as Arabic SaaS products write: short, plain, polite. Address the reader in the masculine singular as apps do; buttons use the imperative (احفظ) or the verbal noun (حفظ) consistently. Arabic punctuation (، ؛ ؟). Product and app names stay in Latin script. Digits are Latin (0-9). Plurals: give zero, one, two, few, many and other.",
         "zh": "Simplified Chinese as written in mainland China SaaS products: short and plain. Address the reader as 您. Full-width punctuation (，。：？！、). Never the Chinese dash ——, nor the em dash. Product and app names stay in Latin script. Plurals: only `other` is needed.",
+        "zh-TW": "Traditional Chinese as written in Taiwan SaaS products (Taiwan Mandarin), translated from the English, never a character conversion of the Simplified pack. Short and plain; address the reader as 您. Full-width punctuation (，。：？！、「」). Never the Chinese dash ——, nor the em dash. Product and app names stay in Latin script. Plurals: only `other` is needed. Use Taiwan vocabulary: 軟體, 資料, 網路, 設定, 帳號, 檔案, 訊息, 影片, 程式, 使用者, 預設, 選單, 連結, 登入/登出, 螢幕, 專案, 建立, 儲存, 伺服器, 搜尋, 支援, 匯出/匯入, 範本, 外掛, 線上, 介面, 品質, 列印, 啟用, 重新整理, 檢視, 貼上, 文字, 字型, 滑鼠, 記憶體, 智慧, 通知, 行事曆, 資料夾. Never the mainland terms: 軟件, 數據, 網絡, 信息, 視頻, 用戶, 默認, 菜單, 鏈接, 登錄, 屏幕, 項目 (for a project), 創建, 保存, 服務器, 搜索, 支持 (for support), 導出/導入, 模板, 插件, 在線, 界面, 質量, 打印, 激活, 刷新, 視圖, 粘貼, 文本, 字體, 鼠標, 內存, 智能, 日曆, 文件夾.",
         "he": "Modern Hebrew as Israeli SaaS products write: short and plain. Buttons and actions in the infinitive (לשמור), sentences addressed in the masculine singular as apps do. Product and app names stay in Latin script. Plurals: give one, two and other."
     },
     "rules": [

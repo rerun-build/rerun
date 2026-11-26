@@ -1,0 +1,510 @@
+{
+    "metadata": {
+        "layout": {
+            "title": "專家",
+            "description": "探索值得信賴的開發者與工作室，在 Rerun 上為您設計、推出並營運 AI 代理。"
+        },
+        "directory": {
+            "title": "聘請頂尖 AI 專家",
+            "description": "與經過審核的開發者、自由工作者與工作室合作，打造真正有成果的 AI 代理。依技能與地點瀏覽 Rerun 專家。"
+        },
+        "program": {
+            "title": "成為 Rerun 專家",
+            "description": "加入 Rerun 專家計畫：列名專家名錄、在免費沙盒中為客戶打造代理、保留 95% 範本銷售收入，並賺取 20% 持續分潤。"
+        }
+    },
+    "jsonLd": {
+        "home": "首頁",
+        "experts": "專家"
+    },
+    "directory": {
+        "eyebrow": "{count, plural, other {# 位經審核的專家}}",
+        "title": "找到您的 AI 專家",
+        "description": "經過審核的開發者與工作室，為您建置最複雜的系統，讓同事串接您企業使用的每一項工具與流程。",
+        "joinAside": "加入已在 Rerun 上架的專家行列",
+        "becomeExpert": "成為專家",
+        "featured": {
+            "label": "精選",
+            "title": "最值得優先聯絡的專家。",
+            "carousel": "精選專家"
+        },
+        "grid": {
+            "allLabel": "所有專家",
+            "resultsLabel": "結果",
+            "title": "{count, plural, other {# 位經審核的開發者與工作室。}}",
+            "clear": "清除篩選條件",
+            "empty": "沒有符合這些篩選條件的專家。"
+        }
+    },
+    "filters": {
+        "facets": {
+            "type": {
+                "label": "類型",
+                "search": "搜尋類型"
+            },
+            "availability": {
+                "label": "可接案狀態",
+                "search": "搜尋可接案狀態"
+            },
+            "budget": {
+                "label": "預算",
+                "search": "搜尋預算"
+            },
+            "skill": {
+                "label": "技能",
+                "search": "搜尋技能"
+            },
+            "language": {
+                "label": "語言",
+                "search": "搜尋語言"
+            }
+        },
+        "types": {
+            "studio": "工作室",
+            "freelancer": "自由工作者",
+            "expert": "專家"
+        },
+        "availabilities": {
+            "available": "可接案",
+            "soon": "即將可接案",
+            "unavailable": "暫不接案"
+        },
+        "segment": "{label}：{value}",
+        "any": "不限",
+        "clear": "清除",
+        "noResults": "沒有結果",
+        "skills": {
+            "agent-design": "代理設計",
+            "workflow-automation": "工作流程自動化",
+            "rag-knowledge-bases": "RAG 與知識庫",
+            "integrations-apis": "整合與 APIs",
+            "mcp-servers": "MCP 伺服器",
+            "prompt-engineering": "提示工程",
+            "data-pipelines": "資料管線",
+            "chatbots-support": "聊天機器人與客服",
+            "voice-agents": "語音代理",
+            "lead-gen-outreach": "潛在客戶開發與觸及",
+            "crm-automation": "CRM 自動化",
+            "web-scraping": "網頁擷取",
+            "e-commerce-automation": "電商自動化",
+            "analytics-reporting": "分析與報表",
+            "fine-tuning": "微調",
+            "no-code-automation": "無程式碼自動化"
+        }
+    },
+    "card": {
+        "hire": "聘請"
+    },
+    "hire": {
+        "title": "與 {name} 合作",
+        "description": "向對方介紹您的專案，對方會直接以電子郵件回覆您。",
+        "fields": {
+            "name": "您的姓名",
+            "namePlaceholder": "Ada Lovelace",
+            "email": "電子郵件",
+            "emailPlaceholder": "you@company.com",
+            "website": "公司網站",
+            "message": "訊息",
+            "messagePlaceholder": "您正在打造什麼？需要哪方面的協助？"
+        },
+        "submit": "送出需求",
+        "sending": "傳送中...",
+        "sent": {
+            "title": "需求已送出",
+            "description": "{name} 會以電子郵件回覆您，通常在 24 小時內。",
+            "close": "關閉"
+        },
+        "validation": {
+            "nameRequired": "請輸入姓名",
+            "emailRequired": "請輸入電子郵件",
+            "emailInvalid": "電子郵件無效",
+            "urlProtocol": "必須以 http:// 或 https:// 開頭",
+            "messageTooShort": "請向專家多介紹一些您的專案",
+            "messageTooLong": "訊息太長"
+        },
+        "errors": {
+            "unavailable": "這位專家已無法接案。",
+            "invalid": "請檢查表單後再試一次。",
+            "failed": "發生錯誤，請再試一次。"
+        }
+    },
+    "program": {
+        "hero": {
+            "eyebrow": "專家計畫",
+            "title": "加入 <mark></mark>Rerun 專家計畫",
+            "promises": {
+                "listed": "列名專家名錄，並與客戶媒合",
+                "workspace": "獲得免費工作區，打造任何您想要的東西",
+                "templates": "打造或匯入同事並作為範本販售，每筆銷售保留 95%",
+                "revenue": "您帶來的每個客戶方案，都能賺取 20% 持續分潤"
+            },
+            "findExpert": "尋找專家",
+            "joined": "加入已在 Rerun 上架的專家行列"
+        },
+        "showcase": {
+            "label": "專家名錄",
+            "title": "躋身頂尖人才之列。",
+            "lede": "已在 Rerun 上架的專家，以及客戶聯絡前會看到的個人檔案。",
+            "carousel": "Rerun 專家",
+            "browseAll": "瀏覽所有專家"
+        },
+        "cta": {
+            "label": "專家計畫",
+            "title": "成為 Rerun 專家",
+            "subtitle": "只需申請一次。我們會人工審閱每份申請，並以電子郵件告知下一步。"
+        },
+        "valueProps": {
+            "badge": "為什麼選擇 Rerun",
+            "title": "為什麼自由工作者與工作室選擇在 Rerun 上開發。",
+            "subtitle": "您交付同事，客戶讓它持續運作。不必租用基礎架構，也不用寫沒人看的交接文件。",
+            "cells": {
+                "ship": {
+                    "title": "幾天就能上線，而不是幾個月",
+                    "desc": "從現成可用的同事與 {connectorCount}+ 個應用程式開始，每個都只要點一下。第一次展示前無需任何佈建。"
+                },
+                "harness": {
+                    "title": "打造完整架構，而不只是提示詞",
+                    "desc": "精確選擇同事能做的事：檔案、Shell、網路、記憶、專屬資料庫、技能。每項能力都是一個開關。"
+                },
+                "board": {
+                    "title": "交付即時看板，而不是聊天紀錄",
+                    "desc": "執行次數、成本、成功率與需要人工處理的事項，都即時顯示在看板上。客戶能看到工作進度，不必一直來問您狀態。"
+                },
+                "handoff": {
+                    "title": "交接後不必手把手",
+                    "desc": "在處理任何敏感事項前，同事會先停下來詢問您的客戶。客戶可在應用程式或 Slack 中核准，您就不必永遠卡在流程裡。"
+                },
+                "running": {
+                    "title": "您離開後它仍持續運作",
+                    "desc": "同事在客戶自己的機器上全天候運作，依排程或觸發條件執行。不必看顧，也不會半夜兩點接到緊急電話。"
+                },
+                "improving": {
+                    "title": "您售出的同事會持續進步",
+                    "desc": "它會記下對客戶的了解，讓您交付的成果自行越來越精準，而不是逐漸過時。"
+                }
+            }
+        },
+        "benefits": {
+            "badge": "您將獲得",
+            "title": "成為 Rerun 專家，成長更快。",
+            "subtitle": "一次申請，四種方式為您已在做的工作獲得報酬。",
+            "items": {
+                "listed": {
+                    "title": "列名專家名錄",
+                    "desc": "公開的個人檔案，客戶可瀏覽、依技能與預算篩選，並一鍵聯絡。每份需求都會直接送進您的收件匣。"
+                },
+                "sandbox": {
+                    "title": "在沙盒中免費開發",
+                    "desc": "專家帳號可獲得沒有同事數量限制、也不收費的沙盒。製作原型、展示，再把完成的同事交給客戶。"
+                },
+                "templates": {
+                    "title": "保留 95% 的範本銷售收入",
+                    "desc": "將同事打包成範本並發布到市集，每次有人安裝就能獲得收入。價格由您決定，每筆銷售保留 95%，款項撥付由我們處理。"
+                },
+                "revenue": {
+                    "title": "您帶來的每位客戶都能賺取 20%",
+                    "desc": "當您引導上線的客戶訂閱時，只要他們持續使用，您每個月都能賺取其 Rerun 方案的 20%。"
+                }
+            }
+        },
+        "perks": {
+            "badge": "專家優勢",
+            "title": "每位 Rerun 專家都能獲得的權益。",
+            "subtitle": "只有一個等級，不必累積點數。以下是申請通過當天起的改變。",
+            "regular": {
+                "title": "一般帳號",
+                "subtitle": "所有 Rerun 使用者"
+            },
+            "expert": {
+                "title": "Rerun 專家",
+                "subtitle": "已通過計畫審核"
+            },
+            "rows": {
+                "directory": {
+                    "label": "名錄刊登",
+                    "regular": "未刊登，客戶找不到您",
+                    "expert": "公開的個人檔案，可被客戶搜尋與篩選"
+                },
+                "matching": {
+                    "label": "客戶媒合",
+                    "regular": "自己開發潛在客戶",
+                    "expert": "依技能與預算將客戶需求轉給您"
+                },
+                "sandbox": {
+                    "label": "沙盒",
+                    "regular": "同事數量有限，每個工作區都要付費",
+                    "expert": "無限制且免費，用來為客戶打造與展示同事"
+                },
+                "marketplace": {
+                    "label": "範本市集",
+                    "regular": "瀏覽與安裝範本",
+                    "expert": "發布您的同事，每筆銷售保留 95%"
+                },
+                "revenue": {
+                    "label": "營收分潤",
+                    "regular": "無",
+                    "expert": "您帶來的客戶方案享 20% 持續分潤"
+                },
+                "community": {
+                    "label": "社群",
+                    "regular": "文件與共用的支援信箱",
+                    "expert": "私人頻道與團隊直通管道"
+                },
+                "earlyAccess": {
+                    "label": "搶先體驗",
+                    "regular": "功能公開推出時才能使用",
+                    "expert": "在公開推出前搶先使用新功能與模型"
+                },
+                "coMarketing": {
+                    "label": "聯合行銷",
+                    "regular": "無",
+                    "expert": "精選個人檔案、客戶案例與上市支援"
+                }
+            }
+        },
+        "apply": {
+            "button": "申請成為專家",
+            "sent": {
+                "title": "已收到申請",
+                "description": "我們會人工審閱每份申請。若合適，您會收到一封電子郵件，內含領取創作者帳號與沙盒的連結。",
+                "close": "關閉"
+            },
+            "title": "申請專家計畫",
+            "description": "請介紹您自己。我們會以電子郵件告知下一步。",
+            "fields": {
+                "name": "姓名或工作室名稱",
+                "namePlaceholder": "Ada Lovelace",
+                "email": "電子郵件",
+                "emailPlaceholder": "you@studio.com",
+                "type": "您的工作型態",
+                "location": "所在地",
+                "locationPlaceholder": "台北，台灣",
+                "website": "網站或作品集",
+                "linkedin": "LinkedIn",
+                "x": "X"
+            },
+            "types": {
+                "freelancer": "自由工作者",
+                "studio": "工作室"
+            },
+            "submit": "送出申請",
+            "sending": "傳送中...",
+            "validation": {
+                "nameRequired": "請輸入姓名",
+                "emailRequired": "請輸入電子郵件",
+                "emailInvalid": "電子郵件無效",
+                "locationTooLong": "所在地太長",
+                "urlProtocol": "必須以 http:// 或 https:// 開頭"
+            },
+            "errors": {
+                "alreadyApplied": "此電子郵件已在我們的紀錄中，我們會再與您聯絡。",
+                "invalid": "請檢查表單後再試一次。",
+                "failed": "發生錯誤，請再試一次。"
+            }
+        }
+    },
+    "visuals": {
+        "harness": {
+            "capabilities": {
+                "filesystem": {
+                    "label": "讀寫檔案",
+                    "blurb": "處理其工作區中的檔案"
+                },
+                "shell": {
+                    "label": "執行指令",
+                    "blurb": "在其 Box 中執行指令"
+                },
+                "web": {
+                    "label": "瀏覽網路",
+                    "blurb": "搜尋並閱讀網頁"
+                },
+                "memory": {
+                    "label": "記住事情",
+                    "blurb": "儲存與回想資訊"
+                },
+                "db": {
+                    "label": "存取資料",
+                    "blurb": "查詢其資料庫"
+                },
+                "skills": {
+                    "label": "使用技能",
+                    "blurb": "執行已安裝的技能"
+                },
+                "self": {
+                    "label": "自我改進",
+                    "blurb": "調整自己的設定"
+                },
+                "schedule": {
+                    "label": "排程任務",
+                    "blurb": "安排之後的工作"
+                },
+                "callAgent": {
+                    "label": "與其他同事合作",
+                    "blurb": "委派給團隊成員"
+                },
+                "askUser": {
+                    "label": "向您提問",
+                    "blurb": "暫停並提供選項詢問您"
+                },
+                "requestApproval": {
+                    "label": "請求核准",
+                    "blurb": "暫停等待您同意"
+                }
+            }
+        },
+        "hitl": {
+            "agent": "Margo · 催收帳款",
+            "question": "acme.com 有兩張發票已逾期 20 天。我該如何催收？",
+            "options": {
+                "remind": "寄送措辭堅定的提醒給 billing@acme.com",
+                "call": "先打電話給對方的應付帳款聯絡人",
+                "escalate": "上報給客戶負責人"
+            },
+            "approval": {
+                "action": "Margo 想退款 $230 給 acme.com",
+                "detail": "發票 #1042 · 有爭議的款項"
+            },
+            "permission": {
+                "label": "寄送電子郵件",
+                "message": "寄送付款提醒給 billing@acme.com",
+                "preview": "主旨：發票 #1042：付款逾期\n\n您好，發票 #1042（$230）的付款期限為 8 月 20 日。"
+            },
+            "resume": {
+                "question": "正在致電應付帳款聯絡人 · 提醒已排入佇列",
+                "approval": "已退款 · 已通知客戶",
+                "permission": "已寄送電子郵件給 billing@acme.com"
+            }
+        },
+        "monitor": {
+            "runs": {
+                "title": "今日執行",
+                "subtitle": "即時"
+            },
+            "status": {
+                "title": "同事狀態",
+                "subtitle": "{count} 位正在工作"
+            },
+            "tokens": {
+                "title": "已用 Token",
+                "subtitle": "過去 7 天"
+            },
+            "success": {
+                "title": "成功率",
+                "subtitle": "近 24 小時"
+            },
+            "logs": {
+                "title": "執行紀錄",
+                "subtitle": "Jules · 進線銷售"
+            },
+            "revenue": {
+                "title": "已成交營收",
+                "subtitle": "本月"
+            },
+            "agents": {
+                "a1": "Jules · 進線銷售",
+                "a2": "Margo · 催收帳款",
+                "a3": "Sam · 收件匣分類",
+                "a4": "Nora · 客服",
+                "a5": "Leo · 報表"
+            }
+        },
+        "triggers": {
+            "listening": "監聽中",
+            "status": {
+                "triggered": "已觸發",
+                "running": "執行中",
+                "done": "完成"
+            },
+            "events": {
+                "morning": {
+                    "source": "每天早上 7:00",
+                    "action": "Sam 整理了您的收件匣"
+                },
+                "lead": {
+                    "source": "潛在客戶來信",
+                    "action": "Jules 正在草擬回覆"
+                },
+                "payment": {
+                    "source": "剛有一筆付款失敗",
+                    "action": "Margo 正在追蹤"
+                },
+                "signup": {
+                    "source": "新註冊",
+                    "action": "已啟動新手引導"
+                },
+                "meeting": {
+                    "source": "會議剛結束",
+                    "action": "Sam 正在撰寫摘要"
+                }
+            }
+        },
+        "memory": {
+            "files": "{count, plural, other {個檔案}}",
+            "updated": "剛剛更新",
+            "kinds": {
+                "skill": "技能",
+                "context": "背景資訊",
+                "preference": "偏好"
+            },
+            "cards": {
+                "invoiceChasing": {
+                    "name": "催收帳款",
+                    "description": "催收逾期發票，又不傷害客戶關係。",
+                    "lines": {
+                        "1": "## 流程",
+                        "2": "1. 每天從 Stripe 擷取未付款的發票",
+                        "3": "2. 逾期第 7 天寄出第一次提醒",
+                        "4": "3. 嘗試 2 次後上報給客戶負責人",
+                        "5": "4. 每次聯繫都記錄在 CRM 對話串中",
+                        "6": "## 例外",
+                        "7": "- 金額低於 $50 的發票一律不催收",
+                        "8": "- 上報前先閱讀 references/tone.md"
+                    }
+                },
+                "acme": {
+                    "name": "Acme Corp",
+                    "description": "同事對這個客戶的了解。",
+                    "lines": {
+                        "1": "## 帳務",
+                        "2": "- 大約第 30 天付款，有時更晚",
+                        "3": "- 每張發票都必須附上採購單號",
+                        "4": "- 發票寄給 ap@acme.co，不是寄給 Dana",
+                        "5": "## 聯絡人",
+                        "6": "- Dana Reyes 負責營運，一天內會回覆",
+                        "7": "- 上報需透過對方的營運長"
+                    }
+                },
+                "emailTone": {
+                    "name": "電子郵件語氣",
+                    "description": "使用者希望如何寫信給潛在客戶。",
+                    "lines": {
+                        "1": "## 語氣",
+                        "2": "- 英文、正式、不用表情符號",
+                        "3": "- 以創辦人身分署名，而非助理",
+                        "4": "- 控制在 120 字以內",
+                        "5": "## 時機",
+                        "6": "- 追蹤兩次後就停止",
+                        "7": "- 草稿完成就寄出"
+                    }
+                }
+            },
+            "rounds": {
+                "confirmed": {
+                    "label": "已確認",
+                    "text": "Acme 又在第 44 天付款",
+                    "after": "- 以 45 天為付款期限，已在 3 張發票上確認"
+                },
+                "preference": {
+                    "label": "偏好",
+                    "text": "絕不在早上 9 點前寄信給客戶",
+                    "after": "- 絕不在對方當地時間早上 9 點前寄出"
+                },
+                "learned": {
+                    "label": "已學到",
+                    "text": "Acme 的上報需透過對方的營運長",
+                    "after": "3. 嘗試 2 次後上報給對方的營運長"
+                }
+            }
+        }
+    }
+}

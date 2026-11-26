@@ -1,0 +1,102 @@
+{
+    "agentPicker": {
+        "open": "{tab, select, chat {開啟 {name} 的聊天} actions {開啟 {name} 的待處理} services {開啟 {name} 的應用程式} mcp {開啟 {name} 的 MCP} skills {開啟 {name} 的技能} data {開啟 {name} 的資料庫} memories {開啟 {name} 的知識} files {開啟 {name} 的檔案} scheduled {開啟 {name} 的例行工作} triggers {開啟 {name} 的觸發條件} other {{name}}}"
+    },
+    "connect": {
+        "added": "已新增 {name}",
+        "connectedNote": "已連結，同事可以使用了",
+        "signInNote": "登入一次，同事就能使用",
+        "connected": "已連結",
+        "signingIn": "正在登入…",
+        "signIn": "登入",
+        "connectNew": "新帳號",
+        "signInNeeded": "需要登入",
+        "unreachable": "無法連線",
+        "couldNotConnect": "無法連結 {name}",
+        "notAdded": "未新增",
+        "customServer": "自訂 MCP 伺服器",
+        "customServerAt": "自訂 MCP 伺服器 · {host}",
+        "connecting": "正在連結…",
+        "connect": "連結",
+        "installed": "已安裝 {name}",
+        "availableNextTurn": "下一輪可用：{tools}"
+    },
+    "event": {
+        "notification": "傳送了一則通知給您",
+        "setUp": "{name} 已設定完成",
+        "setupComplete": "設定完成",
+        "schedules": "{count, plural, other {已啟用 # 個排程}}",
+        "triggers": "{count, plural, other {已啟用 # 個觸發條件}}",
+        "newBrainPage": "新的 Brain 頁面：{title}",
+        "brainChange": "Brain 變更：{title}",
+        "proposedNote": "已提交審核。在有人接受之前，不會有任何變更。",
+        "undone": "已復原：{title}",
+        "undoneNote": "已恢復為先前的版本。",
+        "undo": "復原",
+        "undoFailed": "無法復原這項變更",
+        "tryAgainShortly": "請稍後再試。"
+    },
+    "brain": {
+        "saved": "Brain 已更新：{title}",
+        "created": "新的 Brain 頁面：{title}",
+        "deleted": "已從 Brain 移除：{title}",
+        "accepted": "已接受變更：{title}",
+        "acceptedBy": "已接受 {name} 的變更：{title}",
+        "dismissed": "已略過變更：{title}",
+        "dismissedBy": "已略過 {name} 的變更：{title}",
+        "notes": {
+            "saved": "已儲存。每位同事從下一次執行起都會讀到它。",
+            "deleted": "同事不會再讀取它，但會保留其歷史紀錄。",
+            "accepted": "已儲存。每位同事從下一次執行起都會讀到它。",
+            "dismissed": "頁面維持不變。"
+        }
+    },
+    "file": {
+        "open": "開啟 {name}",
+        "title": "{count, plural, =0 {檔案} other {# 個檔案}}",
+        "size": {
+            "b": "{value} B",
+            "kb": "{value} KB",
+            "mb": "{value} MB"
+        }
+    },
+    "skill": {
+        "remembering": "正在記住",
+        "remembered": "已記住",
+        "failed": "無法記住這項內容",
+        "retry": "重試",
+        "dismiss": "略過",
+        "notRemembered": "未記住",
+        "remember": "記住",
+        "no": "不用",
+        "hideDetails": "隱藏詳細資料",
+        "showDetails": "顯示詳細資料"
+    },
+    "sources": {
+        "count": "{count, plural, other {# 個來源}}"
+    },
+    "table": {
+        "partial": "{shown}/{total}"
+    },
+    "published": {
+        "asksPublic": "{coworker} 希望任何擁有連結的人都能開啟",
+        "keepPrivate": "保持私人",
+        "makePublic": "設為公開",
+        "madePublicByYou": "已由您設為公開",
+        "madePublic": "已設為公開",
+        "keptFor": "僅限 {workspace} 成員",
+        "unpublished": "已取消發布",
+        "copy": "複製連結",
+        "copied": "已複製",
+        "open": "開啟",
+        "updateFailed": "無法更新連結",
+        "fallbackCoworker": "您的同事",
+        "fallbackWorkspace": "工作區",
+        "access": {
+            "public": "任何擁有連結的人",
+            "workspace": "{workspace} 成員",
+            "password": "任何擁有密碼的人",
+            "invited": "僅限您邀請的人"
+        }
+    }
+}

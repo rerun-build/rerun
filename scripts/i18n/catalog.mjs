@@ -14,7 +14,7 @@ export const CONTEXT_KEY = '_context'
 export function supportedLocales() {
     const source = readFileSync(path.join(PACKAGE_DIR, 'src/locales.ts'), 'utf8')
     const block = source.match(/SUPPORTED_LOCALES = \{([\s\S]*?)\}/)?.[1] ?? ''
-    return [...block.matchAll(/^\s*'?([a-z]{2})'?:\s*'(stable|beta)'/gm)].map(([, locale, status]) => ({ locale, status }))
+    return [...block.matchAll(/^\s*'?([a-z]{2}(?:-[A-Z]{2})?)'?:\s*'(stable|beta)'/gm)].map(([, locale, status]) => ({ locale, status }))
 }
 
 export function targetLocales() {

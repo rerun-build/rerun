@@ -38,7 +38,7 @@ const OUTPUT_USD_PER_TOKEN = 10 / 1_000_000
 const BATCH_SIZE = 60
 // Pack files translated at once: a new language is ~160 calls, too long one after the other.
 const CONCURRENT_JOBS = 6
-const LANGUAGE_NAMES = { fr: 'French', es: 'Spanish', de: 'German', it: 'Italian', pt: 'Brazilian Portuguese', nl: 'Dutch', tr: 'Turkish', ar: 'Modern Standard Arabic', zh: 'Simplified Chinese (Mainland China)', he: 'Hebrew' }
+const LANGUAGE_NAMES = { fr: 'French', es: 'Spanish', de: 'German', it: 'Italian', pt: 'Brazilian Portuguese', nl: 'Dutch', tr: 'Turkish', ar: 'Modern Standard Arabic', zh: 'Simplified Chinese (Mainland China)', 'zh-TW': 'Traditional Chinese (Taiwan)', he: 'Hebrew' }
 
 function readArgs(argv) {
     const args = { locales: [], namespaces: [], accept: false, dryRun: false, maxUsd: 20 }

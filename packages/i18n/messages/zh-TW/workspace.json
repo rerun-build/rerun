@@ -1,0 +1,31 @@
+{
+    "settings": {
+        "coworkersLanguage": "同事的語言",
+        "coworkersLanguageHint": "同事依排程或觸發條件自行工作時所使用的語言。",
+        "fallbackName": "工作區",
+        "adminOnly": "只有管理員可以變更工作區設定",
+        "nameRequired": "請輸入名稱",
+        "nameTooLong": "請少於 {max} 個字元",
+        "title": "工作區設定",
+        "description": "您的工作區名稱和標誌，也就是團隊成員和受邀者看到的樣子。",
+        "uploadLogo": "上傳標誌",
+        "name": "名稱",
+        "namePlaceholder": "例如：Acme 股份有限公司",
+        "logoLink": "從網站或連結取得標誌",
+        "noLogoFound": "這個網址找不到標誌",
+        "pickIllustration": "或選擇一張插圖",
+        "showLess": "顯示較少",
+        "showAll": "顯示全部 {count} 張",
+        "illustrationOption": "插圖 {number}"
+    },
+    "access": {
+        "paused": "請先訂閱以恢復您的工作區",
+        "restoring": "工作區還原後即可使用",
+        "paymentFailed": "請先更新付款方式以恢復您的工作區",
+        "sandboxArchived": "沙盒重新啟用後即可使用",
+        "sandboxNone": "專家沙盒沒有自己的設定",
+        "adminsOnly": "僅限管理員",
+        "apiNotIncluded": "您的 AppSumo 方案不包含此功能",
+        "sandboxSingleBox": "沙盒只能有一個 Box"
+    }
+}
