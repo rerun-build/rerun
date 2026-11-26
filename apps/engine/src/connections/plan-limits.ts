@@ -105,6 +105,37 @@ export function planLimitWindowsFromOpencode(body: unknown): PlanLimitWindow[] {
     })
 }
 
+type GrokPeriod = { type?: unknown; start?: unknown; end?: unknown } | null | undefined
+type GrokBilling = { config?: { creditUsagePercent?: unknown; currentPeriod?: GrokPeriod } | null } | null
+
+const GROK_PERIOD_KINDS: Record<string, PlanLimitWindow['kind']> = { USAGE_PERIOD_TYPE_WEEKLY: 'weekly', USAGE_PERIOD_TYPE_MONTHLY: 'monthly' }
+const DAY_MS = 86_400_000
+
+// A period of a type the proxy did not name yet is read off its length, and only when it looks
+// like a week or a month.
+function grokPeriodKind(period: NonNullable<GrokPeriod>): PlanLimitWindow['kind'] | null {
+    if (typeof period.type === 'string' && GROK_PERIOD_KINDS[period.type]) return GROK_PERIOD_KINDS[period.type]!
+    const days = (Date.parse(String(period.end)) - Date.parse(String(period.start))) / DAY_MS
+    if (days >= 6 && days <= 8) return 'weekly'
+    if (days >= 27 && days <= 32) return 'monthly'
+    return null
+}
+
+// Grok Build's `/billing?format=credits`: one window, the share of the period's allowance spent. The
+// proxy leaves the share out while nothing of the period is spent. Any other shape reads as no
+// reading at all: no gauge is better than a wrong one.
+export function planLimitWindowsFromGrok(body: unknown): PlanLimitWindow[] {
+    const config = (body as GrokBilling)?.config
+    const period = config?.currentPeriod
+    if (!config || typeof config !== 'object' || !period || typeof period !== 'object') return []
+    const share = config.creditUsagePercent
+    if (share !== undefined && (typeof share !== 'number' || !Number.isFinite(share))) return []
+    const kind = grokPeriodKind(period)
+    if (!kind) return []
+    const resetsAt = typeof period.end === 'string' && Number.isFinite(Date.parse(period.end)) ? new Date(period.end).toISOString() : null
+    return [{ kind, label: null, usedPercent: share ?? 0, resetsAt }]
+}
+
 // The window a refused call ran into, when the last reading says one is spent.
 export function spentPlanWindow(connectionId: string): PlanLimitWindow | null {
     return readings.get(connectionId)?.windows.find(window => window.usedPercent >= 100) ?? null

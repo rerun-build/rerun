@@ -1,10 +1,77 @@
 import { createOpenAI } from '@ai-sdk/openai'
 import type { LanguageModelMiddleware, wrapLanguageModel } from 'ai'
-import { GROK_PROXY_BASE_URL, grokSeesImages } from '@rerun/contracts'
-import { grokFetch } from '../connections/grok-proxy.js'
+import { GROK_MODEL_NOT_IN_PLAN, GROK_NO_SUBSCRIPTION, GROK_PROXY_BASE_URL, GROK_WEEKLY_LIMIT, grokSeesImages, type PlanLimitWindow } from '@rerun/contracts'
+import { recordCredentialRejected } from '../connections/credential-rejections.js'
+import { refreshGrokPlanLimits } from '../connections/grok-plan-limits.js'
+import { grokFetch, type GrokRequestContext } from '../connections/grok-proxy.js'
+import { readPlanLimits, spentPlanWindow } from '../connections/plan-limits.js'
 import type { LoadedConnection } from '../connections/types.js'
+import { refusalMessageOf, refusalResponse } from '../lib/refusal-body.js'
 
+type FetchFunction = typeof globalThis.fetch
 type LanguageModelV3 = Parameters<typeof wrapLanguageModel>[0]['model']
+
+// xAI's words for an allowance spent or never there, read by OpenClaw and Grok Build alike:
+// "You have run out of credits or need a Grok subscription", "used all available credits".
+const ALLOWANCE_REFUSAL = /used all available credits|run out of credits|monthly spending limit|purchase more credits|raise your spending limit|need a grok subscription/i
+const NO_SUBSCRIPTION = /need a grok subscription/i
+// "The model grok-9 does not exist or your team <id> does not have access to it."
+const MODEL_REFUSAL = /does not exist or your team|does not have access to (?:it|this model)|model .* (?:is )?not available/i
+
+const RESET_FORMAT = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'UTC', timeZoneName: 'short' })
+
+function weeklyLimit(window: PlanLimitWindow | null): string {
+    return window?.resetsAt ? `${GROK_WEEKLY_LIMIT} · resets ${RESET_FORMAT.format(new Date(window.resetsAt))}` : GROK_WEEKLY_LIMIT
+}
+
+type RefusalContext = { connection: LoadedConnection; model: string }
+
+/**
+ * What a refusal is stored as, in the sentences the chat knows (`describeSubscriptionLimit`), or
+ * null to keep the proxy's own sentence. xAI's own body is never kept for these: it names the
+ * account's team. A spent allowance and an account without the plan answer with one sentence, so
+ * the week's reading, taken again now, tells them apart.
+ */
+async function rewrittenRefusal(status: number, original: string, { connection, model }: RefusalContext): Promise<string | null> {
+    if (status === 401) {
+        recordCredentialRejected(connection.id)
+        return 'Grok sign-in refused (401): sign in to Grok again in AI providers.'
+    }
+    if ((status === 402 || status === 403 || status === 429) && ALLOWANCE_REFUSAL.test(original)) {
+        await refreshGrokPlanLimits(connection)
+        const spent = spentPlanWindow(connection.id)
+        if (spent) return weeklyLimit(spent)
+        if (NO_SUBSCRIPTION.test(original) && readPlanLimits(connection.id)) return GROK_NO_SUBSCRIPTION
+        return weeklyLimit(readPlanLimits(connection.id)?.windows[0] ?? null)
+    }
+    if ((status === 400 || status === 403 || status === 404) && MODEL_REFUSAL.test(original)) return `${GROK_MODEL_NOT_IN_PLAN} \`${model}\``
+    if (status === 426) return 'Provider returned error: Grok turned away the client version this engine sends. Update the engine.'
+    if (status === 403) return 'Provider returned error: Grok refused this request (403).'
+    if (status >= 500) return `Grok service unavailable (${status}): ${original}`
+    return null
+}
+
+function modelOfRequest(init: RequestInit | undefined, fallback: string): string {
+    try {
+        const model = (JSON.parse(String(init?.body)) as { model?: unknown }).model
+        return typeof model === 'string' ? model : fallback
+    } catch {
+        return fallback
+    }
+}
+
+export function grokRefusalFetch(context: GrokRequestContext & { model: string }, inner: FetchFunction = grokFetch(context)): FetchFunction {
+    return async (input, init) => {
+        const response = await inner(input, init)
+        if (response.ok) return response
+        const text = await response.text()
+        const original = refusalMessageOf(text)
+        const rewritten = await rewrittenRefusal(response.status, original, { connection: context.connection, model: modelOfRequest(init, context.model) })
+        // xAI writes `{ "error": "<text>" }`, where the OpenAI SDK only reads `error.message`: even a
+        // refusal kept as it is gets the shape that keeps its sentence.
+        return refusalResponse(response, text, rewritten ?? original, 'grok')
+    }
+}
 
 // The proxy keeps nothing between requests (`store: false`): each one carries its reasoning back,
 // encrypted, and points at no item by id. `forceReasoning` because the SDK only reasons on the
@@ -30,7 +97,7 @@ export type GrokLanguageModel = { model: LanguageModelV3; middleware: LanguageMo
  */
 export function grokLanguageModel(connection: LoadedConnection | null, modelId: string, sessionId: string): GrokLanguageModel {
     if (!connection || connection.config.provider !== 'grok') throw new GrokModelError('This coworker has no Grok connection to run on. Pick another model.')
-    const grok = createOpenAI({ apiKey: 'grok-sign-in', baseURL: GROK_PROXY_BASE_URL, fetch: grokFetch({ connection, sessionId }) })
+    const grok = createOpenAI({ apiKey: 'grok-sign-in', baseURL: GROK_PROXY_BASE_URL, fetch: grokRefusalFetch({ connection, sessionId, model: modelId }) })
     return { model: grok.responses(modelId), middleware: [grokResponsesMiddleware] }
 }
 

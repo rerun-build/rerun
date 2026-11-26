@@ -22,6 +22,7 @@ import { refreshStaleCodexPlanLimits } from '../../connections/codex-plan-limits
 import { refreshStaleCustomCatalogs } from '../../connections/custom-catalog.js'
 import { refreshOpencodeCatalog } from '../../connections/opencode-catalog.js'
 import { refreshStaleOpencodePlanLimits } from '../../connections/opencode-plan-limits.js'
+import { refreshStaleGrokPlanLimits } from '../../connections/grok-plan-limits.js'
 import { env, remoteComputersEnabled } from '../../config/env.js'
 import { logger } from '../../lib/logger.js'
 import { closeAllMcp } from '../../tools/mcp-pool.js'
@@ -49,6 +50,7 @@ export async function runCommand(): Promise<void> {
             refreshStaleClaudePlanLimits(connections)
             refreshStaleCodexPlanLimits(connections)
             refreshStaleOpencodePlanLimits(connections)
+            refreshStaleGrokPlanLimits(connections)
             if (connections.some(connection => connection.config.provider === 'opencode')) void refreshOpencodeCatalog()
             refreshStaleCustomCatalogs(connections)
         })

@@ -12,6 +12,7 @@ import { refreshStaleClaudePlanLimits } from '../../connections/claude-plan-limi
 import { refreshCodexPlanLimits, refreshStaleCodexPlanLimits } from '../../connections/codex-plan-limits.js'
 import { refreshOpencodeCatalog, refreshStaleOpencodeCatalog } from '../../connections/opencode-catalog.js'
 import { refreshOpencodePlanLimits, refreshStaleOpencodePlanLimits } from '../../connections/opencode-plan-limits.js'
+import { refreshGrokPlanLimits, refreshStaleGrokPlanLimits } from '../../connections/grok-plan-limits.js'
 import { awaitPendingPlanLimits } from '../../connections/plan-limits-pending.js'
 import { probeCustomEndpoint, refreshCustomCatalog, refreshStaleCustomCatalogs } from '../../connections/custom-catalog.js'
 import type { LoadedConnection } from '../../connections/types.js'
@@ -42,6 +43,7 @@ connectionRoutes.get('/', async c => {
     refreshStaleClaudePlanLimits(connections)
     refreshStaleCodexPlanLimits(connections)
     refreshStaleOpencodePlanLimits(connections)
+    refreshStaleGrokPlanLimits(connections)
     if (fresh) await awaitPendingPlanLimits(connections)
     if (connections.some(connection => connection.config.provider === 'opencode')) refreshStaleOpencodeCatalog()
     refreshStaleCustomCatalogs(connections)
@@ -148,6 +150,7 @@ async function readCliModelsBeforeAdopting(connection: LoadedConnection): Promis
     if (connection.config.provider === 'codex') await refreshCodexPlanLimits(connection)
     if (connection.config.provider === 'opencode') await Promise.all([refreshOpencodeCatalog(), refreshOpencodePlanLimits(connection)])
     if (connection.config.provider === 'custom') await refreshCustomCatalog(connection)
+    if (connection.config.provider === 'grok') await refreshGrokPlanLimits(connection)
 }
 
 // Plugging the first credential into a box is the whole setup, and on its own it changes nothing:

@@ -23,6 +23,7 @@ import { forgetOpencodePlanLimitsAttempt } from './opencode-plan-limits.js'
 import { forgetClaudePlanLimitsAttempt } from './claude-plan-limits.js'
 import { forgetCustomCatalog } from './custom-catalog.js'
 import { forgetGrokTokenState, revokeGrokTokens } from './grok-token.js'
+import { forgetGrokPlanLimitsAttempt } from './grok-plan-limits.js'
 import { getConnection, reloadConnection, unloadConnection } from './registry.js'
 import type { LoadedConnection } from './types.js'
 import { productText } from '../brand/brand.js'
@@ -91,6 +92,7 @@ export async function updateConnectionKeys(id: string, { set, remove }: UpdateCo
         forgetCustomCatalog(id)
         forgetCredentialRejected(id)
         forgetGrokTokenState(id)
+        forgetGrokPlanLimitsAttempt(id)
         await reloadConnection(id)
         return Object.keys(next).sort()
     })
@@ -119,6 +121,7 @@ export async function deleteConnection(id: string): Promise<void> {
     forgetCustomCatalog(id)
     forgetCredentialRejected(id)
     forgetGrokTokenState(id)
+    forgetGrokPlanLimitsAttempt(id)
     await rm(connectionDir(id), { recursive: true, force: true })
 }
 

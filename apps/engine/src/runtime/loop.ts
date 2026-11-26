@@ -22,6 +22,7 @@ import { recordRefusedModel } from '../connections/cli-models.js'
 import { refreshCodexPlanLimits } from '../connections/codex-plan-limits.js'
 import { armPlanLimitLatch, clearPlanLimitLatch } from '../connections/plan-limits.js'
 import { refreshOpencodePlanLimits } from '../connections/opencode-plan-limits.js'
+import { refreshGrokPlanLimits } from '../connections/grok-plan-limits.js'
 import { refreshClaudePlanLimitsAfterRun } from '../connections/claude-plan-limits.js'
 import { behaviourOf } from '../agents/opencode.js'
 import { buildSystemPrompt, calledByBlock, nowBlock, recallMemories, recallSection, systemPromptText, relayedBlock, userBlock, userLanguageBlock } from '../agents/systemPrompt.js'
@@ -327,6 +328,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             void refreshCodexPlanLimits(connection)
         }
         if (provider === 'opencode') void refreshOpencodePlanLimits(connection)
+        if (provider === 'grok') void refreshGrokPlanLimits(connection)
         if (provider === 'claude') refreshClaudePlanLimitsAfterRun(connection, startedAt)
     }
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { armPlanLimitLatch, clearPlanLimitLatch, isPlanLimitLatched, forgetPlanLimits, planLimitWindowsFromClaude, planLimitWindowsFromCodex, readPlanLimits, recordPlanLimits } from './plan-limits.js'
+import { armPlanLimitLatch, clearPlanLimitLatch, isPlanLimitLatched, forgetPlanLimits, planLimitWindowsFromClaude, planLimitWindowsFromCodex, planLimitWindowsFromGrok, readPlanLimits, recordPlanLimits } from './plan-limits.js'
 
 describe('planLimitWindowsFromClaude', () => {
     it('reads the session, weekly and per-model windows', () => {
@@ -119,5 +119,32 @@ describe('plan limit latch', () => {
         armPlanLimitLatch('cleared', now)
         clearPlanLimitLatch('cleared')
         expect(isPlanLimitLatched('cleared', now)).toBe(false)
+    })
+})
+
+// `/billing?format=credits` as the proxy answered a paid Grok account on 2026-11-26, nothing spent yet.
+describe('planLimitWindowsFromGrok', () => {
+    const period = { type: 'USAGE_PERIOD_TYPE_WEEKLY', start: '2026-11-23T14:53:50.529+00:00', end: '2026-11-30T14:53:50.529+00:00' }
+    const answer = (config: Record<string, unknown>) => ({ config: { isUnifiedBillingUser: true, prepaidBalance: { val: 0 }, billingPeriodStart: period.start, billingPeriodEnd: period.end, ...config } })
+
+    it('reads a period with nothing spent as 0%, which the proxy says by leaving the share out', () => {
+        expect(planLimitWindowsFromGrok(answer({ currentPeriod: period }))).toEqual([{ kind: 'weekly', label: null, usedPercent: 0, resetsAt: '2026-11-30T14:53:50.529Z' }])
+    })
+
+    it('reads the share of the week spent', () => {
+        expect(planLimitWindowsFromGrok(answer({ currentPeriod: period, creditUsagePercent: 100 }))[0]).toMatchObject({ kind: 'weekly', usedPercent: 100 })
+        expect(planLimitWindowsFromGrok(answer({ currentPeriod: period, creditUsagePercent: 37.5 }))[0]!.usedPercent).toBe(37.5)
+    })
+
+    it('names a month, and a period of a type it does not know by its length', () => {
+        expect(planLimitWindowsFromGrok(answer({ currentPeriod: { ...period, type: 'USAGE_PERIOD_TYPE_MONTHLY' } }))[0]!.kind).toBe('monthly')
+        expect(planLimitWindowsFromGrok(answer({ currentPeriod: { ...period, type: 'USAGE_PERIOD_TYPE_NEW' } }))[0]!.kind).toBe('weekly')
+    })
+
+    it('keeps no gauge rather than a wrong one when the shape moved', () => {
+        expect(planLimitWindowsFromGrok(null)).toEqual([])
+        expect(planLimitWindowsFromGrok({ config: {} })).toEqual([])
+        expect(planLimitWindowsFromGrok(answer({ currentPeriod: period, creditUsagePercent: '40%' }))).toEqual([])
+        expect(planLimitWindowsFromGrok(answer({ currentPeriod: { type: 'USAGE_PERIOD_TYPE_NEW', start: period.start, end: '2026-11-24T00:00:00Z' } }))).toEqual([])
     })
 })
