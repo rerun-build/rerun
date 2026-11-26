@@ -1,5 +1,5 @@
 import { useChat } from '@ai-sdk/react'
-import { FOREMAN_KICKOFF_MARKER, messageText } from '@rerun/contracts'
+import { FOREMAN_KICKOFF_MARKER, messageText, turnOpenerId } from '@rerun/contracts'
 import type { FileUIPart } from 'ai'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AppState } from 'react-native'
@@ -301,10 +301,11 @@ export function useCoworkerChat({ endpoints, initialSessionId, knownUpdatedAt = 
         if (caller && id) await endpoints.stop(caller, id, runRef.current).catch(() => {})
     }, [chat, endpoints])
 
-    // Sends the last message again, as the web's Try again does.
+    // Sends the last message again, as the web's Try again does: from the user message that opens the
+    // turn, since a turn read back from the hub is one message per step.
     const regenerate = useCallback(() => {
         setRunStartedAt(Date.now())
-        return chat.regenerate()
+        return chat.regenerate({ messageId: turnOpenerId(chat.messages) })
     }, [chat])
 
     // The run holding the conversation, as last named by the hub: what a queued message waits behind.

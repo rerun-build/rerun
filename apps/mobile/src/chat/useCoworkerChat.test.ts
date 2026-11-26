@@ -27,6 +27,7 @@ const mockChat = {
     messages: [] as unknown[],
     resumeOntoRef: { current: null } as { current: string | null },
     reconnectFailedRef: { current: false } as { current: boolean },
+    regenerate: jest.fn(async (): Promise<void> => {}),
 }
 
 const mockGrace = { module: null as null | { begin: jest.Mock<Promise<number>, []>; end: jest.Mock<Promise<boolean>, []> } }
@@ -38,7 +39,7 @@ jest.mock('@ai-sdk/react', () => {
             mockChat.initialMessages = messages
             const [status, setStatus] = useState(mockChat.initialStatus)
             mockChat.setStatus = setStatus
-            return { messages: mockChat.messages, status, error: undefined, clearError: mockChat.clearError, setMessages: mockChat.setMessages, resumeStream: mockChat.resumeStream, stop: mockChat.stop, sendMessage: jest.fn(), regenerate: jest.fn() }
+            return { messages: mockChat.messages, status, error: undefined, clearError: mockChat.clearError, setMessages: mockChat.setMessages, resumeStream: mockChat.resumeStream, stop: mockChat.stop, sendMessage: jest.fn(), regenerate: mockChat.regenerate }
         },
     }
 })
@@ -540,5 +541,30 @@ describe('useCoworkerChat on a page kept beside the one shown', () => {
 
         await act(async () => appStateListener('active'))
         expect(endpoints.messages).toHaveBeenCalledTimes(1)
+    })
+})
+
+// A turn read back from the hub is one message per step: aimed at its last step, the SDK's regenerate
+// sends an empty text and the hub answers 400 "Missing message text" (RER-222).
+describe('useCoworkerChat trying a failed turn again', () => {
+    beforeEach(() => {
+        clearLocalCache()
+        mockChat.initialStatus = 'ready'
+        mockChat.messages = [
+            { id: 'u1', role: 'user', parts: [{ type: 'text', text: 'Install Ubersuggest too' }] },
+            { id: 'u1-step1', role: 'assistant', parts: [] },
+            { id: 'u1-step2', role: 'assistant', parts: [] },
+        ]
+    })
+    afterEach(() => {
+        mockChat.messages = []
+    })
+
+    it('sends it again from the user message that opens the turn', async () => {
+        const { result } = await openConversation(fakeEndpoints(null))
+
+        await act(async () => result.current.regenerate())
+
+        expect(mockChat.regenerate).toHaveBeenCalledWith({ messageId: 'u1' })
     })
 })
