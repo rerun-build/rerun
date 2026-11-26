@@ -10,6 +10,7 @@ import { createServer } from 'node:http'
 import type { AddressInfo } from 'node:net'
 import { tmpdir } from 'node:os'
 import { resolve } from 'node:path'
+import { sleep } from '@rerun/contracts'
 
 process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-browser-download-live-'))
 
@@ -24,8 +25,6 @@ const LIVE = process.env.RERUN_LIVE === '1' && !!process.env.DISPLAY
 const LAUNCHES = 3
 const SETTLE_MS = 3_000
 const invoice = Buffer.alloc(100_000, 'x')
-
-const sleep = (ms: number) => new Promise(done => setTimeout(done, ms))
 
 describe.skipIf(!LIVE)('a download in the coworker browser', () => {
     it('keeps the browser open on every launch of a profile that has downloaded before', async () => {
