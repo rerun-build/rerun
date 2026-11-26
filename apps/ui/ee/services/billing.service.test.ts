@@ -1669,7 +1669,7 @@ describe('listInvoices', () => {
                 { id: 'in_2', created: PERIOD_END, total: 0, status: 'draft' },
             ],
         } as never)
-        await expect(listInvoices()).resolves.toEqual([{ id: 'in_1', createdAt: iso(PERIOD_END), amountCents: 4900, status: 'paid', pdfUrl: 'https://pdf', hostedUrl: 'https://inv' }])
+        await expect(listInvoices()).resolves.toEqual([{ id: 'in_1', createdAt: iso(PERIOD_END), amountCents: 4900, status: 'paid', pdfUrl: 'https://pdf', hostedUrl: 'https://inv', items: [], prorated: false }])
     })
 })
 

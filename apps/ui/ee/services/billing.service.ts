@@ -46,6 +46,7 @@ import { ARCHIVE_RETENTION_DAYS } from '@/lib/archive/retention'
 import { canEndTrialNow, isMachineEntitled, isSubscriptionEntitled } from '@/ee/lib/billing/entitlement'
 import { BOX_DELETION_GRACE_MS } from '@/ee/lib/billing/grace'
 import { isTemplateSubscription, stripeTimestampIso, subscriptionPeriodEndIso } from '@/ee/lib/billing/marketplace'
+import { invoiceItemsOf, type InvoiceItems } from '@/ee/lib/billing/invoice-items'
 import { isLifetimeAddonsSubscription } from '@/ee/lib/billing/lifetime-addons'
 import { isSameSubscription, shouldAdoptSubscription } from '@/ee/lib/billing/ownership'
 import { hasPeriodAdvanced, rerunPeriodUpdate } from '@/ee/lib/billing/period'
@@ -631,7 +632,7 @@ async function readOpenInvoice(subscription: Stripe.Subscription): Promise<Subsc
     return invoice ? { amountCents: invoice.amount_due, createdAt: new Date(invoice.created * 1000).toISOString() } : null
 }
 
-export type InvoiceSummary = { id: string; createdAt: string; amountCents: number; status: string; pdfUrl: string | null; hostedUrl: string | null }
+export type InvoiceSummary = { id: string; createdAt: string; amountCents: number; status: string; pdfUrl: string | null; hostedUrl: string | null } & InvoiceItems
 
 export async function listInvoices(): Promise<InvoiceSummary[]> {
     const workspaceId = await requireWorkspaceId()
@@ -649,6 +650,7 @@ export async function listInvoices(): Promise<InvoiceSummary[]> {
             status: invoice.status ?? 'open',
             pdfUrl: invoice.invoice_pdf ?? null,
             hostedUrl: invoice.hosted_invoice_url ?? null,
+            ...invoiceItemsOf(invoice, { isBasePriceId, addonForPriceId }),
         }))
 }
 

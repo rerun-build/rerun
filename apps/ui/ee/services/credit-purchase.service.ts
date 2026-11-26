@@ -4,6 +4,7 @@ import { requireWorkspaceId } from '@/app/api/_auth/ownership'
 import { getAppOrigin } from '@/lib/app-origin'
 import { AppError } from '@/lib/i18n/action-error'
 import { CREDIT_PURCHASE_CONSENT } from '@/ee/lib/billing/consent'
+import { CREDIT_PURCHASE_KIND } from '@/ee/lib/billing/invoice-items'
 import { MICROS_PER_USD, PLAN_CURRENCY } from '@/ee/lib/billing/plans'
 import { creditPackOncePriceId, idOf, stripe } from '@/ee/lib/billing/stripe'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
@@ -13,7 +14,6 @@ import { assertPaymentAwaitsConfirmation, ensureStripeCustomer, savedCard, type 
 // Rerun credit bought once: it lands in `rerun_topup_micros`, which no renewal resets. With a card
 // on file and an address to tax, the card is charged from the dialog through a one-off invoice; a
 // workspace without them pays on a Stripe Checkout page, which collects both.
-export const CREDIT_PURCHASE_KIND = 'credit_purchase'
 
 export type CreditQuote = {
     dueTodayCents: number
