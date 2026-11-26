@@ -62,7 +62,7 @@ version the folder is at against the one this build takes it to.
   "activeRuns": 1,
   "claimedSessions": 1,
   "desktopViewers": 0,
-  "capabilities": ["files.stream", "foreman.files", "foreman.coworker", "schedules.rename", "schedules.script", "update.artifact", "connections.opencode", "connections.custom", "vault", "vault.rename", "vault.instance", "foreman.vault", "foreman.agent", "messages.edit", "desktop"],
+  "capabilities": ["files.stream", "foreman.files", "foreman.coworker", "schedules.rename", "schedules.script", "update.artifact", "connections.opencode", "connections.custom", "connections.grok", "vault", "vault.rename", "vault.instance", "foreman.vault", "foreman.agent", "messages.edit", "desktop"],
   "commit": "e70322d",
   "startedAt": "2026-11-16T09:12:03.512Z",
   "layout": "release",
@@ -77,7 +77,7 @@ version the folder is at against the one this build takes it to.
   which is a run in flight with no conversation), `desktopViewers` the open screen connections.
 - `capabilities`: `files.stream` (`PUT .../files/raw`), `foreman.files` (the Chief of Staff's file
   routes), `foreman.coworker` (its memories, skills, routines and connectors, and the routes for them), `foreman.checkins` (its check-ins and their settings, see [Check-ins](#check-ins)), `schedules.rename` (a schedule `PATCH` takes `name`), `schedules.script` (a schedule can be a script, `kind: "script"`, see [Script tasks](#script-tasks)), `update.artifact` (`POST /update`
-  takes a prebuilt artifact), `connections.opencode`, `connections.custom`, `vault`, `vault.rename` (a
+  takes a prebuilt artifact), `connections.opencode`, `connections.custom`, `connections.grok`, `vault`, `vault.rename` (a
   Vault item takes `customLabel`), `vault.instance` (`POST /vault/:id/instance`), `foreman.vault`, `foreman.agent` (the Chief of
   Staff answers every coworker route but what its kind does not do, see above), `messages.edit`
   (`replaceFrom` on a chat message and `DELETE .../sessions/:sid/messages/:mid`), and `desktop`
@@ -321,8 +321,9 @@ once makes it available to every agent, and each agent points at one through `co
 Several connections can share a provider, which is the point: one Claude subscription per person.
 
 `provider` is one of `rerun`, `anthropic`, `claude`, `codex`, `openai`, `google`, `openrouter`,
-`opencode`, `custom` (`providerSchema` in `packages/contracts/src/agent.ts`). `claude` and `codex`
-are the Claude and ChatGPT subscriptions, run through the Claude Code and Codex CLIs.
+`opencode`, `custom`, `grok` (`providerSchema` in `packages/contracts/src/agent.ts`). `claude` and
+`codex` are the Claude and ChatGPT subscriptions, run through the Claude Code and Codex CLIs; `grok`
+is the Grok subscription, run in the engine's own loop (see Grok connections below).
 
 Credentials live in `connections/<id>/.env` (chmod 600) and are **never returned** by any
 endpoint. A Codex connection also owns `connections/<id>/.codex/`, so the agents sharing a
@@ -357,6 +358,7 @@ Readings are kept in memory and taken:
 - `codex`: from a short app-server session at the end of every run, and on this list, on
   `ai_status` and at boot when the last attempt is more than 5 minutes old.
 - `opencode`: see OpenCode connections below.
+- `grok`: see Grok connections below.
 
 The list answers with the reading it holds, after waiting at most 5 seconds for one already under way.
 With `?fresh=1` it starts the reads that are due first, then waits for them (5 seconds at most), so
@@ -454,6 +456,37 @@ served on (Anthropic messages, OpenAI responses, OpenAI chat, Google). Every req
   reached", `401` → "OpenCode key refused".
 - On a model without vision, the `vision_analyze` tool asks another model of the connection that
   sees, and the computer tools are not offered.
+
+### Grok connections
+
+`provider: "grok"` is a Grok subscription signed in through xAI's device code by the app, which
+hands the tokens over once (`GROK_OAUTH_TOKEN`, `GROK_OAUTH_REFRESH_TOKEN`, `GROK_OAUTH_ID_TOKEN`,
+`GROK_OAUTH_ACCOUNT_ID`, `GROK_OAUTH_EXPIRES_AT` in ms). From then on the engine alone refreshes
+them against `https://auth.x.ai/oauth2/token`: two minutes before the access token lapses, under the
+connection's lock, from the lineage on disk, one refresh at a time per connection (xAI rotates the
+refresh token on every use). A refused grant marks the connection `credentialRejected`; a network
+failure, a 429 or a 5xx keeps the token in hand while it lasts. `DELETE /connections/:id` revokes
+both tokens at `https://auth.x.ai/oauth2/revoke` first, best effort.
+
+There is no CLI: the engine runs Grok in its own loop, on the OpenAI SDK's Responses model, against
+Grok Build's proxy `https://cli-chat-proxy.grok.com/v1`, with `store: false` and the encrypted
+reasoning carried back. Every request carries the token of the moment and Grok Build's headers
+(`x-grok-client-version`, `x-grok-conv-id` = the conversation id), goes nowhere but the proxy and
+follows no redirect. A `401` forces one refresh and one more try; a `426` takes up the client version
+the proxy asks for.
+
+- `cliModels` lists what `GET /v1/models` of the proxy serves the account: on create (before the
+  default is adopted), at boot and on `GET /connections` once a day. A model outside it is locked; a
+  run refused on a model locks it for 6 hours.
+- `planLimits` reads `GET /v1/billing?format=credits`: one `weekly` window, `0` while nothing of the
+  week is spent, no reading when the answer has another shape.
+- The context window is the 256k the subscription serves.
+- A refusal is rewritten into a sentence the chat knows, never with xAI's body (it names the
+  account's team): the week spent → "Grok weekly limit reached · resets …", an account without the
+  plan → "No Grok subscription on this xAI account", a model not served → "Grok plan does not
+  include" and its id, a `401` after the refresh → "Grok sign-in refused (401)".
+- Grok 4.5 does not see images: `vision_analyze` asks the first model of the connection that does,
+  and the computer tools are not offered on it.
 
 ### Custom connections
 

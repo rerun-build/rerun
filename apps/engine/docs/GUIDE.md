@@ -226,7 +226,7 @@ Trimmed to the fields you set most often (`src/agents/types.ts` re-exports the f
 }
 ```
 
-- `provider` is one of `rerun`, `anthropic`, `claude`, `codex`, `openai`, `google`, `openrouter`, `opencode`, `custom` (`providerSchema` in `packages/contracts/src/agent.ts`). The credential lives on the connection the agent points at (`connectionId`), see Connections in `API.md`. `model: null` follows the engine default.
+- `provider` is one of `rerun`, `anthropic`, `claude`, `codex`, `openai`, `google`, `openrouter`, `opencode`, `custom`, `grok` (`providerSchema` in `packages/contracts/src/agent.ts`). The credential lives on the connection the agent points at (`connectionId`), see Connections in `API.md`. `model: null` follows the engine default.
 - `tools` switches whole tool families on or off; every flag defaults to `true`.
 - `selfImprovement` controls the curator and whether the agent may install tools, register MCP servers and rewrite its soul.
 - `enabled: false` switches a coworker off: it keeps everything and stops running (no chat, no schedule, no call).

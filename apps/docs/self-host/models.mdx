@@ -1,6 +1,6 @@
 ---
 title: "AI models"
-description: "The Rerun models on your OpenRouter key, your own API keys, and your Claude, ChatGPT or OpenCode plan."
+description: "The Rerun models on your OpenRouter key, your own API keys, and your Claude, ChatGPT, Grok or OpenCode plan."
 ---
 
 import { Shot } from '/snippets/media.jsx'
@@ -74,16 +74,35 @@ Small models are uneven at calling tools, which every coworker does all the time
 
 On Rerun Cloud, the address has to be a public one: a cloud machine cannot reach your computer. Expose a local server through a tunnel (Cloudflare Tunnel, ngrok) to use it there.
 
-## Your Claude or ChatGPT plan
+## Your Claude, ChatGPT or Grok plan
 
 In the same **AI providers** dialog, connect a plan you already pay for:
 
 - **Claude**, with a Pro or Max plan
 - **ChatGPT**, with a Plus or Pro plan
+- **Grok**, with a plan that includes Grok Build, such as SuperGrok
 
 Sign in once and your coworkers run on the plan. The engine image ships the official Claude Code and Codex command-line tools that make this work, so there is nothing to install on the server.
 
 A coworker on a ChatGPT plan also generates and edits images, with the image tool built into Codex: the picture shows up in its chat and in its files, and counts against the plan's image allowance. Coworkers on Claude or on an API key have no image tool.
+
+### Grok
+
+Click **SuperGrok**, then **Get code**: xAI's page opens with the code filled in. Approve it with your xAI account, and Rerun stores the connection on its own. There is no key to paste, and Rerun refuses one: a Grok plan only arrives through this sign-in. The app does the same from **Add subscription**.
+
+- The connection offers Grok 4.6, Grok 4.7, Grok 4.7 Fast and Grok 4.5, Grok 4.6 first. Rerun reads which ones your account is served when it connects, then once a day: a model the plan leaves out shows **Not in your Grok plan**. Grok 4.7 Fast spends the week's allowance twice as fast.
+- Coworkers use up to 256k tokens of context on Grok, the window the subscription serves, and Rerun compacts a conversation before it fills it.
+- The connection shows the plan's **weekly** usage and when the week resets. When the week runs out, the chat says **Grok weekly limit reached** with its reset, and coworkers move to your backup models, if you set any.
+- An xAI account whose plan does not include Grok Build reads **No Grok subscription**.
+- Grok 4.5 does not read images: a coworker on it sends its images to the first model of the connection that does.
+- Grok runs inside the engine itself, with no command-line tool. The engine keeps the sign-in alive on its own; if xAI turns it away, the connection asks you to **Sign in again**.
+- Removing the connection signs it out at xAI too.
+
+The sign-in needs `MOBILE_OAUTH_TICKET_SECRET` set, like every other sign-in of the app: see [Secrets](/self-host/configuration#secrets).
+
+<Note>
+  The app offers Grok on a server whose engine is recent enough to run it. On an older engine it is not listed until the engine is updated.
+</Note>
 
 ### OpenCode
 

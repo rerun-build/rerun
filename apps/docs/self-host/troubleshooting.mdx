@@ -165,11 +165,22 @@ OpenCode turned the model away because of the OpenCode account, not Rerun:
 - **Blocked by your OpenCode settings**: the account's **Privacy** settings exclude this model. Select **Global** there for a model hosted outside Europe and the United States, or allow endpoints that train on request data for a model that does, then send the message again. See [OpenCode](/self-host/models#opencode).
 - **No OpenCode Go subscription**: the key's account has no active Go plan, so every Go model is refused, the free ones included. Subscribe to OpenCode Go, or pick a Console model (paid from your OpenCode credits) or another provider.
 
+## A coworker on Grok stops on "Grok weekly limit reached", "No Grok subscription" or a sign-in
+
+- **Grok weekly limit reached**: the plan's allowance for the week is spent. The message says when it resets; until then coworkers move to your backup models, if you set any in **AI providers**. Grok 4.7 Fast spends the allowance twice as fast as the other models.
+- **No Grok subscription**: the xAI account you signed in with has no plan that includes Grok Build. Subscribe on grok.com, or sign in with another account.
+- **Grok plan does not include** a model: the account is not served that model. Pick another one of the connection.
+- **Connection signed out**: xAI turned the sign-in away. Open the connection in **AI providers** and click **Sign in again**.
+- **Grok turned away the client version this engine sends**: update the engine. Rerun takes up the version xAI asks for on its own, so this only shows when xAI changes how it answers.
+- **Grok** missing from **Add subscription**: the engine is older than Grok. Update it.
+
+See [Grok](/self-host/models#grok).
+
 ## The Chief of Staff does not answer
 
 With `OPENROUTER_API_KEY` set, the Chief of Staff walks a new workspace through its onboarding on that key: look for `[llm]` or OpenRouter errors in `docker compose logs app`, an empty balance or a spending limit on the key stops it too.
 
-Without the key, the Chief of Staff skips the onboarding and runs on the AI you connect. If it answers "Set OPENROUTER_API_KEY to run the Rerun models", connect a provider or your Claude or ChatGPT plan from its model picker and pick it.
+Without the key, the Chief of Staff skips the onboarding and runs on the AI you connect. If it answers "Set OPENROUTER_API_KEY to run the Rerun models", connect a provider or your Claude, ChatGPT or Grok plan from its model picker and pick it.
 
 ## "MOBILE_OAUTH_TICKET_SECRET is not configured on this server."
 

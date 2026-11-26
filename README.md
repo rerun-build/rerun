@@ -67,7 +67,7 @@
   <img alt="Gemini" title="Gemini" src=".github/assets/logos/gemini.svg" width="40">
   <img alt="OpenRouter" title="OpenRouter" src=".github/assets/logos/openrouter.svg" width="40">
 </p>
-<p align="center"><sub>an API key, the Claude or ChatGPT subscription you already pay for, or your own model through Ollama, LM Studio, vLLM or any OpenAI-compatible server</sub></p>
+<p align="center"><sub>an API key, the Claude, ChatGPT or Grok subscription you already pay for, or your own model through Ollama, LM Studio, vLLM or any OpenAI-compatible server</sub></p>
 
 <br />
 

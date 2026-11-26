@@ -59,7 +59,7 @@ Click the model pill in the message box to change the model. The picker lists:
 
 - **Workspace default**, with the model it stands for. A star marks it when the coworker follows it.
 - One group per AI connection of the workspace, under its name, with what is left of its credit or of its plan beside it. Each model shows a power rating.
-- **Add a provider**, to connect a **Subscription** (**Claude Pro or Max**, **ChatGPT Plus or Pro**) or an **API key** (Anthropic, OpenAI, Google, OpenRouter, or a **Custom endpoint** for your own model), and **Manage connections**.
+- **Add a provider**, to connect a **Subscription** (**Claude Pro or Max**, **ChatGPT Plus or Pro**, **SuperGrok**) or an **API key** (Anthropic, OpenAI, Google, OpenRouter, or a **Custom endpoint** for your own model), and **Manage connections**.
 
 Picking a model from the chat changes it for that conversation only: a new chat starts on the coworker's default. To change what the coworker runs by default, click the star next to a model (**Set as coworker default**), or pick **Workspace default** to make it follow the workspace again. Either one also moves the conversation you are in onto the new default. Only an admin or a manager of the coworker's Box can change its default.
 
@@ -76,7 +76,7 @@ A model that can think for more or less time has a settings icon on its row. Cli
 
 Picking a level also picks that model for the conversation, and the pill shows it next to the model's name (**Opus 5.5 · High**), as does the model's row in the picker. The star saves the level with the model as the coworker's default. Switching the coworker to another model resets its level to **Default**.
 
-The setting exists for every Claude model except Haiku 4.5, through a subscription, an Anthropic key or OpenRouter, for the OpenAI models through ChatGPT, an API key or OpenRouter, and for the Google models through an API key or OpenRouter. The **Rerun** models, OpenCode and custom endpoints have no settings icon: they run at the level their provider picks.
+The setting exists for every Claude model except Haiku 4.5, through a subscription, an Anthropic key or OpenRouter, for the OpenAI models through ChatGPT, an API key or OpenRouter, for the Grok models through a Grok plan, and for the Google models through an API key or OpenRouter. The **Rerun** models, OpenCode and custom endpoints have no settings icon: they run at the level their provider picks.
 
 <Note>
   Connecting your own subscription or API key needs an active plan or a running trial. The picker offers **Start free trial** or **Subscribe** until then.
@@ -91,14 +91,14 @@ Open the workspace menu and click **AI providers**. Only an admin can change it.
 | **Default model** | What every coworker with no model of its own runs on. Click **Change** to pick another one |
 | **Backups** | Where a coworker carries on when a subscription hits its usage limit, in order. Click **Add backup**, then move or remove each one |
 | **Included** | On Rerun Cloud, the **Rerun** model, paid from the monthly credit of your plan. No key, nothing to set up |
-| **Your subscriptions** | A Claude or ChatGPT plan you already pay for. Click **Add subscription** and sign in once |
+| **Your subscriptions** | A Claude, ChatGPT or Grok plan you already pay for. Click **Add subscription** and sign in once |
 | **Your API keys** | Your own Anthropic, OpenAI, Google or OpenRouter key, or a custom endpoint. Click **Add API key** |
 
 Open a connection to rename it, sign in again or replace its key, and choose which of its models your coworkers can use. A fresh workspace has no default of its own and runs on Rerun. Removing a connection moves every coworker and automation that used it back to the workspace default.
 
 ### Backups
 
-When the Claude or ChatGPT plan a coworker runs on hits its usage limit (the 5-hour or the weekly limit), or its ChatGPT workspace runs out of credits or reaches its spend cap, the coworker carries on with the first backup in the list, in the same conversation, without losing what it already did. A line in the chat says which model took over, and until when if the plan already gave its reset time, for example **Claude limit reached · GPT-6 Sol until 4:40 PM** or **Claude limit reached · GPT-6 Sol**. Once the plan resets, the next message runs on it again and the chat says **Claude reset. Back on Opus 5.5.**
+When the Claude, ChatGPT or Grok plan a coworker runs on hits its usage limit (the 5-hour or the weekly limit), or its ChatGPT workspace runs out of credits or reaches its spend cap, the coworker carries on with the first backup in the list, in the same conversation, without losing what it already did. A line in the chat says which model took over, and until when if the plan already gave its reset time, for example **Claude limit reached · GPT-6 Sol until 4:40 PM** or **Claude limit reached · GPT-6 Sol**. Once the plan resets, the next message runs on it again and the chat says **Claude reset. Back on Opus 5.5.**
 
 - Backups are tried in their order. One on the plan that ran out, one at its own limit, one that is not connected or one whose provider turned its key or sign-in away is skipped.
 - They apply to every coworker, whether it follows the default model or has one of its own, and to scheduled runs: a schedule fires on a backup instead of waiting for the reset.
@@ -181,7 +181,7 @@ A coworker looks at its screen once per call: one screenshot, after the action i
 | The coworker runs on | Screenshots in one run |
 | --- | --- |
 | A Claude or ChatGPT subscription | 600. Every 60, it starts a new session on its own with what it did so far and none of the old screenshots, and carries on in the same answer |
-| An API key, OpenRouter, OpenCode, the Rerun models or a custom endpoint | 200 |
+| An API key, OpenRouter, OpenCode, a Grok plan, the Rerun models or a custom endpoint | 200 |
 
 On a subscription, a coworker whose screen showed almost nothing new over its last 60 screenshots is going in circles: it stops there and tells you what blocks it. You can also stop it yourself at any time.
 
