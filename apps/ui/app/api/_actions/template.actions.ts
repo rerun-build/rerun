@@ -2,16 +2,17 @@
 
 import { isPublicStatus, type TemplateStatus } from '@rerun/contracts'
 import { z } from 'zod'
-import { assertAdminUser, getAdminEmail } from '@/lib/auth/admin'
+import { getAdminEmail } from '@/lib/auth/admin'
 import { assertSpaceAccess } from '@/app/api/_auth/access'
 import { getServerSession } from '@/supabase/session/getServerSession'
 import { loadServiceCatalog, type CatalogEntry } from '@/lib/templates/catalog'
-import { hasTemplateEntitlement, templateAccessByWorkspace } from '@/lib/templates/entitlement'
+import { templateAccessByWorkspace } from '@/lib/templates/entitlement'
 import { loadCreatorDirectory, loadLibraryCreators } from '@/lib/templates/library-creators'
 import { LIBRARY_COLUMNS, toLibraryTemplates, type LibraryCreator, type LibraryRow, type LibraryTemplate } from '@/lib/templates/library'
 import { installTemplate, type TemplateInstallOutcome } from '@/lib/templates/install'
+import { assertTemplateInstallable } from '@/lib/templates/install-guard'
 import type { GridPosition } from '@/lib/board/types'
-import { AppError, failureOf, type ActionFailure } from '@/lib/i18n/action-error'
+import { failureOf, type ActionFailure } from '@/lib/i18n/action-error'
 import { createClient } from '@/supabase/server'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
@@ -113,27 +114,8 @@ export async function installTemplateAction(input: { slug: string; spaceId: stri
         const workspace_id = actor.workspaceId
         const supabase = createServiceRoleClient()
 
-        const { data: template } = await selectMaybeSingle(supabase, 'templates', ['id', 'status', 'creator_id', 'pricing_model'] as const, { slug })
-        if (!template) throw new AppError('templateSlugNotFound', { slug })
-
-        // A live template installs for any member of the workspace; anything not yet public is a
-        // preview, reserved for the admin and the author who is testing their own submission.
-        // Unlike the rest of the app, entitlement is also checked here: this action lands paid
-        // compute from an unauthenticated deep link, so UI-only gating would mean calling the
-        // action by hand is enough to skip the paywall.
-        if (!isPublicStatus(template.status as TemplateStatus)) {
-            const { user } = await getServerSession()
-            if (!user?.id || template.creator_id !== user.id) await assertAdminUser()
-        } else if ((await getAdminEmail()) === null) {
-            const { data: workspace } = await selectMaybeSingle(supabase, 'workspaces', ['subscription_status', 'organization_id'] as const, { id: workspace_id })
-            const status = workspace?.subscription_status
-            if (status !== 'active' && status !== 'trialing') throw new AppError(isManagedWorkspace(workspace) ? 'managedWorkspacePaused' : 'noActivePlan')
-
-            // The plan gate stays first: buying a template unlocks the template, not the compute
-            // it needs to run.
-            const { user } = await getServerSession()
-            if (!(await hasTemplateEntitlement(supabase, workspace_id, template, user?.id))) throw new AppError('templateNeedsPurchase')
-        }
+        const [{ user }, adminEmail] = await Promise.all([getServerSession(), getAdminEmail()])
+        await assertTemplateInstallable(supabase, slug, { workspaceId: workspace_id, userId: user?.id ?? null, isPlatformAdmin: adminEmail !== null })
 
         const outcome = await installTemplate(supabase, slug, { workspaceId: workspace_id, spaceId, actor, positions, again })
         return { ok: true, ...outcome }

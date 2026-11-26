@@ -1,0 +1,49 @@
+---
+title: "Template library"
+description: "Find a ready-made team of coworkers and install it into a Box."
+---
+
+The [template library](/templates/install) holds ready-made teams of coworkers, each installed with its prompts, skills, scheduled tasks and apps in one call. These two tools are the installing side of it. The [template tools](/api/tools/templates) are the author's side, and need an expert sandbox account.
+
+## search_template_library
+
+Searches the library, featured templates first, 20 results at most. `total` says how many match.
+
+<ParamField body="query" type="string">
+  Words found in the title, the tagline or the tags.
+</ParamField>
+
+<ParamField body="category" type="string">
+  `agencies`, `ecommerce`, `saas`, `sales`, `recruiting`, `real-estate`, `legal`, `creators`, `productivity` or `other`.
+</ParamField>
+
+```json Response
+{
+  "templates": [
+    { "slug": "linkedin-ghostwriter", "title": "LinkedIn ghostwriter", "tagline": "…", "category": "creators", "coworkers": ["Writer"], "apps": ["linkedin"], "setupMinutes": 5, "pricing": { "model": "free", "amountCents": 0, "currency": "usd" }, "owned": true }
+  ],
+  "total": 1
+}
+```
+
+`owned` says whether this workspace can install the template now: it is free, bought, or yours. A workspace an organization manages only sees the templates it already holds.
+
+## install_template
+
+Installs a template into a Box. Its coworkers land on the board with everything they came with, and an app that needs a sign-in waits for the account owner to connect it in the app.
+
+<ParamField body="slug" type="string" required>
+  From `search_template_library`.
+</ParamField>
+
+<ParamField body="spaceId" type="string" required>
+  The Box to install it into, from `list_spaces`.
+</ParamField>
+
+It needs **Can manage** on the Box, a workspace with an active plan or trial, and, for a paid template, a purchase for this workspace. A template already installed in the workspace is not installed twice: its coworkers come back with `alreadyInstalled: true`.
+
+```json Response
+{ "installed": 2, "inactive": 0, "agentIds": ["…", "…"] }
+```
+
+`inactive` counts the coworkers that landed switched off because the plan had no room left for them. A coworker that failed to install is listed in `failed` with the reason.

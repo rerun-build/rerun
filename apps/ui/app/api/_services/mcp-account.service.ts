@@ -58,7 +58,7 @@ import { declareService, installServiceSlugs } from './agent-setup.service'
 import { ensureSessionRow, resolveAgentTarget } from './chat.service'
 import { followCoworker, recordSessionParticipant } from './notification-audience.service'
 import { resolveSpaceTarget } from './space.service'
-import { dispatchVaultTool } from './mcp-vault.service'
+import { dispatchLibraryTool } from './mcp-library.service'
 import { allocateServiceInstance, listCatalogServices, listInstalledServices, loadManifest, searchCatalogServices, toAuthMethodSummaries, uninstallService } from './services.service'
 import { readTeamStatus } from './team-status.service'
 import { getWorkspaceConnection, NoEngineError } from './workspace-engine.service'
@@ -974,11 +974,11 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
         }
 
         default:
-            // Three more halves live next door, chained in that order: the Vault and sharing, which
-            // any account can use, then template authoring, which resolves an expert sandbox author
-            // before it runs anything. The ungated ones have to come first so an unknown name does
-            // not pay a gate it was never aiming at. The last default is the one that answers for a
-            // name no file knows.
-            return await dispatchVaultTool(actor, name, args)
+            // The other families live next door, chained in that order: the template library, the Vault and sharing,
+            // which any account can use, then template authoring, which resolves an expert sandbox
+            // author before it runs anything. The ungated ones have to come first so an unknown name
+            // does not pay a gate it was never aiming at. The last default is the one that answers
+            // for a name no file knows.
+            return await dispatchLibraryTool(actor, name, args)
     }
 }

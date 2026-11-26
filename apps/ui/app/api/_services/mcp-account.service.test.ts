@@ -30,7 +30,7 @@ vi.mock('./services.service', () => ({
     toAuthMethodSummaries: vi.fn(() => []),
     uninstallService: vi.fn(),
 }))
-vi.mock('./mcp-vault.service', () => ({ dispatchVaultTool: vi.fn() }))
+vi.mock('./mcp-library.service', () => ({ dispatchLibraryTool: vi.fn() }))
 
 const WORKSPACE_ID = 7
 const FOREIGN_WORKSPACE_ID = 99
