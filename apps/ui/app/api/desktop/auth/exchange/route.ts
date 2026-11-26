@@ -1,4 +1,5 @@
 import { openDesktopSession, redeemDesktopAuthCode } from '@/app/api/_services/desktop-auth.service'
+import { raiseLikeTheBrowser } from '@/lib/auth/two-step/desktop'
 import { createClient } from '@/supabase/server'
 import { parseDesktopShellUserAgent } from '@rerun/contracts'
 import { z } from 'zod'
@@ -15,7 +16,10 @@ export async function POST(request: Request) {
     if (!parsed.success) return Response.json({ reason: 'invalid' }, { status: 400, headers: NO_STORE })
     const redemption = await redeemDesktopAuthCode(parsed.data.code, parsed.data.verifier)
     if (!redemption.ok) return Response.json({ reason: redemption.reason }, { status: redemption.reason === 'unavailable' ? 503 : 400, headers: NO_STORE })
-    const opened = await openDesktopSession(await createClient(), redemption.userId)
+    const session = await createClient()
+    const opened = await openDesktopSession(session, redemption.userId)
     if (!opened) return Response.json({ reason: 'unavailable' }, { status: 503, headers: NO_STORE })
+    // The browser approved at aal2 (approveDesktopSignIn), so the app's session gets there too.
+    if (!(await raiseLikeTheBrowser(session, redemption.userId))) return Response.json({ reason: 'unavailable' }, { status: 503, headers: NO_STORE })
     return Response.json({ ok: true }, { headers: NO_STORE })
 }

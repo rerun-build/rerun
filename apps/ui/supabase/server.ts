@@ -2,6 +2,7 @@ import type { Database } from '@/app/api/database.types'
 import { createServerClient } from '@supabase/ssr'
 import { createClient as createTokenClient } from '@supabase/supabase-js'
 import { cookies, headers } from 'next/headers'
+import { callerUserAgent } from '@/lib/auth/two-step/devices'
 import { readQueryWorkspace } from '@/lib/workspace/query-workspace'
 import { PAGE_HEADER, WORKSPACE_HEADER } from '@/lib/workspace/workspace-header'
 
@@ -49,11 +50,21 @@ export function createSessionlessClient() {
     })
 }
 
+// The caller's own browser or app, so a session the hub opens for them (the OAuth callback, the desktop
+// hand-off) is listed under it in "Where you're signed in" rather than as the server.
+async function requestUserAgent(): Promise<Record<string, string>> {
+    try {
+        return callerUserAgent(await headers())
+    } catch {
+        return {}
+    }
+}
+
 export async function createClient() {
-    const accessToken = await getRequestAccessToken()
+    const [accessToken, userAgent] = await Promise.all([getRequestAccessToken(), requestUserAgent()])
     if (accessToken) {
         return createTokenClient<Database>(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!, {
-            global: { headers: { Authorization: `${BEARER_PREFIX}${accessToken}` } },
+            global: { headers: { ...userAgent, Authorization: `${BEARER_PREFIX}${accessToken}` } },
             auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
         })
     }
@@ -61,6 +72,7 @@ export async function createClient() {
     const cookieStore = await cookies()
 
     return createServerClient<Database>(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!, {
+        global: { headers: userAgent },
         cookies: {
             getAll() {
                 return cookieStore.getAll()

@@ -4,6 +4,7 @@ import { loadPublished } from '@/lib/published/gate'
 import { createClient } from '@/supabase/server'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { readSettledUser } from '@/lib/auth/two-step/gate'
 
 // The first links a coworker shared, before every link had its own host. Where a publish host is
 // configured they all lead there, which checks the access. Without one (staging, a self-hosted app
@@ -14,9 +15,9 @@ export const dynamic = 'force-dynamic'
 const SIGNED_URL_TTL_SECONDS = 60
 
 async function isMember(workspaceId: number): Promise<boolean> {
-    const { data } = await (await createClient()).auth.getUser()
-    if (!data.user || data.user.is_anonymous) return false
-    const { data: membership } = await selectMaybeSingle(createServiceRoleClient(), 'workspace_members', ['user_id'] as const, { user_id: data.user.id, workspace_id: workspaceId })
+    const user = await readSettledUser(await createClient())
+    if (!user || user.is_anonymous) return false
+    const { data: membership } = await selectMaybeSingle(createServiceRoleClient(), 'workspace_members', ['user_id'] as const, { user_id: user.id, workspace_id: workspaceId })
     return !!membership
 }
 

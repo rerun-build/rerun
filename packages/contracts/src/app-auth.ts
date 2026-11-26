@@ -23,6 +23,10 @@ export const appSessionSchema = z.object({
 })
 export type AppSession = z.infer<typeof appSessionSchema>
 
+// The hidden factor the hub signs in with on an account with two-step verification: every list of
+// the person's methods leaves it out by this name.
+export const TWO_STEP_RECOVERY_FACTOR_NAME = 'rerun-recovery'
+
 export const emailCodeRequestSchema = z.object({ email: z.string().trim().email().max(320) })
 
 // `mailed` when the hub sent the code still good for this address again, or holds it back because it

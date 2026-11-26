@@ -187,9 +187,11 @@ export const config = {
          * - api/edge (asked by the edge before it gets a certificate, with a key of its own)
          * - api/desktop/config (asked by the desktop app before it shows the server, staging
          *   included: it carries no session and must answer before anyone signs in)
+         * - .well-known/ (the files Apple and Google read to let the mobile app use passkeys on this
+         *   domain: fetched by their servers, with no session)
          * Feel free to modify this pattern to include more paths.
          */
-        '/((?!_next/static|_next/image|favicon.ico|api/version|api/desktop/config|api/t/|api/files|api/llm/|api/v1/|api/host-metrics|api/edge/|api/public/|og/|render/|email/|r/|p/|published-auth|desktop-view|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)',
+        '/((?!_next/static|_next/image|favicon.ico|\\.well-known/|api/version|api/desktop/config|api/t/|api/files|api/llm/|api/v1/|api/host-metrics|api/edge/|api/public/|og/|render/|email/|r/|p/|published-auth|desktop-view|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)',
         // The labs put back in, for the gate alone: proxy() returns before it ever reaches
         // updateSession(). The UI kit (/render/kit) and the OG renders, /render/brand and
         // /render/templates, stay out: the screenshot service captures those on every card.

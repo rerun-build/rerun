@@ -6,6 +6,7 @@ import { CLIENT_HEADER, hubErrorSchema, type HubEndpoint, type HubPathParams } f
 import type { SupabaseClient, User } from '@supabase/supabase-js'
 import { z } from 'zod'
 import { recordBuildDay } from '@/app/api/v1/_lib/build-days'
+import { awaitsSecondStep, readSettledUser } from '@/lib/auth/two-step/gate'
 import { ApiError } from '@/lib/api-error'
 import { AppError, refusal, type ErrorCode, type ErrorParams } from '@/lib/i18n/action-error'
 
@@ -60,6 +61,8 @@ export function deniedStatus(code: DeniedCode | undefined, fallback: number): nu
     return fallback
 }
 
+const TWO_STEP_REQUIRED_TEXT = 'This account asks for a second step at sign-in. Update the Rerun app to finish signing in.'
+
 function errorResponse(status: number, error: string, extra?: Record<string, unknown>): Response {
     return Response.json({ error, ...extra }, { status })
 }
@@ -71,9 +74,20 @@ function codedResponse(status: number, error: string, code: ErrorCode | undefine
 
 async function authenticateUser(): Promise<UserContext> {
     const supabase = await createClient()
-    const { data } = await supabase.auth.getUser((await getRequestAccessToken()) ?? undefined)
-    if (!data.user || data.user.is_anonymous) throw new UnauthenticatedError()
-    return { user: data.user, supabase }
+    const user = await readSettledUser(supabase, await getRequestAccessToken())
+    if (!user || user.is_anonymous) throw new UnauthenticatedError()
+    return { user, supabase }
+}
+
+// Asked only once a call is refused, to tell a session that still owes its second step from none.
+async function awaitsItsSecondStep(): Promise<boolean> {
+    try {
+        const [supabase, token] = await Promise.all([createClient(), getRequestAccessToken()])
+        const { data } = await supabase.auth.getClaims(token ?? undefined)
+        return !!data?.claims && awaitsSecondStep(data.claims.app_metadata, data.claims.aal)
+    } catch {
+        return false
+    }
 }
 
 async function authenticate<A extends AuthLevel>(level: A): Promise<ContextFor<A>> {
@@ -146,6 +160,8 @@ function route(options: Route, handler: (args: HandlerArgs<AuthLevel, z.ZodType 
         try {
             ctx = await authenticate(options.auth)
         } catch (err) {
+            // A build that predates the second step reads the English text.
+            if (err instanceof UnauthenticatedError && (await awaitsItsSecondStep())) return codedResponse(401, TWO_STEP_REQUIRED_TEXT, 'twoStepRequired')
             if (err instanceof UnauthenticatedError) return codedResponse(401, 'Unauthorized', 'notAuthenticated')
             if (err instanceof AuthorizationError) return codedResponse(403, err.message, err.code, err.params)
             console.error(`[api/v1] ${req.method} ${path} auth failed`, err)

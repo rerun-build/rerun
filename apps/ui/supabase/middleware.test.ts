@@ -11,6 +11,9 @@ const mocks = vi.hoisted(() => ({
     setAll: null as ((cookies: CookieToSet[]) => void) | null,
     getUser: vi.fn(),
     signOut: vi.fn(),
+    level: vi.fn(),
+    refreshSession: vi.fn(),
+    updateUserById: vi.fn(),
     selectMaybeSingle: vi.fn(),
     joinOrganization: vi.fn(),
     reachesBeyond: vi.fn(),
@@ -25,11 +28,20 @@ const getClaims = vi.fn(async () => {
 vi.mock('@supabase/ssr', () => ({
     createServerClient: (_url: string, _key: string, options: { cookies: { setAll: (cookies: CookieToSet[]) => void } }) => {
         mocks.setAll = options.cookies.setAll
-        return { auth: { getUser: mocks.getUser, getClaims, signOut: mocks.signOut } }
+        return {
+            auth: {
+                getUser: mocks.getUser,
+                getClaims,
+                signOut: mocks.signOut,
+                getSession: async () => ({ data: { session: null } }),
+                refreshSession: mocks.refreshSession,
+                mfa: { getAuthenticatorAssuranceLevel: mocks.level },
+            },
+        }
     },
 }))
 
-vi.mock('./serviceRole', () => ({ createServiceRoleClient: () => ({ from: () => ({ update: () => ({ eq: async () => ({}) }) }) }) }))
+vi.mock('./serviceRole', () => ({ createServiceRoleClient: () => ({ from: () => ({ update: () => ({ eq: async () => ({}) }) }), auth: { admin: { updateUserById: mocks.updateUserById } } }) }))
 
 vi.mock('./supabase-helpers', () => ({ selectMaybeSingle: mocks.selectMaybeSingle }))
 vi.mock('@rerun/cloud/organizations.server', () => ({ joinOrganization: mocks.joinOrganization, reachesBeyondOrganization: mocks.reachesBeyond }))
@@ -51,6 +63,9 @@ describe('updateSession', () => {
     beforeEach(() => {
         mocks.getUser.mockReset()
         mocks.signOut.mockReset().mockResolvedValue({ error: null })
+        mocks.level.mockReset().mockResolvedValue({ data: { currentLevel: 'aal1' } })
+        mocks.refreshSession.mockReset().mockResolvedValue({ data: {}, error: null })
+        mocks.updateUserById.mockReset().mockResolvedValue({ data: {}, error: null })
         getClaims.mockClear()
         mocks.selectMaybeSingle.mockReset().mockResolvedValue({ data: { id: 'user-1', workspace_id: 'workspace-1', signed_up_at: '2026-01-01T00:00:00Z' }, error: null })
     })
@@ -122,6 +137,50 @@ describe('updateSession', () => {
         expect(response.headers.get('location')).toBe('https://app.rerun.build/')
         expect(response.cookies.get(AUTH_COOKIE)?.value).toBe('refreshed')
         expect(response.cookies.get(AUTH_COOKIE)?.maxAge).toBe(SET_OPTIONS.maxAge)
+    })
+
+    describe('second step', () => {
+        const twoStepUser = async () => ({ data: { user: { id: 'user-1', is_anonymous: false, app_metadata: { two_step: true }, factors: [] } } })
+
+        it('holds every page of a session that owes it, with where it was going', async () => {
+            mocks.getUser.mockImplementation(twoStepUser)
+            const response = await updateSession(new NextRequest('https://app.rerun.build/settings?tab=apps', { headers: DOCUMENT }))
+            expect(response.headers.get('location')).toBe('https://app.rerun.build/auth/two-step?next=%2Fsettings%3Ftab%3Dapps')
+        })
+
+        it('keeps where the sign-in was headed', async () => {
+            mocks.getUser.mockImplementation(twoStepUser)
+            const response = await updateSession(new NextRequest('https://app.rerun.build/auth?next=%2Fx', { headers: DOCUMENT }))
+            expect(response.headers.get('location')).toBe('https://app.rerun.build/auth/two-step?next=%2Fx')
+        })
+
+        it('keeps the desktop app’s hand-off and its challenge, which have no `next` of their own', async () => {
+            mocks.getUser.mockImplementation(twoStepUser)
+            const handoff = '/auth/desktop?challenge=abc&state=xyz&channel=stable'
+            const response = await updateSession(new NextRequest(`https://app.rerun.build${handoff}`, { headers: DOCUMENT }))
+            expect(response.headers.get('location')).toBe(`https://app.rerun.build/auth/two-step?next=${encodeURIComponent(handoff)}`)
+        })
+
+        it('holds a method that a cut-short setup left without the flag, and writes the flag into its token', async () => {
+            mocks.getUser.mockImplementation(async () => ({ data: { user: { id: 'user-1', is_anonymous: false, app_metadata: {}, factors: [{ id: 'app', status: 'verified', factor_type: 'totp' }] } } }))
+            const response = await updateSession(new NextRequest('https://app.rerun.build/', { headers: DOCUMENT }))
+            expect(response.headers.get('location')).toBe('https://app.rerun.build/auth/two-step')
+            expect(mocks.updateUserById).toHaveBeenCalledWith('user-1', { app_metadata: { two_step: true } })
+            expect(mocks.refreshSession).toHaveBeenCalled()
+        })
+
+        it('writes nothing for an account whose flag is already there', async () => {
+            mocks.getUser.mockImplementation(twoStepUser)
+            await updateSession(new NextRequest('https://app.rerun.build/', { headers: DOCUMENT }))
+            expect(mocks.updateUserById).not.toHaveBeenCalled()
+        })
+
+        it('lets a session through once it reached aal2', async () => {
+            mocks.getUser.mockImplementation(twoStepUser)
+            mocks.level.mockResolvedValue({ data: { currentLevel: 'aal2' } })
+            const response = await updateSession(new NextRequest('https://app.rerun.build/settings', { headers: DOCUMENT }))
+            expect(response.headers.get('location')).toBeNull()
+        })
     })
 
     it('lets a signed-in user reach the callback, where connecting Google ends', async () => {

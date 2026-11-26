@@ -15,6 +15,7 @@ import { PHONE_FAILURE_CODES, type PhoneFailure } from '@/lib/phone/failure-mess
 import { isPhoneCountry, toE164 } from '@/lib/phone/normalize'
 import { VERIFICATION_CODE_LENGTH, verificationLanguage, type VerificationChannel } from '@/lib/phone/verification'
 import { createClient } from '@/supabase/server'
+import { readSettledUser } from '@/lib/auth/two-step/gate'
 
 // `reason` is what the client reports to analytics, `error` what it shows.
 export type PhoneActionRefusal = ActionFailure & { reason: PhoneFailure; retryAfterSeconds?: number }
@@ -51,9 +52,8 @@ function sendRefused(result: { error: PhoneFailure; retryAfterSeconds?: number }
 const callerLanguage = (requestHeaders: Headers) => verificationLanguage(requestHeaders.get('accept-language'))
 
 async function accountUserId(): Promise<string | null> {
-    const supabase = await createClient()
-    const { data } = await supabase.auth.getUser()
-    return data.user && !data.user.is_anonymous ? data.user.id : null
+    const user = await readSettledUser(await createClient())
+    return user && !user.is_anonymous ? user.id : null
 }
 
 export async function skipPhoneStepAction(): Promise<PhoneActionResult> {
@@ -105,9 +105,8 @@ export async function verifyPhoneSignInCodeAction(input: z.input<typeof signInSc
 // Nobody on an organization's address: an account keeps no number there.
 async function signedInAccount(): Promise<PhoneAccount | null> {
     if (!(await isRerunHost())) return null
-    const supabase = await createClient()
-    const { data } = await supabase.auth.getUser()
-    return data.user && !data.user.is_anonymous ? { id: data.user.id, email: data.user.email ?? null } : null
+    const user = await readSettledUser(await createClient())
+    return user && !user.is_anonymous ? { id: user.id, email: user.email ?? null } : null
 }
 
 const signInFirst = (): PhoneActionRefusal => ({ ...failure('signInToChangeNumber'), reason: 'signed_out' })

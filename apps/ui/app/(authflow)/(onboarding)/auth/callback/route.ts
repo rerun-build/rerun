@@ -14,6 +14,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { publicUrl } from '@/lib/auth/public-url'
+import { callerUserAgent } from '@/lib/auth/two-step/devices'
 
 // Every provider click leaves the intent behind, and the app reads it back as the birth of an account
 // once `signed_up_at` shows up. An account that was already signed up before this sign-in, the one a
@@ -66,6 +67,7 @@ export async function GET(request: Request) {
     const sessionCookies: { name: string; value: string; options: CookieOptions }[] = []
 
     const supabase = createServerClient<Database>(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!, {
+        global: { headers: callerUserAgent(request.headers) },
         cookies: {
             getAll() {
                 return cookieStore.getAll()

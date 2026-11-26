@@ -1,6 +1,7 @@
 import { createClient, getRequestAccessToken, getRequestWorkspaceId, isPageRequest } from '@/supabase/server'
 import type { Database, Enums } from '@/app/api/database.types'
 import { requestHostScope } from '@/lib/brand/host-scope'
+import { awaitsSecondStep, readAccount, readSettledUser } from '@/lib/auth/two-step/gate'
 import { LAST_WORKSPACE_COOKIE, opensOnHost, pickHostWorkspace, readWorkspaceId, type HostMembership, type HostScope } from '@/lib/workspace/host-workspace'
 import type { SupabaseClient, User } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
@@ -21,7 +22,8 @@ async function readSessionIdentity(supabase: SupabaseClient<Database>, token: st
     try {
         const { data } = await supabase.auth.getClaims(token ?? undefined)
         const claims = data?.claims
-        if (!claims?.sub) return null
+        // Signed in with the first method only: nobody yet, until the second step is done.
+        if (!claims?.sub || awaitsSecondStep(claims.app_metadata, claims.aal)) return null
         return { id: claims.sub, email: claims.email, is_anonymous: claims.is_anonymous, user_metadata: claims.user_metadata ?? {}, app_metadata: claims.app_metadata ?? {} }
     } catch {
         return null
@@ -135,9 +137,15 @@ export const getServerSession = cache(async () => {
     return { user, workspace, workspaceRefused, membership, session: identity }
 })
 
-// The account as the auth server holds it now, for what a token cannot say or says too late.
+// The account as the auth server holds it now, for what a token cannot say or says too late. Null
+// while the second step of its sign-in is still owed.
 export async function getAuthUser(): Promise<User | null> {
     const [supabase, token] = await Promise.all([createClient(), getRequestAccessToken()])
-    const { data } = await supabase.auth.getUser(token ?? undefined)
-    return data.user
+    return readSettledUser(supabase, token)
+}
+
+// The account even before its second step, for that step alone.
+export async function getSigningInAccount(): Promise<{ user: User; pending: boolean } | null> {
+    const [supabase, token] = await Promise.all([createClient(), getRequestAccessToken()])
+    return readAccount(supabase, token)
 }

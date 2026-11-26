@@ -14,6 +14,7 @@ import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { createClient } from '@/supabase/server'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { getTranslations } from 'next-intl/server'
+import { readSettledUser } from '@/lib/auth/two-step/gate'
 
 export const dynamic = 'force-dynamic'
 
@@ -40,8 +41,7 @@ export default async function PublishedAuthPage({ searchParams }: { searchParams
     if (!entry) return <GateScreen brand={await getBrand()} lock={null} mark={<BrandTile />} title={t('linkOff.title')} subtitle={t('linkOff.subtitle')} />
 
     const returnTo = openPublishedHref(slug, next)
-    const { data } = await (await createClient()).auth.getUser()
-    const user = data.user
+    const user = await readSettledUser(await createClient())
     if (!user || user.is_anonymous) redirect(`/auth?next=${encodeURIComponent(returnTo)}`)
 
     const { data: membership } = await selectMaybeSingle(createServiceRoleClient(), 'workspace_members', ['user_id'] as const, { user_id: user.id, workspace_id: entry.workspace_id })

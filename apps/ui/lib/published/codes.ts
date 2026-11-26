@@ -8,6 +8,7 @@ import { inviteAllows } from '@/lib/published/access'
 import { workspaceLocale } from '@/lib/i18n/recipient-locale'
 import type { PublishedEntry } from '@/lib/published/gate'
 import { loadWorkspaceBrand } from '@/lib/published/gate'
+import { claimAttempt } from '@/lib/rate-limit/attempts'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany } from '@/supabase/supabase-helpers'
 import { emailTranslator } from '@rerun/emails/i18n'
@@ -45,17 +46,11 @@ function codeHash(fileId: string, email: string, code: string): string {
     return createHmac('sha256', secret()).update(`${fileId}:${email}:${code}`).digest('base64url')
 }
 
-async function claim(scopes: string[], max: number, windowSeconds: number): Promise<boolean> {
-    const { data, error } = await createServiceRoleClient().rpc('claim_published_gate_attempt', { p_scopes: scopes, p_max: max, p_window_seconds: windowSeconds })
-    if (error) throw new Error(`Gate limit check failed: ${error.message}`)
-    return data === true
-}
-
 export async function claimPasswordTry(slug: string, ip: string): Promise<boolean> {
     const caller = callerRateKey(ip)
     const [perCaller, perLink] = await Promise.all([
-        claim([`password:${slug}:${caller}`], PASSWORD_TRIES_PER_CALLER, PASSWORD_WINDOW_SECONDS),
-        claim([`password:${slug}`], PASSWORD_TRIES_PER_LINK, PASSWORD_WINDOW_SECONDS),
+        claimAttempt([`password:${slug}:${caller}`], PASSWORD_TRIES_PER_CALLER, PASSWORD_WINDOW_SECONDS),
+        claimAttempt([`password:${slug}`], PASSWORD_TRIES_PER_LINK, PASSWORD_WINDOW_SECONDS),
     ])
     return perCaller && perLink
 }
@@ -73,9 +68,9 @@ const DATA_WRITES_PER_LINK_HOUR = 600
 export async function claimDataWrite(slug: string, ip: string): Promise<boolean> {
     const caller = callerRateKey(ip)
     const claims = await Promise.all([
-        claim([`data-write:${slug}:${caller}`], DATA_WRITES_PER_CALLER_MINUTE, MINUTE_SECONDS),
-        claim([`data-write-hour:${slug}:${caller}`], DATA_WRITES_PER_CALLER_HOUR, HOUR_SECONDS),
-        claim([`data-write:${slug}`], DATA_WRITES_PER_LINK_HOUR, HOUR_SECONDS),
+        claimAttempt([`data-write:${slug}:${caller}`], DATA_WRITES_PER_CALLER_MINUTE, MINUTE_SECONDS),
+        claimAttempt([`data-write-hour:${slug}:${caller}`], DATA_WRITES_PER_CALLER_HOUR, HOUR_SECONDS),
+        claimAttempt([`data-write:${slug}`], DATA_WRITES_PER_LINK_HOUR, HOUR_SECONDS),
     ])
     return claims.every(Boolean)
 }
@@ -85,7 +80,7 @@ export async function claimDataWrite(slug: string, ip: string): Promise<boolean>
 const DATA_READS_PER_CALLER_MINUTE = 120
 
 export async function claimDataRead(slug: string, ip: string): Promise<boolean> {
-    return claim([`data-read:${slug}:${callerRateKey(ip)}`], DATA_READS_PER_CALLER_MINUTE, MINUTE_SECONDS)
+    return claimAttempt([`data-read:${slug}:${callerRateKey(ip)}`], DATA_READS_PER_CALLER_MINUTE, MINUTE_SECONDS)
 }
 
 export type SendOutcome = 'sent' | 'silent' | 'limited'
@@ -93,8 +88,8 @@ export type SendOutcome = 'sent' | 'silent' | 'limited'
 export async function sendAccessCode(entry: PublishedEntry, email: string, ip: string): Promise<SendOutcome> {
     const caller = callerRateKey(ip)
     const [perAddress, perCaller] = await Promise.all([
-        claim([`code-send:${entry.slug}:${email}`], SENDS_PER_ADDRESS, SEND_WINDOW_SECONDS),
-        claim([`code-send:${caller}`], SENDS_PER_CALLER, SEND_WINDOW_SECONDS),
+        claimAttempt([`code-send:${entry.slug}:${email}`], SENDS_PER_ADDRESS, SEND_WINDOW_SECONDS),
+        claimAttempt([`code-send:${caller}`], SENDS_PER_CALLER, SEND_WINDOW_SECONDS),
     ])
     if (!perAddress || !perCaller) return 'limited'
     if (entry.access !== 'invited' || !inviteAllows(entry.invited, email)) return 'silent'
@@ -120,7 +115,7 @@ export async function sendAccessCode(entry: PublishedEntry, email: string, ip: s
 export type VerifyOutcome = 'ok' | 'wrong' | 'limited'
 
 export async function verifyAccessCode(entry: PublishedEntry, email: string, code: string, ip: string): Promise<VerifyOutcome> {
-    if (!(await claim([`code-verify:${entry.slug}:${callerRateKey(ip)}`], VERIFIES_PER_CALLER, VERIFY_WINDOW_SECONDS))) return 'limited'
+    if (!(await claimAttempt([`code-verify:${entry.slug}:${callerRateKey(ip)}`], VERIFIES_PER_CALLER, VERIFY_WINDOW_SECONDS))) return 'limited'
     if (entry.access !== 'invited' || !inviteAllows(entry.invited, email)) return 'wrong'
 
     const supabase = createServiceRoleClient()

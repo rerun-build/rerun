@@ -6,6 +6,8 @@ import { REFERRAL_COOKIE, REFERRAL_PATH } from '@/ee/lib/billing/referral'
 import { drawPriceArm } from '@rerun/cloud/billing'
 import { joinOrganization, reachesBeyondOrganization } from '@rerun/cloud/organizations.server'
 import { internalPath } from '@/lib/auth/internal-path'
+import { asksSecondStep, awaitsSecondStep, hasTwoStep, sessionLevel, tokenHasTwoStep, TWO_STEP_PATH } from '@/lib/auth/two-step/gate'
+import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { requestHost, requestProtocol } from '@/lib/request-host'
 import { MOVED_PARAM } from '@/lib/brand/host-paths'
 import { routes } from '@/lib/routes'
@@ -41,6 +43,37 @@ function redirectToSignIn(request: NextRequest, sessionResponse: NextResponse): 
     const response = NextResponse.redirect(url)
     sessionResponse.cookies.getAll().forEach(cookie => response.cookies.set(cookie))
     return response
+}
+
+// A token issued while the account had two-step on, read once the auth server vouched for its user.
+async function tokenOutlivedTwoStep(supabase: SupabaseClient<Database>): Promise<boolean> {
+    try {
+        return tokenHasTwoStep((await supabase.auth.getSession()).data.session?.access_token)
+    } catch {
+        return false
+    }
+}
+
+// A method that a setup cut short left without the flag: the flag goes in now, and into this session's
+// token, so what reads the token alone (navigations, the database's policies) holds the session too.
+// The Security tab then finishes the setup (recovery factor, backup codes) once the session is at aal2.
+async function flagCutShortSetup(supabase: SupabaseClient<Database>, userId: string): Promise<void> {
+    try {
+        const { error } = await createServiceRoleClient().auth.admin.updateUserById(userId, { app_metadata: { two_step: true } })
+        if (error) throw error
+        await supabase.auth.refreshSession()
+    } catch (err) {
+        console.error('[two-step] flag of a cut-short setup not written', err instanceof Error ? err.message : err)
+    }
+}
+
+// The second step, with where they were going: from the sign-in, where it was headed. The desktop
+// app's hand-off is a destination of its own, with its challenge in the query.
+function secondStepUrl(request: NextRequest): string {
+    const { pathname, search, searchParams } = request.nextUrl
+    const fromSignIn = pathname.startsWith(routes.auth) && pathname !== DESKTOP_AUTH_PATH
+    const back = fromSignIn ? internalPath(searchParams.get('next'), routes.home) : `${pathname}${search}`
+    return back === routes.home ? TWO_STEP_PATH : `${TWO_STEP_PATH}?next=${encodeURIComponent(back)}`
 }
 
 // The sign-in of the address Rerun answers for, with where they were going and why they are sent there.
@@ -194,6 +227,7 @@ export async function updateSession(request: NextRequest, site: HostSite = { kin
 
     let user: User | null = null
     let identity: Identity | null = null
+    let pendingSecondStep = false
     if (isPageLoad(request)) {
         user = (await supabase.auth.getUser()).data.user
         // Visitors used to get an anonymous session; one still valid is closed on its next page
@@ -205,7 +239,17 @@ export async function updateSession(request: NextRequest, site: HostSite = { kin
     } else {
         const { data } = await supabase.auth.getClaims()
         if (data?.claims.sub && data.claims.is_anonymous !== true) identity = { id: data.claims.sub }
+        pendingSecondStep = !!identity && awaitsSecondStep(data?.claims.app_metadata, data?.claims.aal)
     }
+    // The account says whether it asks for a second step, from the moment the flag is written, and
+    // even before it is when a setup was cut short after its method was confirmed.
+    if (user && asksSecondStep(user)) {
+        if (!hasTwoStep(user.app_metadata)) await flagCutShortSetup(supabase, user.id)
+        pendingSecondStep = (await sessionLevel(supabase)) !== 'aal2'
+    }
+    // Two-step turned off since this token was issued: the database still reads the flag in it and
+    // would answer nothing, so the session takes a fresh token now rather than within the hour.
+    else if (user && (await tokenOutlivedTwoStep(supabase))) await supabase.auth.refreshSession()
 
     identity ??= user ? { id: user.id } : null
 
@@ -219,8 +263,10 @@ export async function updateSession(request: NextRequest, site: HostSite = { kin
         return redirectKeepingSession(request, signInOnDefaultAddress(request, site.defaultOrigin), supabaseResponse)
     }
 
+    // An account with two-step already exists, and before its second step the database answers it
+    // nothing: provisioning would read it as new.
     let provisioned: Provisioned = null
-    if (identity && provisioningNeeded(request.cookies.get(PROVISIONED_COOKIE)?.value, identity)) {
+    if (identity && !pendingSecondStep && provisioningNeeded(request.cookies.get(PROVISIONED_COOKIE)?.value, identity)) {
         user ??= (await supabase.auth.getUser()).data.user
         if (user) {
             provisioned = await provision(request, supabase, user, site)
@@ -236,7 +282,13 @@ export async function updateSession(request: NextRequest, site: HostSite = { kin
     if (identity && provisioned && request.cookies.has(REFERRAL_COOKIE)) supabaseResponse.cookies.delete(REFERRAL_COOKIE)
 
     const { pathname } = request.nextUrl
-    if (identity) {
+    if (identity && pendingSecondStep) {
+        // Signed in with the first method only: every page waits behind the second step. Calls and
+        // actions go on to their own checks, which take such a session for nobody.
+        if (isPage(request) && pathname !== TWO_STEP_PATH && pathname !== routes.authCallback) {
+            return redirectKeepingSession(request, secondStepUrl(request), supabaseResponse)
+        }
+    } else if (identity) {
         // A signed-in visit to the sign-in goes where it was headed. The callback is let through:
         // connecting Google from the account settings comes back to it signed in, and the code it
         // carries is only exchanged there. So is the desktop app's hand-off, which a signed-in

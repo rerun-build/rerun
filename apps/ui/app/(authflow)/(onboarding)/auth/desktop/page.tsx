@@ -5,6 +5,7 @@ import { createClient } from '@/supabase/server'
 import { isDesktopShellChannel, type DesktopSignInProvider } from '@rerun/contracts'
 import { getTranslations } from 'next-intl/server'
 import { DesktopHandoff } from './DesktopHandoff'
+import { readSettledUser } from '@/lib/auth/two-step/gate'
 
 const STATE_PATTERN = /^[A-Za-z0-9_-]{16,128}$/
 
@@ -22,8 +23,8 @@ export default async function DesktopAuthPage({ searchParams }: { searchParams: 
             </OnboardingPage>
         )
     }
-    const { data } = await (await createClient()).auth.getUser()
-    const user = data.user && !data.user.is_anonymous ? data.user : null
+    const settled = await readSettledUser(await createClient())
+    const user = settled && !settled.is_anonymous ? settled : null
     const signInProvider: DesktopSignInProvider | null = provider === 'google' || provider === 'apple' ? provider : null
     return <DesktopHandoff challenge={challenge} state={state} channel={channel} provider={signInProvider} account={user ? (user.email ?? user.phone ?? '') : null} />
 }
