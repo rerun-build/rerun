@@ -4,10 +4,12 @@ import type { ThreadRow } from '@/app/api/_services/conversation.service'
 import { AgentChat } from '@/components/chat/AgentChat'
 import type { MentionAgent } from '@/components/chat/MentionAutocomplete'
 import { useAgentSkillSummaries } from '@/hooks/useAgentSkillSummaries'
+import { useForemanName } from '@/hooks/useForemanName'
 import { NEW_THREAD_TITLE } from '@/hooks/useSessionTabs'
 import { useBoardStore } from '@/stores/board.store'
 import { createClient } from '@/supabase/client'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { AGENT_KIND_POLICY, FOREMAN_AGENT_ID } from '@rerun/contracts'
 import { AgentBuddy } from '@rerun/ui/iso-grid'
 import { Stripes } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
@@ -39,16 +41,28 @@ export function AgentSheetChat({ uid, active, agentId, sessionId, sessionPending
     const t = useTranslations('agent')
     const boardAgents = useBoardStore(s => s.agents)
     const spaces = useBoardStore(s => s.spaces)
+    const tForeman = useTranslations('workspaceView.foreman')
+    const foremanName = useForemanName()
     // Every agent of the workspace answers to `call_agent`, whichever Box it sits in. Its own Box
     // opens the list, and only the others carry a Box name, so a single-Box workspace sees none.
+    // The Chief of Staff answers too, under its fixed id: the engine does not know the name the
+    // workspace gave it, so the mention is `@foreman`.
     const mentionAgents = useMemo<MentionAgent[]>(() => {
         const self = boardAgents.find(a => a.id === agentId)
         if (!self) return []
         const boxNames = new Map(spaces.map(space => [space.id, space.name]))
-        return boardAgents
+        const foreman: MentionAgent = {
+            id: FOREMAN_AGENT_ID,
+            name: tForeman('name', foremanName),
+            handle: FOREMAN_AGENT_ID,
+            hint: foremanName.named === 'yes' ? tForeman('name', { named: 'no', name: '' }) : undefined,
+            look: AGENT_KIND_POLICY.foreman.look,
+        }
+        const coworkers = boardAgents
             .filter(a => a.id !== agentId && !a.disabledAt)
             .map(a => ({ id: a.id, name: a.name, handle: a.handle, hint: a.spaceId === self.spaceId ? undefined : (boxNames.get(a.spaceId) ?? undefined), preferred: a.spaceId === self.spaceId }))
-    }, [boardAgents, spaces, agentId])
+        return [foreman, ...coworkers]
+    }, [boardAgents, spaces, agentId, tForeman, foremanName])
 
     const mentionSkills = useAgentSkillSummaries(agentId)
 

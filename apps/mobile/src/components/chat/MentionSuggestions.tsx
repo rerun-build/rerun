@@ -3,6 +3,7 @@ import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated'
 import { useTranslations } from 'use-intl'
 
 import { usePaneSize } from '@/components/layout/PaneSize'
+import { ForemanOrb } from '@/components/orb/ForemanOrb'
 import { useGlassStyle } from '@/components/ui/GlassButton'
 import { AppText } from '@/components/ui/AppText'
 import { GlassSurface } from '@/components/ui/GlassSurface'
@@ -48,13 +49,16 @@ export function MentionSuggestions({ trigger, items, listRead = true, onPick }: 
                     <ScrollView style={{ maxHeight }} keyboardShouldPersistTaps="always" contentContainerStyle={{ paddingVertical: spacing.xs }}>
                         {items.map(item => (
                             <Pressable key={item.kind === 'skill' ? item.slug : item.id} onPress={() => onPick(item)} accessibilityRole="button" style={({ pressed }) => ({ minHeight: ROW, justifyContent: 'center', paddingHorizontal: spacing.lg, backgroundColor: pressed ? theme.muted : 'transparent' })}>
-                                <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: spacing.sm }}>
-                                    <AppText variant="callout" medium numberOfLines={1} style={{ flexShrink: 1 }}>
-                                        {item.name}
-                                    </AppText>
-                                    <AppText variant="footnote" tone="muted" numberOfLines={1} style={{ flexShrink: 2 }}>
-                                        {item.kind === 'agent' && item.hint ? `${mentionText(item)} · ${item.hint}` : item.kind === 'computer' && !item.online ? `${mentionText(item)} · ${t('offline')}` : mentionText(item)}
-                                    </AppText>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+                                    {item.kind === 'agent' && item.look === 'orb' && <ForemanOrb size={20} animated={false} facing="right" />}
+                                    <View style={{ flex: 1, flexDirection: 'row', alignItems: 'baseline', gap: spacing.sm }}>
+                                        <AppText variant="callout" medium numberOfLines={1} style={{ flexShrink: 1 }}>
+                                            {item.name}
+                                        </AppText>
+                                        <AppText variant="footnote" tone="muted" numberOfLines={1} style={{ flexShrink: 2 }}>
+                                            {item.kind === 'agent' && item.hint ? `${mentionText(item)} · ${item.hint}` : item.kind === 'computer' && !item.online ? `${mentionText(item)} · ${t('offline')}` : mentionText(item)}
+                                        </AppText>
+                                    </View>
                                 </View>
                             </Pressable>
                         ))}

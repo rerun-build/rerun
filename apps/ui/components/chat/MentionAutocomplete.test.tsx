@@ -2,27 +2,28 @@
 import { act, createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import type { MentionTrigger } from './MentionAutocomplete'
+import type { MentionAgent, MentionTrigger } from './MentionAutocomplete'
 
 // The composer told only its symbols: `@`, `/` and `#` now open a menu that says what each does,
 // and a bare symbol with nothing behind it says so instead of showing nothing.
 
 vi.mock('@rerun/ui/iso-grid', () => ({ AgentBuddy: () => null }))
+vi.mock('@rerun/ui/foreman', () => ({ Orb: () => null }))
 vi.mock('@/components/computers/ComputerBits', () => ({ ComputerHandle: () => null, ComputerStatusBadge: () => null, OsTile: () => null }))
 
 const { useMentionAutocomplete } = await import('./MentionAutocomplete')
 
-const AGENTS = [{ id: 'scout', name: 'Scout', handle: 'scout' }]
+const AGENTS: MentionAgent[] = [{ id: 'scout', name: 'Scout', handle: 'scout' }]
 const SKILLS = [{ slug: 'weekly-report', name: 'Weekly report' }]
 
 let container: HTMLDivElement
 let root: Root
 const written: string[] = []
 
-type HarnessProps = { skills?: typeof SKILLS | null; computers?: [] | null; triggers?: MentionTrigger[] }
+type HarnessProps = { agents?: MentionAgent[]; skills?: typeof SKILLS | null; computers?: [] | null; triggers?: MentionTrigger[] }
 
-function Harness({ skills = SKILLS, computers = [], triggers }: HarnessProps) {
-    const { menu, inputRef, textareaProps, commands } = useMentionAutocomplete(AGENTS, skills, text => written.push(text), computers, undefined, triggers)
+function Harness({ agents = AGENTS, skills = SKILLS, computers = [], triggers }: HarnessProps) {
+    const { menu, inputRef, textareaProps, commands } = useMentionAutocomplete(agents, skills, text => written.push(text), computers, undefined, triggers)
     return createElement('div', null, menu, createElement('textarea', { ref: inputRef, ...textareaProps }), createElement('button', { type: 'button', onClick: () => commands.onPick('/') }))
 }
 
@@ -126,5 +127,24 @@ describe('useMentionAutocomplete', () => {
         type('#')
         expect(menuText()).toContain('Let your coworker work on a linked computer')
         expect(menuText()).not.toContain('No computer linked yet')
+    })
+
+    it('opens the list on the Chief of Staff, mentioned by its fixed id whatever its name', () => {
+        const foreman: MentionAgent = { id: 'foreman', name: 'Maya', handle: 'foreman', hint: 'Chief of Staff', look: 'orb' }
+        mount({ agents: [{ id: 'ada', name: 'Ada', handle: 'ada', preferred: true }, ...AGENTS, foreman] })
+        type('Ask @')
+        const options = [...container.querySelectorAll('[role="option"]')].map(option => option.textContent)
+        expect(options).toHaveLength(3)
+        expect(options[0]).toContain('Maya')
+        expect(options[0]).toContain('Chief of Staff')
+        expect(options[1]).toContain('Ada')
+        press('Enter')
+        expect(field().value).toBe('Ask @foreman ')
+    })
+
+    it('finds a named Chief of Staff by its role', () => {
+        mount({ agents: [...AGENTS, { id: 'foreman', name: 'Maya', handle: 'foreman', hint: 'Chief of Staff', look: 'orb' }] })
+        type('@chief')
+        expect([...container.querySelectorAll('[role="option"]')].map(option => option.textContent)).toEqual([expect.stringContaining('Maya')])
     })
 })

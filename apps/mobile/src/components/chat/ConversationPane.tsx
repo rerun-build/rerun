@@ -29,6 +29,7 @@ import { useSkillProposals } from '@/chat/useSkillProposals'
 import { cachedBoard } from '@/data/local-cache'
 import { useMentionComputers } from '@/data/useMentionComputers'
 import { useCoworkerSkills } from '@/data/useCoworkerSkills'
+import { foremanLabel, useForemanName } from '@/data/useForemanName'
 import { useMemberProfiles } from '@/data/useMemberProfiles'
 import { useWorkspaceAgents } from '@/data/useWorkspaceAgents'
 import { CHAT_COLUMN_MAX_WIDTH } from '@/components/layout/split'
@@ -56,7 +57,7 @@ import { QueuedMessagePill } from './QueuedMessagePill'
 import { RISE_IN, ScrollToEndButton, SINK_OUT } from './ScrollToEndButton'
 import { replacesComposer } from './hitl/registry'
 import { HITL_WIDGETS } from './hitl/widgets'
-import { mentionAgentsOf, type MentionTrigger } from './mentions'
+import { foremanMention, mentionAgentsOf, type MentionTrigger } from './mentions'
 import { runPhase, stepGroupShowsActivity } from './run-phase'
 import { RunStatus } from './RunStatus'
 import { ChatScreen } from './screen/ChatScreen'
@@ -396,7 +397,9 @@ function ConversationPaneBody({ coworker, makeEndpoints, initialSessionId, onSes
     const mentionComputers = useMentionComputers()
     const workspaceAgents = useWorkspaceAgents()
     const boxes = me ? (cachedBoard(me.workspace.id).read()?.boxes ?? []) : []
-    const mentionAgents = workspaceAgents ? mentionAgentsOf(workspaceAgents, boxes, isForeman ? null : coworker.id) : null
+    const foremanName = useForemanName()
+    const coworkerMentions = workspaceAgents ? mentionAgentsOf(workspaceAgents, boxes, isForeman ? null : coworker.id) : null
+    const mentionAgents = coworkerMentions && !isForeman ? [foremanMention(foremanLabel(foremanName)), ...coworkerMentions] : coworkerMentions
     // The web's chat notices: a dead sign-in opens the connection the coworker runs on, used-up
     // credits open the two plans. Rerun itself has no sign-in, so it opens the list.
     const runsOn = models?.resolved?.connectionId ?? models?.boxDefault?.connectionId

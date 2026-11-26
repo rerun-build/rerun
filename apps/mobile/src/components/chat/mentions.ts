@@ -1,11 +1,11 @@
-import type { BoardAgent, Box, SkillSummary } from '@rerun/contracts'
+import { AGENT_KIND_POLICY, FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, type AgentKindPolicy, type BoardAgent, type Box, type SkillSummary } from '@rerun/contracts'
 
 // The web composer's `@` and `/` menus, same strings: the engine reads `@handle` and `/slug` from the
 // text through its prompt, nothing parses them on the way.
 
 // `hint` tells apart two coworkers of the same name, by the Box each lives in. `preferred` opens the
-// list: the coworkers sharing the Box of the conversation.
-export type MentionAgent = { id: string; name: string; handle: string | null; hint?: string; preferred?: boolean }
+// list: the coworkers sharing the Box of the conversation. An `orb`, the Chief of Staff, comes before them.
+export type MentionAgent = { id: string; name: string; handle: string | null; hint?: string; preferred?: boolean; look?: AgentKindPolicy['look'] }
 // A computer linked to the workspace, `#handle` in a message. Offline ones stay in the list, after the others.
 export type MentionComputer = { id: string; name: string; handle: string; online: boolean }
 export type MentionItem = ({ kind: 'agent' } & MentionAgent) | ({ kind: 'skill' } & SkillSummary) | ({ kind: 'computer' } & MentionComputer)
@@ -39,7 +39,7 @@ export function mentionItems(mention: MentionQuery, agents: MentionAgent[], skil
     return agents
         .filter(agent => [agent.name, agent.handle ?? '', agent.hint ?? ''].some(field => field.toLowerCase().includes(query)))
         .map(agent => ({ kind: 'agent' as const, ...agent }))
-        .sort((a, b) => Number(b.preferred ?? false) - Number(a.preferred ?? false) || a.name.localeCompare(b.name))
+        .sort((a, b) => Number(b.look === 'orb') - Number(a.look === 'orb') || Number(b.preferred ?? false) - Number(a.preferred ?? false) || a.name.localeCompare(b.name))
 }
 
 export function mentionText(item: MentionItem): string {
@@ -79,4 +79,11 @@ export function mentionAgentsOf(agents: BoardAgent[], boxes: Box[], selfId: stri
             const sameBox = self !== undefined && agent.spaceId === self.spaceId
             return { id: agent.id, name: agent.name, handle: agent.handle, hint: sameBox ? undefined : (boxNames.get(agent.spaceId) ?? undefined), preferred: sameBox }
         })
+}
+
+// The Chief of Staff answers `call_agent` under its fixed id: the engine does not know the name the
+// workspace gave it, so it is mentioned `@foreman`, its role beside a name it was given. `label` is the
+// name a chat shows for it (`foremanLabel`).
+export function foremanMention(label: string): MentionAgent {
+    return { id: FOREMAN_AGENT_ID, name: label, handle: FOREMAN_AGENT_ID, hint: label === FOREMAN_DISPLAY_NAME ? undefined : FOREMAN_DISPLAY_NAME, look: AGENT_KIND_POLICY.foreman.look }
 }

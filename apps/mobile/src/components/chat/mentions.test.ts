@@ -1,6 +1,6 @@
 import type { BoardAgent } from '@rerun/contracts'
 
-import { insertAtCaret, insertMention, insertTrigger, mentionAgentsOf, mentionItems, mentionQueryAt, mentionText, type MentionAgent } from './mentions'
+import { foremanMention, insertAtCaret, insertMention, insertTrigger, mentionAgentsOf, mentionItems, mentionQueryAt, mentionText, type MentionAgent } from './mentions'
 
 const agents: MentionAgent[] = [
     { id: 'b', name: 'Bob', handle: 'sales-bob' },
@@ -85,6 +85,20 @@ describe('mentionAgentsOf', () => {
             { id: 'mate', name: 'mate', handle: 'mate', hint: undefined, preferred: true },
             { id: 'far', name: 'far', handle: 'far', hint: 'Ops', preferred: false },
         ])
+    })
+})
+
+describe('the Chief of Staff in the @ menu', () => {
+    it('is mentioned by its fixed id, its role beside a name the workspace gave it', () => {
+        expect(foremanMention('Chief of Staff')).toEqual({ id: 'foreman', name: 'Chief of Staff', handle: 'foreman', hint: undefined, look: 'orb' })
+        expect(foremanMention('Maya')).toEqual({ id: 'foreman', name: 'Maya', handle: 'foreman', hint: 'Chief of Staff', look: 'orb' })
+        expect(mentionText({ kind: 'agent', ...foremanMention('Maya') })).toBe('@foreman')
+    })
+
+    it('opens the list, before the coworkers of the same Box, and answers to its role', () => {
+        const list: MentionAgent[] = [{ id: 'ada', name: 'Ada', handle: 'ada', preferred: true }, { id: 'bob', name: 'Bob', handle: 'bob' }, foremanMention('Maya')]
+        expect(mentionItems(mentionQueryAt('@', 1)!, list, []).map(item => item.name)).toEqual(['Maya', 'Ada', 'Bob'])
+        expect(mentionItems(mentionQueryAt('@chief', 6)!, list, []).map(item => item.name)).toEqual(['Maya'])
     })
 })
 

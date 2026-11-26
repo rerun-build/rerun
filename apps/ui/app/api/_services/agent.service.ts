@@ -11,7 +11,7 @@ import {
     updateSchedule,
 } from '@/lib/engine/client'
 import type { EngineAgentConfigPatch } from '@/lib/engine/types'
-import { agentKindPolicy, type CoworkerLook } from '@rerun/contracts'
+import { agentKindPolicy, FOREMAN_AGENT_ID, type CoworkerLook } from '@rerun/contracts'
 import { AGENT_SPAN, UNPLACED_COL, agentsOverlap, isPlaced } from '@/lib/board/iso'
 import type { GridPosition } from '@/lib/board/types'
 import { coworkerLanguageFor } from '@/app/api/_services/coworker-language.service'
@@ -131,10 +131,11 @@ function allocateHandle(displayName: string, taken: Set<string>): string {
 // The mention token / call_agent resolution key. Derived from the free display name, unique per
 // workspace (suffix _2, _3, … on collision), and kept equal to the engine's config.name so
 // @mentions resolve on the engine. Workspace-wide rather than per Box, because every Box of a
-// workspace now runs on the same engine, where one name means one agent.
+// workspace now runs on the same engine, where one name means one agent. `foreman` is always taken:
+// the Chief of Staff is mentioned by its fixed id, which its row does not carry as a handle.
 export async function deriveUniqueHandle(supabase: ReturnType<typeof createServiceRoleClient>, workspaceId: number, displayName: string, excludeAgentId?: string): Promise<string> {
     const { data } = await selectMany(supabase, 'agents', ['id', 'handle'] as const, { workspace_id: workspaceId })
-    const taken = new Set((data ?? []).filter(a => a.id !== excludeAgentId && a.handle).map(a => a.handle as string))
+    const taken = new Set([FOREMAN_AGENT_ID, ...(data ?? []).filter(a => a.id !== excludeAgentId && a.handle).map(a => a.handle as string)])
     return allocateHandle(displayName, taken)
 }
 
@@ -143,7 +144,7 @@ export async function deriveUniqueHandle(supabase: ReturnType<typeof createServi
 // yet.
 export async function deriveUniqueHandles(supabase: ReturnType<typeof createServiceRoleClient>, workspaceId: number, displayNames: string[]): Promise<string[]> {
     const { data } = await selectMany(supabase, 'agents', ['handle'] as const, { workspace_id: workspaceId })
-    const taken = new Set((data ?? []).filter(a => a.handle).map(a => a.handle as string))
+    const taken = new Set([FOREMAN_AGENT_ID, ...(data ?? []).filter(a => a.handle).map(a => a.handle as string)])
     return displayNames.map(displayName => {
         const handle = allocateHandle(displayName, taken)
         taken.add(handle)
@@ -438,7 +439,7 @@ export async function changeAgentHandle(id: string, requestedHandle: string) {
 
     if (handle !== agent.handle) {
         const { data: siblings } = await selectMany(supabase, 'agents', ['id', 'handle'] as const, { workspace_id: agent.workspace_id })
-        if ((siblings ?? []).some(sibling => sibling.id !== id && sibling.handle === handle)) {
+        if (handle === FOREMAN_AGENT_ID || (siblings ?? []).some(sibling => sibling.id !== id && sibling.handle === handle)) {
             throw new AppError('handleTaken', { handle })
         }
     }

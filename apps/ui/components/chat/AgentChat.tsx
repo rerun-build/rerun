@@ -25,7 +25,7 @@ import { useConnectorServices } from '@/hooks/useConnectorServices'
 import { AgentBuddy } from '@rerun/ui/iso-grid'
 import type { CatalogEntry } from '@rerun/ui/new-agent'
 import { ChatComposer, type ChatComposerHandle } from '@/components/chat/ChatComposer'
-import { mentionMenuBox, useMentionAutocomplete, type MentionMenuBox } from '@/components/chat/MentionAutocomplete'
+import { mentionMenuBox, useMentionAutocomplete, type MentionAgent, type MentionMenuBox } from '@/components/chat/MentionAutocomplete'
 import { MessageFeedbackDialog } from '@/components/chat/MessageFeedbackDialog'
 import { AuthoredGroup } from '@/components/chat/AuthoredGroup'
 import { ChatTimeSeparator } from '@/components/chat/ChatTimeSeparator'
@@ -115,7 +115,7 @@ type AgentChatProps = {
     // Bumped each time the conversation is opened from somewhere else (a notification, the inbox):
     // it then lands on its latest message, or on the top of the question it is waiting on.
     arrival?: number
-    mentionAgents?: { id: string; name: string; handle: string | null }[]
+    mentionAgents?: MentionAgent[]
     // `null` while the agent's skills are not read yet.
     mentionSkills?: { slug: string; name: string; description?: string }[] | null
     sessionWorking?: boolean

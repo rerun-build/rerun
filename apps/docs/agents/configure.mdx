@@ -222,7 +222,7 @@ echo $! > worker.pid
 
 ## Name and handle
 
-The **name** is free text, the one you see. The **handle** is the key other coworkers use to call it with `@handle`. Type `@` in the message box, or click **@** at its bottom and choose **Mention a coworker**, to pick a coworker.
+The **name** is free text, the one you see. The **handle** is the key other coworkers use to call it with `@handle`. Type `@` in the message box, or click **@** at its bottom and choose **Mention a coworker**, to pick a coworker. Your Chief of Staff opens that list in a coworker's chat: it is mentioned `@foreman`, whatever name you gave it. That handle stays its own: a coworker named Foreman gets `@foreman_2`.
 
 Renaming a coworker moves its handle too: the handle is re-derived from the new name, and every `@oldhandle` written into the other coworkers (souls, skills, scheduled tasks, webhook triggers, memories) is rewritten to the new one. Past conversations stay as they were. Set the handle on its own, from the API, only when the call key should differ from the name.
 

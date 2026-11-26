@@ -69,6 +69,12 @@ describe('renameAgent', () => {
 
         await expect(renameAgent('a1', 'Ranger')).resolves.toEqual({ name: 'Ranger', handle: 'ranger_2', handleChanged: true })
     })
+
+    it('leaves `foreman` to the Chief of Staff, which answers to it without a row holding it', async () => {
+        siblings([{ id: 'a1', handle: 'scout' }])
+
+        await expect(renameAgent('a1', 'Foreman')).resolves.toEqual({ name: 'Foreman', handle: 'foreman_2', handleChanged: true })
+    })
 })
 
 describe('changeAgentHandle', () => {
@@ -88,6 +94,12 @@ describe('changeAgentHandle', () => {
         vi.mocked(patchAgent).mockRejectedValueOnce(new Error('engine down'))
 
         await expect(changeAgentHandle('a1', 'ranger')).rejects.toThrow('engine down')
+        expect(update).not.toHaveBeenCalled()
+    })
+
+    it('refuses `foreman`, the handle of the Chief of Staff', async () => {
+        await expect(changeAgentHandle('a1', 'Foreman')).rejects.toMatchObject({ code: 'handleTaken' })
+        expect(patchAgent).not.toHaveBeenCalled()
         expect(update).not.toHaveBeenCalled()
     })
 })

@@ -1,6 +1,7 @@
 'use client'
 
-import type { RemoteOs } from '@rerun/contracts'
+import type { AgentKindPolicy, RemoteOs } from '@rerun/contracts'
+import { Orb } from '@rerun/ui/foreman'
 import { AgentBuddy } from '@rerun/ui/iso-grid'
 import { PromptInputButton } from '@/components/ai-elements/prompt-input'
 import { ComputerHandle, ComputerStatusBadge, OsTile } from '@/components/computers/ComputerBits'
@@ -11,8 +12,8 @@ import { cn } from '@/lib/utils'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent, type KeyboardEvent, type ReactNode, type SyntheticEvent } from 'react'
 
-/** `hint` disambiguates two agents sharing a name, e.g. the Box each one lives in. `preferred` opens the list, e.g. the agents that share the Box of the conversation being typed in. */
-export type MentionAgent = { id: string; name: string; handle: string | null; hint?: string; preferred?: boolean }
+/** `hint` disambiguates two agents sharing a name, e.g. the Box each one lives in. `preferred` opens the list, e.g. the agents that share the Box of the conversation being typed in. An `orb` (the Chief of Staff) opens it before them. */
+export type MentionAgent = { id: string; name: string; handle: string | null; hint?: string; preferred?: boolean; look?: AgentKindPolicy['look'] }
 export type MentionSkill = { slug: string; name: string; description?: string }
 /** A computer linked to the workspace, named `#handle` in a message. */
 export type MentionComputer = { id: string; name: string; handle: string; os: RemoteOs; status: ComputerStatus }
@@ -86,7 +87,7 @@ export function useMentionAutocomplete(
         return agents
             .filter(a => [a.name, a.handle ?? '', a.hint ?? ''].some(field => field.toLowerCase().includes(query)))
             .map(a => ({ kind: 'agent' as const, ...a }))
-            .sort((a, b) => Number(b.preferred ?? false) - Number(a.preferred ?? false) || a.name.localeCompare(b.name))
+            .sort((a, b) => Number(b.look === 'orb') - Number(a.look === 'orb') || Number(b.preferred ?? false) - Number(a.preferred ?? false) || a.name.localeCompare(b.name))
     }, [agents, skills, computers, mention])
 
     const tokens = useMemo(() => mentionTokensOf(agents, skills ?? NO_SKILLS, computers ?? NO_COMPUTERS), [agents, skills, computers])
@@ -253,7 +254,7 @@ function MentionMenu({ trigger, items, listRead, highlight, onHover, onPick }: M
                                     onPick(item)
                                 }}
                             >
-                                {item.kind === 'agent' && <AgentBuddy agentId={item.id} size={20} animated={false} facing="right" />}
+                                {item.kind === 'agent' && (item.look === 'orb' ? <Orb size={20} paused facing="right" /> : <AgentBuddy agentId={item.id} size={20} animated={false} facing="right" />)}
                                 {item.kind === 'computer' && <OsTile os={item.os} size="sm" />}
                                 <span className="flex-1 min-w-0">
                                     <span className="block truncate">
