@@ -34,7 +34,12 @@
         "settingUpTemplate": "Configurando {title}…",
         "settingUpCoworker": "Configurando seu coworker…",
         "installTemplate": "Clique para instalar {title}",
-        "addBoxOnSide": "Adicionar uma Box deste lado"
+        "addBoxOnSide": "Adicionar uma Box deste lado",
+        "numberedBox": "{number} · {name}",
+        "keys": {
+            "wholeBoard": "Quadro inteiro",
+            "noBox": "Nenhuma Box {number}"
+        }
     },
     "discoveries": {
         "statusDigging": "Conhecendo {name}",

@@ -34,7 +34,12 @@
         "settingUpTemplate": "מגדיר את {title}…",
         "settingUpCoworker": "מגדיר את העמית שלך…",
         "installTemplate": "ללחוץ כדי להתקין את {title}",
-        "addBoxOnSide": "להוסיף Box בצד הזה"
+        "addBoxOnSide": "להוסיף Box בצד הזה",
+        "numberedBox": "{number} · {name}",
+        "keys": {
+            "wholeBoard": "כל הלוח",
+            "noBox": "אין Box מספר {number}"
+        }
     },
     "discoveries": {
         "statusDigging": "מכירים את {name}",

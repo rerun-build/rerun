@@ -469,7 +469,8 @@
         "groups": {
             "general": "一般",
             "chat": "對話",
-            "files": "檔案"
+            "files": "檔案",
+            "board": "看板"
         },
         "actions": {
             "controlCenter": "開啟控制中心",
@@ -488,7 +489,11 @@
             "deleteMessage": "刪除選取的訊息",
             "deselectMessage": "取消選取",
             "previousFile": "上一個檔案",
-            "nextFile": "下一個檔案"
+            "nextFile": "下一個檔案",
+            "zoomIn": "放大",
+            "zoomOut": "縮小",
+            "fitBoard": "顯示整個看板",
+            "fitBox": "聚焦 Box 1 到 9"
         }
     },
     "viewSettings": {

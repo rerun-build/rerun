@@ -34,7 +34,12 @@
         "settingUpTemplate": "Kuruluyor: {title}…",
         "settingUpCoworker": "Coworker'ınız kuruluyor…",
         "installTemplate": "Kurmak için tıklayın: {title}",
-        "addBoxOnSide": "Bu tarafa Box ekle"
+        "addBoxOnSide": "Bu tarafa Box ekle",
+        "numberedBox": "{number} · {name}",
+        "keys": {
+            "wholeBoard": "Tüm pano",
+            "noBox": "Box yok: {number}"
+        }
     },
     "discoveries": {
         "statusDigging": "{name} şirketini tanıyoruz",

@@ -46,6 +46,9 @@
         "deleteTable.title": "{table} is the name of a database table.",
         "purgeTable.title": "Purge means deleting every row while keeping the table. {table} is the name of a database table.",
         "shortcuts.actions.searchInPage": "Pressing the shortcut twice searches the text of the page.",
+        "shortcuts.groups.board": "The isometric board where the Boxes and their coworkers are drawn.",
+        "shortcuts.actions.fitBoard": "Keyboard shortcut: zooms and moves the view so the whole board fits on screen.",
+        "shortcuts.actions.fitBox": "Keyboard shortcut: the digits 1 to 9 frame the Box with that number on the board.",
         "viewSettings.description": "Intro of the dialog that configures a view (a table, a board, a gallery) of a database table. {table} is the table's name, <mono> sets it in a code font.",
         "viewSettings.roles.badge": "Card field shown as a small pill.",
         "viewSettings.formatOf": "Accessible label of the format picker of a column. {column} is the column name.",
@@ -555,7 +558,8 @@
         "groups": {
             "general": "General",
             "chat": "Chat",
-            "files": "Files"
+            "files": "Files",
+            "board": "Board"
         },
         "actions": {
             "controlCenter": "Open the control center",
@@ -574,7 +578,11 @@
             "deleteMessage": "Delete the selected message",
             "deselectMessage": "Clear the selection",
             "previousFile": "Previous file",
-            "nextFile": "Next file"
+            "nextFile": "Next file",
+            "zoomIn": "Zoom in",
+            "zoomOut": "Zoom out",
+            "fitBoard": "Fit the whole board",
+            "fitBox": "Fit Box 1 to 9"
         }
     },
     "viewSettings": {

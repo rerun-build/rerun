@@ -44,6 +44,9 @@ import { useOnboardingIndustry } from '@/lib/onboarding/useOnboardingIndustry'
 import { AGENT_SPAN } from '@/lib/board/iso'
 import { freeRectOnSide } from '@/lib/board/space-layout'
 import { SIDE_PANEL_GAP, loadSidePanelWidth } from '@/lib/side-panel-width'
+import { orderBoxesForShortcuts } from '@/lib/board/board-shortcuts'
+import { BoardKeyHud } from '@/components/builder/BoardKeyHud'
+import { agentPanelInset, useBoardShortcuts } from '@/components/builder/useBoardShortcuts'
 import type { SpacePublic } from '@/lib/board/types'
 
 
@@ -193,6 +196,10 @@ export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpac
         return invites
     }, [invitesAgents, agents, realSpaces, agentIdeas, industry, t, tSuggestions])
 
+    // Boxes 1 to 9 of the keyboard, numbered on the board in reading order.
+    const shortcutBoxes = useMemo(() => (showPlaceholder ? [] : orderBoxesForShortcuts(realSpaces).map(space => ({ id: space.id, name: space.name || tKit('isoGrid.untitledBox') }))), [showPlaceholder, realSpaces, tKit])
+    const shortcutNumbers = useMemo(() => new Map(shortcutBoxes.map((box, index) => [box.id, index + 1])), [shortcutBoxes])
+
     const boardContainers = useMemo<Container[]>(
         () =>
             showPlaceholder
@@ -215,9 +222,12 @@ export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpac
                       ]
                 : realSpaces.map(space => {
                       const invite = boxInvites.get(space.id)
-                      return boxContainerFor(invite ? { ...containerFromSpace(space, tKit), ...invite } : containerFromSpace(space, tKit), manageableSpaceIds.has(space.id), tErrors('boxManagerOnly'))
+                      const container = containerFromSpace(space, tKit)
+                      const number = shortcutNumbers.get(space.id)
+                      const numbered = number ? { ...container, label: t('numberedBox', { number, name: container.label ?? '' }) } : container
+                      return boxContainerFor(invite ? { ...numbered, ...invite } : numbered, manageableSpaceIds.has(space.id), tErrors('boxManagerOnly'))
                   }),
-        [showPlaceholder, emptyOnboardingBoard, isSandbox, workspaceAccess, startingFirstAgent, placing, parkedTitle, memberWithoutBox, realSpaces, boxInvites, manageableSpaceIds, t, tKit, tErrors]
+        [showPlaceholder, emptyOnboardingBoard, isSandbox, workspaceAccess, startingFirstAgent, placing, parkedTitle, memberWithoutBox, realSpaces, boxInvites, shortcutNumbers, manageableSpaceIds, t, tKit, tErrors]
     )
     const containers = useMemo(() => (planPreview ? [...boardContainers, ...planPreview.containers] : boardContainers), [planPreview, boardContainers])
 
@@ -426,12 +436,20 @@ export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpac
     // sans remount le workspace B s'ouvrirait sur la caméra de A puis l'écraserait.
     const cameraScope = workspace ? `board:${workspace.id}` : null
     const initialCamera = useMemo(() => readCamera(cameraScope), [cameraScope])
+    const zoomRef = useRef(initialCamera?.zoom ?? 1)
     const handleCameraChange = useCallback(
         (camera: IsoCamera) => {
+            zoomRef.current = camera.zoom
             if (cameraScope) writeCamera(cameraScope, camera)
         },
         [cameraScope]
     )
+    const { viewRequest, hud } = useBoardShortcuts({
+        enabled: hydrated && !dialogCoversBoard && !placing && mode !== 'space' && !emptyOnboardingBoard && !boxFirstOpen,
+        boxes: shortcutBoxes,
+        zoomRef,
+        insetRight: () => agentPanelInset(belowMd),
+    })
     // Bascule builder → dashboard : le démontage doit committer l'écriture encore en attente.
     useEffect(() => flushCamera, [])
 
@@ -485,6 +503,7 @@ export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpac
                     fitToContent={viewer.role === 'member'}
                     recenterSignal={recenterSignal}
                     focusRequest={focusRequest}
+                    viewRequest={viewRequest}
                     onCameraChange={handleCameraChange}
                     onTileSelect={handleTileSelect}
                     onContainerSelect={handleSelectSpace}
@@ -504,6 +523,8 @@ export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpac
                     worldOverlay={zoom => <CursorOverlay cursors={cursors} zoom={zoom} />}
                 />
             </BoardContextMenu>
+
+            <BoardKeyHud hud={hud} />
 
             <AnimatePresence>
                 {showDiscoveries && discoveriesDomain && (

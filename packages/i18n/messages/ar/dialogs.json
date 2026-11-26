@@ -469,7 +469,8 @@
         "groups": {
             "general": "عام",
             "chat": "الدردشة",
-            "files": "الملفات"
+            "files": "الملفات",
+            "board": "اللوحة"
         },
         "actions": {
             "controlCenter": "فتح مركز التحكم",
@@ -488,7 +489,11 @@
             "deleteMessage": "حذف الرسالة المحددة",
             "deselectMessage": "إلغاء التحديد",
             "previousFile": "الملف السابق",
-            "nextFile": "الملف التالي"
+            "nextFile": "الملف التالي",
+            "zoomIn": "تكبير",
+            "zoomOut": "تصغير",
+            "fitBoard": "عرض اللوحة كاملة",
+            "fitBox": "عرض Box من 1 إلى 9"
         }
     },
     "viewSettings": {

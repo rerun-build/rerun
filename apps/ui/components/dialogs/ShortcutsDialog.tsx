@@ -9,9 +9,9 @@ import { useShortcutsStore } from '@/stores/shortcuts.store'
 import { useForemanName } from '@/hooks/useForemanName'
 import { useTranslations } from 'next-intl'
 
-type ShortcutAction = 'controlCenter' | 'askRerun' | 'holdToTalk' | 'searchInPage' | 'newConversation' | 'closeTab' | 'sendMessage' | 'newLine' | 'selectMessage' | 'editMessage' | 'regenerateReply' | 'copyMessage' | 'copyMessageLink' | 'deleteMessage' | 'deselectMessage' | 'previousFile' | 'nextFile'
+type ShortcutAction = 'controlCenter' | 'askRerun' | 'holdToTalk' | 'searchInPage' | 'newConversation' | 'closeTab' | 'sendMessage' | 'newLine' | 'selectMessage' | 'editMessage' | 'regenerateReply' | 'copyMessage' | 'copyMessageLink' | 'deleteMessage' | 'deselectMessage' | 'previousFile' | 'nextFile' | 'zoomIn' | 'zoomOut' | 'fitBoard' | 'fitBox'
 type Shortcut = { keys: string[]; action: ShortcutAction }
-type ShortcutGroup = { title: 'general' | 'chat' | 'files'; shortcuts: Shortcut[] }
+type ShortcutGroup = { title: 'general' | 'chat' | 'files' | 'board'; shortcuts: Shortcut[] }
 
 function buildGroups(mod: string): ShortcutGroup[] {
     return [
@@ -45,6 +45,15 @@ function buildGroups(mod: string): ShortcutGroup[] {
             shortcuts: [
                 { keys: ['←'], action: 'previousFile' },
                 { keys: ['→'], action: 'nextFile' },
+            ],
+        },
+        {
+            title: 'board',
+            shortcuts: [
+                { keys: ['+'], action: 'zoomIn' },
+                { keys: ['−'], action: 'zoomOut' },
+                { keys: ['0'], action: 'fitBoard' },
+                { keys: ['1', '…', '9'], action: 'fitBox' },
             ],
         },
     ]

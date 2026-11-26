@@ -14,6 +14,9 @@
         "isoBoard.settingUpTemplate": "{title} is the name of a template being installed.",
         "isoBoard.installTemplate": "{title} is the name of a template the person came to install.",
         "isoBoard.addBoxOnSide": "Button on the side of a Box on the board: adds a new Box next to it.",
+        "isoBoard.numberedBox": "Name of a Box drawn on the board, after its number. Pressing that digit on the keyboard frames the Box. {number} is 1 to 9, {name} the Box's name. Keep the number first.",
+        "isoBoard.keys.wholeBoard": "Short note shown after pressing 0 on the board: the view now frames the whole board.",
+        "isoBoard.keys.noBox": "Short note shown after pressing a digit on the board that matches no Box. {number} is the digit pressed (1 to 9).",
         "discoveries.statusDigging": "Onboarding: Rerun is researching the person's company. {name} is the company name.",
         "discoveries.statusDone": "Title once the research on the company is done. {name} is the company name.",
         "discoveries.found": "Badge: how many facts were found about the company.",
@@ -56,7 +59,12 @@
         "settingUpTemplate": "Setting up {title}…",
         "settingUpCoworker": "Setting up your coworker…",
         "installTemplate": "Click to install {title}",
-        "addBoxOnSide": "Add a Box on this side"
+        "addBoxOnSide": "Add a Box on this side",
+        "numberedBox": "{number} · {name}",
+        "keys": {
+            "wholeBoard": "Whole board",
+            "noBox": "No Box {number}"
+        }
     },
     "discoveries": {
         "statusDigging": "Getting to know {name}",

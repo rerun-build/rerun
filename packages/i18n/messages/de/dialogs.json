@@ -469,7 +469,8 @@
         "groups": {
             "general": "Allgemein",
             "chat": "Chat",
-            "files": "Dateien"
+            "files": "Dateien",
+            "board": "Board"
         },
         "actions": {
             "controlCenter": "Kontrollzentrum öffnen",
@@ -488,7 +489,11 @@
             "deleteMessage": "Ausgewählte Nachricht löschen",
             "deselectMessage": "Auswahl aufheben",
             "previousFile": "Vorherige Datei",
-            "nextFile": "Nächste Datei"
+            "nextFile": "Nächste Datei",
+            "zoomIn": "Vergrößern",
+            "zoomOut": "Verkleinern",
+            "fitBoard": "Ganzes Board anzeigen",
+            "fitBox": "Box 1 bis 9 anzeigen"
         }
     },
     "viewSettings": {

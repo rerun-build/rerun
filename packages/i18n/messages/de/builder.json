@@ -34,7 +34,12 @@
         "settingUpTemplate": "{title} wird eingerichtet…",
         "settingUpCoworker": "Dein Coworker wird eingerichtet…",
         "installTemplate": "Klicke, um {title} zu installieren",
-        "addBoxOnSide": "Box auf dieser Seite hinzufügen"
+        "addBoxOnSide": "Box auf dieser Seite hinzufügen",
+        "numberedBox": "{number} · {name}",
+        "keys": {
+            "wholeBoard": "Ganzes Board",
+            "noBox": "Keine Box {number}"
+        }
     },
     "discoveries": {
         "statusDigging": "Wir lernen {name} kennen",

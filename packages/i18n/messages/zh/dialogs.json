@@ -469,7 +469,8 @@
         "groups": {
             "general": "通用",
             "chat": "聊天",
-            "files": "文件"
+            "files": "文件",
+            "board": "看板"
         },
         "actions": {
             "controlCenter": "打开控制中心",
@@ -488,7 +489,11 @@
             "deleteMessage": "删除所选消息",
             "deselectMessage": "清除选择",
             "previousFile": "上一个文件",
-            "nextFile": "下一个文件"
+            "nextFile": "下一个文件",
+            "zoomIn": "放大",
+            "zoomOut": "缩小",
+            "fitBoard": "显示整个看板",
+            "fitBox": "聚焦 Box 1 到 9"
         }
     },
     "viewSettings": {

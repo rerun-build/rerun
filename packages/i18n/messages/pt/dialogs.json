@@ -469,7 +469,8 @@
         "groups": {
             "general": "Geral",
             "chat": "Chat",
-            "files": "Arquivos"
+            "files": "Arquivos",
+            "board": "Quadro"
         },
         "actions": {
             "controlCenter": "Abrir a central de controle",
@@ -488,7 +489,11 @@
             "deleteMessage": "Excluir a mensagem selecionada",
             "deselectMessage": "Limpar a seleção",
             "previousFile": "Arquivo anterior",
-            "nextFile": "Próximo arquivo"
+            "nextFile": "Próximo arquivo",
+            "zoomIn": "Aumentar zoom",
+            "zoomOut": "Diminuir zoom",
+            "fitBoard": "Ver o quadro inteiro",
+            "fitBox": "Enquadrar as Box 1 a 9"
         }
     },
     "viewSettings": {

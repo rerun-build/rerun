@@ -469,7 +469,8 @@
         "groups": {
             "general": "כללי",
             "chat": "צ׳אט",
-            "files": "קבצים"
+            "files": "קבצים",
+            "board": "לוח"
         },
         "actions": {
             "controlCenter": "לפתוח את מרכז הבקרה",
@@ -488,7 +489,11 @@
             "deleteMessage": "למחוק את ההודעה שנבחרה",
             "deselectMessage": "לנקות את הבחירה",
             "previousFile": "הקובץ הקודם",
-            "nextFile": "הקובץ הבא"
+            "nextFile": "הקובץ הבא",
+            "zoomIn": "להגדיל",
+            "zoomOut": "להקטין",
+            "fitBoard": "להציג את כל הלוח",
+            "fitBox": "להציג את Box 1 עד 9"
         }
     },
     "viewSettings": {

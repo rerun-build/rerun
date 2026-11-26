@@ -469,7 +469,8 @@
         "groups": {
             "general": "Général",
             "chat": "Chat",
-            "files": "Fichiers"
+            "files": "Fichiers",
+            "board": "Board"
         },
         "actions": {
             "controlCenter": "Ouvrir le centre de contrôle",
@@ -488,7 +489,11 @@
             "deleteMessage": "Supprimer le message sélectionné",
             "deselectMessage": "Annuler la sélection",
             "previousFile": "Fichier précédent",
-            "nextFile": "Fichier suivant"
+            "nextFile": "Fichier suivant",
+            "zoomIn": "Zoom avant",
+            "zoomOut": "Zoom arrière",
+            "fitBoard": "Afficher tout le board",
+            "fitBox": "Cadrer les Box 1 à 9"
         }
     },
     "viewSettings": {

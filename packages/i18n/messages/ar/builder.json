@@ -34,7 +34,12 @@
         "settingUpTemplate": "جارٍ إعداد {title}…",
         "settingUpCoworker": "جارٍ إعداد زميلك…",
         "installTemplate": "انقر لتثبيت {title}",
-        "addBoxOnSide": "أضف Box على هذا الجانب"
+        "addBoxOnSide": "أضف Box على هذا الجانب",
+        "numberedBox": "{number} · {name}",
+        "keys": {
+            "wholeBoard": "اللوحة كاملة",
+            "noBox": "لا يوجد Box رقم {number}"
+        }
     },
     "discoveries": {
         "statusDigging": "نتعرّف على {name}",

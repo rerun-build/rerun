@@ -469,7 +469,8 @@
         "groups": {
             "general": "Genel",
             "chat": "Sohbet",
-            "files": "Dosyalar"
+            "files": "Dosyalar",
+            "board": "Pano"
         },
         "actions": {
             "controlCenter": "Kontrol merkezini aç",
@@ -488,7 +489,11 @@
             "deleteMessage": "Seçili mesajı sil",
             "deselectMessage": "Seçimi temizle",
             "previousFile": "Önceki dosya",
-            "nextFile": "Sonraki dosya"
+            "nextFile": "Sonraki dosya",
+            "zoomIn": "Yakınlaştır",
+            "zoomOut": "Uzaklaştır",
+            "fitBoard": "Tüm panoyu göster",
+            "fitBox": "1-9 arası Box'ları göster"
         }
     },
     "viewSettings": {

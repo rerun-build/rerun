@@ -34,7 +34,12 @@
         "settingUpTemplate": "正在設定 {title}…",
         "settingUpCoworker": "正在設定您的同事…",
         "installTemplate": "按一下即可安裝 {title}",
-        "addBoxOnSide": "在這一側新增 Box"
+        "addBoxOnSide": "在這一側新增 Box",
+        "numberedBox": "{number} · {name}",
+        "keys": {
+            "wholeBoard": "整個看板",
+            "noBox": "沒有 Box {number}"
+        }
     },
     "discoveries": {
         "statusDigging": "正在認識 {name}",

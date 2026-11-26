@@ -34,7 +34,12 @@
         "settingUpTemplate": "正在设置 {title}…",
         "settingUpCoworker": "正在设置您的同事…",
         "installTemplate": "点击安装 {title}",
-        "addBoxOnSide": "在此侧添加 Box"
+        "addBoxOnSide": "在此侧添加 Box",
+        "numberedBox": "{number} · {name}",
+        "keys": {
+            "wholeBoard": "整个看板",
+            "noBox": "没有 Box {number}"
+        }
     },
     "discoveries": {
         "statusDigging": "正在了解 {name}",
