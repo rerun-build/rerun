@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { buildQuoteBlock, prependQuote } from '@rerun/contracts'
 import { buildAttachmentsRef } from '@/lib/chat/attachments-marker'
 import { buildInstallMessage } from '@/lib/chat/install-marker'
 import { MAX_TOOL_OUTPUT_CHARS, type HistoryMessage, toApiMessages, transformEngineMessages } from '@/lib/chat/engine-history'
@@ -43,6 +44,16 @@ describe('toApiMessages', () => {
         expect(message.parts).toEqual([])
         expect(message.metadata?.voice).toEqual({ transcript: 'Read this brief', src: 'chat-uploads/v.m4a', durationMs: 4200, peaks: '' })
         expect(message.metadata?.attachments).toEqual([{ name: 'brief.pdf', path: 'chat-uploads/brief.pdf', mediaType: 'application/pdf' }])
+    })
+
+    it('keeps a reply quote in the text the app reads, out of a voice transcript', () => {
+        const quote = { from: 'Nova', messageId: 'engine-a1', text: '7 are hiring right now' }
+        const [voiceReply] = toApiMessages([user(prependQuote('Call them\n\n<voice src="chat-uploads/v.m4a" ms="4200" peaks="">', quote))])
+        expect(voiceReply.parts).toEqual([{ type: 'text', text: buildQuoteBlock(quote) }])
+        expect(voiceReply.metadata?.voice?.transcript).toBe('Call them')
+        const [filesReply] = toApiMessages([user(`${prependQuote('Look at these', quote)}\n\n${buildAttachmentsRef(['chat-uploads/a.png'])}`)])
+        expect(filesReply.parts).toEqual([{ type: 'text', text: prependQuote('Look at these', quote) }])
+        expect(filesReply.metadata?.attachments).toHaveLength(1)
     })
 
     it('hands the app the bare guide of an install, and who it installs', () => {

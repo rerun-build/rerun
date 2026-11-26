@@ -5,7 +5,7 @@ import { parseScheduledRun } from '@/lib/schedules/scheduled-run'
 import { encodePeaks } from '@/lib/voice/peaks'
 import { parseVoiceMessage } from '@/lib/voice/marker'
 import { hitlKindOf } from '@/lib/chat-hitl'
-import { ENGINE_MESSAGE_ID_PREFIX, PROVIDER_SWITCH_PART, readProviderSwitchEntry, isContextPart, visibleText, billedMicrosOf, capabilityOfCall, isPaidDataTool, paidCallReceipt, stripBridgePrefix, withHitlVersion, type ConversationAttachment, type ConversationMessage, type ConversationMessageMetadata, type ProviderSwitch } from '@rerun/contracts'
+import { ENGINE_MESSAGE_ID_PREFIX, PROVIDER_SWITCH_PART, readProviderSwitchEntry, isContextPart, visibleText, billedMicrosOf, capabilityOfCall, isPaidDataTool, paidCallReceipt, parseQuote, prependQuote, stripBridgePrefix, withHitlVersion, type ConversationAttachment, type ConversationMessage, type ConversationMessageMetadata, type ProviderSwitch } from '@rerun/contracts'
 import { randomUuid } from '@/lib/random-uuid'
 
 type TextPart = { type: 'text'; text: string }
@@ -209,9 +209,11 @@ function userMessageForApi(message: HistoryMessage): ConversationMessage {
     const authorId = message.metadata?.authorId
     const relayedBy = message.metadata?.relayedBy
     const authored = { ...(authorId && { authorId }), ...(relayedBy && { relayedBy }) }
-    // A voice message sent with files carries the attachments marker after its voice marker.
-    const attachments = parseAttachments(text)
-    const voice = parseVoiceMessage(attachments?.text ?? text)
+    // A reply opens on the quote it carries, and keeps it in its text: the app reads it there. A voice
+    // message sent with files carries the attachments marker after its voice marker.
+    const quoted = parseQuote(text)
+    const attachments = parseAttachments(quoted?.text ?? text)
+    const voice = parseVoiceMessage(attachments?.text ?? quoted?.text ?? text)
     if (!attachments && !voice) return { id: message.id, role: 'user', parts: message.parts, ...((authorId || createdAt) && { metadata: { ...dated, ...authored } }) }
 
     const metadata: ConversationMessageMetadata = {
@@ -220,7 +222,7 @@ function userMessageForApi(message: HistoryMessage): ConversationMessage {
         ...(attachments && { attachments: attachments.paths.map(attachmentOf) }),
         ...(voice && { voice: { transcript: voice.transcript, src: voice.src, durationMs: voice.durationMs, peaks: encodePeaks(voice.peaks) } }),
     }
-    const body = voice ? '' : attachments?.text
+    const body = prependQuote(voice ? '' : (attachments?.text ?? ''), quoted?.quote)
     return { id: message.id, role: 'user', parts: body ? [{ type: 'text', text: body }] : [], metadata }
 }
 

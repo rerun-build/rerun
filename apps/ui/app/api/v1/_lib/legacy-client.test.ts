@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { agentViewSchema, boardAgentSchema, COWORKER_COLORS, coworkerLookSchema, type AgentModels, type AgentView, type AiConnectionsView, type BoardAgent } from '@rerun/contracts'
+import { agentViewSchema, boardAgentSchema, COWORKER_COLORS, coworkerLookSchema, prependQuote, QUOTE_FROM_USER, type AgentModels, type AgentView, type AiConnectionsView, type BoardAgent, type ConversationMessage } from '@rerun/contracts'
 import { z } from 'zod'
 
 import { shippedBeforeGrok, shippedIosAgentModelsSchema, shippedIosAgentViewSchema, shippedIosConnectionsViewSchema } from '@/test/shipped-ios'
-import { agentModelsForClient, agentViewForClient, aiConnectionsForClient, boardAgentsForClient, clientKnowsProvider, clientReadsForemanRuns, emailCodeForClient } from './legacy-client'
+import { agentModelsForClient, agentViewForClient, aiConnectionsForClient, boardAgentsForClient, clientKnowsProvider, clientReadsForemanRuns, emailCodeForClient, messagesForClient } from './legacy-client'
 
 const request = (client?: string) => new Request('https://app.rerun.build/api/v1/agents/a1', { headers: client ? { 'x-rerun-client': client } : {} })
 
@@ -229,5 +229,30 @@ describe('boardAgentsForClient', () => {
         expect(boardAgentsForClient(request('android/1.1.0 (19)'), agents)).toBe(agents)
         expect(agentViewForClient(request('ios/1.1.0 (52)'), { ...agentView, agent: orange }).agent.look?.color).toBe('#ff7a00')
         expect(boardAgentsForClient(request('ios/1.0.9 (51)'), agents)[0].look?.color).toBe('#f0127f')
+    })
+})
+
+describe('messagesForClient', () => {
+    const quote = { from: 'Nova', messageId: 'engine-a1', text: 'The split:\n\n7 are hiring right now' }
+    const reply: ConversationMessage = { id: 'u2', role: 'user', parts: [{ type: 'text', text: prependQuote('Which ones?', quote) }] }
+    const ownPassage: ConversationMessage = { id: 'u3', role: 'user', parts: [{ type: 'text', text: prependQuote('', { ...quote, from: QUOTE_FROM_USER }) }] }
+    const answer: ConversationMessage = { id: 'a1', role: 'assistant', parts: [{ type: 'text', text: 'On it.' }] }
+    const messages = [reply, ownPassage, answer]
+
+    it('sends a build from before quotes the passage as a markdown quote', () => {
+        for (const client of [undefined, 'ios/1.0.9 (51)', 'android/1.0.9 (18)']) {
+            const [quoted, own, untouched] = messagesForClient(request(client), messages)
+            expect(quoted.parts).toEqual([{ type: 'text', text: '> **Nova** · The split: · 7 are hiring right now\n\nWhich ones?' }])
+            expect(own.parts).toEqual([{ type: 'text', text: '> The split: · 7 are hiring right now' }])
+            expect(untouched).toBe(answer)
+        }
+    })
+
+    it('hands the quote as it is from the build named for its platform', () => {
+        vi.stubEnv('MOBILE_IOS_QUOTE_BUILD', '52')
+        vi.stubEnv('MOBILE_ANDROID_QUOTE_BUILD', '19')
+        expect(messagesForClient(request('ios/1.1.0 (52)'), messages)).toBe(messages)
+        expect(messagesForClient(request('android/1.1.0 (19)'), messages)).toBe(messages)
+        expect(messagesForClient(request('ios/1.0.9 (51)'), messages)[0].parts[0]).toMatchObject({ text: expect.stringMatching(/^> \*\*Nova\*\*/) })
     })
 })

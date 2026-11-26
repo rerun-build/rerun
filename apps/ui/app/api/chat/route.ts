@@ -16,7 +16,7 @@ import { seedSessionTitle } from '@/lib/chat/session-title'
 import { preferredLanguage } from '@/lib/foreman/language'
 import { stripVoiceMarker } from '@/lib/voice/marker'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
-import { FOREMAN_AGENT_ID, MESSAGE_EDIT_ENGINE_OUTDATED, MESSAGE_NOT_FOUND, SESSION_NOT_FOUND, engineMessageIdOf, reasoningEffortSchema, type MessageAuthor, type SessionKind, type SessionSource } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, MESSAGE_EDIT_ENGINE_OUTDATED, MESSAGE_NOT_FOUND, SESSION_NOT_FOUND, engineMessageIdOf, parseQuote, reasoningEffortSchema, type MessageAuthor, type SessionKind, type SessionSource } from '@rerun/contracts'
 
 type ChatRequestBody = {
     agentId?: unknown
@@ -123,10 +123,11 @@ export async function POST(request: Request) {
     }
 
     // A voice message carries its audio as a marker appended to the transcript; the session title
-    // is about what was said, not about the file. An install is named after the setup it starts,
-    // never after a summary of its guide.
+    // is about what was said, not about the file nor the passage a reply quotes. An install is named
+    // after the setup it starts, never after a summary of its guide.
     const install = parseInstallMessage(text)
-    const sessionTitleSeed = install ? installSessionTitle(install.agentName) : stripVoiceMarker(stripAttachmentsRef(text))
+    const quoted = parseQuote(text)
+    const sessionTitleSeed = install ? installSessionTitle(install.agentName) : stripVoiceMarker(stripAttachmentsRef(quoted?.text ?? text)) || (quoted?.quote.text ?? '')
 
     // A tab that opens General before anyone spoke in it has no session id: the row may still exist,
     // written by another tab or another member a moment ago, and then it is the one to continue.

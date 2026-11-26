@@ -1,4 +1,5 @@
 import { attachmentDisplayName, parseAttachments } from './chat-attachments.js'
+import { parseQuote, quotePreview, stripQuote } from './chat-quote.js'
 import { stripVoiceMarker } from './voice.js'
 
 /**
@@ -38,9 +39,11 @@ export function parseQueued(raw: string | null): QueuedMessage | null {
 
 /** What the pill shows: the prose without its markers, and the display names of the files. */
 export function queuedPreview(text: string): { text: string; attachments: string[] } {
-    const attachments = parseAttachments(text)
+    const quoted = parseQuote(text)
+    if (quoted && !quoted.text.trim()) return { text: quotePreview(quoted.quote.text), attachments: [] }
+    const attachments = parseAttachments(stripQuote(text))
     return {
-        text: stripVoiceMarker(attachments?.text ?? text),
+        text: stripVoiceMarker(attachments?.text ?? stripQuote(text)),
         attachments: attachments?.paths.map(attachmentDisplayName) ?? [],
     }
 }

@@ -1,4 +1,5 @@
 import { appendAttachmentsRef, buildAttachmentsRef, parseAttachments } from './chat-attachments.js'
+import { parseQuote, prependQuote } from './chat-quote.js'
 import { messageText } from './message-text.js'
 import { parseVoiceMessage } from './voice.js'
 
@@ -20,15 +21,16 @@ type PartLike = { type: string; text?: string }
 type MessageLike = { id: string; role: string; parts: readonly PartLike[] }
 
 // The words of a message of the user as an editor shows them, and how an edit is sent back with the
-// files it carried. A voice message is a recording: there is nothing to edit.
+// passage it quoted and the files it carried. A voice message is a recording: there is nothing to edit.
 export function editableTextOf(message: MessageLike): { text: string; rebuild: (edited: string) => string } | null {
     if (message.role !== 'user') return null
-    const full = messageText(message)
+    const quoted = parseQuote(messageText(message))
+    const full = quoted?.text ?? messageText(message)
     const attachments = parseAttachments(full)
     const text = attachments?.text ?? full
     if (parseVoiceMessage(text)) return null
-    if (!attachments) return { text, rebuild: edited => edited.trim() }
-    return { text, rebuild: edited => appendAttachmentsRef(edited, buildAttachmentsRef(attachments.paths)) }
+    const withFiles = (edited: string) => (attachments ? appendAttachmentsRef(edited, buildAttachmentsRef(attachments.paths)) : edited.trim())
+    return { text, rebuild: edited => prependQuote(withFiles(edited), quoted?.quote) }
 }
 
 export function userIndexBefore(messages: readonly MessageLike[], index: number): number {

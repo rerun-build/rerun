@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 
 import { readSessionTranscript } from '@/app/api/_services/conversation.service'
 import { ApiError, apiRoute } from '@/app/api/v1/_lib/api-route'
+import { messagesForClient } from '@/app/api/v1/_lib/legacy-client'
 import { refusal } from '@/lib/i18n/action-error'
 import { AuthorizationError } from '@/app/api/_auth/ownership'
 import { toApiMessages } from '@/lib/chat/engine-history'
@@ -19,7 +20,7 @@ export const GET = apiRoute(mobileApi.getConversationMessages, { auth: 'member' 
         console.error('[api/v1] conversation messages unreachable', err)
         throw new ApiError(502, refusal('boxDidNotAnswer'))
     })
-    const body = JSON.stringify(toApiMessages(messages))
+    const body = JSON.stringify(messagesForClient(req, toApiMessages(messages)))
     const etag = `"${createHash('sha1').update(body).digest('base64url')}"`
     const headers: Record<string, string> = { ETag: etag, 'Cache-Control': 'no-store' }
     if (updatedAt) headers[TRANSCRIPT_UPDATED_AT_HEADER] = updatedAt

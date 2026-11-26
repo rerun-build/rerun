@@ -1,4 +1,4 @@
-import { type AgentModels, type AgentView, type AiConnectionsView, type BoardAgent, type ClientPlatform, COWORKER_COLORS, type EmailCodePrepared, nearestHashedCoworkerColor, type Provider } from '@rerun/contracts'
+import { type AgentModels, type AgentView, type AiConnectionsView, type BoardAgent, type ClientPlatform, type ConversationMessage, COWORKER_COLORS, type EmailCodePrepared, nearestHashedCoworkerColor, type Provider, quoteAsMarkdown } from '@rerun/contracts'
 import { clientOf } from './client-platform'
 
 // The builds already in people's hands parse `providerSchema` strictly: one provider they do not know
@@ -116,4 +116,16 @@ function withHashedColor(agent: BoardAgent): BoardAgent {
 
 export function boardAgentsForClient(req: Request, agents: BoardAgent[]): BoardAgent[] {
     return clientReadsFreeColors(req) ? agents : agents.map(withHashedColor)
+}
+
+// A reply quotes a passage in a block at the head of its text only since the builds these variables
+// name: an older one would show the block's tags in the bubble. It gets the passage as a markdown quote
+// instead. Unset, no build of that platform reads one.
+const FIRST_QUOTE_BUILD_ENV: Record<ClientPlatform, string> = { ios: 'MOBILE_IOS_QUOTE_BUILD', android: 'MOBILE_ANDROID_QUOTE_BUILD' }
+
+const withQuoteAsMarkdown = (message: ConversationMessage): ConversationMessage =>
+    message.role === 'user' ? { ...message, parts: message.parts.map(part => (part.type === 'text' && typeof part.text === 'string' ? { ...part, text: quoteAsMarkdown(part.text) } : part)) } : message
+
+export function messagesForClient(req: Request, messages: ConversationMessage[]): ConversationMessage[] {
+    return clientAtOrPast(req, FIRST_QUOTE_BUILD_ENV) ? messages : messages.map(withQuoteAsMarkdown)
 }

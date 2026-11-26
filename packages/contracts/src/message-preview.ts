@@ -1,4 +1,5 @@
 import { attachmentDisplayName, parseAttachments } from './chat-attachments.js'
+import { parseQuote } from './chat-quote.js'
 import { stripVoiceMarker } from './voice.js'
 
 export const MESSAGE_PREVIEW_MAX = 200
@@ -45,14 +46,17 @@ function clip(text: string): string {
 
 /**
  * A message as one readable line, for the list of coworkers: markdown, links and tables read as text,
- * a voice message as its transcript, files sent on their own as their names. Empty when nothing is
- * left to show, which leaves the previous line in place.
+ * a voice message as its transcript, files sent on their own as their names, a reply as its words
+ * rather than the passage it quotes. Empty when nothing is left to show, which leaves the previous
+ * line in place.
  */
 export function messagePreview(text: string): string {
-    const withoutVoice = stripVoiceMarker(text)
+    const quoted = parseQuote(text)
+    const withoutVoice = stripVoiceMarker(quoted ? quoted.text : text)
     const attached = parseAttachments(withoutVoice)
     const source = stripVoiceMarker(attached ? attached.text : withoutVoice)
     const body = plainText(source.slice(0, PREVIEW_SOURCE_MAX))
     if (body) return clip(body)
-    return attached ? clip(attached.paths.map(attachmentDisplayName).join(', ')) : ''
+    if (attached) return clip(attached.paths.map(attachmentDisplayName).join(', '))
+    return quoted ? clip(plainText(quoted.quote.text.slice(0, PREVIEW_SOURCE_MAX))) : ''
 }
