@@ -66,6 +66,36 @@ A routine the Chief of Staff sets itself to come back to something wakes it in a
 
 While a coworker installed from a template has not finished its setup, its scheduled tasks stay off and **Test Run** stays locked: **Test Run unlocks once the setup is finished.** Finish or skip the setup in the chat first.
 
+### Run a script without a model
+
+A scheduled task can also run a command as it is, with no model and no credit: a Python script every six hours, a backup every night. Under **Task prompt**, click **Run a command instead, without a model**: the prompt becomes a **Command** and the **Model** field goes away. **Write an instruction instead** brings the prompt back.
+
+<ParamField path="Runs on" type="string">
+  **Workspace machine**, the default, or one of your [linked computers](/computers). On a computer, the script runs only while that computer is online.
+</ParamField>
+
+<ParamField path="Command" type="string">
+  The shell command, for example `python3 scripts/sync_prices.py`. On the workspace machine it runs with the coworker's own variables and Vault secrets, like the commands the coworker runs itself.
+</ParamField>
+
+<ParamField path="Folder" type="string">
+  Where the command starts. On the workspace machine: `shared/` (the default) or a folder under it, the shared folder every coworker sees, or `workspace/` and a folder under it for the coworker's own files. On a linked computer: a folder of that computer, its working folder when left empty.
+</ParamField>
+
+<ParamField path="Stop after" type="string">
+  **1 min**, **5 min** (the default), **15 min** or **1 hour**. Past it, the command is stopped with everything it started, and the run fails with exit code `124`.
+</ParamField>
+
+<ParamField path="Notify only when it fails" type="boolean">
+  On by default: a run that ends with exit code `0` tells nobody, a failure or a stop at the limit sends a [notification](/agents/human-in-the-loop#notifications) with its exit code and the last line it printed. Turn it off to hear of every run.
+</ParamField>
+
+Each run keeps its exit code and the last 64,000 characters it printed. The editor of a script opens on its last run, with the last lines of its output; **History** lists every run with its exit code and duration, and a row opens on its whole output. **Run now** starts it right away. In the list, a script shows a terminal icon, where it runs, and how its last run ended (**Exit 0 in 3 min**, **Failed, exit 1**).
+
+On a linked computer, nobody is in the chat to approve the command: it runs only when the computer takes work **Without anyone in the chat** and its [approval mode](/computers#approvals) already lets the program through (**Always allow** it, or **Full access**). Otherwise, or when the computer is offline or paused, the run fails and says why.
+
+A coworker or the [Chief of Staff](/chief-of-staff) can set one up too when you ask: "run `python3 sync.py` every morning". A coworker sets up a command on the workspace machine only when its shell is on, and on a linked computer only when it reaches the linked computers; it can change the command later with the same checks. The Chief of Staff sets one up on a coworker you can manage. The script shows in the coworker's list like one you created.
+
 ### Continuity between runs
 
 A scheduled run opens a fresh thread every time. The coworker does not remember last Monday's conversation.

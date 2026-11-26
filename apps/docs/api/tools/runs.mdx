@@ -46,6 +46,7 @@ The answer names the conversation twice: `sessionId` is the engine's id, the one
   "startedAt": "2026-08-15T09:12:04.000Z",
   "finishedAt": "2026-08-15T09:12:41.000Z",
   "error": null,
+  "exitCode": null,
   "output": "Done. I added 14 rows to the leads table and flagged 3 duplicates."
 }
 ```
@@ -114,9 +115,11 @@ One execution: its status, output, error, token usage and cost.
 
 Run statuses are `running`, `done`, `error` and `cancelled`. `costUsd` is the model cost of that run, and is `null` while it is still running.
 
+The run of a [script](/api/tools/schedules) has no model: its `provider`, `model`, tokens and `costUsd` are `null`, its `sessionId` is empty, `exitCode` is the code its command ended with (`124` when it was stopped at its limit, `null` when it never ran or was stopped) and `output` the last 64,000 characters it printed. On any other run `exitCode` is `null`.
+
 ## cancel_run
 
-Stops a run that is still working. The coworker stops at its next step and the run ends as `cancelled`. What it did before it stopped stays done.
+Stops a run that is still working. The coworker stops at its next step and the run ends as `cancelled`. What it did before it stopped stays done. The run of a script is stopped with everything its command started, on the workspace machine or on its linked computer.
 
 <ParamField body="agentId" type="string" required>
   A coworker's id, or `foreman` for one of your runs with the Chief of Staff.

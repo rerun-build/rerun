@@ -3,7 +3,7 @@ title: "Scheduled tasks"
 description: "Give a coworker a cron or a one-off run, and fire it on demand to test it."
 ---
 
-A scheduled task runs a coworker with no user message. Its body is the instruction the coworker receives when it fires. See [Automations](/agents/automations) for the concept.
+A scheduled task runs a coworker with no user message. Its body is the instruction the coworker receives when it fires, or, for a script, a shell command run as it is with no model. See [Automations](/agents/automations) for the concept.
 
 ## list_schedules
 
@@ -28,7 +28,7 @@ Creates a scheduled task, or updates it when `slug` is given.
 </ParamField>
 
 <ParamField body="body" type="string">
-  Required when creating. The instruction sent to the coworker when the task fires, written as if you were talking to it. On an update it replaces the whole instruction.
+  Required when creating. The instruction sent to the coworker when the task fires, written as if you were talking to it, or the shell command of a script. On an update it replaces the whole instruction.
 </ParamField>
 
 <ParamField body="cron" type="string">
@@ -53,6 +53,15 @@ Creates a scheduled task, or updates it when `slug` is given.
 
 <ParamField body="model" type="string | null">
   Run this one on a model of its own. Omit it and it runs whatever its coworker runs. Pass `null` to go back to that.
+</ParamField>
+
+<ParamField body="script" type="object">
+  Run `body` as a shell command, with no model and no credit, for a fixed job that needs no judgement. Never with `model` or `connectionId`. A task stays an instruction or a script: delete and recreate it to change that. On an update, what you leave out stays as it was.
+
+  - `runsOn`: the `#handle` of a [linked computer](/computers), or `workspace` for the workspace machine (the default)
+  - `folder`: where it starts. On the workspace machine, `shared/` (the default) or `workspace/` and a folder under them. On a linked computer, a folder of that computer, its working folder when left out
+  - `timeoutMinutes`: `1`, `5` (the default), `15` or `60`. Past it the command is stopped and the run fails with exit code `124`
+  - `notifyOnSuccess`: also notify when a run succeeds. Left out, only a failure is notified
 </ParamField>
 
 <Warning>
