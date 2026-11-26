@@ -73,6 +73,9 @@ import {
     type BrainSeedResult,
     workspaceSearchResultSchema,
     type WorkspaceSearchResult,
+    usageRunsResponseSchema,
+    type UsageRunsQuery,
+    type UsageRunsResponse,
 } from '@rerun/contracts'
 import { isNetworkFailure } from '@/lib/net/network-error'
 import { forgetMachineAt } from '@/lib/engine/engine-memory'
@@ -1035,6 +1038,13 @@ export async function getRunTools(conn: EngineConnection, agentId: string, runId
 export async function getAgentUsage(conn: EngineConnection, agentId: string, range?: string): Promise<EngineUsageBucket[]> {
     const qs = range ? `?range=${encodeURIComponent(range)}` : ''
     return request(conn, `/agents/${encodeURIComponent(agentId)}/usage${qs}`, { method: 'GET' }, d => engineUsageSchema.parse(d).buckets)
+}
+
+// Every run of the machine's coworkers in a window, for the usage dashboard. `engineAgentIds` narrows
+// it to the coworkers a member reaches, before the engine caps the list.
+export async function listUsageRuns(conn: EngineConnection, query: UsageRunsQuery, engineAgentIds?: string[]): Promise<UsageRunsResponse> {
+    const qs = new URLSearchParams({ from: query.from, to: query.to, ...(query.since ? { since: query.since } : {}), ...(engineAgentIds ? { agents: engineAgentIds.join(',') } : {}) })
+    return request(conn, `/usage/runs?${qs}`, { method: 'GET' }, d => usageRunsResponseSchema.parse(d))
 }
 
 export async function getAgentStats(conn: EngineConnection, agentId: string, query: EngineStatsQuery): Promise<EngineStatsPoint[]> {
