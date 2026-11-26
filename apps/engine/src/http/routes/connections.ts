@@ -13,6 +13,7 @@ import { refreshCodexPlanLimits, refreshStaleCodexPlanLimits } from '../../conne
 import { refreshOpencodeCatalog, refreshStaleOpencodeCatalog } from '../../connections/opencode-catalog.js'
 import { refreshOpencodePlanLimits, refreshStaleOpencodePlanLimits } from '../../connections/opencode-plan-limits.js'
 import { refreshGrokPlanLimits, refreshStaleGrokPlanLimits } from '../../connections/grok-plan-limits.js'
+import { refreshGrokModels, refreshStaleGrokModels } from '../../connections/grok-models.js'
 import { awaitPendingPlanLimits } from '../../connections/plan-limits-pending.js'
 import { probeCustomEndpoint, refreshCustomCatalog, refreshStaleCustomCatalogs } from '../../connections/custom-catalog.js'
 import type { LoadedConnection } from '../../connections/types.js'
@@ -47,6 +48,7 @@ connectionRoutes.get('/', async c => {
     if (fresh) await awaitPendingPlanLimits(connections)
     if (connections.some(connection => connection.config.provider === 'opencode')) refreshStaleOpencodeCatalog()
     refreshStaleCustomCatalogs(connections)
+    refreshStaleGrokModels(connections)
     return c.json({ connections: connections.map(toSummary), default: await readBoxDefault(), backups: await readBoxBackups() })
 })
 
@@ -144,13 +146,13 @@ connectionRoutes.delete('/:id', async c => {
 // The first default a box adopts must be a model the account's Codex serves, and the only reading
 // that can say so is the one taken against the credential that just arrived. Awaited here, a few
 // seconds at most, because the adoption below is the one write that cannot wait for the next list.
-// OpenCode's live catalog says the same of a model it stopped publishing. Nothing to read for the
-// other providers: Claude refuses nothing, a key has no CLI.
+// OpenCode's live catalog says the same of a model it stopped publishing, Grok Build's list of the
+// models the account is served. Nothing to read for the other providers: Claude refuses nothing, a key has no CLI.
 async function readCliModelsBeforeAdopting(connection: LoadedConnection): Promise<void> {
     if (connection.config.provider === 'codex') await refreshCodexPlanLimits(connection)
     if (connection.config.provider === 'opencode') await Promise.all([refreshOpencodeCatalog(), refreshOpencodePlanLimits(connection)])
     if (connection.config.provider === 'custom') await refreshCustomCatalog(connection)
-    if (connection.config.provider === 'grok') await refreshGrokPlanLimits(connection)
+    if (connection.config.provider === 'grok') await Promise.all([refreshGrokModels(connection), refreshGrokPlanLimits(connection)])
 }
 
 // Plugging the first credential into a box is the whole setup, and on its own it changes nothing:

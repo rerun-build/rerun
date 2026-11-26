@@ -55,6 +55,9 @@ export const ENGINE_CAPABILITY_ARTIFACT_UPDATE = 'update.artifact'
 // The engine runs OpenCode connections: the hub offers OpenCode only to a box that says so.
 export const ENGINE_CAPABILITY_OPENCODE = 'connections.opencode'
 
+// The engine runs Grok subscription connections: the hub offers Grok only to a box that says so.
+export const ENGINE_CAPABILITY_GROK = 'connections.grok'
+
 // The engine runs custom OpenAI-compatible connections and answers `POST /connections/probe`.
 export const ENGINE_CAPABILITY_CUSTOM = 'connections.custom'
 

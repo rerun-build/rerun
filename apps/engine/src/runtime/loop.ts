@@ -449,9 +449,9 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             // The token is still on file, so the connection would keep reading "Ready" while every
             // run on it fails. The keyless Rerun connection answers for the hub's key, not the user's.
             if (errorCode === RUN_ERROR_CODES.unauthorized && connection && connection.id !== RERUN_CONNECTION_ID) recordCredentialRejected(connection.id)
-            // Codex's answer to a real request outranks the list it gave: the model is greyed out from now
-            // on, and a box default naming it moves to one the account serves.
-            if (errorCode === RUN_ERROR_CODES.modelNotInPlan && provider === 'codex' && connection) {
+            // Codex's and Grok's answer to a real request outranks the list they gave: the model is
+            // greyed out from now on, and a box default naming it moves to one the account serves.
+            if (errorCode === RUN_ERROR_CODES.modelNotInPlan && (provider === 'codex' || provider === 'grok') && connection) {
                 const refusedOn = connection
                 recordRefusedModel(refusedOn.id, model)
                 await repairBoxDefault(refusedOn).catch(err => logger.warn({ err: String(err), connection: refusedOn.id }, 'box default repair failed'))

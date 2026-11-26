@@ -14,7 +14,7 @@ import type { LoadedAgent } from './types.js'
 export type RunModel = { connection: LoadedConnection | null; provider: Provider; model: string }
 
 // What the subscription behind the connection accepts, past the list the box owner curated: Codex
-// answers for the account (a ChatGPT plan without the model refuses it with a 400), OpenCode for
+// and Grok answer for the account (a ChatGPT plan without the model refuses it with a 400), OpenCode for
 // the models it still publishes. Without a reading nothing is refused.
 function servedByProvider(connection: LoadedConnection, model: string): boolean {
     const { provider } = connection.config
