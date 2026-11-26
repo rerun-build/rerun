@@ -94,7 +94,7 @@ const NAMES_ALLOWED: Record<string, string> = {
     'app/api/_services/phone-delivery.service.ts': 'the account behind a phone number',
     'app/api/_services/phone-sign-in.service.ts': 'the account signing in',
     'app/api/_services/desktop-auth.service.ts': 'the account signing in',
-    'lib/foreman/inbox-tools.ts': 'signed through messageAuthorOf',
+    'lib/mcp/member.ts': 'the member behind an API key, signed through messageAuthorOf or brainAuthorOf, which sign staff with the brand',
     'lib/foreman/checkin-context.ts': 'the founder, staff left out',
     'app/api/_services/naming.service.ts': 'the founder, staff left out, whose first name the workspace may carry',
     'lib/apps/analytics.ts': 'the first member for analytics, staff left out',

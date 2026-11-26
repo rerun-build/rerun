@@ -7,7 +7,7 @@ import { messageAuthorOf } from '@/app/api/_services/me.service'
 import { replyAs } from '@/app/api/_services/reply.service'
 import { ApiError } from '@/lib/api-error'
 import { asString, requireString } from '@/lib/mcp/args'
-import { createServiceRoleClient } from '@/supabase/serviceRole'
+import { authUserOf, NO_MEMBER_BEHIND_KEY } from '@/lib/mcp/member'
 import { pendingApprovals, pendingQuestions, pendingSpend, serializeAnswers, type ConversationReply, type HitlKind, type MessageAuthor } from '@rerun/contracts'
 
 // What only the person can do, and the line the Chief of Staff tells them instead of answering.
@@ -55,15 +55,25 @@ function projectCard(card: PendingCard) {
     }
 }
 
-function personBehind(actor: Actor): UserActor {
-    if (actor.kind !== 'user') throw new Error('A card is answered in the name of the member you are talking to, and this turn has none behind it. Tell the user what waits on them instead.')
-    return actor
+// Who answers a card in the member's name: the Chief of Staff, whose answer the conversation shows as
+// relayed, or an outside assistant on the member's own API key, whose answer reads as theirs.
+export type CardAnswerer = 'foreman' | 'api'
+
+function personBehind(actor: Actor, answerer: CardAnswerer): UserActor {
+    if (actor.kind === 'user') return actor
+    if (answerer === 'api') throw new Error(NO_MEMBER_BEHIND_KEY)
+    throw new Error('A card is answered in the name of the member you are talking to, and this turn has none behind it. Tell the user what waits on them instead.')
 }
 
-async function authorFor(actor: UserActor): Promise<MessageAuthor> {
-    const { data } = await createServiceRoleClient().auth.admin.getUserById(actor.userId)
-    const author = data.user ? await messageAuthorOf({ userId: actor.userId, authUser: data.user, organizationStaff: actor.organizationStaff, workspace: { id: actor.workspaceId } }) : { id: actor.userId }
-    return { ...author, via: 'foreman' }
+async function authorFor(actor: UserActor, answerer: CardAnswerer): Promise<MessageAuthor> {
+    const authUser = await authUserOf(actor)
+    const author = authUser ? await messageAuthorOf({ userId: actor.userId, authUser, organizationStaff: actor.organizationStaff, workspace: { id: actor.workspaceId } }) : { id: actor.userId }
+    return answerer === 'foreman' ? { ...author, via: 'foreman' } : author
+}
+
+const SPEND_NEEDS_A_YES: Record<CardAnswerer, string> = {
+    foreman: "Spending money needs the user's own yes: ask them with request_approval, naming the coworker and what it would pay for, then call again with userApproved: true once they approved.",
+    api: "Spending money needs the user's own yes: ask them, naming the coworker and what it would pay for, then call again with userApproved: true once they approved.",
 }
 
 const stale = () => new Error('This card was answered or closed in the meantime. Read what still waits with list_pending_cards.')
@@ -103,11 +113,11 @@ function questionReplyText(input: Record<string, unknown>, args: Record<string, 
     return serializeAnswers(questions.map((item, index) => ({ question: item.question, answers: [answered[index]] })))
 }
 
-async function answerCard(caller: Actor, args: Record<string, unknown>) {
+async function answerCard(caller: Actor, args: Record<string, unknown>, answerer: CardAnswerer) {
     const sessionId = requireString(args.sessionId, 'sessionId')
     const action = answerActionOf(args.action)
-    const actor = personBehind(caller)
-    const author = await authorFor(actor)
+    const actor = personBehind(caller, answerer)
+    const author = await authorFor(actor, answerer)
     const peek = await readPendingRequest(sessionId, actor)
 
     const proposalId = asString(args.proposalId)
@@ -135,7 +145,7 @@ async function answerCard(caller: Actor, args: Record<string, unknown>) {
     } else {
         if (action === 'reply') throw new Error(`This card is ${pending.kind === 'spend' ? 'a spend' : 'an approval'}: answer it with "approve" or "decline".`)
         if (pending.kind === 'spend' && action === 'approve' && args.userApproved !== true) {
-            throw new Error('Spending money needs the user\'s own yes: ask them with request_approval, naming the coworker and what it would pay for, then call again with userApproved: true once they approved.')
+            throw new Error(SPEND_NEEDS_A_YES[answerer])
         }
         reply = { action: action === 'approve' ? 'approve' : 'deny', toolCallId }
     }
@@ -149,16 +159,16 @@ async function answerCard(caller: Actor, args: Record<string, unknown>) {
     }
 }
 
-// The cards the coworkers left waiting on the user, and the answers the Chief of Staff gives them in
-// the user's name (app/api/_services/foreman-hub.service.ts dispatches here).
-export async function dispatchInboxTool(actor: Actor, name: string, args: Record<string, unknown>): Promise<unknown> {
+// The cards the coworkers left waiting on the user, and the answers given them in the user's name:
+// by the Chief of Staff (app/api/_services/foreman-hub.service.ts) or the account MCP server.
+export async function dispatchInboxTool(actor: Actor, name: string, args: Record<string, unknown>, answerer: CardAnswerer = 'foreman'): Promise<unknown> {
     switch (name) {
         case 'list_pending_cards': {
             const cards = (await listPendingCards(actor)).map(projectCard)
             return { cards, ...(cards.length === 0 && { note: 'Nothing waits on the user.' }) }
         }
         case 'answer_card':
-            return answerCard(actor, args)
+            return answerCard(actor, args, answerer)
         default:
             throw new Error(`Unknown tool: ${name}`)
     }

@@ -15,7 +15,7 @@ vi.mock('./workspace-engine.service', () => ({ NoEngineError: class NoEngineErro
 vi.mock('./agent.service', () => ({ changeAgentHandle: vi.fn(), createAgent: vi.fn(), deleteAgent: vi.fn(), moveAgentToBox: vi.fn(), renameAgent: vi.fn(), setAgentLook: vi.fn() }))
 vi.mock('./agent-setup.service', () => ({ installServiceSlugs: vi.fn() }))
 vi.mock('./services.service', () => ({ listCatalogServices: vi.fn(), listInstalledServices: vi.fn(), searchCatalogServices: vi.fn(), uninstallService: vi.fn() }))
-vi.mock('./mcp-publish.service', () => ({ dispatchPublishTool: vi.fn() }))
+vi.mock('./mcp-conversations.service', () => ({ dispatchConversationTool: vi.fn() }))
 
 const ACTOR = workspaceActor(7)
 const LOOK = { eyes: 'googly', mouth: 'smile', color: '#7a2cf5' }

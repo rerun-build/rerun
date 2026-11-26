@@ -1,9 +1,9 @@
 ---
 title: "Messages and runs"
-description: "Talk to a coworker, then read what it actually did."
+description: "Talk to a coworker, read what it actually did, and stop a run."
 ---
 
-A run is one execution of a coworker. These three tools are how you test a coworker without first inventing a routine for it, and how you find out why the answer was not what you expected.
+A run is one execution of a coworker. These tools are how you test a coworker without first inventing a routine for it, how you find out why the answer was not what you expected, and how you stop a run that went the wrong way. To read the whole conversation a run happened in, see [Conversations and cards](/api/tools/conversations).
 
 ## send_message
 
@@ -105,3 +105,21 @@ One execution: its status, output, error, token usage and cost.
 ```
 
 Run statuses are `running`, `done`, `error` and `cancelled`. `costUsd` is the model cost of that run, and is `null` while it is still running.
+
+## cancel_run
+
+Stops a run that is still working. The coworker stops at its next step and the run ends as `cancelled`. What it did before it stopped stays done.
+
+<ParamField body="agentId" type="string" required>
+  A coworker's id, or `foreman` for one of your runs with the Chief of Staff.
+</ParamField>
+
+<ParamField body="runId" type="string" required>
+  From `list_runs`, `get_run`, `send_message` or `run_schedule_now`.
+</ParamField>
+
+It needs **Can use** on the coworker's Box, like `get_run`. A run of the Chief of Staff can only be stopped by the member whose conversation it runs in. A run that already ended is left as it is: the answer carries `cancelled: false` and its status.
+
+```json Response
+{ "runId": "…", "status": "cancelled", "cancelled": true, "steps": 4 }
+```

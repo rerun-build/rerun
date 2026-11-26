@@ -122,6 +122,7 @@
               "api/tools/schedules",
               "api/tools/triggers",
               "api/tools/runs",
+              "api/tools/conversations",
               "api/tools/databases",
               "api/tools/connectors",
               "api/tools/vault",

@@ -327,20 +327,28 @@ export type { ConversationHit } from '@rerun/contracts'
 // an agent and no text it lists that agent's latest ones. Engine-only conversations have no row to
 // match and are left out, as in the overview above.
 export async function searchWorkspaceConversations(ctx: WorkspaceContext, query: string, agentId?: string): Promise<ConversationHit[]> {
+    return searchConversationsAs(actorFromContext(ctx), query, agentId)
+}
+
+// The same search for a caller with no browser session (an API key). A caller who is no member has
+// no conversation of the Chief of Staff to find.
+export async function searchConversationsAs(actor: Actor, query: string, agentId?: string): Promise<ConversationHit[]> {
     const text = sanitizeIlike(query)
     if (!text && !agentId) return []
 
+    const supabase = createServiceRoleClient()
     // The Chief of Staff's conversations are the caller's own: found among theirs, under the name the apps call it by.
-    const foremanId = !agentId || agentId === FOREMAN_AGENT_ID ? await ensureForemanAgentRow(ctx.supabase, ctx.workspace.id) : null
-    const workspaceAgentIds = agentId === FOREMAN_AGENT_ID ? [] : (await reachableAgents(ctx)).map(a => a.id)
+    const ownerId = actor.kind === 'user' ? actor.userId : null
+    const foremanId = ownerId && (!agentId || agentId === FOREMAN_AGENT_ID) ? await ensureForemanAgentRow(supabase, actor.workspaceId) : null
+    const workspaceAgentIds = agentId === FOREMAN_AGENT_ID ? [] : (await agentsReachedBy(actor, supabase)).map(a => a.id)
     const agentIds = agentId && agentId !== FOREMAN_AGENT_ID ? workspaceAgentIds.filter(id => id === agentId) : workspaceAgentIds
     if (agentIds.length === 0 && !foremanId) return []
 
     const titled = text ? { title: { ilike: `%${text}%` } } : {}
     const limit = text ? SEARCH_LIMIT : AGENT_RECENT_LIMIT
     const [coworkers, foreman] = await Promise.all([
-        agentIds.length ? selectMany(ctx.supabase, 'sessions', SEARCH_COLUMNS, { agent_id: agentIds, ...titled }, { column: 'updated_at', ascending: false }, limit) : Promise.resolve({ data: [], error: null }),
-        foremanId ? selectMany(ctx.supabase, 'sessions', SEARCH_COLUMNS, { agent_id: foremanId, owner_user_id: ctx.userId, ...titled }, { column: 'updated_at', ascending: false }, limit) : Promise.resolve({ data: [], error: null }),
+        agentIds.length ? selectMany(supabase, 'sessions', SEARCH_COLUMNS, { agent_id: agentIds, ...titled }, { column: 'updated_at', ascending: false }, limit) : Promise.resolve({ data: [], error: null }),
+        foremanId && ownerId ? selectMany(supabase, 'sessions', SEARCH_COLUMNS, { agent_id: foremanId, owner_user_id: ownerId, ...titled }, { column: 'updated_at', ascending: false }, limit) : Promise.resolve({ data: [], error: null }),
     ])
     if (coworkers.error) throw coworkers.error
     if (foreman.error) throw foreman.error

@@ -1,0 +1,102 @@
+---
+title: "Conversations and cards"
+description: "Read and search what was said, and answer the cards coworkers leave waiting."
+---
+
+A conversation holds every message of a coworker chat, scheduled task or trigger run, and the tools the coworker called on the way. A card is what a coworker leaves waiting on a person mid-run: a question, an approval, a spend. See [Human in the loop](/agents/human-in-the-loop).
+
+Reading needs **Can use** on the coworker's Box. Your conversations with the [Chief of Staff](/chief-of-staff) are yours alone: with `agentId: "foreman"` these tools only reach the ones of the member who created the key.
+
+## list_conversations
+
+Lists the conversations of a coworker, newest first, 200 per page.
+
+<ParamField body="agentId" type="string" required>
+  A coworker's id, or `foreman` for your conversations with the Chief of Staff.
+</ParamField>
+
+<ParamField body="before" type="string">
+  From the previous answer, to read the next, older page.
+</ParamField>
+
+```json Response
+{
+  "conversations": [
+    { "conversationId": "…", "sessionId": "…", "title": "Weekly report", "status": "idle", "kind": "thread", "source": "schedule", "automation": "weekly-report", "createdAt": "2026-11-24T08:00:00.000Z", "updatedAt": "2026-11-24T08:02:10.000Z" }
+  ],
+  "before": "2026-11-10T08:00:00.000Z"
+}
+```
+
+`conversationId` is what `read_conversation` takes. `sessionId` is what [`send_message`](/api/tools/runs#send_message) takes to continue the conversation: the engine's id for a coworker, the same id as `conversationId` for the Chief of Staff.
+
+`openedBy` names the coworker that opened a conversation on this one. Such a conversation has a `conversationId` of `null` until someone opens it in the app, but its `sessionId` continues it.
+
+## read_conversation
+
+Reads the messages of one conversation, oldest to newest: who wrote each one, when, its `text`, and the `toolCalls` of the coworker with a preview of their input and result. Each preview keeps its first 2,000 characters.
+
+<ParamField body="conversationId" type="string" required>
+  From `list_conversations`, `search_conversations`, `list_pending_cards` or `send_message`.
+</ParamField>
+
+<ParamField body="before" type="integer">
+  Read the messages before this position, from the previous answer.
+</ParamField>
+
+<ParamField body="limit" type="number">
+  Default `50`, between `1` and `200`.
+</ParamField>
+
+The first call returns the latest messages. `total` is the number of messages in the conversation, `from` the position of the first one returned, and `before` the value to pass for the page before, `null` at the start.
+
+## search_conversations
+
+Finds conversations by their title, newest first, across every coworker the key reaches: 20 at most. It matches titles only, never what was said inside.
+
+<ParamField body="query" type="string" />
+
+<ParamField body="agentId" type="string">
+  Only this coworker, or `foreman` for your conversations with the Chief of Staff. With an `agentId` and no `query`, it returns that coworker's 8 latest conversations.
+</ParamField>
+
+## list_pending_cards
+
+Lists the cards waiting on you, newest first. Each card gives its conversation (`sessionId`) and the card itself (`toolCallId`), the coworker, what it asks in its own words, the choices it offered, and `answeredBy`:
+
+- `answer_card` when it can be answered from here: a question, an approval, a spend, a skill proposal.
+- `user` with `why` when only the person can, in the app: a credential, an app or a server to sign in to, a browser takeover, access to a linked computer, a request to the Rerun team.
+
+Takes no parameter.
+
+## answer_card
+
+Answers one card in the name of the member who created the key, as they would from their inbox: the coworker's run resumes and the card leaves the inbox. The answer reads as theirs in the conversation.
+
+<ParamField body="sessionId" type="string" required />
+
+<ParamField body="toolCallId" type="string">
+  The card, from `list_pending_cards`. Required for every card but a skill proposal. A card answered meanwhile is refused.
+</ParamField>
+
+<ParamField body="action" type="string" required>
+  `reply` for a question, `approve` or `decline` for an approval, a spend or a skill proposal.
+</ParamField>
+
+<ParamField body="text" type="string">
+  The answer to a question.
+</ParamField>
+
+<ParamField body="answers" type="object[]">
+  For a card with several questions: one `{ question, answer }` per question, the question copied as `list_pending_cards` gave it.
+</ParamField>
+
+<ParamField body="proposalId" type="string">
+  The skill proposal to decide.
+</ParamField>
+
+<ParamField body="userApproved" type="boolean">
+  Approving a spend of money needs the person's explicit yes: pass `true` once they gave it.
+</ParamField>
+
+A key that acts for the workspace rather than a member cannot answer: create a new key.

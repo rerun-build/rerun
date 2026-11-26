@@ -160,3 +160,25 @@ describe('answer_card', () => {
         await expect(dispatchInboxTool(member, 'answer_card', { sessionId: 's4', action: 'approve' })).rejects.toThrow(/proposalId/)
     })
 })
+
+describe('answered from the account MCP server', () => {
+    it('answers in the name of the member who created the key, as their own answer', async () => {
+        mocks.readPendingRequest.mockResolvedValue(question([{ question: 'Which tone?', options: ['Formal', 'Casual'] }]))
+
+        await dispatchInboxTool(member, 'answer_card', { sessionId: 's1', toolCallId: 'call-q', action: 'reply', text: 'Casual' }, 'api')
+
+        expect(mocks.replyAs).toHaveBeenCalledWith(member, { id: 'u-1', name: 'Ada Lovelace' }, 's1', { action: 'reply', toolCallId: 'call-q', text: 'Casual' })
+    })
+
+    it('tells a key with nobody behind it to make a new one', async () => {
+        await expect(dispatchInboxTool(checkin, 'answer_card', { sessionId: 's1', toolCallId: 'call-q', action: 'reply', text: 'Casual' }, 'api')).rejects.toThrow('Create a new key')
+        expect(mocks.replyAs).not.toHaveBeenCalled()
+    })
+
+    it('asks for the yes of the person without naming a tool only the Chief of Staff has', async () => {
+        mocks.readPendingRequest.mockResolvedValue(spend)
+        const refused = dispatchInboxTool(member, 'answer_card', { sessionId: 's1', toolCallId: 'call-s', action: 'approve' }, 'api')
+        await expect(refused).rejects.toThrow('userApproved: true')
+        await expect(dispatchInboxTool(member, 'answer_card', { sessionId: 's1', toolCallId: 'call-s', action: 'approve' }, 'api')).rejects.not.toThrow('request_approval')
+    })
+})
