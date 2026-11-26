@@ -25,6 +25,8 @@ type BuddyArtProps = {
     faceScale?: number
     // How many CSS pixels one unit of the drawing takes: a material's relief flattens when drawn small.
     detail?: number
+    // Its mood follows the coworker's runs: at rest its eyes close, and they open when a run starts.
+    closesEyesAtRest?: boolean
 }
 
 // What tints a chrome block: the coworker's colour barely, a state hard enough to read on the board.
@@ -34,7 +36,7 @@ const CHROME_STATE_SHARE = 42
 // Today's tile grown into a soft block with a face. At rest its top wears the agent's colour, the
 // only colour on it, or the whole block does when it is made of a material; at work, broken or
 // waiting, the whole block takes the state's colour instead.
-export function BuddyArt({ uid, id, mood, look, plain, geometry: baseGeometry = BUDDY_GEOMETRY, lit = !plain, faceScale = 1, detail }: BuddyArtProps) {
+export function BuddyArt({ uid, id, mood, look, plain, geometry: baseGeometry = BUDDY_GEOMETRY, lit = !plain, faceScale = 1, detail, closesEyesAtRest = false }: BuddyArtProps) {
     const material = plain ? 'classic' : (look.material ?? 'classic')
     const classic = material === 'classic'
     const geometry = { ...baseGeometry, radius: MATERIAL_RADIUS[material] ?? baseGeometry.radius }
@@ -79,6 +81,7 @@ export function BuddyArt({ uid, id, mood, look, plain, geometry: baseGeometry = 
                                     light={resting && !plain ? shade(identity, 0.35) : '#fff'}
                                     lit={lit}
                                     tint={resting ? identity : body}
+                                    closesEyesAtRest={closesEyesAtRest && !plain}
                                 />
                             </g>
                         </GrowsFrom>

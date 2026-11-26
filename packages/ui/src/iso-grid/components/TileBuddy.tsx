@@ -60,9 +60,10 @@ type TileBuddyProps = {
     ghost?: { valid: boolean }
     reducedMotion?: boolean
     paused?: boolean
+    closesEyesAtRest?: boolean
 }
 
-export function TileBuddy({ id, style, width, height, floorOffset, active, stretched, ghost, reducedMotion, paused }: TileBuddyProps) {
+export function TileBuddy({ id, style, width, height, floorOffset, active, stretched, ghost, reducedMotion, paused, closesEyesAtRest }: TileBuddyProps) {
     useBuddyBlinks()
     const t = useKitTranslations()
     const uid = useId().replace(/[^a-zA-Z0-9]/g, '')
@@ -146,7 +147,7 @@ export function TileBuddy({ id, style, width, height, floorOffset, active, stret
                 }}
             >
                 <svg viewBox={`${BUDDY_VIEW.x} ${BUDDY_VIEW.y} ${BUDDY_VIEW.w} ${BUDDY_VIEW.h}`} width="100%" height="100%" style={{ overflow: 'visible' }}>
-                    <BuddyArt uid={uid} id={id} mood={mood} look={look} plain={plain} detail={unit * zoom} />
+                    <BuddyArt uid={uid} id={id} mood={mood} look={look} plain={plain} detail={unit * zoom} closesEyesAtRest={closesEyesAtRest} />
                 </svg>
             </div>
 

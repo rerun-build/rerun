@@ -55,6 +55,7 @@ type TileBlockProps = {
     reducedMotion?: boolean
     // The board is frozen on its current frame (`data-iso-paused`): what a timer drives must hold too.
     paused?: boolean
+    closesEyesAtRest?: boolean
     // La tile vient d'être posée → joue l'animation d'atterrissage à l'apparition (fade + slide down).
     justPlaced?: boolean
 }
@@ -76,7 +77,7 @@ function ShimmerStrip({ animation, shade }: { animation: string | undefined; sha
     )
 }
 
-export const TileBlock = memo(function TileBlock({ tile, selected, hovered, isDragging, dragPosition, worldOffset, ghost, onSelect, reducedMotion, paused, justPlaced }: TileBlockProps) {
+export const TileBlock = memo(function TileBlock({ tile, selected, hovered, isDragging, dragPosition, worldOffset, ghost, onSelect, reducedMotion, paused, closesEyesAtRest, justPlaced }: TileBlockProps) {
     const t = useKitTranslations()
     const s = tile.style
     const span = tile.span ?? DEFAULT_SPAN
@@ -207,7 +208,7 @@ export const TileBlock = memo(function TileBlock({ tile, selected, hovered, isDr
             )}
 
             {buddy ? (
-                <TileBuddy id={tile.id} style={s} width={AW} height={AH} floorOffset={blockHeight} active={selected || !!hovered} stretched={selected && !ghost} ghost={ghost} reducedMotion={reducedMotion} paused={paused} />
+                <TileBuddy id={tile.id} style={s} width={AW} height={AH} floorOffset={blockHeight} active={selected || !!hovered} stretched={selected && !ghost} ghost={ghost} reducedMotion={reducedMotion} paused={paused} closesEyesAtRest={closesEyesAtRest} />
             ) : (
                 <>
                 {/* Top face */}

@@ -80,7 +80,7 @@ export function DockBuddy({ coworker, edge, active = false, onOpen, onMenu }: Do
                 {isForemanDockEntry(coworker) ? (
                     <ForemanBuddy coworker={coworker} edge={edge} />
                 ) : (
-                    <AgentBuddy agentId={coworker.id} mood={coworker.mood} size={BUDDY_SIZE} facing={edge === 'right' ? 'left' : 'right'} badge={<CountPip count={coworker.pending} tone={coworker.mood === 'error' ? 'error' : 'brand'} />} />
+                    <AgentBuddy agentId={coworker.id} mood={coworker.mood} size={BUDDY_SIZE} closesEyesAtRest facing={edge === 'right' ? 'left' : 'right'} badge={<CountPip count={coworker.pending} tone={coworker.mood === 'error' ? 'error' : 'brand'} />} />
                 )}
             </button>
         </TooltipLabeled>

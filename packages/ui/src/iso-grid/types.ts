@@ -341,6 +341,9 @@ export type IsoGridProps = {
     // dialog) ou non regardé (fenêtre sans focus) ; hors viewport et onglet caché, la grille se fige
     // déjà d'elle-même.
     paused?: boolean
+    // For a board whose tiles follow their coworkers' runs live: a buddy at rest closes its eyes.
+    // Left out by a scene, a capture or a preview, whose moods are staged.
+    closesEyesAtRest?: boolean
     // Pan/zoom au scroll (molette/trackpad) + pan/pinch tactile. Défaut: true (comportement app UI).
     // Mettre à false pour que la page scrolle normalement par-dessus la grille.
     scrollGestures?: boolean

@@ -221,6 +221,7 @@ export const IsoGrid = memo(function IsoGrid(props: IsoGridProps) {
         canDraw = true,
         className,
         paused = false,
+        closesEyesAtRest = false,
         scrollGestures = true,
         locked = false,
         showViewControls = false,
@@ -1378,7 +1379,7 @@ export const IsoGrid = memo(function IsoGrid(props: IsoGridProps) {
                         const isDragging = dragState?.tileId === tile.id
                         const carried = !!boxDrag && tile.containerId === boxDrag.containerId
                         const dragPosition = isDragging && dragGhostCell ? dragGhostCell : carried ? { col: tile.position.col + boxDrag.delta.col, row: tile.position.row + boxDrag.delta.row } : undefined
-                        return <TileBlock key={tile.id} tile={tile} selected={tile.id === selectedTileId} hovered={tile.id === hoveredTile?.id} isDragging={isDragging} dragPosition={dragPosition} worldOffset={worldOffset} onSelect={onTileSelect} reducedMotion={reducedMotion} paused={paused || !onScreen} justPlaced={tile.justPlaced} />
+                        return <TileBlock key={tile.id} tile={tile} selected={tile.id === selectedTileId} hovered={tile.id === hoveredTile?.id} isDragging={isDragging} dragPosition={dragPosition} worldOffset={worldOffset} onSelect={onTileSelect} reducedMotion={reducedMotion} paused={paused || !onScreen} closesEyesAtRest={closesEyesAtRest} justPlaced={tile.justPlaced} />
                     })}
                 </BuddyZoomProvider>
 

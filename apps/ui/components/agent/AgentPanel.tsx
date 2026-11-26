@@ -184,7 +184,7 @@ export function AgentPanel() {
                         <FloatingPill label={t('agentPanel.coworkerCard')} onClick={() => toggleSurface({ kind: 'card' })} active={shownSurface?.kind === 'card'} className="pointer-events-auto relative min-w-0 ps-1.5">
                             <BorderBeam pattern="arcs" tone="neutral" angle={243} outset={1} className="opacity-50" />
                             <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-muted">
-                                <AgentBuddy agentId={agent.id} mood={buddyMood} size={20} facing="right" />
+                                <AgentBuddy agentId={agent.id} mood={buddyMood} size={20} facing="right" closesEyesAtRest />
                             </span>
                             <span className="truncate font-medium">{agent.name}</span>
                             <ChevronDownIcon className="size-3.5 shrink-0 text-muted-foreground" />

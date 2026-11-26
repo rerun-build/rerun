@@ -58,7 +58,7 @@ export function ForemanTeamEmptyState({ model, now, onSend, onPrefill, orbPaused
 }
 
 function RowLeading({ row }: { row: TeamEmptyStateRow }) {
-    if (row.leading === 'agent') return <AgentBuddy agentId={row.agentId} mood={row.working ? 'working' : 'idle'} size={32} animated={false} facing="right" className="shrink-0" />
+    if (row.leading === 'agent') return <AgentBuddy agentId={row.agentId} mood={row.working ? 'working' : 'idle'} closesEyesAtRest size={32} animated={false} facing="right" className="shrink-0" />
     const Icon = ROW_ICONS[row.leading]
     return (
         <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
@@ -74,7 +74,7 @@ function Pulse({ pulse, now }: { pulse: TeamPulse; now: number }) {
         <div className={cn('flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs text-muted-foreground', SHORT_HIDDEN)}>
             <span className="flex -space-x-1.5">
                 {pulse.agents.slice(0, PULSE_BUDDIES).map(agent => (
-                    <AgentBuddy key={agent.id} agentId={agent.id} mood={agent.working ? 'working' : 'idle'} size={22} animated={false} facing="right" />
+                    <AgentBuddy key={agent.id} agentId={agent.id} mood={agent.working ? 'working' : 'idle'} closesEyesAtRest size={22} animated={false} facing="right" />
                 ))}
             </span>
             <span>

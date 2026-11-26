@@ -29,8 +29,13 @@ function Pair({ y, children }: { y: number; children: (eye: EyeProps) => ReactNo
     return <>{[CENTER - GAP, CENTER + GAP].map(x => <g key={x}>{children({ x, y })}</g>)}</>
 }
 
-function closed(x: number, y: number, color = INK) {
-    return <path d={`M${x - 2.4} ${y} Q${x} ${y + 2.2} ${x + 2.4} ${y}`} stroke={color} strokeWidth={1.5} strokeLinecap="round" fill="none" />
+function closed(x: number, y: number, color = INK, size = 1) {
+    return <path d={`M${x - 2.4 * size} ${y} Q${x} ${y + 2.2 * size} ${x + 2.4 * size} ${y}`} stroke={color} strokeWidth={1.5} strokeLinecap="round" fill="none" />
+}
+
+// Glasses and visors keep their frame when broken or shut, with the eyes crossed or closed inside it.
+function keepsFrame(style: BuddyEyes) {
+    return style === 'visor' || style === 'shades' || style === 'glasses'
 }
 
 function cross(x: number, y: number, color = INK) {
@@ -72,14 +77,13 @@ const HEARTS: ReadonlySet<EyePaint> = new Set(['heart'])
 // The gradients one face actually paints with, following the branches of `Eyes`. A page draws a
 // buddy dozens of times, and writing all seven gradients into each one cost a few hundred nodes.
 function eyePaints(style: BuddyEyes, mood: BuddyMood): ReadonlySet<EyePaint> {
-    const keepsFrame = style === 'visor' || style === 'shades' || style === 'glasses'
-    if (mood === 'asleep' || (mood === 'error' && !keepsFrame)) return INK_ONLY
+    if ((mood === 'asleep' || mood === 'error') && !keepsFrame(style)) return INK_ONLY
     switch (style) {
         case 'googly':
         case 'cyclops':
             return EYEBALL
         case 'visor':
-            return VISOR
+            return mood === 'asleep' ? SHADES : VISOR
         case 'shades':
             return SHADES
         case 'glasses':
@@ -153,14 +157,16 @@ function Eyes({ style, mood, y: baseY, light, uid, lit }: EyesProps) {
     const solid = (shape: (paint: Paint, backing: boolean) => ReactNode) => <Solid uid={uid} lit={lit}>{shape}</Solid>
     const glint = (x: number, y: number, r = 0.62) => (lit ? <ellipse cx={x - 0.55} cy={y} rx={r} ry={r * 1.15} fill="#fff" fillOpacity={0.95} /> : null)
 
-    if (mood === 'asleep') return solid(paint => <Pair y={baseY}>{({ x, y }) => closed(x, y, paint(P.ink))}</Pair>)
-    // Glasses and visors keep their frame when broken; everything else shows the crossed eyes.
-    if (mood === 'error' && style !== 'visor' && style !== 'shades' && style !== 'glasses') return solid(paint => <Pair y={baseY}>{({ x, y }) => cross(x, y, paint(P.ink))}</Pair>)
+    if (mood === 'asleep' && style === 'cyclops') return solid(paint => closed(CENTER, baseY, paint(P.ink), 1.4))
+    if (mood === 'asleep' && !keepsFrame(style)) return solid(paint => <Pair y={baseY}>{({ x, y }) => closed(x, y, paint(P.ink))}</Pair>)
+    if (mood === 'error' && !keepsFrame(style)) return solid(paint => <Pair y={baseY}>{({ x, y }) => cross(x, y, paint(P.ink))}</Pair>)
 
     const lookX = mood === 'working' ? 1 : 0
     const lookY = mood === 'waiting' ? -1.6 : mood === 'working' ? 1 : 0
     const y = baseY + lookY
     const at = (x: number) => x + lookX
+    const crossed = (color: string) => <Pair y={y}>{e => cross(e.x, e.y, color)}</Pair>
+    const shut = (color: string) => <Pair y={y}>{e => closed(e.x, e.y, color)}</Pair>
 
     switch (style) {
         case 'pill':
@@ -215,7 +221,9 @@ function Eyes({ style, mood, y: baseY, light, uid, lit }: EyesProps) {
                     {solid((paint, backing) => <rect x={CENTER - 12} y={y - 3.6} width={24} height={7.2} rx={3.6} fill={paint(P.glass)} stroke={backing ? undefined : INK} strokeOpacity={0.3} strokeWidth={backing ? undefined : 0.6} />)}
                     {!flat && <path d={`M${CENTER - 9.5} ${y - 2.2} L${CENTER + 3} ${y - 2.2}`} stroke="#fff" strokeOpacity={0.22} strokeWidth={0.7} strokeLinecap="round" />}
                     {mood === 'error' ? (
-                        <Pair y={y}>{e => cross(e.x, e.y, light)}</Pair>
+                        crossed(light)
+                    ) : mood === 'asleep' ? (
+                        shut(light)
                     ) : (
                         <g {...blinking(y)}><Pair y={y}>{e => <rect x={at(e.x) - 2.2} y={e.y - 1.2} width={4.4} height={2.4} rx={1.2} fill={P.light} />}</Pair></g>
                     )}
@@ -235,6 +243,7 @@ function Eyes({ style, mood, y: baseY, light, uid, lit }: EyesProps) {
                             )
                         }
                     </Pair>
+                    {mood === 'asleep' && shut(INK)}
                     {mood === 'error' && <path d={`M${CENTER - 3} ${y + 5} q3 -1.6 6 0`} stroke={INK} strokeWidth={1.2} strokeLinecap="round" fill="none" />}
                 </g>
             )
@@ -247,7 +256,7 @@ function Eyes({ style, mood, y: baseY, light, uid, lit }: EyesProps) {
                             <Pair y={y}>{e => <circle cx={e.x} cy={e.y} r={3.5} fill={backing ? 'none' : P.lens} stroke={paint(P.ink)} strokeWidth={0.9} />}</Pair>
                         </>
                     ))}
-                    {mood === 'error' ? <Pair y={y}>{e => cross(e.x, e.y, P.ink)}</Pair> : <g {...blinking(y)}><Pair y={y}>{e => <circle cx={at(e.x)} cy={e.y + lookY * 0.3} r={1.2} fill={P.ink} />}</Pair></g>}
+                    {mood === 'error' ? crossed(P.ink) : mood === 'asleep' ? shut(P.ink) : <g {...blinking(y)}><Pair y={y}>{e => <circle cx={at(e.x)} cy={e.y + lookY * 0.3} r={1.2} fill={P.ink} />}</Pair></g>}
                 </g>
             )
         case 'sleepy':
@@ -350,15 +359,18 @@ type BuddyFaceProps = {
     lit: boolean
     // The colour the eyes pick up towards their lower edge.
     tint: string
+    // At rest, draws the closed eyes of a sleeping buddy while the rest of the face keeps its mood.
+    closesEyesAtRest?: boolean
 }
 
-export function BuddyFace({ uid, eyes, mouth, mood, depth, light, lit, tint }: BuddyFaceProps) {
+export function BuddyFace({ uid, eyes, mouth, mood, depth, light, lit, tint, closesEyesAtRest = false }: BuddyFaceProps) {
     const hasMouth = mouth !== 'none' || mood === 'error' || mood === 'waiting'
     const eyeY = depth * (hasMouth ? 0.38 : 0.45)
+    const eyesMood = closesEyesAtRest && mood === 'idle' ? 'asleep' : mood
     return (
         <>
-            {lit && <EyeDefs uid={uid} y={eyeY} tint={tint} light={light} paints={eyePaints(eyes, mood)} />}
-            <Eyes style={eyes} mood={mood} y={eyeY} light={light} uid={uid} lit={lit} />
+            {lit && <EyeDefs uid={uid} y={eyeY} tint={tint} light={light} paints={eyePaints(eyes, eyesMood)} />}
+            <Eyes style={eyes} mood={eyesMood} y={eyeY} light={light} uid={uid} lit={lit} />
             {hasMouth && mood !== 'asleep' && <Mouth mouth={mouth} mood={mood} y={eyeY + 6.6} />}
         </>
     )

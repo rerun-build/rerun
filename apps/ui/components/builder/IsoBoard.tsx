@@ -468,6 +468,7 @@ export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpac
                     selectedTileId={selectedAgentId}
                     selectedContainerId={selectedSpaceId}
                     paused={dialogCoversBoard || !windowFocused}
+                    closesEyesAtRest
                     placingTileId={placingAgentId}
                     placing={placingFromQueue}
                     placingTile={placingTile}

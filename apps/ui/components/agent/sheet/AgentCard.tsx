@@ -201,7 +201,7 @@ function CardIdentity({ agent, canRename }: { agent: IsoAgent; canRename: boolea
 
     return (
         <div className="flex shrink-0 flex-col items-center px-4 pb-3 pt-4">
-            <AgentBuddy agentId={agent.id} mood={mood} size={116} facing="left" />
+            <AgentBuddy agentId={agent.id} mood={mood} size={116} facing="left" closesEyesAtRest />
             {editing ? (
                 <Input
                     ref={inputRef}

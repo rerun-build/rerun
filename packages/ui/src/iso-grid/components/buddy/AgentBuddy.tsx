@@ -45,12 +45,15 @@ type AgentBuddyProps = {
     // The side its face is turned to. A buddy looks at what it stands next to: right when its text
     // follows it, left (the board's pose) when it stands alone.
     facing?: 'left' | 'right'
+    // Its mood follows the coworker's runs: at rest its eyes close, and they open when a run starts.
+    // Left out for a buddy whose mood is not its coworker's live state.
+    closesEyesAtRest?: boolean
     // Sits on the bottom corner its face is turned away from.
     badge?: ReactNode
     className?: string
 }
 
-export function AgentBuddy({ agentId, look: shownLook, mood = 'idle', size, animated = true, alive = false, facing = 'left', badge, className }: AgentBuddyProps) {
+export function AgentBuddy({ agentId, look: shownLook, mood = 'idle', size, animated = true, alive = false, facing = 'left', closesEyesAtRest = false, badge, className }: AgentBuddyProps) {
     const worn = useBuddyLookOf(agentId)
     const look = shownLook ?? worn
     const uid = useId().replace(/[^a-zA-Z0-9]/g, '')
@@ -84,7 +87,7 @@ export function AgentBuddy({ agentId, look: shownLook, mood = 'idle', size, anim
             }
         >
             <svg viewBox={viewBox} width="100%" height="100%" style={{ overflow: 'visible', transform: facing === 'right' ? 'scaleX(-1)' : undefined }}>
-                <BuddyArt uid={uid} id={agentId} mood={mood} look={small ? smallLook(agentId, look) : look} geometry={geometry} lit={!small} faceScale={small ? SMALL_FACE_SCALE : 1} detail={size / side} />
+                <BuddyArt uid={uid} id={agentId} mood={mood} look={small ? smallLook(agentId, look) : look} geometry={geometry} lit={!small} faceScale={small ? SMALL_FACE_SCALE : 1} detail={size / side} closesEyesAtRest={closesEyesAtRest} />
             </svg>
             {badge && <span className={cn('absolute -bottom-1 flex', facing === 'right' ? '-left-1' : '-right-1')}>{badge}</span>}
         </span>

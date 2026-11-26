@@ -67,7 +67,7 @@ export function AgentView({ agent, tab, onTabChange, onBack, onClose, onOpenSess
 
     return (
         <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-            <AgentViewHeader name={agent.name} avatar={avatar ?? <AgentBuddy agentId={agent.id} mood={mood} size={16} facing="right" />} title={t(`views.${view}`)} onBack={onBack} onClose={onClose} />
+            <AgentViewHeader name={agent.name} avatar={avatar ?? <AgentBuddy agentId={agent.id} mood={mood} size={16} facing="right" closesEyesAtRest />} title={t(`views.${view}`)} onBack={onBack} onClose={onClose} />
             <SidePanelTabSwitcher tabs={switcherTabs} value={shown} onChange={onTabChange} />
             <div className="relative min-h-0 flex-1 overflow-hidden">
                 <div className="absolute inset-0 flex flex-col">

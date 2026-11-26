@@ -1033,7 +1033,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
                             {threadRows.leading.length > 0 && !historyAwaited && <div className="flex flex-col gap-3">{threadBranches(threadRows.leading)}</div>}
                             {messages.length === 0 && threadRows.leading.length === 0 && !suppressEmptyState && !historyAwaited && !showInstallGate && (
                                 <ConversationEmptyState>
-                                    <AgentBuddy agentId={agentId} mood={buddyMood} size={96} />
+                                    <AgentBuddy agentId={agentId} mood={buddyMood} size={96} closesEyesAtRest />
                                     <div className="space-y-1">
                                         <h3 className="font-medium text-sm">{t('emptyTitle')}</h3>
                                         <p className="text-muted-foreground text-sm">{t('emptyDescription')}</p>

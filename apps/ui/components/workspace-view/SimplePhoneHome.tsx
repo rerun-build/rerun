@@ -202,7 +202,7 @@ function PinnedDisc({ agent, unseen, onOpen }: { agent: IsoAgent; unseen: boolea
     return (
         <button type="button" onClick={onOpen} className="flex w-full flex-col items-center gap-1.5 py-2 active:opacity-60">
             <span className="relative flex size-20 items-center justify-center rounded-full bg-muted">
-                <AgentBuddy agentId={agent.id} mood={buddyMoodOfStatus(agent.status, !!agent.disabledAt)} size={56} />
+                <AgentBuddy agentId={agent.id} mood={buddyMoodOfStatus(agent.status, !!agent.disabledAt)} size={56} closesEyesAtRest />
                 {unseen && <span className="absolute top-1.5 start-1.5 size-3.5 rounded-full border-2 border-background bg-brand" />}
             </span>
             <span className={cn('max-w-full truncate text-[13px]', unseen ? 'font-medium text-foreground' : 'text-muted-foreground')}>{agent.name}</span>
