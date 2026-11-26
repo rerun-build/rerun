@@ -41,7 +41,15 @@ one line, under the tabs.
 ```tsx
 <Dialog open={open} onOpenChange={onOpenChange}>
     <PanelDialogContent className="sm:max-w-xl">
-        <DialogHeaderBar icon={<AppIcon slug="linkedin" size="md" />} title="LinkedIn Pro" description="One short line." />
+        {/* on a sub-page the same header navigates: its back button, then the page's icon, title and description */}
+        <DialogHeaderBar
+            icon={page === 'list' ? <AppIcon slug="linkedin" size="md" /> : SettingsIcon}
+            title={page === 'list' ? 'LinkedIn Pro' : 'Account'}
+            description="One short line."
+            onBack={page === 'list' ? undefined : () => setPage('list')}
+            backLabel="LinkedIn Pro"
+            page={{ key: page, depth: page === 'list' ? 0 : 1 }}
+        />
         <div className="flex min-h-0 flex-1 flex-col">
             <PanelSteps stepKey={page} depth={page === 'list' ? 0 : 1}>
                 {page === 'list' ? (
@@ -51,10 +59,7 @@ one line, under the tabs.
                         </Group>
                     </PanelScroller>
                 ) : (
-                    <>
-                        {/* page header: back button + icon + title + hint, see ProviderHeader */}
-                        <PanelScroller className="space-y-4 p-4">{/* form, action button aligned right */}</PanelScroller>
-                    </>
+                    <PanelScroller className="space-y-4 p-4">{/* form, action button aligned right; no header of its own */}</PanelScroller>
                 )}
             </PanelSteps>
         </div>
@@ -69,8 +74,9 @@ one line, under the tabs.
 1. **shadcn primitives**: `Dialog`, `DialogFooter` from `components/ui/dialog`, the header through `DialogHeaderBar`. Do not add a house composite to `components/ui/dialog.tsx`, that file stays a faithful copy of shadcn.
 2. **A service's logo**: `<Icon {...serviceIconProps(service.icon, service.category)} />` with the catalog row (`useCatalogServices`), like the app library. Never a redrawn brand SVG.
 3. **Statuses**: shared `Badge` with a `tone`. Warnings: `Alert`. Empty list: `EmptyPitch` inside a group, or `EmptyState`.
-4. **Opening a row**: the page slides one level down with `PanelSteps`, never a hard swap.
+4. **Opening a row**: the page slides one level down with `PanelSteps`, never a hard swap. The dialog's header navigates: `DialogHeaderBar page={{ key, depth }} onBack backLabel` with the sub-page's icon, title and description, back to the real parent. With `page` the header keeps one height on every page (one line of title, one of description, truncated) and rolls its content in the direction of travel. The body never stacks a second header (a back button and a title above the content).
 5. **Forbidden buttons**: disabled with `TooltipDisabledReason`. Risky actions: `ConfirmDialog`.
+6. **Figures that move** (a stepper, a total, a prorated amount, the amount in a pay button): animated with NumberFlow through `UsdFlow` / `CountFlow` (`ee/components/dialogs/billing/parts.tsx`), never a hard swap of digits.
 
 ## Wizard variant
 

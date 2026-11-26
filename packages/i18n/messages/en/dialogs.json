@@ -86,7 +86,8 @@
         "mcpConnect.labels.stdioClients": "Label above a command for MCP clients that only support the stdio transport. Keep \"stdio\" as it is.",
         "mcpConnect.hints.codexCliOnly": "Under the ChatGPT command: it works in the Codex CLI, not in the ChatGPT app.",
         "shortcuts.actions.askRerun": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used.",
-        "shortcuts.actions.holdToTalk": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used."
+        "shortcuts.actions.holdToTalk": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used.",
+        "headerBar.backTo": "Accessible label of the back button in a dialog header. {page} is the name of the page it goes back to, like Billing."
     },
     "account": {
         "emailChangeNeedsCurrentAddress": "This change still has to be confirmed from your current address.",
@@ -795,5 +796,9 @@
             "codexCliOnly": "Codex CLI. The ChatGPT app only takes OAuth connections, so a key gets you nowhere there.",
             "coworkerReach": "Gives one of your coworkers the same reach over this workspace as an outside client."
         }
+    },
+    "headerBar": {
+        "back": "Back",
+        "backTo": "Back to {page}"
     }
 }

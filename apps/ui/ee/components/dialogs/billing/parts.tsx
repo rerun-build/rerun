@@ -10,6 +10,7 @@ import { Badge, useScrollFade, type BadgeTone } from '@rerun/ui/primitives'
 import NumberFlow from '@number-flow/react'
 import { AnimatePresence, motion } from 'motion/react'
 
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Field } from '@/components/ui/field'
@@ -449,7 +450,7 @@ export function PayFooter({
     error,
     children,
 }: {
-    cta: string
+    cta: ReactNode
     footnote?: ReactNode
     onClick?: () => void
     loading?: boolean
@@ -495,10 +496,10 @@ export function SuccessPanel({ title, body, rows, cta, onDone, loading }: { titl
 
 export function Notice({ tone, children }: { tone: 'warning' | 'danger'; children: ReactNode }) {
     return (
-        <div className={cn('flex gap-3 rounded-xl p-4 text-sm ring-1', tone === 'danger' ? 'bg-destructive/10 ring-destructive/30' : 'bg-orange-400/10 ring-orange-400/30')}>
-            <TriangleAlertIcon className={cn('mt-0.5 size-4 shrink-0', tone === 'danger' ? 'text-destructive' : 'text-orange-400')} />
-            <p>{children}</p>
-        </div>
+        <Alert variant={tone} stripes className="rounded-xl px-4 py-3">
+            <TriangleAlertIcon />
+            <AlertDescription>{children}</AlertDescription>
+        </Alert>
     )
 }
 

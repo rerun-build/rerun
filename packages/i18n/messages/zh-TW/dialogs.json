@@ -706,5 +706,9 @@
             "codexCliOnly": "Codex CLI。ChatGPT 應用程式只接受 OAuth 連線，所以在那裡使用金鑰無效。",
             "coworkerReach": "讓您的一位同事擁有與外部用戶端相同的工作區存取範圍。"
         }
+    },
+    "headerBar": {
+        "back": "返回",
+        "backTo": "返回 {page}"
     }
 }

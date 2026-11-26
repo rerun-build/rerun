@@ -706,5 +706,9 @@
             "codexCliOnly": "Codex CLI. La app de ChatGPT solo acepta conexiones OAuth, así que ahí una clave no sirve.",
             "coworkerReach": "Da a uno de tus coworkers el mismo alcance sobre este workspace que un cliente externo."
         }
+    },
+    "headerBar": {
+        "back": "Atrás",
+        "backTo": "Volver a {page}"
     }
 }

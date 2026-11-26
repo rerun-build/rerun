@@ -706,5 +706,9 @@
             "codexCliOnly": "Codex CLI. ChatGPT uygulaması yalnızca OAuth bağlantılarını kabul eder, bu yüzden orada anahtar işe yaramaz.",
             "coworkerReach": "Coworker'larınızdan birine bu çalışma alanında dış bir istemciyle aynı erişimi verir."
         }
+    },
+    "headerBar": {
+        "back": "Geri",
+        "backTo": "Geri dön: {page}"
     }
 }
