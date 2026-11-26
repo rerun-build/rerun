@@ -47,6 +47,7 @@ What **Connect** says when it refuses an address:
 Before you raise a minimum build, check who still runs an older one: your server counts, in the `app_build_days` table of its database, one row per person, build and day the app called it.
 | `MOBILE_IOS_CUSTOM_BUILD`, `MOBILE_IOS_OPENCODE_BUILD` | The first iPhone build that knows **Custom endpoint** and OpenCode connections. While they are empty, the app does not list those connections. |
 | `MOBILE_IOS_FOREMAN_RUNS_BUILD`, `MOBILE_ANDROID_FOREMAN_RUNS_BUILD` | The first iPhone and Android builds that mark a conversation with the Chief of Staff read as they show it. While they are empty, the app's notifications list its conversations that wait on you, not the runs it finished. |
+| `MOBILE_IOS_FREE_COLOR_BUILD`, `MOBILE_ANDROID_FREE_COLOR_BUILD` | The first iPhone and Android builds that draw a coworker in the color it was given, any `#rrggbb`. While they are empty, the app shows the closest of the 8 colors coworkers are born with. |
 
 ## What is different from Rerun Cloud
 

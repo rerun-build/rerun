@@ -46,12 +46,12 @@ describe('POST /api/v1/agents', () => {
         expect(await (await create({ name: 'Scout', description: 'Find leads', spaceId: SPACE })).json()).toEqual({ agentId: 'agent-1', active: true, sessionId: null, runId: null })
     })
 
-    it('dresses the coworker in the look it was given, and refuses a colour that means a state', async () => {
-        const look = { eyes: 'heart', mouth: 'cat', color: '#00b862' }
+    it('dresses the coworker in the look it was given, any colour included, and refuses one that is not a hex', async () => {
+        const look = { eyes: 'heart', mouth: 'cat', color: '#ff7a00' }
         await create({ name: 'Scout', spaceId: SPACE, look })
         expect(createAgentWithSetup).toHaveBeenCalledWith(expect.objectContaining({ name: 'Scout', look }))
 
-        expect((await create({ name: 'Scout', spaceId: SPACE, look: { ...look, color: '#f59e0b' } })).status).toBe(400)
+        expect((await create({ name: 'Scout', spaceId: SPACE, look: { ...look, color: 'orange' } })).status).toBe(400)
         expect(createAgentWithSetup).toHaveBeenCalledTimes(1)
     })
 

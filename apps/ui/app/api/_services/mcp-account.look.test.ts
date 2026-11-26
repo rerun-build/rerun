@@ -45,8 +45,14 @@ describe('update_agent, the look of a coworker', () => {
         expect(setAgentLook).toHaveBeenCalledWith('agent-own', { ...LOOK, material: 'chrome' })
     })
 
-    it('refuses a colour that means a state, or a part it cannot wear, before changing anything', async () => {
-        await expect(dispatchAccountTool(ACTOR, 'update_agent', { agentId: 'agent-own', name: 'Renamed', look: { ...LOOK, color: '#ef4444' } })).rejects.toThrow(/color one of/)
+    it('dresses it in a colour picked freely, kept in lower case', async () => {
+        await dispatchAccountTool(ACTOR, 'update_agent', { agentId: 'agent-own', look: { ...LOOK, color: '#FF7A00' } })
+
+        expect(setAgentLook).toHaveBeenCalledWith('agent-own', { ...LOOK, color: '#ff7a00' })
+    })
+
+    it('refuses a colour that is not a hex, or a part it cannot wear, before changing anything', async () => {
+        await expect(dispatchAccountTool(ACTOR, 'update_agent', { agentId: 'agent-own', name: 'Renamed', look: { ...LOOK, color: 'orange' } })).rejects.toThrow(/color a #rrggbb hex/)
         await expect(dispatchAccountTool(ACTOR, 'update_agent', { agentId: 'agent-own', look: { ...LOOK, eyes: 'laser' } })).rejects.toThrow(/eyes one of/)
         await expect(dispatchAccountTool(ACTOR, 'update_agent', { agentId: 'agent-own', look: { ...LOOK, material: 'velvet' } })).rejects.toThrow(/material one of/)
 

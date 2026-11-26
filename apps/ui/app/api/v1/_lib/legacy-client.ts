@@ -1,4 +1,4 @@
-import { type AgentModels, type AgentView, type AiConnectionsView, type ClientPlatform, type EmailCodePrepared, type Provider } from '@rerun/contracts'
+import { type AgentModels, type AgentView, type AiConnectionsView, type BoardAgent, type ClientPlatform, COWORKER_COLORS, type EmailCodePrepared, nearestHashedCoworkerColor, type Provider } from '@rerun/contracts'
 import { clientOf } from './client-platform'
 
 // The iOS builds already in people's hands parse `providerSchema` strictly: one provider they do not
@@ -53,9 +53,16 @@ export function agentModelsForClient(req: Request, models: AgentModels): AgentMo
 // Both pairs are nullable already: an old build reads them as "follows the machine" and "not
 // resolved yet", which is what it can show without knowing the provider.
 export function agentViewForClient(req: Request, view: AgentView): AgentView {
+    const agent = clientReadsFreeColors(req) ? view.agent : withHashedColor(view.agent)
+    const dressed = agent === view.agent ? view : { ...view, agent }
     const unknownToLegacy = unknownTo(req)
-    if (!unknownToLegacy || !view.detail) return view
+    if (!unknownToLegacy || !dressed.detail) return dressed
+    return providersForLegacy(dressed, unknownToLegacy)
+}
+
+function providersForLegacy(view: AgentView, unknownToLegacy: (provider: Provider | null | undefined) => boolean): AgentView {
     const { detail } = view
+    if (!detail) return view
     const config = unknownToLegacy(detail.config.provider) ? { ...detail.config, provider: null, model: null } : detail.config
     const resolved = unknownToLegacy(detail.resolvedProvider) ? { resolvedProvider: null, resolvedModel: null } : {}
     return { ...view, detail: { ...detail, config, ...resolved } }
@@ -77,8 +84,33 @@ export function emailCodeForClient(req: Request, answer: EmailCodePrepared): Ema
 const FIRST_FOREMAN_RUNS_BUILD_ENV: Record<ClientPlatform, string> = { ios: 'MOBILE_IOS_FOREMAN_RUNS_BUILD', android: 'MOBILE_ANDROID_FOREMAN_RUNS_BUILD' }
 
 export function clientReadsForemanRuns(req: Request): boolean {
+    return clientAtOrPast(req, FIRST_FOREMAN_RUNS_BUILD_ENV)
+}
+
+function clientAtOrPast(req: Request, firstBuildEnv: Record<ClientPlatform, string>): boolean {
     const client = clientOf(req)
     if (!client) return false
-    const firstBuild = Number.parseInt(process.env[FIRST_FOREMAN_RUNS_BUILD_ENV[client.platform]] ?? '', 10)
+    const firstBuild = Number.parseInt(process.env[firstBuildEnv[client.platform]] ?? '', 10)
     return Number.isInteger(firstBuild) && firstBuild > 0 && client.build >= firstBuild
+}
+
+// A look's colour is any `#rrggbb` only since the builds these variables name: an older one parses
+// it against the eight colours a coworker is hashed to, and one it does not know fails its whole
+// board. It gets the closest of those eight instead. Unset, no build of that platform reads one.
+const FIRST_FREE_COLOR_BUILD_ENV: Record<ClientPlatform, string> = { ios: 'MOBILE_IOS_FREE_COLOR_BUILD', android: 'MOBILE_ANDROID_FREE_COLOR_BUILD' }
+
+const HASHED_COLORS = new Set<string>(COWORKER_COLORS)
+
+function clientReadsFreeColors(req: Request): boolean {
+    return clientAtOrPast(req, FIRST_FREE_COLOR_BUILD_ENV)
+}
+
+function withHashedColor(agent: BoardAgent): BoardAgent {
+    const { look } = agent
+    if (!look || HASHED_COLORS.has(look.color)) return agent
+    return { ...agent, look: { ...look, color: nearestHashedCoworkerColor(look.color) } }
+}
+
+export function boardAgentsForClient(req: Request, agents: BoardAgent[]): BoardAgent[] {
+    return clientReadsFreeColors(req) ? agents : agents.map(withHashedColor)
 }

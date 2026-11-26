@@ -1,4 +1,4 @@
-import { agentKindPolicy, connectorSkillReadOnlyError, coworkerLookSchema, FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, isSetupAnswered, MAX_TEXT_WRITE_CHARS, providerSchema, sleep, triggerMethodSchema, verbositySchema } from '@rerun/contracts'
+import { agentKindPolicy, connectorSkillReadOnlyError, COWORKER_PALETTE, coworkerLookSchema, FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, isSetupAnswered, MAX_TEXT_WRITE_CHARS, providerSchema, sleep, triggerMethodSchema, verbositySchema } from '@rerun/contracts'
 import { AccessDeniedError, assertAgentInWorkspace, assertRunInReach, callableEngineAgentIds, runSessionsInReach, isAdminActor, keepVisible, manageableSpaceIds, spaceAccessMap, visibleAgentIds, visibleSpaceIds, type Actor } from '@/app/api/_auth/access'
 import type { Database } from '@/app/api/database.types'
 import {
@@ -307,7 +307,7 @@ function connectorView({ key, slug, name, label, status }: InstalledService) {
 
 function readLook(value: unknown) {
     const parsed = coworkerLookSchema.nullable().safeParse(value)
-    if (!parsed.success) throw new Error(`look must be null or { eyes, mouth, color, material? } with eyes one of ${coworkerLookSchema.shape.eyes.options.join(', ')}; mouth one of ${coworkerLookSchema.shape.mouth.options.join(', ')}; color one of ${coworkerLookSchema.shape.color.options.join(', ')}; material one of ${coworkerLookSchema.shape.material.unwrap().options.join(', ')}.`)
+    if (!parsed.success) throw new Error(`look must be null or { eyes, mouth, color, material? } with eyes one of ${coworkerLookSchema.shape.eyes.options.join(', ')}; mouth one of ${coworkerLookSchema.shape.mouth.options.join(', ')}; color a #rrggbb hex such as ${COWORKER_PALETTE.join(', ')}; material one of ${coworkerLookSchema.shape.material.unwrap().options.join(', ')}.`)
     return parsed.data
 }
 

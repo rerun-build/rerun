@@ -1,0 +1,8 @@
+# This build parses the colour of a coworker's look against the eight colours a coworker is hashed to.
+# The hub sends it the closest of them instead of a colour picked freely or one added to the palette:
+# apps/ui/app/api/v1/_lib/legacy-client.ts (boardAgentsForClient, agentViewForClient), tested in legacy-client.test.ts.
+GET /api/v1/agents removed the enum constraint from the `items/look/color` response property for the response status `200`
+GET /api/v1/agents/{id} removed the enum constraint from the `agent/look/color` response property for the response status `200`
+# This build never sends a look: it has no picker (apps/mobile/src of its commit). Every colour it knows matches the pattern.
+POST /api/v1/agents added the pattern `^#[0-9a-fA-F]{6}$` to the request property `look/color`
+PATCH /api/v1/agents/{id} added the pattern `^#[0-9a-fA-F]{6}$` to the request property `look/color`

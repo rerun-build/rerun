@@ -1,8 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { agentViewSchema, type AgentModels, type AgentView, type AiConnectionsView } from '@rerun/contracts'
+import { agentViewSchema, boardAgentSchema, COWORKER_COLORS, coworkerLookSchema, type AgentModels, type AgentView, type AiConnectionsView, type BoardAgent } from '@rerun/contracts'
+import { z } from 'zod'
 
 import { shippedIosAgentModelsSchema, shippedIosAgentViewSchema, shippedIosConnectionsViewSchema } from '@/test/shipped-ios'
-import { agentModelsForClient, agentViewForClient, aiConnectionsForClient, clientKnowsProvider, clientReadsForemanRuns, emailCodeForClient } from './legacy-client'
+import { agentModelsForClient, agentViewForClient, aiConnectionsForClient, boardAgentsForClient, clientKnowsProvider, clientReadsForemanRuns, emailCodeForClient } from './legacy-client'
 
 const request = (client?: string) => new Request('https://app.rerun.build/api/v1/agents/a1', { headers: client ? { 'x-rerun-client': client } : {} })
 
@@ -153,5 +154,34 @@ describe('clientReadsForemanRuns', () => {
         expect(clientReadsForemanRuns(request('android/1.0.3 (13)'))).toBe(false)
         expect(clientReadsForemanRuns(request('android/1.0.4 (14)'))).toBe(true)
         expect(clientReadsForemanRuns(request())).toBe(false)
+    })
+})
+
+// What iOS 45 to 51 and Android 13 to 18 parse a coworker's look against.
+const shippedBoardAgentSchema = boardAgentSchema.extend({ look: coworkerLookSchema.extend({ color: z.enum(COWORKER_COLORS) }).nullable().optional() })
+
+describe('boardAgentsForClient', () => {
+    const orange: BoardAgent = { ...agentView.agent, id: 'a2', look: { eyes: 'pill', mouth: 'none', color: '#ff7a00', material: 'fluffy' } }
+    const blue: BoardAgent = { ...agentView.agent, id: 'a3', look: { eyes: 'pill', mouth: 'none', color: '#0f52ff' } }
+    const undressed: BoardAgent = { ...agentView.agent, id: 'a4', look: null }
+    const agents = [orange, blue, undressed]
+
+    it('sends a build that knows only the hashed colours the closest of them, which it parses', () => {
+        for (const client of ['ios/1.0.9 (51)', 'android/1.0.9 (18)']) {
+            const answer = boardAgentsForClient(request(client), agents)
+            expect(answer.map(agent => agent.look?.color ?? null)).toEqual(['#f0127f', '#0f52ff', null])
+            expect(answer[0].look).toMatchObject({ eyes: 'pill', mouth: 'none', material: 'fluffy' })
+            for (const agent of answer) expect(shippedBoardAgentSchema.safeParse(agent).success).toBe(true)
+            expect(shippedBoardAgentSchema.safeParse(agentViewForClient(request(client), { ...agentView, agent: orange }).agent).success).toBe(true)
+        }
+    })
+
+    it('hands a free colour as it is from the build named for its platform', () => {
+        vi.stubEnv('MOBILE_IOS_FREE_COLOR_BUILD', '52')
+        vi.stubEnv('MOBILE_ANDROID_FREE_COLOR_BUILD', '19')
+        expect(boardAgentsForClient(request('ios/1.1.0 (52)'), agents)).toBe(agents)
+        expect(boardAgentsForClient(request('android/1.1.0 (19)'), agents)).toBe(agents)
+        expect(agentViewForClient(request('ios/1.1.0 (52)'), { ...agentView, agent: orange }).agent.look?.color).toBe('#ff7a00')
+        expect(boardAgentsForClient(request('ios/1.0.9 (51)'), agents)[0].look?.color).toBe('#f0127f')
     })
 })

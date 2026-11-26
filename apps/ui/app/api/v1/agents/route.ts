@@ -5,11 +5,12 @@ import { listBoardAgents } from '@/app/api/_services/board-agents.service'
 import { startKickoff } from '@/app/api/_services/kickoff.service'
 import { messageAuthorOf } from '@/app/api/_services/me.service'
 import { apiRoute } from '@/app/api/v1/_lib/api-route'
+import { boardAgentsForClient } from '@/app/api/v1/_lib/legacy-client'
 import { type CreatedCoworker, mobileApi } from '@rerun/contracts'
 
 export const dynamic = 'force-dynamic'
 
-export const GET = apiRoute(mobileApi.listAgents, { auth: 'member' }, async ({ ctx }) => listBoardAgents(ctx))
+export const GET = apiRoute(mobileApi.listAgents, { auth: 'member' }, async ({ req, ctx }) => boardAgentsForClient(req, await listBoardAgents(ctx)))
 
 // The web's own creation, then its first message: the description, reformulated. A coworker that
 // arrives switched off for want of a plan slot gets no message, it could not run it. Creating in a

@@ -1,4 +1,4 @@
-import { COWORKER_COLORS, COWORKER_EYES, COWORKER_MATERIALS, COWORKER_MOUTHS, FOREMAN_AGENT_ID } from '@rerun/contracts'
+import { COWORKER_EYES, COWORKER_MATERIALS, COWORKER_MOUTHS, COWORKER_PALETTE, FOREMAN_AGENT_ID } from '@rerun/contracts'
 import { CONVERSATION_TOOL_DEFS } from './conversation-tools'
 import { KNOWLEDGE_TOOL_DEFS } from './knowledge-tools'
 import { LIBRARY_TOOL_DEFS } from './library-tools'
@@ -193,8 +193,8 @@ const AGENT_TOOL_DEFS = [
                 setup: SETUP_PROPERTY,
                 look: {
                     type: ['object', 'null'],
-                    description: 'How its buddy looks on the board and everywhere else: the colour of its top, its eyes, its mouth and the material its block is made of (classic, the default, is the plain block). Pass null to give it back the look drawn from its id. Amber, red and cyan are not offered: on the board they mean working, broken and waiting.',
-                    properties: { eyes: { type: 'string', enum: [...COWORKER_EYES] }, mouth: { type: 'string', enum: [...COWORKER_MOUTHS] }, color: { type: 'string', enum: [...COWORKER_COLORS] }, material: { type: 'string', enum: [...COWORKER_MATERIALS] } },
+                    description: `How its buddy looks on the board and everywhere else: the colour of its top, its eyes, its mouth and the material its block is made of (classic, the default, is the plain block). Pass null to give it back the look drawn from its id. The color is any #rrggbb; the palette offers ${COWORKER_PALETTE.join(', ')}. Avoid amber, red and cyan: on the board the whole block takes them while it works, breaks or waits.`,
+                    properties: { eyes: { type: 'string', enum: [...COWORKER_EYES] }, mouth: { type: 'string', enum: [...COWORKER_MOUTHS] }, color: { type: 'string', pattern: '^#[0-9a-fA-F]{6}$' }, material: { type: 'string', enum: [...COWORKER_MATERIALS] } },
                     required: ['eyes', 'mouth', 'color'],
                 },
             },

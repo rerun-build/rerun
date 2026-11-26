@@ -1,4 +1,4 @@
-import { COWORKER_COLORS, COWORKER_EYES, COWORKER_MATERIALS, COWORKER_MOUTHS, FOREMAN_AGENT_ID, type CoworkerLook } from '@rerun/contracts'
+import { COWORKER_EYES, COWORKER_MATERIALS, COWORKER_MOUTHS, FOREMAN_AGENT_ID, type CoworkerLook } from '@rerun/contracts'
 import { hashedBuddyLook } from '@rerun/ui/iso-grid/buddy-look'
 
 import { APP_URL } from '@/lib/app-url'
@@ -16,7 +16,7 @@ export type CoworkerPortrait = { kind: 'foreman' } | { kind: 'buddy'; look: Requ
 function portraitSlug(agentId: string, look: CoworkerLook | null): string {
     if (agentId === FOREMAN_AGENT_ID) return FOREMAN_AGENT_ID
     const { eyes, mouth, color, material = 'classic' } = look ?? hashedBuddyLook(agentId)
-    return [eyes, mouth, color.slice(1), material].join('-')
+    return [eyes, mouth, color.slice(1).toLowerCase(), material].join('-')
 }
 
 // `origin` is the app of the brand the picture is shown under: an email of an organization loads it
@@ -42,7 +42,7 @@ export function portraitOfSlug(slug: string): CoworkerPortrait | null {
     const [eyesPart, mouthPart, colorPart, materialPart, ...rest] = slug.split('-')
     const eyes = COWORKER_EYES.find(value => value === eyesPart)
     const mouth = COWORKER_MOUTHS.find(value => value === mouthPart)
-    const color = COWORKER_COLORS.find(value => value === `#${colorPart}`)
+    const color = /^[0-9a-f]{6}$/.test(colorPart ?? '') ? `#${colorPart}` : undefined
     const material = COWORKER_MATERIALS.find(value => value === materialPart)
     if (!eyes || !mouth || !color || !material || rest.length) return null
     return { kind: 'buddy', look: { eyes, mouth, color, material } }

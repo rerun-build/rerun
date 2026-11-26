@@ -12,6 +12,11 @@ describe('coworkerPortraitUrl', () => {
         expect(portraitOfSlug(slugOf(coworkerPortraitUrl('agent-1', look)))).toEqual({ kind: 'buddy', look })
     })
 
+    it('carries a colour picked freely, in lower case', () => {
+        const look = { eyes: 'pill', mouth: 'none', color: '#FF7A00', material: 'fluffy' } as const
+        expect(portraitOfSlug(slugOf(coworkerPortraitUrl('agent-1', look)))).toEqual({ kind: 'buddy', look: { ...look, color: '#ff7a00' } })
+    })
+
     it('draws a coworker nobody dressed with the look hashed from its id, in the classic block', () => {
         const id = 'b4d2f6d0-5a3c-4c0e-9a43-0d8a7f6f2c11'
         expect(portraitOfSlug(slugOf(coworkerPortraitUrl(id, null)))).toEqual({ kind: 'buddy', look: { ...hashedBuddyLook(id), material: 'classic' } })
@@ -27,7 +32,7 @@ describe('coworkerPortraitUrl', () => {
 })
 
 describe('portraitOfSlug', () => {
-    it.each(['', 'pill', 'pill-smile-0f52ff', 'pill-smile-0f52ff-marble', 'pill-smile-ffffff-classic', 'pill-smile-0f52ff-classic-extra', '../board'])('refuses %j', slug => {
+    it.each(['', 'pill', 'pill-smile-0f52ff', 'pill-smile-0f52ff-marble', 'pill-smile-orange-classic', 'pill-smile-FF7A00-classic', 'pill-smile-ff7a0-classic', 'pill-smile-0f52ff-classic-extra', '../board'])('refuses %j', slug => {
         expect(portraitOfSlug(slug)).toBeNull()
     })
 })

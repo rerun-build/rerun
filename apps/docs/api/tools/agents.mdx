@@ -252,10 +252,10 @@ Updates a coworker. Every field is optional and only what you pass changes.
 
   - `eyes`: `pill`, `round`, `happy`, `googly`, `visor`, `sleepy`, `wink`, `pixel`, `star`, `heart`, `dot`, `brows`, `cyclops`, `shades`, `glasses`, `sparkle` or `line`
   - `mouth`: `none`, `smile`, `open`, `cat` or `flat`
-  - `color`: `#0f52ff`, `#4fb800`, `#f0127f`, `#7a2cf5`, `#e935c1`, `#3b32e8`, `#00b862` or `#a81fe0`
+  - `color`: any `#rrggbb`. The palette of the app offers `#0f52ff`, `#4fb800`, `#f0127f`, `#7a2cf5`, `#e935c1`, `#3b32e8`, `#00b862`, `#a81fe0`, `#ff6a13`, `#2b9bf4`, `#0e9f8e`, `#8d5a3b` and `#5d6778`
   - `material`: `classic` (the default, the plain block), `fluffy`, `plush`, `felt`, `knit`, `clay`, `rubber`, `glass` or `chrome`
 
-  Amber, red and cyan are refused: on the board they mean working, in error and waiting for you. An invalid look is refused before anything else in the call is written.
+  Avoid amber, red and cyan: on the board the whole character takes them while it works, is in error or waits for you. An invalid look is refused before anything else in the call is written.
 </ParamField>
 
 Renaming moves the handle. It is re-derived from the new `name`, and every `@oldhandle` written into the other coworkers (prompts, skills, scheduled tasks, webhook triggers, memories) is rewritten, so their calls keep resolving. Pass `handle` only to set a call key that differs from the name.
