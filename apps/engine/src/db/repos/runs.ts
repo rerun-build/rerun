@@ -1,5 +1,5 @@
 import { and, desc, eq, gte, sql } from 'drizzle-orm'
-import type { ContextOccupancy } from '@rerun/contracts'
+import type { ContextOccupancy, RunStarter } from '@rerun/contracts'
 import { getSystemDb } from '../systemDb.js'
 import { runs, type RunRow } from '../schema.js'
 import { newId, nowIso } from '../../lib/ids.js'
@@ -79,6 +79,8 @@ export async function startRun(agentId: string, sessionId: string, id: string = 
         cachedInputTokens: null,
         reasoningTokens: null,
         totalTokens: null,
+        starterKind: null,
+        starterId: null,
         startedAt: nowIso(),
         finishedAt: null,
         error: null,
@@ -93,6 +95,11 @@ export type RunContextPatch = { provider: string; model: string; triggerSource: 
 export async function setRunContext(agentId: string, id: string, patch: RunContextPatch): Promise<void> {
     const { db } = await getSystemDb(agentId)
     await db.update(runs).set(patch).where(eq(runs.id, id))
+}
+
+export async function setRunStarter(agentId: string, id: string, starter: RunStarter): Promise<void> {
+    const { db } = await getSystemDb(agentId)
+    await db.update(runs).set({ starterKind: starter.kind, starterId: starter.id }).where(eq(runs.id, id))
 }
 
 export async function bumpRunStep(agentId: string, id: string, stepCount: number): Promise<void> {

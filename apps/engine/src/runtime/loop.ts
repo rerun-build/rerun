@@ -33,7 +33,7 @@ import { appendMessage, deleteMessage, lastMessage, lastMessageId, lastProviderS
 import { getLatestCheckpoint } from '../db/repos/checkpoints.js'
 import type { MessageRow } from '../db/schema.js'
 import { isSharedConversation, signText } from './message-authors.js'
-import { bumpRunStep, cancelRun, failRun, finishRun, setRunContext, startRun } from '../db/repos/runs.js'
+import { bumpRunStep, cancelRun, failRun, finishRun, setRunContext, setRunStarter, startRun } from '../db/repos/runs.js'
 import { insertRunStep, insertToolCall } from '../db/repos/telemetry.js'
 import { touchSession } from '../db/repos/sessions.js'
 import { settledWithin } from '../lib/abort.js'
@@ -48,6 +48,7 @@ import { prepareMcpServer } from '../tools/mcp.js'
 import { withPooledRelays } from '../tools/mcp-relay.js'
 import { HostBreaker } from '../tools/host-breaker.js'
 import { refreshBrand } from '../brand/brand.js'
+import { starterOf } from './run-starter.js'
 import { offersTeamRequests, runsReadOnly, runsUnattended, type PartialResult, type RunContext, type RunTrigger, type SkillProposalNotice } from './context.js'
 import { partialResultsNote } from './partial-results.js'
 import { stoppedTurn } from './stopped-turn.js'
@@ -288,6 +289,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
     // tool/MCP setup would otherwise leave it `running` forever with no terminal event for the hub.
     const startedAt = Date.now()
     const run = runId ? { id: runId } : await startRun(baseAgent.id, sessionId)
+    if (!handover) await setRunStarter(baseAgent.id, run.id, starterOf(trigger)).catch(err => logger.warn({ err: String(err) }, 'run starter not recorded'))
     const controller = handover?.controller ?? registerRunAbort(run.id, baseAgent.id)
     // Its own signal rather than the run's: a turn handed over to a backup goes on in the same run.
     const attempt = new AbortController()

@@ -51,6 +51,9 @@ export const runs = sqliteTable('runs', {
     cachedInputTokens: integer('cached_input_tokens'),
     reasoningTokens: integer('reasoning_tokens'),
     totalTokens: integer('total_tokens'),
+    // Who started the run (see `RunStarterKind`); null on the runs from before system.db v9.
+    starterKind: text('starter_kind'),
+    starterId: text('starter_id'),
     startedAt: text('started_at').notNull(),
     finishedAt: text('finished_at'),
     error: text('error'),

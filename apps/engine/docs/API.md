@@ -1636,6 +1636,26 @@ Token and cost totals of the agent's `done` runs, per day and model (`range` def
 { "buckets": [ { "day": "2026-11-15", "model": "claude-sonnet-4-6", "inputTokens": 12000, "outputTokens": 3400, "cachedInputTokens": 0, "reasoningTokens": 0, "totalTokens": 15400, "costMicros": 18300, "runCount": 7 } ] }
 ```
 
+### `GET /usage/runs?from=&to=&since=&agents=`
+
+Every run of every agent of the machine for the usage dashboard, newest first. An engine from
+before it answers `404`. `from` and `to` (ISO datetimes, required) keep the runs that started between them;
+the runs still `running` come back whenever they started. `since` keeps only the runs that started
+after it, the ones still running and the ones that ended after it, so a dashboard can refresh
+without reading the whole window again. `agents` (engine ids, comma-separated) keeps only those
+agents. At most 20,000 runs: `truncated` says when more matched. A window that ends before it
+starts, or a date that is not one, answers `400 { "error": "invalid usage query" }`.
+
+`costMicros` is `null` when the provider reported no price (a subscription, the customer's own key,
+a custom endpoint), never `0`. `starterKind` says who started the run (`person`, `coworker`,
+`schedule`, `webhook`, `checkin`, `job`, `api`), from the `starter_kind` and `starter_id` columns of
+`runs` (system.db v9). On an older run it is read from the run's trigger or its session, or `null`
+when nothing says it; `starterName` is the member's name for a `person`.
+
+```json
+{ "runs": [ { "id": "r1", "agentId": "nova", "status": "done", "startedAt": "2026-11-25T10:00:00.000Z", "finishedAt": "2026-11-25T10:01:00.000Z", "provider": "rerun", "model": "anthropic/claude-sonnet-4.5", "inputTokens": 1200, "outputTokens": 80, "costMicros": 30000, "starterKind": "person", "starterId": "user-1", "starterName": "Noa Levi" } ], "truncated": false }
+```
+
 ### `GET /agents/:id/stats`
 
 A time series for a chart. `dataset` and `metric` are required, `groupBy` defaults to `none`,

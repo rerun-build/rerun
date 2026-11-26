@@ -167,6 +167,7 @@ DELETE /agents/:id/sessions/:sid/messages/:mid
 GET    /agents/:id/runs   /runs/:rid   /runs/:rid/stream   /runs/:rid/steps   /runs/:rid/tools
 POST   /agents/:id/runs/:rid/cancel   /runs/:rid/tasks/:taskId/cancel
 GET    /agents/:id/usage   /agents/:id/stats
+GET    /usage/runs                           every run of every agent, for the usage dashboard
 
 GET|POST|DELETE /agents/:id/memories   POST /memories/recall   DELETE /memories/:memoryId
 GET|POST /agents/:id/skills   POST /skills/import   GET|PATCH|DELETE /skills/:slug   GET /skills/:slug/archive

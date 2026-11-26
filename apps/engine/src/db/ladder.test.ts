@@ -120,6 +120,10 @@ describe('sqlite ladders', () => {
               8,
               "message-author-via",
             ],
+            [
+              9,
+              "run-starter",
+            ],
           ]
         `)
         expect(SHARED_DB_MIGRATIONS.map(s => [s.version, s.id])).toMatchInlineSnapshot(`
@@ -320,6 +324,19 @@ describe('system.db v7 to v8', () => {
         expect(await sqliteVersion(client)).toBe(SYSTEM_DB_VERSION)
         await SYSTEM_DB_MIGRATIONS[7].up(client)
         expect((await client.execute('SELECT author_id, author_via FROM messages')).rows.map(row => ({ ...row }))).toEqual([{ author_id: 'u1', author_via: null }])
+    })
+})
+
+describe('system.db v8 to v9', () => {
+    it('adds who started a run, leaves the runs already there not recorded, and replays without harm', async () => {
+        const client = freshFile('v8-system')
+        await migrateSqlite(client, SYSTEM_DB_MIGRATIONS.slice(0, 8), 'v8-system.db')
+        expect(await columns(client, 'runs')).not.toContain('starter_kind')
+        await client.execute("INSERT INTO runs (id, agent_id, session_id, status, started_at) VALUES ('r1', 'a1', 's1', 'done', '2026-11-25T00:00:00.000Z')")
+        await migrateSystemDb(client, 'v8-system.db')
+        expect(await sqliteVersion(client)).toBe(SYSTEM_DB_VERSION)
+        await SYSTEM_DB_MIGRATIONS[8].up(client)
+        expect((await client.execute('SELECT id, starter_kind, starter_id FROM runs')).rows.map(row => ({ ...row }))).toEqual([{ id: 'r1', starter_kind: null, starter_id: null }])
     })
 })
 

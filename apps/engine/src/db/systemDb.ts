@@ -259,6 +259,11 @@ CREATE TABLE IF NOT EXISTS members (
 // What a check-in of the Chief of Staff made of its run, beside the run it was.
 const RUN_CHECKIN_COLUMNS = ['checkin_json TEXT']
 
+// Who started a run: a person, another coworker, a schedule, a webhook... `starter_id` is the
+// person's or the calling coworker's id, or the slug of the schedule or webhook. Null on the runs
+// from before this step, which the usage dashboard shows as not recorded.
+const RUN_STARTER_COLUMNS = ['starter_kind TEXT', 'starter_id TEXT']
+
 // A schema change is a new step at the end, never an edit to a shipped one: see `db/ladder.ts`.
 export const SYSTEM_DB_MIGRATIONS: SqliteMigration[] = [
     {
@@ -319,6 +324,13 @@ export const SYSTEM_DB_MIGRATIONS: SqliteMigration[] = [
         id: 'message-author-via',
         up: async client => {
             await ensureColumns(client, 'messages', MESSAGE_AUTHOR_VIA_COLUMNS)
+        },
+    },
+    {
+        version: 9,
+        id: 'run-starter',
+        up: async client => {
+            await ensureColumns(client, 'runs', RUN_STARTER_COLUMNS)
         },
     },
 ]

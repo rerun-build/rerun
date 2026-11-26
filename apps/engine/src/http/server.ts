@@ -16,6 +16,7 @@ import { skillProposalRoutes } from './routes/skill-proposals.js'
 import { scheduleRoutes } from './routes/schedules.js'
 import { triggerRoutes } from './routes/triggers.js'
 import { runRoutes, usageRoutes } from './routes/runs.js'
+import { workspaceUsageRoutes } from './routes/workspace-usage.js'
 import { statsRoutes } from './routes/stats.js'
 import { toolRoutes } from './routes/tools.js'
 import { updateRoutes } from './routes/update.js'
@@ -89,6 +90,7 @@ export function createServer(): Hono {
     )
     api.route('/shared/files', createFilesRouter(() => sharedDir(), sharedFileMetaHooks))
     api.route('/shared/data', createDataRouter(() => getSharedDb(), SHARED_HIDDEN_TABLES, () => listAgentIdsOnDisk()))
+    api.route('/usage', workspaceUsageRoutes)
     api.route('/search', searchRoutes)
     api.route('/brain/skills', brainSkillRoutes)
     api.route('/brain', brainRoutes)
