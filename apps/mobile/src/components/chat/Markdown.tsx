@@ -121,10 +121,15 @@ function decodeEntities(text: string): string {
     return text.replace(/&(amp|lt|gt|quot|#39);/g, entity => ENTITIES[entity] ?? entity)
 }
 
+// Off under a message whose long press opens its actions: iOS would select the words under the same
+// press and draw its own Copy over the menu. The menu copies the whole message.
+export const ParagraphSelectable = createContext(true)
+
 function Paragraph({ tokens, style }: { tokens: Token[] | undefined; style?: TextStyle }) {
     const ink = useInk()
+    const selectable = use(ParagraphSelectable)
     return (
-        <AppText variant="body" selectable style={[{ color: ink.text }, style]}>
+        <AppText variant="body" selectable={selectable} style={[{ color: ink.text }, style]}>
             {renderInline(tokens)}
         </AppText>
     )

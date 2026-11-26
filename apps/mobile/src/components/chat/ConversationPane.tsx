@@ -22,6 +22,7 @@ import type { ChatEndpoints } from '@/chat/endpoints'
 import type { FileOwner } from '@/api/files'
 import { placeOf, rememberPlace } from '@/chat/reading-place'
 import { useCoworkerChat } from '@/chat/useCoworkerChat'
+import { useMessageActions } from '@/chat/useMessageActions'
 import { useMessageTimes } from '@/chat/useMessageTimes'
 import { useMessageFeedback } from '@/chat/useMessageFeedback'
 import { useQueuedMessage } from '@/chat/useQueuedMessage'
@@ -44,6 +45,7 @@ import { uploadAttachments, type ComposerAttachment } from './attachments'
 import { PinnedSkillProposal } from './cards/SkillProposalRow'
 import { CHAT_HEADER_HEIGHT } from './ChatHeader'
 import { Composer, type ComposerHandle } from './Composer'
+import { EditingBanner } from './EditingBanner'
 import { ErrorCard, type ErrorCardActions } from './ErrorCard'
 import { ConversationSkeleton } from './ConversationSkeleton'
 import { CoworkerEmptyState, ForemanEmptyState } from './EmptyStates'
@@ -349,6 +351,10 @@ function ConversationPaneBody({ coworker, makeEndpoints, initialSessionId, onSes
 
     const submit = async (text: string) => {
         const message = text.trim()
+        if (messageActions.editingId) {
+            if (message && (await messageActions.sendEdit(message))) setDraft('')
+            return
+        }
         if (!message && attachments.length === 0) return
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
         if (caller) askForPushOnce(caller).catch(() => {})
@@ -419,8 +425,28 @@ function ConversationPaneBody({ coworker, makeEndpoints, initialSessionId, onSes
         const runId = chat.activeRunId()
         if (caller && runId) cancelSubRun(caller, coworker.id, runId, taskId).catch(() => Alert.alert(t('stopTaskFailed'), tc('tryAgainShortly')))
     })
-    const regenerate = useStableCallback(() => void chat.regenerate())
-    const transcript = { messages: chat.messages, busy: chat.busy, agentId: isForeman ? null : coworker.id, coworkerName: coworker.name, fileOwner, hiddenCallId: alert?.toolCallId ?? null, skillProposals, onStopTask: stopTask, onRegenerate: pending ? undefined : regenerate, ratingOf: feedback.ratingOf, onRate: feedback.rate, paidSourcesByTurn, authorOf, startedBy: banner, threadRows, onOpenThread: openThread }
+    const messageActions = useMessageActions({
+        chat,
+        caller,
+        endpoints,
+        agentId: coworker.id,
+        coworkerName: coworker.name,
+        onEdit: text => {
+            setDraft(text)
+            composer.current?.focus()
+        },
+    })
+    const cancelEdit = () => {
+        messageActions.cancelEdit()
+        setDraft('')
+    }
+    // A coworker's reply asked again replaces it in the engine; the Chief of Staff's route only appends.
+    const regenerate = useStableCallback(() => {
+        const lastReply = chat.messages.findLast(message => message.role === 'assistant')
+        if (isForeman || !lastReply) return void chat.regenerate()
+        void messageActions.regenerateReply(lastReply.id)
+    })
+    const transcript = { messages: chat.messages, busy: chat.busy, agentId: isForeman ? null : coworker.id, coworkerName: coworker.name, fileOwner, hiddenCallId: alert?.toolCallId ?? null, skillProposals, onStopTask: stopTask, onRegenerate: pending ? undefined : regenerate, ratingOf: feedback.ratingOf, onRate: feedback.rate, paidSourcesByTurn, authorOf, startedBy: banner, threadRows, onOpenThread: openThread, onMessageActions: isForeman ? undefined : messageActions.open }
     const placeholder = pending || unknownCall ? t('answerPlaceholder', { name: coworker.name }) : tComposer(isForeman ? 'placeholderNoSkill' : 'placeholder')
 
     return (
@@ -575,6 +601,7 @@ function ConversationPaneBody({ coworker, makeEndpoints, initialSessionId, onSes
                     )}
                     {/* The composer's glass goes blank under a parent below full opacity, and when it is laid while
                         moving: it comes back in place once a block is answered, and only leaves with a slide. */}
+                    {messageActions.editingId && <EditingBanner onCancel={cancelEdit} />}
                     {!composerReplaced && (
                         <Animated.View exiting={SlideOutDown.duration(280)} style={{ paddingHorizontal: spacing.md }}>
                             <Composer ref={composer} value={draft} onChangeText={setDraft} attachments={attachments} onAttachmentsChange={setAttachments} skills={skills} mentionAgents={mentionAgents} mentionComputers={mentionComputers} triggers={isForeman ? FOREMAN_MENTION_TRIGGERS : undefined} onSend={() => submit(draft)} onStop={chat.stop} running={chat.busy || uploading} placeholder={placeholder} model={model} onOpenModel={openModel} canAttach={canAttach && !pending} voice={voice} autoFocus={!initialSessionId && onScreen} onScreen={onScreen} />

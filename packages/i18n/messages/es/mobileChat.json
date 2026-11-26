@@ -317,5 +317,23 @@
         "copyLink": "Copiar enlace",
         "backToChat": "Volver a la conversación",
         "brand": "Rerun"
+    },
+    "messageActions": {
+        "edit": "Editar",
+        "regenerate": "Regenerar",
+        "copy": "Copiar",
+        "copyLink": "Copiar enlace",
+        "delete": "Eliminar",
+        "cancel": "Cancelar",
+        "editing": "Editando el mensaje",
+        "editHint": "Las respuestas posteriores a este mensaje se reemplazan.",
+        "cancelEdit": "Cancelar la edición",
+        "deleteTitle": "¿Eliminar este mensaje?",
+        "deleteUserDescription": "{name} tampoco lo verá. Las respuestas se quedan en la conversación.",
+        "deleteReplyDescription": "Sale de la conversación y {name} tampoco lo verá.",
+        "busy": "Espera a que termine la respuesta antes de cambiar un mensaje.",
+        "engineOutdated": "Actualiza la máquina de este workspace para editar mensajes.",
+        "notReady": "Este mensaje todavía se está guardando. Inténtalo de nuevo en un momento.",
+        "failed": "No se pudo cambiar el mensaje. Inténtalo de nuevo."
     }
 }

@@ -318,7 +318,28 @@
         "backToChat": "Back to the conversation",
         "brand": "Rerun"
     },
+    "messageActions": {
+        "edit": "Edit",
+        "regenerate": "Regenerate",
+        "copy": "Copy",
+        "copyLink": "Copy link",
+        "delete": "Delete",
+        "cancel": "Cancel",
+        "editing": "Editing message",
+        "editHint": "The replies after it are replaced.",
+        "cancelEdit": "Cancel the edit",
+        "deleteTitle": "Delete this message?",
+        "deleteUserDescription": "{name} will no longer see it either. The replies stay in the conversation.",
+        "deleteReplyDescription": "It leaves the conversation, and {name} will no longer see it either.",
+        "busy": "Wait for the reply to finish before changing a message.",
+        "engineOutdated": "Update the machine of this workspace to edit messages.",
+        "notReady": "This message is still being saved. Try again in a moment.",
+        "failed": "The message could not be changed. Try again."
+    },
     "_context": {
+        "messageActions.editHint": "Above the message box while the user edits a message they sent: sending it removes every message after it and the coworker answers again.",
+        "messageActions.deleteUserDescription": "{name} is the coworker's name. The message deleted is one the user wrote.",
+        "messageActions.deleteReplyDescription": "{name} is the coworker's name. The message deleted is one of the coworker's replies.",
         "composer.placeholder": "Empty message box of the chat, on a phone: keep it short, one line. The symbols @, / and # stay as they are; coworker and skill stay in English.",
         "composer.placeholderNoSkill": "Same as composer.placeholder for the Chief of Staff, which has no skill: no / part.",
         "messages.relayedFor": "Under a message the Chief of Staff sent into a coworker's conversation in a person's name, answering the coworker's card for them. {name} is the Chief of Staff's own name when the workspace gave it one, {person} the first name of that person.",
@@ -351,6 +372,7 @@
         "browser.brand": "Name of the app, shown under a web page opened in the app, beside the coworker who wrote the link. Rerun is the product name, keep it.",
         "empty.team.greeting": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used.",
         "empty.team.greetingNamed": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used.",
-        "messages.askRerun": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used."
+        "messages.askRerun": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used.",
+        "messageActions.engineOutdated": "The machine is the server that runs the workspace's coworkers."
     }
 }

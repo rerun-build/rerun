@@ -22,6 +22,7 @@ import { TableCardView } from './cards/TableCardView'
 import { ApprovalReceipt, CancelledReceipt, McpReceipt, QuestionReceipt, SecretReceipt, ServiceReceipt, SpendReceipt, TakeoverReceipt, FeatureRequestReceipt } from './hitl/Receipts'
 import { attachmentsOf, userTextOf, voiceOf } from './message-text'
 import { InstallDivider, JobEndDivider, ScheduledRunDivider, WebhookRunDivider } from './origins/RunOrigins'
+import { ParagraphSelectable } from './Markdown'
 import { AssistantMessage, UserBubble } from './Messages'
 import { MessageTimeReveal, type MessageStamp } from './MessageTimeReveal'
 import { PaidSourcesPill } from './PaidSourcesPill'
@@ -91,6 +92,8 @@ type MessageViewProps = {
     paidSources?: PaidTurnSources
     // The links published in this turn that are drawn under this message's text (publishCardsByMessage).
     publishedCards?: PublishCard[]
+    // A long press on what the person wrote or what the coworker answered: edit, copy, delete…
+    onActions?: (message: UIMessage) => void
 }
 
 type Block = { key: string; node: React.ReactNode }
@@ -111,8 +114,14 @@ export const MessageView = memo(MessageViewBody, (previous, next) => {
     return true
 })
 
-function MessageViewBody({ message, isLastAssistant, running, settled = false, agentId, fileOwner, coworkerName, hiddenCallId, skillProposals, onStopTask, onRegenerate, rating = null, onRate, stamp, paidSources, publishedCards }: MessageViewProps) {
+function MessageViewBody(props: MessageViewProps) {
+    const body = <MessageViewContent {...props} />
+    return props.onActions ? <ParagraphSelectable value={false}>{body}</ParagraphSelectable> : body
+}
+
+function MessageViewContent({ message, isLastAssistant, running, settled = false, agentId, fileOwner, coworkerName, hiddenCallId, skillProposals, onStopTask, onRegenerate, rating = null, onRate, stamp: timeStamp, paidSources, publishedCards, onActions }: MessageViewProps) {
     noteRender('MessageView')
+    const stamp = timeStamp && onActions ? { ...timeStamp, onLongPress: () => onActions(message) } : timeStamp
     const t = useTranslations('mobileChat.messages')
     const tTools = useTranslations('tools')
     if (message.role === 'user') {
@@ -262,7 +271,7 @@ function MessageViewBody({ message, isLastAssistant, running, settled = false, a
     if (blocks.length === 0) return null
 
     return (
-        <MessageTimeReveal stamp={stamp} side="left">
+        <MessageTimeReveal stamp={answer.length > 0 ? stamp : timeStamp} side="left">
             <View style={{ gap: spacing.md }}>
                 {blocks.map(block => (
                     <View key={block.key}>{block.node}</View>

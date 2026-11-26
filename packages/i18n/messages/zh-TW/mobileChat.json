@@ -317,5 +317,23 @@
         "copyLink": "複製連結",
         "backToChat": "返回對話",
         "brand": "Rerun"
+    },
+    "messageActions": {
+        "edit": "編輯",
+        "regenerate": "重新產生",
+        "copy": "複製",
+        "copyLink": "複製連結",
+        "delete": "刪除",
+        "cancel": "取消",
+        "editing": "正在編輯訊息",
+        "editHint": "之後的回覆將會被取代。",
+        "cancelEdit": "取消編輯",
+        "deleteTitle": "要刪除這則訊息嗎？",
+        "deleteUserDescription": "{name} 也將無法再看到它。回覆會保留在對話中。",
+        "deleteReplyDescription": "它會從對話中移除，{name} 也將無法再看到它。",
+        "busy": "請等回覆完成後再修改訊息。",
+        "engineOutdated": "請更新這個工作區的機器，才能編輯訊息。",
+        "notReady": "這則訊息仍在儲存中，請稍後再試。",
+        "failed": "無法修改這則訊息，請再試一次。"
     }
 }

@@ -8,7 +8,8 @@ import { useMessageTimes } from '@/lib/time'
 import { MOTION } from '@/theme/motion'
 import { spacing } from '@/theme/tokens'
 
-export type MessageStamp = { createdAt: string; shown: boolean; onToggle: () => void }
+// `onLongPress` opens what can be done with the message; without it a long press does nothing.
+export type MessageStamp = { createdAt: string; shown: boolean; onToggle: () => void; onLongPress?: () => void }
 
 const ignoreLongPress = () => {}
 
@@ -22,8 +23,8 @@ export function MessageTimeReveal({ stamp, side, children }: { stamp?: MessageSt
                 Haptics.selectionAsync()
                 stamp.onToggle()
             }}
-            // A long press selects the text: letting go of it must not bring the time up as well.
-            onLongPress={ignoreLongPress}
+            // Letting go of a long press must not bring the time up as well.
+            onLongPress={stamp.onLongPress ?? ignoreLongPress}
             // The links, photos and buttons inside stay their own elements for VoiceOver.
             accessible={false}
             style={{ alignItems: side === 'right' ? 'flex-end' : 'stretch' }}

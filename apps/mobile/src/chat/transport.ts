@@ -93,7 +93,8 @@ export function createChatTransport(link: ChatLink) {
         headers,
         fetch: streamingFetch,
         // `queued` tells the hub the text waited behind a run: it retries the engine instead of dropping it.
-        prepareSendMessagesRequest: ({ messages, body }) => ({ body: { ...link.endpoints.sendBody(link.sessionRef.current, lastUserText(messages)), ...(body?.queued === true && { queued: true }) } }),
+        // `replaceFrom`: the message this one replaces in the engine, with everything after it (an edit, a reply asked again).
+        prepareSendMessagesRequest: ({ messages, body }) => ({ body: { ...link.endpoints.sendBody(link.sessionRef.current, lastUserText(messages)), ...(body?.queued === true && { queued: true }), ...(typeof body?.replaceFrom === 'string' && { replaceFrom: body.replaceFrom }) } }),
         prepareReconnectToStreamRequest: () => ({ api: `${environment.apiUrl}${hubPath(mobileApi.resumeChat, {}, { agentId: link.endpoints.agentId, runId: link.runRef.current ?? '' })}`, headers: headers() }),
     })
 }

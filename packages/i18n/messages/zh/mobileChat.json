@@ -317,5 +317,23 @@
         "copyLink": "复制链接",
         "backToChat": "返回对话",
         "brand": "Rerun"
+    },
+    "messageActions": {
+        "edit": "编辑",
+        "regenerate": "重新生成",
+        "copy": "复制",
+        "copyLink": "复制链接",
+        "delete": "删除",
+        "cancel": "取消",
+        "editing": "正在编辑消息",
+        "editHint": "此消息之后的回复将被替换。",
+        "cancelEdit": "取消编辑",
+        "deleteTitle": "删除这条消息？",
+        "deleteUserDescription": "{name} 也将无法再看到它。回复会保留在对话中。",
+        "deleteReplyDescription": "它将从对话中移除，{name} 也将无法再看到它。",
+        "busy": "请等待回复完成后再更改消息。",
+        "engineOutdated": "请更新此工作区的机器以编辑消息。",
+        "notReady": "此消息仍在保存中，请稍后重试。",
+        "failed": "无法更改消息，请重试。"
     }
 }

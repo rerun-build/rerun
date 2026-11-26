@@ -25,6 +25,11 @@ export async function fetchActiveRun(caller: Caller, sessionId: string): Promise
     return (await hub(mobileApi.getActiveRun, { ...caller, params: { id: sessionId } })).runId
 }
 
+// A reply goes whole, its tool calls with it. `messageId` is the id the transcript gives the message.
+export async function deleteConversationMessage(caller: Caller, sessionId: string, messageId: string): Promise<void> {
+    await hub(mobileApi.deleteConversationMessage, { ...caller, params: { id: sessionId, messageId } })
+}
+
 export async function stopConversation(caller: Caller, sessionId: string): Promise<void> {
     await hub(mobileApi.stopConversation, { ...caller, params: { id: sessionId } })
 }

@@ -286,10 +286,11 @@ export function useCoworkerChat({ endpoints, initialSessionId, knownUpdatedAt = 
     // transcript comes back with the author the engine stored.
     const authorId = me?.user.id
     const send = useCallback(
-        (text: string, files?: FileUIPart[], options?: { queued?: boolean }) => {
+        (text: string, files?: FileUIPart[], options?: { queued?: boolean; replaceFrom?: string }) => {
             setRunStartedAt(Date.now())
             lastSentRef.current = text
-            return chat.sendMessage({ text, files, metadata: authorId ? { authorId } : undefined }, options?.queued ? { body: { queued: true } } : undefined)
+            const body = { ...(options?.queued && { queued: true }), ...(options?.replaceFrom && { replaceFrom: options.replaceFrom }) }
+            return chat.sendMessage({ text, files, metadata: authorId ? { authorId } : undefined }, Object.keys(body).length > 0 ? { body } : undefined)
         },
         [chat, authorId]
     )
@@ -302,11 +303,15 @@ export function useCoworkerChat({ endpoints, initialSessionId, knownUpdatedAt = 
     }, [chat, endpoints])
 
     // Sends the last message again, as the web's Try again does: from the user message that opens the
-    // turn, since a turn read back from the hub is one message per step.
-    const regenerate = useCallback(() => {
-        setRunStartedAt(Date.now())
-        return chat.regenerate({ messageId: turnOpenerId(chat.messages) })
-    }, [chat])
+    // turn, since a turn read back from the hub is one message per step. `replaceFrom` names the message
+    // of the user it replaces in the engine, with everything after it.
+    const regenerate = useCallback(
+        (options?: { replaceFrom?: string }) => {
+            setRunStartedAt(Date.now())
+            return chat.regenerate(options?.replaceFrom ? { body: { replaceFrom: options.replaceFrom } } : { messageId: turnOpenerId(chat.messages) })
+        },
+        [chat]
+    )
 
     // The run holding the conversation, as last named by the hub: what a queued message waits behind.
     const activeRunId = useCallback(() => runRef.current, [])
@@ -314,5 +319,5 @@ export function useCoworkerChat({ endpoints, initialSessionId, knownUpdatedAt = 
     // What the app sent for the Chief of Staff to speak first is not theirs to read.
     const messages = useMemo(() => chat.messages.filter(message => message.role !== 'user' || messageText(message).trim() !== FOREMAN_KICKOFF_MARKER), [chat.messages])
 
-    return { messages, status, runStartedAt, activeRunId, regenerate, error: error && !error.message.includes('run_in_flight') ? error : undefined, busy, sessionId, history, fresh, send, stop, retry: () => refresh({ resume: true }).catch(() => setHistory('error')) }
+    return { messages, setMessages, clearError, status, runStartedAt, activeRunId, regenerate, error: error && !error.message.includes('run_in_flight') ? error : undefined, busy, sessionId, history, fresh, send, stop, retry: () => refresh({ resume: true }).catch(() => setHistory('error')) }
 }
