@@ -106,16 +106,10 @@
         "nextTurn": "Disponível no próximo turno: {tools}"
     },
     "list": {
-        "emptyTitle": "Nenhum app encontrado",
-        "emptyDescription": "Não encontramos nenhum app para a sua busca.",
-        "request": "Pedir um app",
-        "installed": "Instalado",
         "addAccount": "Adicionar conta",
         "needsSignIn": "Requer login",
         "needsSetup": "Requer configuração",
-        "removeApp": "Remover app",
-        "finishSetup": "Concluir configuração",
-        "install": "Instalar"
+        "add": "Adicionar"
     },
     "suggestion": {
         "loading": "Carregando apps sugeridos…",

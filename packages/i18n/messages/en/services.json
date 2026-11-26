@@ -125,16 +125,10 @@
         "nextTurn": "Available on the next turn: {tools}"
     },
     "list": {
-        "emptyTitle": "No apps found",
-        "emptyDescription": "We could not find an app matching your search.",
-        "request": "Request an app",
-        "installed": "Installed",
         "addAccount": "Add account",
         "needsSignIn": "Needs sign-in",
         "needsSetup": "Needs setup",
-        "removeApp": "Remove app",
-        "finishSetup": "Finish setup",
-        "install": "Install"
+        "add": "Add"
     },
     "suggestion": {
         "loading": "Loading suggested apps…",

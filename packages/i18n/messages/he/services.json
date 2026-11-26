@@ -106,16 +106,10 @@
         "nextTurn": "זמין בתור הבא: {tools}"
     },
     "list": {
-        "emptyTitle": "לא נמצאו אפליקציות",
-        "emptyDescription": "לא מצאנו אפליקציה שמתאימה לחיפוש שלך.",
-        "request": "לבקש אפליקציה",
-        "installed": "מותקן",
         "addAccount": "להוסיף חשבון",
         "needsSignIn": "נדרשת התחברות",
         "needsSetup": "נדרשת הגדרה",
-        "removeApp": "להסיר אפליקציה",
-        "finishSetup": "לסיים הגדרה",
-        "install": "להתקין"
+        "add": "להוסיף"
     },
     "suggestion": {
         "loading": "טוען אפליקציות מומלצות…",

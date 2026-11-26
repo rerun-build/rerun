@@ -9,36 +9,34 @@ import { getAgentDetailAction, patchAgentMcpServersAction } from '@/app/api/_act
 import { listAgentConnectorsAction, removeCustomMcpServerAction } from '@/app/api/_actions/custom-mcp.actions'
 import { McpOAuthAuthorize } from '@/components/agent/McpOAuthAuthorize'
 import { McpServerEditor } from '@/components/agent/McpServerEditor'
-import { CustomMcpRow } from '@/components/services/CustomMcpRow'
 import { openPendingSignInPopup } from '@/components/services/sign-in-popup'
 import { setConnectorServices } from '@/hooks/useConnectorServices'
 import { refreshMcpServerStatuses, useMcpServerStatuses } from '@/hooks/useMcpServerStatuses'
 import type { EngineMcpServer } from '@/lib/engine/types'
-import { PanelDeleteButton, PanelEditorBody, PanelEditorHeader, PanelEditorShell } from '@/components/ui/panel-editor'
+import { PanelEditorBody, PanelEditorHeader, PanelEditorShell } from '@/components/ui/panel-editor'
 import { PanelSteps } from '@/components/ui/panel-steps'
 import { RequestConnectorDialog } from '@/components/services/RequestConnectorDialog'
 import { ServiceAlternatives } from '@/components/services/ServiceAlternatives'
 import { ServiceConfigForm } from '@/components/services/ServiceConfigForm'
 import { ServiceList } from '@/components/services/ServiceList'
 import { Button } from '@/components/ui/button'
-import { Chip } from '@/components/ui/chip'
-import { Badge, HScrollFade } from '@rerun/ui/primitives'
+import { ConfirmDialog } from '@/components/dialogs/ConfirmDialog'
 import { Icon } from '@/components/ui/icon'
 import { Input } from '@/components/ui/input'
-import { TooltipDisabledReason, TooltipLabeled } from '@/components/ui/tooltip'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
 import { useBoxManageReason } from '@/hooks/useBoxManageReason'
 import { serviceIconProps } from '@/lib/services/icons'
-import { SERVICE_CATEGORIES, type ServiceCategory } from '@/lib/services/manifest'
 import { MAX_OFFERED_ALTERNATIVES } from '@/lib/services/alternatives'
 import type { AppTarget, AuthMethodSummary, ComposioTarget, CustomMcpServer, InstalledService, ManagedTarget, OAuthTarget, ServiceAlternative, ServiceDetails, ServiceSearchResult } from '@/lib/services/types'
-import { AlertTriangleIcon, Loader2Icon, RefreshCwIcon } from '@/lib/icons'
-import { PanelList, PanelScroller, PanelSection } from '@/components/ui/panel-list'
-import { PanelRow } from '@/components/ui/panel-row'
+import { Loader2Icon, ServerIcon } from '@/lib/icons'
+import { PanelScroller } from '@/components/ui/panel-list'
 import { SkeletonPanelRows } from '@/components/ui/skeleton'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { CoworkerVaultAttachedRows, CoworkerVaultAvailable, VaultBadge, useCoworkerVault } from '@/components/vault/CoworkerVaultSection'
+import { CoworkerVaultAvailable, useCoworkerVault, useVaultIcons } from '@/components/vault/CoworkerVaultSection'
+import { useCatalogServices } from '@/hooks/useCatalogServices'
+import { AppTileCard, AppsHeading, TILE_GRID, TileSkeletons, type TileHandlers } from '@/components/agent/AppTiles'
+import { type AppTile, groupTiles, takenSlugs, tileMatches, toTiles, vaultEntryMatches } from '@/components/agent/apps-tab'
 
 type AgentPanelServicesProps = {
     agentId: string
@@ -82,17 +80,7 @@ function toSetupTarget(details: ServiceDetails, icon: string | null, alternative
     }
 }
 
-const STATUS_RANK: Record<InstalledService['status'], number> = { active: 0, needs_auth: 1, needs_config: 2, error: 3 }
-
-// One status per app for the library tiles: the base account's, else the best account left.
-function statusByApp(installed: InstalledService[]): Map<string, InstalledService['status']> {
-    const statuses = new Map<string, InstalledService['status']>()
-    for (const s of installed) {
-        const current = statuses.get(s.slug)
-        if (s.key === s.slug || current === undefined || (!installed.some(o => o.key === s.slug) && STATUS_RANK[s.status] < STATUS_RANK[current])) statuses.set(s.slug, s.status)
-    }
-    return statuses
-}
+type Confirm = { title: string; description: string; label: string; onConfirm: () => Promise<void> }
 
 // Browse page size for the paginated catalog. Matches the server default; a full page back
 // means there may be more, so infinite scroll keeps going.
@@ -104,12 +92,12 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
     const boxManageReason = useBoxManageReason(agentId)
     const t = useTranslations('agent.agentPanelServices')
     const tServices = useTranslations('services')
+    const tMcp = useTranslations('services.customMcp')
     const errorText = useErrorText()
     const [installed, setInstalled] = useState<InstalledService[]>([])
     const [custom, setCustom] = useState<CustomMcpServer[]>([])
     const [customStep, setCustomStep] = useState<CustomStep | null>(null)
-    const { statuses: customStatuses, loading: customStatusesLoading } = useMcpServerStatuses(agentId)
-    const [selectedCategory, setSelectedCategory] = useState<ServiceCategory | null>(null)
+    const { statuses: customStatuses } = useMcpServerStatuses(agentId)
     const [query, setQuery] = useState('')
     const [debouncedQuery, setDebouncedQuery] = useState('')
     const [loading, setLoading] = useState(true)
@@ -118,6 +106,7 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
     const [swapError, setSwapError] = useState<string | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [reconnecting, setReconnecting] = useState<string | null>(null)
+    const [confirm, setConfirm] = useState<Confirm | null>(null)
     // Bumped after every change of the list, so the Vault section below reads its own state again.
     const [revision, setRevision] = useState(0)
     const canManage = useCanManageAgent(agentId)
@@ -153,7 +142,7 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
         browseLoadingRef.current = true
         setBrowseLoading(true)
         const offset = browseOffsetRef.current
-        const page = await listCatalogServicesAction({ limit: BROWSE_PAGE_SIZE, offset, category: selectedCategory ?? undefined })
+        const page = await listCatalogServicesAction({ limit: BROWSE_PAGE_SIZE, offset })
         browseOffsetRef.current = offset + page.length
         setBrowseServices(prev => {
             const seen = new Set(prev.map(s => s.slug))
@@ -162,7 +151,7 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
         setBrowseHasMore(page.length === BROWSE_PAGE_SIZE)
         setBrowseLoading(false)
         browseLoadingRef.current = false
-    }, [browseHasMore, selectedCategory])
+    }, [browseHasMore])
 
     const resetBrowse = useCallback(() => {
         browseOffsetRef.current = 0
@@ -171,7 +160,7 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
     }, [])
 
     // Reload the installed section and re-seed the first browse page. Called on mount and after
-    // any (un)install so the "Installed" badge on browse tiles stays coherent.
+    // any (un)install, so an app that was just added leaves the library.
     const load = useCallback(async () => {
         setLoading(true)
         const { services, custom: customServers } = await listAgentConnectorsAction(agentId)
@@ -188,19 +177,12 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
     }, [load])
 
     const coworkerVault = useCoworkerVault(agentId, revision, load, setError)
-    const vaultAttached = coworkerVault.vault?.attached.length ?? 0
 
     // Seed the first browse page once the initial load has cleared it.
     useEffect(() => {
         if (isSearchActive) return
         if (browseServices.length === 0) loadMoreBrowse()
     }, [isSearchActive, browseServices.length, loadMoreBrowse])
-
-    // Changing the category filter restarts the browse from an empty set, which the seed effect
-    // above then re-fetches with the new category.
-    useEffect(() => {
-        resetBrowse()
-    }, [selectedCategory, resetBrowse])
 
     // Run the ranked search when a query is active; annulable so a stale response can't clobber
     // a newer one.
@@ -213,7 +195,7 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
         }
         let active = true
         setSearching(true)
-        searchServicesAction(agentId, q, selectedCategory ?? undefined).then(results => {
+        searchServicesAction(agentId, q).then(results => {
             if (!active) return
             setSearchResults(results)
             setSearching(false)
@@ -221,7 +203,7 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
         return () => {
             active = false
         }
-    }, [agentId, debouncedQuery, selectedCategory])
+    }, [agentId, debouncedQuery])
 
     const onInstall = useCallback(
         async (key: string, authTarget?: AuthTargets) => {
@@ -351,15 +333,57 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
         setSetupTarget(toSetupTarget(details, alternative.icon, [current, ...setupTarget.alternatives.filter(a => a.slug !== alternative.slug)].slice(0, MAX_OFFERED_ALTERNATIVES)))
     }
 
-    // Browse pages come back agent-less (never installed), so mark them from the separately
-    // loaded installed set. Search results already carry the correct status.
-    const statusBySlug = useMemo(() => statusByApp(installed), [installed])
-    const browseWithInstalled = useMemo(
-        () => browseServices.map(s => ({ ...s, installStatus: statusBySlug.get(s.slug) ?? null, installed: statusBySlug.get(s.slug) === 'active' })),
-        [browseServices, statusBySlug],
-    )
+    const tiles = useMemo(() => toTiles(installed, custom, customStatuses, coworkerVault.vault?.attached ?? []), [installed, custom, customStatuses, coworkerVault.vault])
+    const vaultAvailable = useMemo(() => coworkerVault.vault?.available ?? [], [coworkerVault.vault])
+    const taken = useMemo(() => takenSlugs(tiles, vaultAvailable), [tiles, vaultAvailable])
+    // Results still on screen while a new query is typed belong to the previous one.
+    const foundSlugs = useMemo(() => new Set(searchLoading ? [] : searchResults.map(s => s.slug)), [searchLoading, searchResults])
+    const { resolved: catalogRows } = useCatalogServices([...new Set(installed.map(s => s.slug))])
+    const vaultIconOf = useVaultIcons(coworkerVault.vault?.attached ?? [])
 
     useLoadMoreOnScroll({ sentinelRef, enabled: !isSearchActive && browseHasMore, loaded: browseServices.length, loadMore: loadMoreBrowse })
+
+    const tileHandlers: TileHandlers = {
+        onSignIn: tile => {
+            if (tile.kind === 'app') void onInstall(tile.key)
+            // The sign-in window opens inside the click, before anything is fetched, or the browser blocks it.
+            if (tile.kind === 'mcp') setCustomStep({ kind: 'connect', server: tile.server, popup: openPendingSignInPopup(tile.server.displayName, tServices('signInPopup.connecting', { name: tile.server.displayName })) })
+        },
+        onReconnect: tile => void onReconnect(tile.key),
+        onEdit: tile => {
+            if (tile.kind === 'mcp') void onEditCustom(tile.server.name)
+        },
+        onAddAccount: slug => void onAddAccount(slug),
+        onRemove: tile => {
+            if (tile.kind === 'mcp') {
+                setConfirm({ title: tMcp('removeTitle', { name: tile.name }), description: tMcp('removeDescription'), label: tMcp('removeConfirm'), onConfirm: () => onRemoveCustom(tile.server.name) })
+            } else if (tile.kind === 'vault') {
+                setConfirm({ title: t('vaultRemoveConfirm', { name: tile.name }), description: t('vaultRemoveDescription'), label: t('vaultRemoveAction'), onConfirm: () => coworkerVault.change(tile.item, false) })
+            } else if (tile.service.vault) {
+                // Lent by the Vault: removing it only detaches this coworker.
+                setConfirm({ title: t('vaultRemoveConfirm', { name: tile.account ? `${tile.name} · ${tile.account}` : tile.name }), description: t('vaultRemoveDescription'), label: t('vaultRemoveAction'), onConfirm: () => onUninstall(tile.key) })
+            } else {
+                setConfirm({
+                    title: tile.account ? t('uninstallLabeledConfirm', { name: tile.name, label: tile.account }) : t('uninstallConfirm', { name: tile.name }),
+                    description: t('uninstallDescription'),
+                    label: t('uninstallAction'),
+                    onConfirm: () => onUninstall(tile.key),
+                })
+            }
+        },
+    }
+
+    const iconOf = (tile: AppTile) => {
+        if (tile.kind === 'app') return <Icon {...serviceIconProps(tile.service.icon, tile.service.category)} size="sm" />
+        if (tile.kind === 'vault') return vaultIconOf(tile.item)
+        return tile.server.icon ? <Icon {...serviceIconProps(tile.server.icon, 'custom')} size="sm" /> : <Icon icon={ServerIcon} size="sm" />
+    }
+    // A paid app takes its other accounts in its own picker (its Account item), never as a new install.
+    const canAddAccount = (tile: AppTile) => {
+        const row = tile.kind === 'app' ? catalogRows.get(tile.slug ?? '') : undefined
+        return !!row?.multiInstance && !row.paidApp
+    }
+    const isBusy = (tile: AppTile) => (tile.kind === 'vault' ? coworkerVault.busy === tile.item.id : reconnecting === tile.key)
 
     const signInUrl = customStep?.kind === 'connect' ? customStep.server.signInUrl : null
     if (customStep?.kind === 'connect' && signInUrl) {
@@ -395,7 +419,7 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
 
     if (setupTarget) {
         // An app the agent already runs would only be offered to be set up a second time.
-        const alternatives = setupTarget.alternatives.filter(a => statusBySlug.get(a.slug) !== 'active')
+        const alternatives = setupTarget.alternatives.filter(a => !installed.some(s => s.slug === a.slug && s.status === 'active'))
         // Two accounts of one app never share a form's state.
         const setupKey = setupTarget.key ?? `${setupTarget.slug}:new`
         return (
@@ -432,148 +456,93 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
         )
     }
 
+    const groups = groupTiles(tiles.filter(tile => tileMatches(query, tile, foundSlugs)))
+    const shownVault = vaultAvailable.filter(item => vaultEntryMatches(query, item, foundSlugs))
+    const library = (isSearchActive ? searchResults : browseServices).filter(s => !taken.has(s.slug))
+    const nothing = isSearchActive && !searchLoading && groups.length + shownVault.length + library.length === 0
+    const showRequest = isSearchActive ? !searchLoading && library.length === 0 : !browseHasMore
+    const initialLoading = loading || (!isSearchActive && browseServices.length === 0 && browseHasMore)
+
     return (
         <PanelSteps stepKey="list" depth={0}>
             <div className="flex h-full flex-col">
-                <div className="space-y-2 border-b border-border p-3">
+                <div className="border-b border-border p-3">
                     <Input value={query} placeholder={t('searchPlaceholder')} className="h-8 text-sm" onChange={e => setQuery(e.target.value)} />
-                    <HScrollFade className="-mx-1 gap-1.5 px-1" fadeClassName="from-background">
-                        <Chip selected={selectedCategory === null} onClick={() => setSelectedCategory(null)}>
-                            {t('allCategories')}
-                        </Chip>
-                        {SERVICE_CATEGORIES.filter(c => c !== 'other').map(c => (
-                            <Chip key={c} selected={selectedCategory === c} onClick={() => setSelectedCategory(c)}>
-                                {tServices(`categories.${c}`)}
-                            </Chip>
-                        ))}
-                    </HScrollFade>
                 </div>
-                <PanelScroller className="space-y-4">
+                <PanelScroller className="space-y-5">
                     {error && <p className="text-xs text-destructive">{error}</p>}
-                    {loading || (!isSearchActive && browseServices.length === 0 && browseHasMore) ? (
-                        <SkeletonPanelRows rows={6} leading className="p-0" />
+                    {initialLoading ? (
+                        <TileSkeletons />
                     ) : (
                         <>
-                            {installed.length + custom.length + vaultAttached > 0 && (
-                                <PanelSection label={t('installed')}>
-                                    <PanelList>
-                                        {installed.map(s => (
-                                            <PanelRow
-                                                key={s.key}
-                                                leading={<Icon {...serviceIconProps(s.icon, s.category)} size="sm" />}
-                                                description={s.label}
-                                                title={
-                                                    <span className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5">
-                                                        <span className="truncate">{s.name}</span>
-                                                        {s.vault && <VaultBadge />}
-                                                        {s.status === 'active' && (
-                                                            <Badge size="xs" tone="green" glow={false} className="shrink-0">
-                                                                {tServices('connect.connected')}
-                                                            </Badge>
-                                                        )}
-                                                        {(s.status === 'needs_config' || s.status === 'needs_auth') && (
-                                                            <TooltipLabeled label={s.status === 'needs_auth' ? t('needsAuthHint') : t('needsConfigHint')}>
-                                                                <AlertTriangleIcon className="size-3.5 shrink-0 text-amber-400" />
-                                                            </TooltipLabeled>
-                                                        )}
-                                                    </span>
-                                                }
-                                                actions={
-                                                    <>
-                                                        {s.status === 'needs_config' && (
-                                                            <TooltipDisabledReason reason={manageReason}>
-                                                                <Button size="sm" variant="outline" disabled={!canManage} onClick={() => onInstall(s.key)}>
-                                                                    {t('configure')}
-                                                                </Button>
-                                                            </TooltipDisabledReason>
-                                                        )}
-                                                        {s.status === 'needs_auth' && (
-                                                            <TooltipDisabledReason reason={manageReason}>
-                                                                <Button size="sm" variant="outline" disabled={!canManage} onClick={() => onInstall(s.key)}>
-                                                                    {t('connect')}
-                                                                </Button>
-                                                            </TooltipDisabledReason>
-                                                        )}
-                                                        {s.status === 'active' && (
-                                                            <TooltipDisabledReason reason={manageReason}>
-                                                                <Button size="sm" variant="ghost" className="text-muted-foreground" disabled={!canManage || reconnecting === s.key} onClick={() => onReconnect(s.key)}>
-                                                                    {reconnecting === s.key ? <Loader2Icon className="animate-spin" /> : <RefreshCwIcon />}
-                                                                    {s.app ? t('account') : t('reconnect')}
-                                                                </Button>
-                                                            </TooltipDisabledReason>
-                                                        )}
-                                                        {s.vault ? (
-                                                            // Lent by the Vault: removing it only detaches this coworker.
-                                                            <TooltipDisabledReason reason={s.vault.sharedWithAll ? t('vaultShared') : manageReason}>
-                                                                <PanelDeleteButton
-                                                                    label={t('vaultRemove', { name: s.name })}
-                                                                    disabled={!canManage || s.vault.sharedWithAll}
-                                                                    onClick={() => onUninstall(s.key)}
-                                                                    confirmTitle={t('vaultRemoveConfirm', { name: s.label ? `${s.name} · ${s.label}` : s.name })}
-                                                                    confirmDescription={t('vaultRemoveDescription')}
-                                                                    confirmLabel={t('vaultRemoveAction')}
-                                                                />
-                                                            </TooltipDisabledReason>
-                                                        ) : (
-                                                            <TooltipDisabledReason reason={manageReason}>
-                                                                <PanelDeleteButton
-                                                                    label={s.label ? t('uninstallLabeled', { name: s.name, label: s.label }) : t('uninstall', { name: s.name })}
-                                                                    disabled={!canManage}
-                                                                    onClick={() => onUninstall(s.key)}
-                                                                    confirmTitle={s.label ? t('uninstallLabeledConfirm', { name: s.name, label: s.label }) : t('uninstallConfirm', { name: s.name })}
-                                                                    confirmDescription={t('uninstallDescription')}
-                                                                    confirmLabel={t('uninstallAction')}
-                                                                />
-                                                            </TooltipDisabledReason>
-                                                        )}
-                                                    </>
-                                                }
+                            {nothing && <p className="py-8 text-center text-xs text-muted-foreground">{t('noMatch', { query: query.trim() })}</p>}
+                            {groups.length > 0 && (
+                                <section>
+                                    <AppsHeading title={t('installed')} count={groups.length} />
+                                    <div className={TILE_GRID}>
+                                        {groups.map(group => (
+                                            <AppTileCard
+                                                key={group[0].key}
+                                                tiles={group}
+                                                icon={iconOf(group[0])}
+                                                canAddAccount={canAddAccount(group[0])}
+                                                busy={group.some(isBusy)}
+                                                readOnlyReason={manageReason}
+                                                handlers={tileHandlers}
                                             />
                                         ))}
-                                        {custom.map(server => (
-                                            <CustomMcpRow
-                                                key={`mcp:${server.name}`}
-                                                server={server}
-                                                status={customStatuses.get(server.name)}
-                                                statusLoading={customStatusesLoading}
-                                                onConnect={() => setCustomStep({ kind: 'connect', server, popup: openPendingSignInPopup(server.displayName, tServices('signInPopup.connecting', { name: server.displayName })) })}
-                                                onEdit={() => onEditCustom(server.name)}
-                                                onRemove={() => onRemoveCustom(server.name)}
-                                                disabledReason={manageReason}
-                                            />
-                                        ))}
-                                        <CoworkerVaultAttachedRows {...coworkerVault} disabledReason={manageReason} />
-                                    </PanelList>
-                                </PanelSection>
+                                    </div>
+                                </section>
                             )}
-                            <CoworkerVaultAvailable {...coworkerVault} disabledReason={manageReason} />
-                            <PanelSection label={t('library')}>
-                                {searchLoading ? <SkeletonPanelRows rows={6} leading className="p-0" /> : <ServiceList services={isSearchActive ? searchResults : browseWithInstalled} onInstall={onInstall} onUninstall={onUninstall} onAddAccount={onAddAccount} disabledReason={manageReason} />}
-                                {!isSearchActive && (
-                                    <>
-                                        <div ref={sentinelRef} className="h-px" />
-                                        {browseLoading && (
-                                            <div className="flex justify-center py-2">
-                                                <Loader2Icon className="size-4 animate-spin text-muted-foreground" />
-                                            </div>
-                                        )}
-                                        {!browseHasMore && browseServices.length > 0 && (
-                                            <div className="flex flex-col items-center gap-2 rounded-md border border-dashed border-border py-6 text-center">
-                                                <p className="text-xs text-muted-foreground">{t('requestHint')}</p>
-                                                <RequestConnectorDialog agentId={agentId}>
-                                                    <Button size="sm" variant="outline">
-                                                        {t('requestApp')}
-                                                    </Button>
-                                                </RequestConnectorDialog>
-                                            </div>
-                                        )}
-                                    </>
-                                )}
-                            </PanelSection>
+                            <CoworkerVaultAvailable items={shownVault} canAttach={!!coworkerVault.vault?.canAttach} busy={coworkerVault.busy} change={coworkerVault.change} disabledReason={manageReason} />
+                            {searchLoading ? (
+                                <SkeletonPanelRows rows={6} leading className="p-0" />
+                            ) : (
+                                library.length > 0 && (
+                                    <section>
+                                        <AppsHeading title={t('library')} count={isSearchActive || !browseHasMore ? library.length : undefined} hint={t('libraryHint')} />
+                                        <ServiceList services={library} onInstall={onInstall} disabledReason={manageReason} />
+                                    </section>
+                                )
+                            )}
+                            {!isSearchActive && (
+                                <>
+                                    <div ref={sentinelRef} className="h-px" />
+                                    {browseLoading && (
+                                        <div className="flex justify-center py-2">
+                                            <Loader2Icon className="size-4 animate-spin text-muted-foreground" />
+                                        </div>
+                                    )}
+                                </>
+                            )}
+                            {showRequest && (
+                                <div className="flex flex-col items-center gap-2 rounded-md border border-dashed border-border py-6 text-center">
+                                    <p className="text-xs text-muted-foreground">{t('requestHint')}</p>
+                                    <RequestConnectorDialog agentId={agentId}>
+                                        <Button size="sm" variant="outline">
+                                            {t('requestApp')}
+                                        </Button>
+                                    </RequestConnectorDialog>
+                                </div>
+                            )}
                         </>
                     )}
                 </PanelScroller>
             </div>
+            {confirm && (
+                <ConfirmDialog
+                    open
+                    onOpenChange={open => !open && setConfirm(null)}
+                    title={confirm.title}
+                    description={confirm.description}
+                    confirmLabel={confirm.label}
+                    onConfirm={() => {
+                        const { onConfirm } = confirm
+                        setConfirm(null)
+                        void onConfirm()
+                    }}
+                />
+            )}
         </PanelSteps>
     )
 }

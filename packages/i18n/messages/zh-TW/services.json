@@ -106,16 +106,10 @@
         "nextTurn": "下一輪即可使用：{tools}"
     },
     "list": {
-        "emptyTitle": "找不到 App",
-        "emptyDescription": "找不到符合您搜尋條件的 App。",
-        "request": "申請 App",
-        "installed": "已安裝",
         "addAccount": "新增帳號",
         "needsSignIn": "需要登入",
         "needsSetup": "需要設定",
-        "removeApp": "移除 App",
-        "finishSetup": "完成設定",
-        "install": "安裝"
+        "add": "新增"
     },
     "suggestion": {
         "loading": "正在載入建議的 App…",

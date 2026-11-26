@@ -13,13 +13,19 @@ That skill belongs to the app: it is read only, in the app as much as for the co
 
 You sign in to an app once, in the workspace's [Vault](/vault), then pick the coworkers that use it. An app you install from a coworker goes to the Vault too, switched on for that coworker only, so the next coworker that needs it reuses the same account instead of signing in again.
 
-A coworker can hold several accounts of the same app, each with its own label (for example **Work**): the email or workspace name its sign-in reported, `Gmail 2` for a second account, or the name you give it in the Vault ([Rename an account](/vault#rename-an-account)). A machine that runs a version of Rerun from before the Vault keeps every app per coworker.
+A coworker can hold several accounts of the same app, each with its own label (for example **Work**): the email or workspace name its sign-in reported, `Gmail 2` for a second account, or the name you give it in the Vault ([Rename an account](/vault#rename-an-account)). The accounts of one app share a tile in the coworker's **Apps** tab, which reads **2 accounts**; its menu lists each account with its own actions, then **Add account**. A machine that runs a version of Rerun from before the Vault keeps every app per coworker.
 
 ## Install one
 
 <Tabs>
   <Tab title="From the coworker">
-    Open the coworker card, then **Apps**. The screen lists what is **Installed**, what the Vault holds that the coworker does not have yet under **From the Vault**, each with **Add**, and the **Library**. Search with **Search apps…** or filter by category, then click an app. Rerun tells you what it needs before you commit.
+    Open the coworker card, then **Apps**. The screen shows three sections, each with its count:
+
+    - **Installed**: a tile per app, MCP server and Vault entry the coworker holds, with its account under its name. Click a tile to open its menu: **Reconnect**, **Uninstall** (or **Remove** for what the Vault lends), **Add account**.
+    - **Vault**: what the Vault holds that the coworker does not have yet, each with **Add**.
+    - **Library**: every other app, each with **Add**. An app the coworker already holds, or that the Vault offers, is not listed again.
+
+    **Search apps…** filters the three sections at once, and a section with nothing left disappears. Rerun tells you what an app needs before you commit.
   </Tab>
   <Tab title="Ask the coworker">
     Name the service in the chat. The coworker searches the library itself and raises a setup card for you to finish. When the Vault already holds an account of that app, the card offers to use it. The coworker never asks you to paste a key into the conversation.
@@ -32,7 +38,7 @@ A coworker can hold several accounts of the same app, each with its own label (f
   </Tab>
 </Tabs>
 
-<Shot src="/images/agents/apps/apps-tab" alt="The Apps tab of Lead Scout: Gmail, HubSpot and a secret installed from the Vault, Stripe offered under From the Vault, and the CRM apps of the library" />
+<Shot src="/images/agents/apps/apps-tab" alt="The Apps tab of Lead Scout: tiles for Gmail, HubSpot and a secret from the Vault, Stripe offered under Vault, and the apps of the library" />
 
 ## Tools load when the coworker needs them
 
@@ -58,7 +64,7 @@ A coworker attaches or uploads a file of its own workspace or of the shared spac
 
 ## Outlook shared mailboxes
 
-Connected to Outlook, a coworker also reads, sends from and files the mail of a shared mailbox, or of a colleague's mailbox, that your account was granted in Exchange (Full Access to read, Send As or Send on Behalf to send). Name the mailbox by its address in your request (`support@acme.com`). Your Microsoft 365 admin may have to approve the shared mailbox permissions the first time you connect. An Outlook connection made before November 24, 2026 does not carry them: click **Reconnect** next to Outlook in the coworker's apps to sign in again.
+Connected to Outlook, a coworker also reads, sends from and files the mail of a shared mailbox, or of a colleague's mailbox, that your account was granted in Exchange (Full Access to read, Send As or Send on Behalf to send). Name the mailbox by its address in your request (`support@acme.com`). Your Microsoft 365 admin may have to approve the shared mailbox permissions the first time you connect. An Outlook connection made before November 24, 2026 does not carry them: click the Outlook tile in the coworker's **Apps** tab, then **Reconnect**, to sign in again.
 
 ## How an app authenticates
 
@@ -78,23 +84,23 @@ Shopify connected with a **Client ID and secret** is checked before it is saved,
 
 ## Statuses
 
-Every app on a coworker shows one of three states:
+Every app on a coworker shows one of three states. On its tile, a green dot means it works; an amber triangle and a yellow outline mean it needs you, with **Needs sign-in** or **Needs setup** under its name. Hover the dot or the triangle to read why.
 
 <CardGroup cols={3}>
   <Card title="active" icon="circle-check">
-    Shows **Connected**. Its tools are available to the coworker. **Reconnect** next to it signs in again.
+    A green dot, **Connected**. Its tools are available to the coworker. **Reconnect** in its menu signs in again.
   </Card>
   <Card title="needs_auth" icon="circle-user">
-    Waiting for you to sign in. Click **Connect**.
+    Waiting for you to sign in. Click its tile, then **Connect**.
   </Card>
   <Card title="needs_config" icon="circle-alert">
-    Waiting for a credential, or for you to pick between several ways to connect. Click **Configure**.
+    Waiting for a credential, or for you to pick between several ways to connect. Click its tile, then **Configure**.
   </Card>
 </CardGroup>
 
 A coworker with an app in `needs_auth` or `needs_config` tells you so rather than silently failing. An account the service signed out shows as **Signed out** in the Vault, where you reconnect it once for every coworker that uses it.
 
-An MCP server of your own shows a live status instead: **Connected** with its number of tools, **Sign-in needed**, or **Unreachable**.
+An MCP server of your own shows a live status instead: **Connected** with its number of tools, **Sign-in needed**, or **Unreachable**. Its menu offers **Connect** when it waits on a sign-in, **Edit** and **Remove**.
 
 ## Paid apps
 
@@ -112,7 +118,7 @@ Each connected account takes one paid slot on your plan: see [Paid apps](/billin
 
 Each account has a recommended daily pace, for example 25 invitations and 100 profile views a day on LinkedIn, or 20 new conversations a day on WhatsApp. It never blocks you: past it, the coworker still does what you ask, and tells you once that going on puts the account at risk of a LinkedIn restriction or a WhatsApp ban. If LinkedIn or WhatsApp itself asks the account to slow down, the coworkers stop using it for 24 hours.
 
-An account is connected once for the workspace. Once it is, its app shows under **Apps** in the workspace menu, where you add a slot, reconnect or disconnect it. A LinkedIn profile or a WhatsApp number is connected to one workspace at a time: to move it to another workspace, disconnect it under **Apps** in the first one, then connect it in the new one. A paid app is attached coworker by coworker: in the **Apps** of each coworker that should use it, open the app and tick its accounts under **Acts as**. Each ticked account has its own **Wake this coworker when**, where you choose which events start a run. An account already connected costs nothing more, whatever the number of coworkers that use it. To remove the last account of a coworker, uninstall the app from it. With several accounts, the coworker names the one it acts with at every step: when you have not said which one, nothing is sent and it asks you. See [Automations](/agents/automations#wake-on-a-reply).
+An account is connected once for the workspace. Once it is, its app shows under **Apps** in the workspace menu, where you add a slot, reconnect or disconnect it. A LinkedIn profile or a WhatsApp number is connected to one workspace at a time: to move it to another workspace, disconnect it under **Apps** in the first one, then connect it in the new one. A paid app is attached coworker by coworker: in the **Apps** of each coworker that should use it, click the app's tile, then **Account**, and tick its accounts under **Acts as**. Each ticked account has its own **Wake this coworker when**, where you choose which events start a run. An account already connected costs nothing more, whatever the number of coworkers that use it. To remove the last account of a coworker, uninstall the app from it. With several accounts, the coworker names the one it acts with at every step: when you have not said which one, nothing is sent and it asks you. See [Automations](/agents/automations#wake-on-a-reply).
 
 A self-hosted install does not offer paid apps.
 

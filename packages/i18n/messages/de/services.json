@@ -106,16 +106,10 @@
         "nextTurn": "Ab der nächsten Runde verfügbar: {tools}"
     },
     "list": {
-        "emptyTitle": "Keine Apps gefunden",
-        "emptyDescription": "Wir haben keine App gefunden, die zu deiner Suche passt.",
-        "request": "App anfragen",
-        "installed": "Installiert",
         "addAccount": "Konto hinzufügen",
         "needsSignIn": "Anmeldung nötig",
         "needsSetup": "Einrichtung nötig",
-        "removeApp": "App entfernen",
-        "finishSetup": "Einrichtung abschließen",
-        "install": "Installieren"
+        "add": "Hinzufügen"
     },
     "suggestion": {
         "loading": "Vorgeschlagene Apps werden geladen…",

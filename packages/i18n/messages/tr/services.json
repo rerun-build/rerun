@@ -106,16 +106,10 @@
         "nextTurn": "Sonraki turda kullanılabilir: {tools}"
     },
     "list": {
-        "emptyTitle": "Uygulama bulunamadı",
-        "emptyDescription": "Aramanızla eşleşen bir uygulama bulamadık.",
-        "request": "Uygulama iste",
-        "installed": "Kurulu",
         "addAccount": "Hesap ekle",
         "needsSignIn": "Oturum açılmalı",
         "needsSetup": "Kurulum gerekli",
-        "removeApp": "Uygulamayı kaldır",
-        "finishSetup": "Kurulumu bitir",
-        "install": "Kur"
+        "add": "Ekle"
     },
     "suggestion": {
         "loading": "Önerilen uygulamalar yükleniyor…",

@@ -106,16 +106,10 @@
         "nextTurn": "متاح في الدور التالي: {tools}"
     },
     "list": {
-        "emptyTitle": "لم يُعثر على تطبيقات",
-        "emptyDescription": "لم نجد تطبيقًا يطابق بحثك.",
-        "request": "طلب تطبيق",
-        "installed": "مثبّت",
         "addAccount": "إضافة حساب",
         "needsSignIn": "يلزم تسجيل الدخول",
         "needsSetup": "يلزم الإعداد",
-        "removeApp": "إزالة التطبيق",
-        "finishSetup": "إكمال الإعداد",
-        "install": "تثبيت"
+        "add": "إضافة"
     },
     "suggestion": {
         "loading": "جارٍ تحميل التطبيقات المقترحة…",

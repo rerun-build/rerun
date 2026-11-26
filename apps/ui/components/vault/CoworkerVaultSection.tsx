@@ -3,12 +3,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslations } from 'next-intl'
 
+import { AppsHeading } from '@/components/agent/AppTiles'
 import { attachVaultEntryAction, coworkerVaultAction, detachVaultEntryAction } from '@/app/api/_actions/vault.actions'
 import type { CoworkerVault } from '@/app/api/_services/vault.service'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
-import { PanelList, PanelSection } from '@/components/ui/panel-list'
-import { PanelDeleteButton } from '@/components/ui/panel-editor'
+import { PanelList } from '@/components/ui/panel-list'
 import { PanelRow } from '@/components/ui/panel-row'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useCatalogServices } from '@/hooks/useCatalogServices'
@@ -16,7 +16,6 @@ import { useErrorText } from '@/hooks/useErrorText'
 import { KeyIcon, ServerIcon } from '@/lib/icons'
 import { serviceIconProps } from '@/lib/services/icons'
 import { vaultAccountLabel, type VaultItemSummary } from '@rerun/contracts'
-import { Badge } from '@rerun/ui/primitives'
 
 type Change = (item: VaultItemSummary, attach: boolean) => Promise<void>
 
@@ -44,9 +43,9 @@ export function useCoworkerVault(agentId: string, revision: number, onChanged: (
     return { vault, busy, change }
 }
 
-type Rows = { vault: CoworkerVault | null; busy: string | null; change: Change; disabledReason?: string }
+type AvailableProps = { items: VaultItemSummary[]; canAttach: boolean; busy: string | null; change: Change; disabledReason?: string }
 
-function useVaultIcons(items: VaultItemSummary[]) {
+export function useVaultIcons(items: VaultItemSummary[]) {
     const slugs = useMemo(() => [...new Set(items.flatMap(item => (item.slug ? [item.slug] : [])))], [items])
     const { resolved } = useCatalogServices(slugs)
     return function iconOf(item: VaultItemSummary) {
@@ -56,72 +55,23 @@ function useVaultIcons(items: VaultItemSummary[]) {
     }
 }
 
-function titleOf(item: VaultItemSummary): string {
-    const label = vaultAccountLabel(item)
-    return label ? `${item.name} · ${label}` : item.name
-}
-
-export function VaultBadge() {
+// The entries of the Vault the coworker does not hold (already filtered by the search), each one
+// click away.
+export function CoworkerVaultAvailable({ items, canAttach, busy, change, disabledReason }: AvailableProps) {
     const t = useTranslations('agent.agentPanelServices')
+    const iconOf = useVaultIcons(items)
+    if (items.length === 0) return null
+    const reason = disabledReason ?? (canAttach ? undefined : t('vaultShared'))
     return (
-        <Badge size="xs" tone="neutral" glow={false}>
-            {t('vaultBadge')}
-        </Badge>
-    )
-}
-
-// The custom servers and secrets the coworker gets from the Vault, as rows of its installed list
-// (its catalog apps already come through its registry).
-export function CoworkerVaultAttachedRows({ vault, busy, change, disabledReason }: Rows) {
-    const t = useTranslations('agent.agentPanelServices')
-    const iconOf = useVaultIcons(vault?.attached ?? [])
-    if (!vault) return null
-    return (
-        <>
-            {vault.attached.map(item => (
-                <PanelRow
-                    key={item.id}
-                    leading={iconOf(item)}
-                    title={
-                        <span className="flex min-w-0 items-center gap-1.5">
-                            <span className="truncate">{titleOf(item)}</span>
-                            <VaultBadge />
-                        </span>
-                    }
-                    description={item.kind === 'secret' ? item.envKeys.join(', ') : undefined}
-                    actions={
-                        <TooltipDisabledReason reason={item.sharedWithAll ? t('vaultShared') : disabledReason}>
-                            <PanelDeleteButton
-                                label={t('vaultRemove', { name: item.name })}
-                                disabled={item.sharedWithAll || !!disabledReason || busy === item.id}
-                                onClick={() => void change(item, false)}
-                                confirmTitle={t('vaultRemoveConfirm', { name: item.name })}
-                                confirmDescription={t('vaultRemoveDescription')}
-                                confirmLabel={t('vaultRemoveAction')}
-                            />
-                        </TooltipDisabledReason>
-                    }
-                />
-            ))}
-        </>
-    )
-}
-
-// Every entry of the Vault the coworker does not hold, each one click away.
-export function CoworkerVaultAvailable({ vault, busy, change, disabledReason }: Rows) {
-    const t = useTranslations('agent.agentPanelServices')
-    const iconOf = useVaultIcons(vault?.available ?? [])
-    if (!vault || vault.available.length === 0) return null
-    const reason = disabledReason ?? (vault.canAttach ? undefined : t('vaultShared'))
-    return (
-        <PanelSection label={t('fromVault')}>
+        <section>
+            <AppsHeading title={t('vault')} count={items.length} />
             <PanelList>
-                {vault.available.map(item => (
+                {items.map(item => (
                     <PanelRow
                         key={item.id}
                         leading={iconOf(item)}
-                        title={titleOf(item)}
-                        description={item.kind === 'secret' ? item.envKeys.join(', ') : undefined}
+                        title={item.name}
+                        description={item.kind === 'secret' ? item.envKeys.join(', ') : vaultAccountLabel(item)}
                         actions={
                             <TooltipDisabledReason reason={reason}>
                                 <Button size="sm" variant="outline" disabled={!!reason || busy === item.id} onClick={() => void change(item, true)}>
@@ -132,6 +82,6 @@ export function CoworkerVaultAvailable({ vault, busy, change, disabledReason }: 
                     />
                 ))}
             </PanelList>
-        </PanelSection>
+        </section>
     )
 }
