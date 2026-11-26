@@ -77,7 +77,7 @@ async function under(brand: unknown) {
 
 const PRODUCT_NOTE = /<product>[\s\S]*?<\/product>/
 // What a model may still read of the word: an identifier, which the product section tells it to keep to itself.
-const IDENTIFIER = /\bmcp__rerun__|\brerun_[a-z_]+|\bRERUN_[A-Z_]+|\.rerun\/|\/opt\/rerun\b|named rerun\b|\\?"rerun\\?"|\/[\w./-]*rerun[\w./-]*/g
+const IDENTIFIER = /\bmcp__rerun__|\brerun_[a-z_]+|\b(?:window\.)?rerun\.data\b|\bRERUN_[A-Z_]+|\.rerun\/|\/opt\/rerun\b|named rerun\b|\\?"rerun\\?"|\/[\w./-]*rerun[\w./-]*/g
 
 describe('the prompts of a machine under a brand', async () => {
     const rerun = await under({ name: 'Rerun', whiteLabel: false, supportEmail: null })
