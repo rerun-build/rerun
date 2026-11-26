@@ -125,6 +125,7 @@
               "api/tools/databases",
               "api/tools/connectors",
               "api/tools/vault",
+              "api/tools/published-pages",
               "api/tools/sharing",
               "api/tools/template-library",
               "api/tools/templates"

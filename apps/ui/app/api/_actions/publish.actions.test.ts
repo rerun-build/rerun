@@ -17,7 +17,8 @@ vi.mock('@/app/api/_auth/access', () => ({
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 vi.mock('@rerun/cloud/email', () => ({ EMAIL_DELIVERY: true }))
 vi.mock('@/lib/services/publish-thumbnail', () => ({ publishWithThumbnail: vi.fn() }))
-vi.mock('@/lib/services/publish', () => ({
+vi.mock('@/lib/services/publish', async importOriginal => ({
+    assertPublishedLinkInReach: (await importOriginal<typeof import('@/lib/services/publish')>()).assertPublishedLinkInReach,
     listPublished: vi.fn(),
     listWorkspacePublished: vi.fn(),
     unpublishFile: vi.fn(),

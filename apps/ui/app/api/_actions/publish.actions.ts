@@ -1,11 +1,12 @@
 'use server'
 
-import { assertAgentInWorkspace, isAdminActor, requireLightSessionActor, visibleAgentIds, type Actor } from '@/app/api/_auth/access'
+import { assertAgentInWorkspace, requireLightSessionActor, visibleAgentIds, type Actor } from '@/app/api/_auth/access'
 import { requireAdminContext, requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import type { Database } from '@/app/api/database.types'
 import { EMAIL_DELIVERY } from '@rerun/cloud/email'
 import { effectivePolicy, isPublishPolicy, isPublishedAccess, type PublishPolicy } from '@/lib/published/access'
 import {
+    assertPublishedLinkInReach,
     closePublicLinks,
     countPublicLinks,
     dismissAccessRequest,
@@ -21,18 +22,13 @@ import { publishWithThumbnail } from '@/lib/services/publish-thumbnail'
 import { getPageData, updatePageData, type PageData } from '@/lib/services/published-data'
 import type { DataGrant } from '@/lib/published/data-grants'
 import type { PublishedFile } from '@/lib/services/types'
-import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { failure, failureOf, refusalOf, type ActionRefusal } from '@/lib/i18n/action-error'
 import type { ActionResult } from './space.actions'
 
-// A link is the coworker's that published it: reaching the link by its slug takes reaching that
-// coworker's Box, the way the coworker's Published tab does. An admin reaches them all.
 async function reachablePublishedLink(slug: string): Promise<{ workspaceId: number; actor: Actor }> {
     const actor = await requireLightSessionActor()
-    if (isAdminActor(actor)) return { workspaceId: actor.workspaceId, actor }
-    const { data } = await selectMaybeSingle(createServiceRoleClient(), 'published_files', ['agent_id'] as const, { workspace_id: actor.workspaceId, slug })
-    if (data) await assertAgentInWorkspace(data.agent_id, 'use', actor)
+    await assertPublishedLinkInReach(actor, slug)
     return { workspaceId: actor.workspaceId, actor }
 }
 

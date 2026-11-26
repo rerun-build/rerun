@@ -9,7 +9,7 @@ import { ACCOUNT_TOOL_DEFS, ACCOUNT_TOOL_NAMES } from './account-tools'
 
 const advertisedNames: string[] = ACCOUNT_TOOL_NAMES
 
-const handledNames = ['mcp-account.service.ts', 'mcp-library.service.ts', 'mcp-vault.service.ts', 'mcp-shares.service.ts', 'mcp-templates.service.ts'].flatMap(file =>
+const handledNames = ['mcp-account.service.ts', 'mcp-publish.service.ts', 'mcp-library.service.ts', 'mcp-vault.service.ts', 'mcp-shares.service.ts', 'mcp-templates.service.ts'].flatMap(file =>
     [...readFileSync(path.resolve(import.meta.dirname, '../../app/api/_services', file), 'utf8').matchAll(/case '([a-z_]+)':/g)].map(match => match[1]),
 )
 
@@ -44,6 +44,7 @@ describe('account tool defs', () => {
             'create_agent_share',
             'revoke_agent_share',
             'delete_vault_entry',
+            'unpublish_page',
         ]
         const missing = gated.filter(name => {
             const tool = ACCOUNT_TOOL_DEFS.find(candidate => candidate.name === name) as { inputSchema: { properties: Record<string, { type?: string }> } } | undefined

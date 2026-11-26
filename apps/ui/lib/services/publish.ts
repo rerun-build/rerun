@@ -1,4 +1,4 @@
-import { keepVisible } from '@/app/api/_auth/access'
+import { assertAgentInWorkspace, isAdminActor, keepVisible, type Actor } from '@/app/api/_auth/access'
 import { getWorkspaceConnection } from '@/app/api/_services/workspace-engine.service'
 import type { Database } from '@/app/api/database.types'
 import { fetchRawFile, listFiles } from '@/lib/engine/client'
@@ -365,6 +365,14 @@ export async function unpublishFile(agentId: string, ident: { path?: string; slu
 
     await removePublished(supabase, rowData)
     return { status: 'unpublished', slug: rowData.slug, path: rowData.source_path }
+}
+
+// A link is the coworker's that published it: reaching the link by its slug takes reaching that
+// coworker's Box, the way the coworker's Published tab does. An admin reaches them all.
+export async function assertPublishedLinkInReach(actor: Actor, slug: string): Promise<void> {
+    if (isAdminActor(actor)) return
+    const { data } = await selectMaybeSingle(createServiceRoleClient(), 'published_files', ['agent_id'] as const, { workspace_id: actor.workspaceId, slug })
+    if (data) await assertAgentInWorkspace(data.agent_id, 'use', actor)
 }
 
 // A person may take down any link of their workspace, whichever coworker published it.

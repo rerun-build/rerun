@@ -1,0 +1,77 @@
+---
+title: "Published pages"
+description: "Put a coworker's file or site online, choose who opens it and which tables it reads or writes."
+---
+
+A coworker can put a file of its folder online at an address of its own: a PDF or an image as a file, an HTML file or a folder holding an `index.html` as a page. These tools do what **Publish** and **Share settings** do in the app. See [Publishing a file](/agents/data#publishing-a-file).
+
+They act as a person, the member who created the key: a link they make public goes live at once, unless the workspace policy is **Nothing goes public**. Reaching a link takes **Can use** on the coworker that published it; an admin reaches them all.
+
+These are not the [share links](/api/tools/sharing) of `create_agent_share`, which hand out a copy of a coworker.
+
+## list_published_pages
+
+Lists the links of the coworkers the key reaches, newest first.
+
+<ParamField body="agentId" type="string">
+  Only the links of this coworker.
+</ParamField>
+
+```json Response
+{
+  "links": [
+    { "slug": "q1-report-k3m9xqw7pt", "agentId": "…", "path": "site", "url": "https://q1-report-k3m9xqw7pt.rerun.site", "kind": "site", "title": "Q1 report", "access": "workspace", "requestedAccess": null, "publishedAt": "2026-11-25T10:00:00.000Z", "updatedAt": "2026-11-26T08:30:00.000Z" }
+  ]
+}
+```
+
+`requestedAccess` is `public` when a coworker asked to make the link public and is waiting for a person to agree. `invited` lists the addresses of an `invited` link, and `hasPassword` says whether a `password` link has one.
+
+## publish_file
+
+Puts a file or a folder of a coworker folder online, with the access the workspace gives a new link.
+
+<ParamField body="agentId" type="string" required />
+
+<ParamField body="path" type="string" required>
+  The file or folder, as `list_files` gives it, for example `site` or `reports/q1.pdf`.
+</ParamField>
+
+Publishing the same path again replaces what the link serves and keeps its address. A file holds 25 MB at most, a site 300 files and 50 MB.
+
+## update_published_page
+
+Changes who can open a link, and which tables of the workspace a page reads or writes. Every field is optional: with the `slug` alone, it changes nothing and returns the tables the page reaches (`tables.listed`) and the ones it could be given (`tables.others`).
+
+<ParamField body="slug" type="string" required />
+
+<ParamField body="access" type="string">
+  `public` (anyone with the address), `workspace` (signed-in members), `password` (anyone who types the password) or `invited` (the addresses in `invite`, who confirm theirs with a code).
+</ParamField>
+
+<ParamField body="invite" type="string[]">
+  For `invited`: the email addresses, or whole domains such as `@company.com`, who may open it. An install that sends no email refuses `invited`.
+</ParamField>
+
+<ParamField body="password" type="string">
+  For `password`: the password. It is never returned.
+</ParamField>
+
+<ParamField body="tables" type="object[]">
+  For a page or a site: every table it may reach, replacing the list. `database` is `shared` for the database every coworker shares, or the id of the coworker whose own database holds the table; `grant` is `read` (**Can view**) or `write` (**Can view and add**). Pass `[]` to take them all away.
+</ParamField>
+
+```json Request arguments
+{ "slug": "q1-report-k3m9xqw7pt", "tables": [{ "database": "shared", "table": "leads", "grant": "write" }] }
+```
+
+Only a table the key reaches can be given or raised. One it does not reach can only be lowered or taken away: the ones the call could not give come back in `refused`.
+
+The answer is the link as `list_published_pages` gives it, with `tables` when you passed them or the `slug` alone. Everything is checked before anything changes, and the tables are written before the access: when the machine of the workspace does not answer, the call fails and the link stays as it was.
+
+## unpublish_page
+
+Takes a link down: its address stops answering at once, and publishing the file again gives it a new one. The file stays in the coworker folder. Needs `confirm: true`.
+
+<ParamField body="slug" type="string" required />
+<ParamField body="confirm" type="boolean" required />
