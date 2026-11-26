@@ -164,5 +164,17 @@
         "unfinished": "ההתחברות לא הסתיימה. כדאי לנסות שוב.",
         "authorizationFailed": "ההרשאה נכשלה",
         "startFailed": "לא ניתן להתחיל את ההתחברות"
+    },
+    "grok": {
+        "codeStep": "קבלו קוד מ-xAI",
+        "approveStep": "אשרו אותו ב-xAI",
+        "getCode": "קבלת קוד",
+        "gettingCode": "מקבלים קוד…",
+        "getNewCode": "קבלת קוד חדש",
+        "copyCode": "העתקת הקוד",
+        "openXai": "פתיחת xAI",
+        "enterHint": "הדביקו את הקוד בדף של xAI ואשרו. המסך הזה יזהה זאת לבד.",
+        "plans": "עובד עם מינוי Grok שכולל את Grok Build, כמו SuperGrok.",
+        "expired": "תוקף הקוד הזה פג. קבלו קוד חדש."
     }
 }

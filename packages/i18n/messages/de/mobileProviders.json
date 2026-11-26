@@ -164,5 +164,17 @@
         "unfinished": "Die Anmeldung wurde nicht abgeschlossen. Versuch es erneut.",
         "authorizationFailed": "Autorisierung fehlgeschlagen",
         "startFailed": "Anmeldung konnte nicht gestartet werden"
+    },
+    "grok": {
+        "codeStep": "Hol dir einen Code von xAI",
+        "approveStep": "Bestätige ihn bei xAI",
+        "getCode": "Code holen",
+        "gettingCode": "Code wird geholt…",
+        "getNewCode": "Neuen Code holen",
+        "copyCode": "Code kopieren",
+        "openXai": "xAI öffnen",
+        "enterHint": "Füge den Code auf der Seite von xAI ein und bestätige. Dieser Bildschirm erkennt es von selbst.",
+        "plans": "Funktioniert mit einem Grok-Abo, das Grok Build enthält, etwa SuperGrok.",
+        "expired": "Dieser Code ist abgelaufen. Hol dir einen neuen."
     }
 }

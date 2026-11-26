@@ -270,3 +270,83 @@ function StuckHint({ expired, workspacePlan }: { expired: boolean; workspacePlan
         </View>
     )
 }
+
+export type GrokPhase = 'idle' | 'starting' | 'waiting' | 'connected'
+
+type GrokSignInProps = {
+    phase: GrokPhase
+    pending: { userCode: string; verificationUrl: string } | null
+    expired: boolean
+    error: string | null
+    onGetCode: () => void
+    ending: SignInEnding
+    onBack: () => void
+}
+
+// The web's GrokPlanSteps: get a code, approve it on xAI's page. Nothing to switch on first, unlike
+// ChatGPT: xAI takes a code from any account it signs in.
+export function GrokSignIn({ phase, pending, expired, error, onGetCode, ending, onBack }: GrokSignInProps) {
+    const theme = useTheme()
+    const t = useTranslations('mobileProviders.grok')
+    const tEnding = useTranslations('mobileProviders.ending')
+    const [copied, setCopied] = useState(false)
+    const linked = phase === 'connected'
+    const waiting = phase === 'waiting' && pending !== null
+
+    const copy = () => {
+        if (!pending) return
+        Clipboard.setStringAsync(pending.userCode)
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
+    }
+
+    return (
+        <SheetFrame title="Grok" onBack={onBack}>
+            <StepTrack
+                at={linked ? 2 : waiting ? 1 : 0}
+                done={linked ? 3 : waiting ? 1 : 0}
+                steps={[
+                    {
+                        title: t('codeStep'),
+                        body:
+                            linked || waiting ? null : (
+                                <View style={{ gap: spacing.sm }}>
+                                    <View style={{ alignSelf: 'flex-start' }}>
+                                        <Button label={phase === 'starting' ? t('gettingCode') : expired || error ? t('getNewCode') : t('getCode')} icon={<ProviderLogo provider="grok" size={16} color={theme.primaryForeground} />} onPress={onGetCode} loading={phase === 'starting'} />
+                                    </View>
+                                    <AppText variant="footnote" tone="muted">
+                                        {expired ? t('expired') : t('plans')}
+                                    </AppText>
+                                    <ErrorLine error={error} />
+                                </View>
+                            ),
+                    },
+                    {
+                        title: t('approveStep'),
+                        // The code stays in sight here: the step that handed it out is folded once it is done.
+                        body: waiting ? (
+                            <View style={{ gap: spacing.md }}>
+                                <Pressable onPress={copy} accessibilityRole="button" accessibilityLabel={t('copyCode')} testID="grok-code" style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, borderRadius: radius.md, borderCurve: 'continuous', paddingVertical: spacing.md, paddingLeft: spacing.lg, paddingRight: spacing.md, backgroundColor: pressed ? theme.secondary : theme.muted })}>
+                                    <AppText numberOfLines={1} adjustsFontSizeToFit maxFontSizeMultiplier={1.2} style={{ flex: 1, fontFamily: fonts.mono, fontSize: 22, lineHeight: 28, letterSpacing: 4, color: theme.foreground, writingDirection: 'ltr' }}>
+                                        {pending.userCode}
+                                    </AppText>
+                                    <Icon name={copied ? 'check' : 'copy'} size={17} color={theme.foreground} />
+                                </Pressable>
+                                <View style={{ alignSelf: 'flex-start' }}>
+                                    <Button label={t('openXai')} symbol="arrow-up-right" variant="outline" onPress={() => WebBrowser.openBrowserAsync(pending.verificationUrl)} />
+                                </View>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+                                    <ActivityIndicator size="small" color={theme.mutedForeground} />
+                                    <AppText variant="footnote" tone="muted" style={{ flex: 1 }}>
+                                        {t('enterHint')}
+                                    </AppText>
+                                </View>
+                            </View>
+                        ) : null,
+                    },
+                    lastStep(ending, linked, tEnding),
+                ]}
+            />
+        </SheetFrame>
+    )
+}

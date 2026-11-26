@@ -164,5 +164,17 @@
         "unfinished": "登入未完成，請再試一次。",
         "authorizationFailed": "授權失敗",
         "startFailed": "無法開始登入"
+    },
+    "grok": {
+        "codeStep": "從 xAI 取得代碼",
+        "approveStep": "在 xAI 上核准",
+        "getCode": "取得代碼",
+        "gettingCode": "正在取得代碼…",
+        "getNewCode": "取得新代碼",
+        "copyCode": "複製代碼",
+        "openXai": "開啟 xAI",
+        "enterHint": "在 xAI 頁面上貼上代碼並核准。此畫面會自動偵測。",
+        "plans": "適用於包含 Grok Build 的 Grok 方案，例如 SuperGrok。",
+        "expired": "這組代碼已過期。請取得新代碼。"
     }
 }

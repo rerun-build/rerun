@@ -13,8 +13,9 @@ export async function setAgentModel(caller: Caller, agentId: string, choice: Set
     await hub(mobileApi.setAgentModel, { ...caller, params: { id: agentId }, body: choice })
 }
 
-// The mark a connection's provider shows under: five logos cover every provider the engine runs.
+// The mark a connection's provider shows under: six logos cover every provider the engine runs.
 export function logoOf(provider: Provider): ModelProvider {
+    if (provider === 'grok') return 'grok'
     if (provider === 'rerun' || provider === 'openrouter') return 'rerun'
     if (provider === 'anthropic' || provider === 'claude') return 'claude'
     if (provider === 'openai' || provider === 'codex') return 'codex'

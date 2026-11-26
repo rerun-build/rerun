@@ -164,5 +164,17 @@
         "unfinished": "Giriş tamamlanmadı. Tekrar deneyin.",
         "authorizationFailed": "Yetkilendirme başarısız oldu",
         "startFailed": "Giriş başlatılamadı"
+    },
+    "grok": {
+        "codeStep": "xAI'den bir kod alın",
+        "approveStep": "xAI'de onaylayın",
+        "getCode": "Kod al",
+        "gettingCode": "Kod alınıyor…",
+        "getNewCode": "Yeni kod al",
+        "copyCode": "Kodu kopyala",
+        "openXai": "xAI'yi aç",
+        "enterHint": "Kodu xAI sayfasına yapıştırın ve onaylayın. Bu ekran bunu kendiliğinden algılar.",
+        "plans": "SuperGrok gibi Grok Build içeren bir Grok planıyla çalışır.",
+        "expired": "Bu kodun süresi doldu. Yeni bir kod alın."
     }
 }

@@ -164,5 +164,17 @@
         "unfinished": "La connexion n'a pas abouti. Réessayez.",
         "authorizationFailed": "L'autorisation a échoué",
         "startFailed": "Impossible de lancer la connexion"
+    },
+    "grok": {
+        "codeStep": "Obtenez un code de xAI",
+        "approveStep": "Approuvez-le sur xAI",
+        "getCode": "Obtenir le code",
+        "gettingCode": "Obtention du code…",
+        "getNewCode": "Obtenir un nouveau code",
+        "copyCode": "Copier le code",
+        "openXai": "Ouvrir xAI",
+        "enterHint": "Collez le code sur la page de xAI et approuvez. Cet écran le détecte tout seul.",
+        "plans": "Fonctionne avec un abonnement Grok qui inclut Grok Build, comme SuperGrok.",
+        "expired": "Ce code a expiré. Obtenez-en un nouveau."
     }
 }

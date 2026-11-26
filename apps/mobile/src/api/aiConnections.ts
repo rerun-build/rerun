@@ -8,6 +8,9 @@ import {
     type CodexSignInStart,
     type ConnectionUsage,
     type CreateAiConnectionInput,
+    type GrokSignInPoll,
+    type GrokSignInPollInput,
+    type GrokSignInStart,
     type UpdateConnectionInput,
     type WorkspaceDefaultInput,
 } from '@rerun/contracts'
@@ -58,4 +61,13 @@ export async function startCodexSignIn(caller: Caller): Promise<CodexSignInStart
 
 export async function pollCodexSignIn(caller: Caller, input: CodexSignInPollInput): Promise<CodexSignInPoll> {
     return hub(mobileApi.pollCodexSignIn, { ...caller, body: input })
+}
+
+export async function startGrokSignIn(caller: Caller): Promise<GrokSignInStart> {
+    return hub(mobileApi.startGrokSignIn, caller)
+}
+
+// The hub stores the approval itself: what comes back is the connection, never a token.
+export async function pollGrokSignIn(caller: Caller, input: GrokSignInPollInput): Promise<GrokSignInPoll> {
+    return hub(mobileApi.pollGrokSignIn, { ...caller, body: input })
 }

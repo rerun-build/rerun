@@ -164,5 +164,17 @@
         "unfinished": "لم يكتمل تسجيل الدخول. حاول مرة أخرى.",
         "authorizationFailed": "فشل التفويض",
         "startFailed": "تعذّر بدء تسجيل الدخول"
+    },
+    "grok": {
+        "codeStep": "احصل على رمز من xAI",
+        "approveStep": "وافق عليه في xAI",
+        "getCode": "احصل على الرمز",
+        "gettingCode": "جارٍ الحصول على الرمز…",
+        "getNewCode": "احصل على رمز جديد",
+        "copyCode": "انسخ الرمز",
+        "openXai": "افتح xAI",
+        "enterHint": "الصق الرمز في صفحة xAI ووافق. ستلتقط هذه الشاشة ذلك تلقائيًا.",
+        "plans": "يعمل مع اشتراك Grok يشمل Grok Build، مثل SuperGrok.",
+        "expired": "انتهت صلاحية هذا الرمز. احصل على رمز جديد."
     }
 }

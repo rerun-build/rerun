@@ -164,5 +164,17 @@
         "unfinished": "El inicio de sesión no terminó. Inténtalo de nuevo.",
         "authorizationFailed": "La autorización falló",
         "startFailed": "No se pudo iniciar el inicio de sesión"
+    },
+    "grok": {
+        "codeStep": "Obtén un código de xAI",
+        "approveStep": "Apruébalo en xAI",
+        "getCode": "Obtener código",
+        "gettingCode": "Obteniendo código…",
+        "getNewCode": "Obtener un código nuevo",
+        "copyCode": "Copiar código",
+        "openXai": "Abrir xAI",
+        "enterHint": "Pega el código en la página de xAI y apruébalo. Esta pantalla lo detecta sola.",
+        "plans": "Funciona con un plan de Grok que incluya Grok Build, como SuperGrok.",
+        "expired": "Ese código caducó. Obtén uno nuevo."
     }
 }

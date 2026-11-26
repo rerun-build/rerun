@@ -12,8 +12,8 @@ export function leave() {
     else router.replace('/')
 }
 
-// OpenCode is sold as a plan but connected with a key: only Claude and ChatGPT sign in again, every
-// other provider gets a new key pasted over the one turned away.
+// OpenCode is sold as a plan but connected with a key: only Claude, ChatGPT and Grok sign in again,
+// every other provider gets a new key pasted over the one turned away.
 export function signsIn(provider: string): boolean {
-    return provider === 'claude' || provider === 'codex'
+    return provider === 'claude' || provider === 'codex' || provider === 'grok'
 }

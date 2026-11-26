@@ -171,6 +171,19 @@
         "chatgpt.adminMessage": "A message the user copies and sends to their ChatGPT admin. Keep the quoted setting name in English: it is ChatGPT's label.",
         "chatgpt.stuck.expiredSetting": "<link>Settings → Security</link> is ChatGPT's own menu path: keep it in English.",
         "chatgpt.stuck.errorSetting": "<link>Settings → Security</link> is ChatGPT's own menu path: keep it in English.",
-        "models.enabledCount": "How many of the source's models are switched on, out of all of them."
+        "models.enabledCount": "How many of the source's models are switched on, out of all of them.",
+        "grok.plans": "Grok Build is xAI's coding agent, SuperGrok a paid Grok plan: product names, keep them as they are."
+    },
+    "grok": {
+        "codeStep": "Get a code from xAI",
+        "approveStep": "Approve it on xAI",
+        "getCode": "Get code",
+        "gettingCode": "Getting code…",
+        "getNewCode": "Get a new code",
+        "copyCode": "Copy code",
+        "openXai": "Open xAI",
+        "enterHint": "Paste the code on xAI's page and approve. This screen picks it up on its own.",
+        "plans": "Works with a Grok plan that includes Grok Build, such as SuperGrok.",
+        "expired": "That code ran out. Get a new one."
     }
 }

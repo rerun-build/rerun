@@ -164,5 +164,17 @@
         "unfinished": "O login não foi concluído. Tente de novo.",
         "authorizationFailed": "Falha na autorização",
         "startFailed": "Não foi possível iniciar o login"
+    },
+    "grok": {
+        "codeStep": "Obtenha um código da xAI",
+        "approveStep": "Aprove-o na xAI",
+        "getCode": "Obter código",
+        "gettingCode": "Obtendo código…",
+        "getNewCode": "Obter um novo código",
+        "copyCode": "Copiar código",
+        "openXai": "Abrir xAI",
+        "enterHint": "Cole o código na página da xAI e aprove. Esta tela detecta sozinha.",
+        "plans": "Funciona com um plano do Grok que inclua o Grok Build, como o SuperGrok.",
+        "expired": "Esse código expirou. Obtenha um novo."
     }
 }

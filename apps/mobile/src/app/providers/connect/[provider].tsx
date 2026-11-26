@@ -2,7 +2,7 @@ import { addableProviderSchema } from '@rerun/contracts'
 import { useLocalSearchParams } from 'expo-router'
 
 import { useIsWorkspaceAdmin } from '@/auth/AuthProvider'
-import { ApiKeyConnect, ChatGptConnect, ClaudeConnect } from '@/components/providers/connect'
+import { ApiKeyConnect, ChatGptConnect, ClaudeConnect, GrokConnect } from '@/components/providers/connect'
 import { ProvidersAdminOnly } from '@/components/providers/screens'
 
 // `reconnect` signs an existing connection in again instead of adding one.
@@ -15,5 +15,6 @@ export default function ConnectProviderSheet() {
     const reconnectId = params.reconnect ?? null
     if (provider.data === 'claude') return <ClaudeConnect reconnectId={reconnectId} />
     if (provider.data === 'codex') return <ChatGptConnect reconnectId={reconnectId} />
+    if (provider.data === 'grok') return <GrokConnect reconnectId={reconnectId} />
     return <ApiKeyConnect provider={provider.data} reconnectId={reconnectId} />
 }

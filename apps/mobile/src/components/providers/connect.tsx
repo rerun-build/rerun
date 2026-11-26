@@ -1,19 +1,19 @@
 import type { AiConnectionMethod } from '@rerun/analytics'
-import { claudeTokenIssue, type AddableProvider, type AiConnectionsView, type ClaudeSignInStart, type CodexSignInStart } from '@rerun/contracts'
+import { claudeTokenIssue, type AddableProvider, type AiConnectionsView, type ClaudeSignInStart, type CodexSignInStart, type GrokSignInStart } from '@rerun/contracts'
 import * as Clipboard from 'expo-clipboard'
 import * as WebBrowser from 'expo-web-browser'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'use-intl'
 
 import { ApiError } from '@/api/client'
-import { createAiConnection, finishClaudeSignIn, pollCodexSignIn, replaceAiConnectionKey, startClaudeSignIn, startCodexSignIn, updateAiConnection } from '@/api/aiConnections'
+import { createAiConnection, finishClaudeSignIn, pollCodexSignIn, pollGrokSignIn, replaceAiConnectionKey, startClaudeSignIn, startCodexSignIn, startGrokSignIn, updateAiConnection } from '@/api/aiConnections'
 import { messageOf, useAiConnections } from '@/data/useAiConnections'
 import { track } from '@/lib/analytics'
 import * as Haptics from '@/lib/haptics'
 
 import { ApiKeyForm } from './ApiKeyForm'
 import { leave } from './routes'
-import { ChatGptSignIn, ClaudeSignIn, type ChatGptPhase, type ClaudePhase, type SignInEnding } from './PlanSignIn'
+import { ChatGptSignIn, ClaudeSignIn, GrokSignIn, type ChatGptPhase, type ClaudePhase, type GrokPhase, type SignInEnding } from './PlanSignIn'
 
 // OpenAI refuses the code on its own page while the setting is off, and the app only ever sees the
 // wait go on: past this, the wait is more likely that than a slow user.
@@ -216,7 +216,88 @@ export function ChatGptConnect({ reconnectId }: { reconnectId: string | null }) 
 }
 
 // `reconnectId` replaces the key of a connection its provider turned away rather than adding one.
-export function ApiKeyConnect({ provider, reconnectId = null }: { provider: Exclude<AddableProvider, 'claude' | 'codex'>; reconnectId?: string | null }) {
+// The web's Grok sign-in: a code typed on xAI's page while the hub polls and stores the connection
+// itself. A refusal of the moment (a hub out of reach) is polled through, so an approval given
+// meanwhile still lands; xAI's own answers end the wait.
+const GROK_FINAL_REFUSALS: ReadonlySet<string> = new Set(['grokSignInDenied', 'grokSignInExpired', 'grokNeedsUpdate', 'signInOtherProvider'])
+
+export function GrokConnect({ reconnectId }: { reconnectId: string | null }) {
+    const { view, caller } = useAiConnections()
+    const surface: Surface = reconnectId ? 'reconnect' : 'add_provider'
+    const [pending, setPending] = useState<GrokSignInStart | null>(null)
+    const [starting, setStarting] = useState(false)
+    const [connectionId, setConnectionId] = useState<string | null>(null)
+    const [expired, setExpired] = useState(false)
+    const [error, setError] = useState<string | null>(null)
+    const ending = useEnding('grok', connectionId, Boolean(reconnectId), view, caller)
+    const reconnectRef = useRef(reconnectId)
+    const t = useTranslations('mobileProviders.connect')
+
+    const getCode = async () => {
+        if (!caller || starting) return
+        setStarting(true)
+        setError(null)
+        setExpired(false)
+        try {
+            const next = await startGrokSignIn(caller)
+            setPending(next)
+            // The code is what the person types on xAI's page: it is on the clipboard as the page opens.
+            await Clipboard.setStringAsync(next.userCode).catch(() => undefined)
+            WebBrowser.openBrowserAsync(next.verificationUrl)
+        } catch (err) {
+            const message = messageOf(err, t('startFailed'))
+            setError(message)
+            track('ai_connection_failed', { provider: 'grok', method: 'oauth', surface, reason: 'start_failed', error: message.slice(0, 200) })
+        } finally {
+            setStarting(false)
+        }
+    }
+
+    useEffect(() => {
+        if (!pending || !caller) return
+        let cancelled = false
+        let failed = 0
+        const timer = setInterval(async () => {
+            if (Date.now() > pending.expiresAt) {
+                clearInterval(timer)
+                if (cancelled) return
+                setPending(null)
+                setExpired(true)
+                track('ai_connection_failed', { provider: 'grok', method: 'oauth', surface, reason: 'code_expired' })
+                return
+            }
+            let answer: Awaited<ReturnType<typeof pollGrokSignIn>>
+            try {
+                answer = await pollGrokSignIn(caller, { ticket: pending.ticket, connectionId: reconnectRef.current ?? undefined })
+            } catch (err) {
+                if (cancelled) return
+                const final = err instanceof ApiError && err.status < 500 && (err.status === 403 || GROK_FINAL_REFUSALS.has(err.code ?? ''))
+                if (!final && ++failed < 6) return
+                clearInterval(timer)
+                setPending(null)
+                setError(messageOf(err, t('startFailed')))
+                track('ai_connection_failed', { provider: 'grok', method: 'oauth', surface, reason: 'device_auth_failed', error: messageOf(err, '').slice(0, 200) })
+                return
+            }
+            if (cancelled || answer.status === 'pending') return
+            clearInterval(timer)
+            setPending(null)
+            setConnectionId(answer.connectionId)
+            connected('grok', 'oauth', surface)
+            if (reconnectRef.current) leave()
+        }, pending.pollIntervalMs)
+        return () => {
+            cancelled = true
+            clearInterval(timer)
+        }
+    }, [pending, caller, surface, t])
+
+    const phase: GrokPhase = connectionId ? 'connected' : pending ? 'waiting' : starting ? 'starting' : 'idle'
+    const shown = pending ? { userCode: pending.userCode, verificationUrl: pending.verificationUrl } : null
+    return <GrokSignIn phase={phase} pending={shown} expired={expired} error={error} onGetCode={getCode} ending={ending} onBack={() => leave()} />
+}
+
+export function ApiKeyConnect({ provider, reconnectId = null }: { provider: Exclude<AddableProvider, 'claude' | 'codex' | 'grok'>; reconnectId?: string | null }) {
     const { view, caller } = useAiConnections()
     const entry = view?.addable.find(candidate => candidate.provider === provider)
     const [name, setName] = useState<string | null>(null)
