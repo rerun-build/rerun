@@ -108,6 +108,18 @@ describe('POST /api/mcp/oauth/start', () => {
         expect(cookie.name.length + cookie.value.length).toBeLessThan(4096)
     })
 
+    it('signs in with the resource the server advertises when the typed URL ends with a slash', async () => {
+        documents[RESOURCE_METADATA_URL] = { resource: 'https://mcp.acme.test/mcp', authorization_servers: ['https://auth.acme.test'] }
+
+        const res = await start({ mcpUrl: 'https://mcp.acme.test/mcp/' })
+
+        expect(res.status).toBe(200)
+        const { authorizationUrl } = (await res.json()) as { authorizationUrl: string }
+        expect(new URL(authorizationUrl).searchParams.get('resource')).toBe('https://mcp.acme.test/mcp')
+        const [cookie] = res.cookies.getAll()
+        expect(decodeContext(cookie.value)).toMatchObject({ mcpUrl: 'https://mcp.acme.test/mcp/', resource: 'https://mcp.acme.test/mcp' })
+    })
+
     it('refuses an agent of another workspace without setting a cookie', async () => {
         agentWorkspace = 2
 

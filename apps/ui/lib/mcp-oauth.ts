@@ -30,6 +30,8 @@ export type OAuthContext = {
     agentId: string
     serverName: string
     mcpUrl: string
+    // The resource indicator the server advertises for `mcpUrl`, which may lack or add its trailing slash.
+    resource?: string
     tokenEndpoint: string
     clientId: string
     clientSecret?: string
@@ -53,6 +55,7 @@ export type DiscoveredMetadata = {
     registrationEndpoint?: string
     scopesSupported?: string[]
     clientIdMetadataDocumentSupported?: boolean
+    resource?: string
 }
 
 export type SignInEndpoints = Pick<DiscoveredMetadata, 'authorizationEndpoint' | 'tokenEndpoint' | 'scopesSupported'>
@@ -175,6 +178,9 @@ export async function discoverAuthServer(mcpUrl: string): Promise<DiscoveredMeta
     // the authorization server's global scopes_supported, which may advertise scopes (or scope
     // combinations) the resource rejects with invalid_scope at /authorize.
     const resourceScopes = Array.isArray(prm?.scopes_supported) ? (prm!.scopes_supported as string[]) : undefined
+    // RFC 8707: some authorization servers match the resource indicator character for character, so
+    // BrowserAct refuses its own documented `…/mcp/` with invalid_target when it advertises `…/mcp`.
+    const advertisedResource = typeof prm?.resource === 'string' && trimSlash(prm.resource) === trimSlash(url.href) ? prm.resource : undefined
     let meta: Record<string, unknown> | null = null
     let foundAt: string | null = null
     for (const base of bases) {
@@ -198,6 +204,7 @@ export async function discoverAuthServer(mcpUrl: string): Promise<DiscoveredMeta
         registrationEndpoint: typeof meta.registration_endpoint === 'string' ? await endpointOnSite(meta.registration_endpoint, 'registration endpoint', sites) : undefined,
         scopesSupported: resourceScopes ?? (Array.isArray(meta.scopes_supported) ? (meta.scopes_supported as string[]) : undefined),
         clientIdMetadataDocumentSupported: meta.client_id_metadata_document_supported === true,
+        ...(advertisedResource ? { resource: advertisedResource } : {}),
     }
 }
 
@@ -340,7 +347,7 @@ export function buildAuthorizeUrl(metadata: DiscoveredMetadata, ctx: OAuthContex
         state,
         code_challenge: challenge,
         code_challenge_method: 'S256',
-        resource: ctx.mcpUrl,
+        resource: ctx.resource ?? ctx.mcpUrl,
     })
     const scope = metadata.scopesSupported?.join(' ')
     if (scope) params.set('scope', scope)
@@ -356,7 +363,7 @@ export async function exchangeCode(ctx: OAuthContext, code: string): Promise<Exc
         redirect_uri: ctx.redirectUri,
         client_id: ctx.clientId,
         code_verifier: ctx.verifier,
-        resource: ctx.mcpUrl,
+        resource: ctx.resource ?? ctx.mcpUrl,
     })
     const clientSecret = clientSecretFor(ctx)
     if (clientSecret) body.set('client_secret', clientSecret)

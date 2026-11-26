@@ -50,6 +50,7 @@ export async function POST(req: Request) {
             agentId,
             serverName,
             mcpUrl,
+            resource: discovered.resource,
             tokenEndpoint: metadata.tokenEndpoint,
             clientId: clientInfo.clientId,
             clientSecret: clientInfo.clientSecret,

@@ -46,6 +46,7 @@ async function mcpOAuthRedirect(req: Request, target: { agentId: string; serverN
         agentId: target.agentId,
         serverName: target.serverName,
         mcpUrl: target.url,
+        resource: discovered.resource,
         tokenEndpoint: metadata.tokenEndpoint,
         clientId: clientInfo.clientId,
         clientSecret: clientInfo.clientSecret,

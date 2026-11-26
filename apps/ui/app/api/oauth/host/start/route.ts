@@ -40,7 +40,7 @@ async function startMcp(back: HostReturn, target: Extract<HostReturn['target'], 
     const metadata = { ...discovered, ...client.signIn }
 
     const { verifier, challenge, state } = createPkce()
-    const ctx: OAuthContext = { verifier, agentId: back.agentId, serverName: target.serverName, mcpUrl: target.mcpUrl, tokenEndpoint: metadata.tokenEndpoint, clientId: client.clientId, redirectUri: callbackUrl(onRerunHost()), workspaceId: back.workspaceId, host: back }
+    const ctx: OAuthContext = { verifier, agentId: back.agentId, serverName: target.serverName, mcpUrl: target.mcpUrl, resource: discovered.resource, tokenEndpoint: metadata.tokenEndpoint, clientId: client.clientId, redirectUri: callbackUrl(onRerunHost()), workspaceId: back.workspaceId, host: back }
     return toProvider(buildAuthorizeUrl(metadata, ctx, challenge, state), { name: OAUTH_COOKIE_PREFIX + state, value: encodeContext(ctx), path: OAUTH_COOKIE_PATH })
 }
 

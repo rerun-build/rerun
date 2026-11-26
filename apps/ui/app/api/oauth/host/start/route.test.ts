@@ -27,6 +27,7 @@ vi.mock('@/lib/mcp-oauth', async importOriginal => ({
         tokenEndpoint: 'https://public-api.wordpress.com/oauth2-1/token',
         registrationEndpoint: 'https://public-api.wordpress.com/oauth2-1/register',
         scopesSupported: ['global', 'auth', 'openid', 'posts', 'media'],
+        resource: WPCOM_MCP,
     }),
 }))
 
@@ -48,7 +49,7 @@ describe('GET /api/oauth/host/start, for a sign-in started on an organization ad
         expect(authorize.searchParams.get('client_id')).toBe('wpcom-app')
         expect(authorize.searchParams.get('scope')).toBe('global')
         const ctx = decodeContext(res.cookies.getAll()[0].value)
-        expect(ctx).toMatchObject({ clientId: 'wpcom-app', tokenEndpoint: 'https://public-api.wordpress.com/oauth2/token', mcpUrl: WPCOM_MCP })
+        expect(ctx).toMatchObject({ clientId: 'wpcom-app', tokenEndpoint: 'https://public-api.wordpress.com/oauth2/token', mcpUrl: WPCOM_MCP, resource: WPCOM_MCP })
         expect(ctx.clientSecret).toBeUndefined()
     })
 })

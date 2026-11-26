@@ -147,7 +147,7 @@ Rerun finds the authorization server in one of three ways, in this order:
 - it names that document, on its own origin, in the `WWW-Authenticate: Bearer resource_metadata="…"` header of its `401`. A server hosted as a Supabase Edge Function does this;
 - with neither, its domain or a parent domain publishes the authorization server's metadata, under `/.well-known/oauth-authorization-server` or `/.well-known/openid-configuration`.
 
-The authorization and token endpoints stay on the domain of the server or of the authorization server it names.
+The authorization and token endpoints stay on the domain of the server or of the authorization server it names. Rerun names the server to the authorization server by its address (the OAuth `resource` parameter). When the address you entered differs from the `resource` of its protected-resource document only by a trailing slash, Rerun uses the one in the document.
 
 **Paste its JSON config.** Most servers give their setup as a JSON block for Claude Desktop, Cursor, Claude Code or VS Code. Under **Command** (or **URL**), click **Paste a JSON config** and paste it, or paste it straight into **Name**, **Command** or **URL**. The form fills in at once for you to check:
 

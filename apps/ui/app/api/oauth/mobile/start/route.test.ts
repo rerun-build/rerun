@@ -31,7 +31,7 @@ vi.mock('@/lib/composio/client', async importOriginal => ({ ...(await importOrig
 vi.mock('@/app/api/_services/workspace-engine.service', async importOriginal => ({ ...(await importOriginal<typeof import('@/app/api/_services/workspace-engine.service')>()), findWorkspaceEngine: vi.fn(async () => null) }))
 vi.mock('@/lib/mcp-oauth', async importOriginal => ({
     ...(await importOriginal<typeof import('@/lib/mcp-oauth')>()),
-    discoverAuthServer: async () => ({ authorizationEndpoint: 'https://linear.app/oauth/authorize', tokenEndpoint: 'https://linear.app/oauth/token', scopesSupported: ['read'] }),
+    discoverAuthServer: async () => ({ authorizationEndpoint: 'https://linear.app/oauth/authorize', tokenEndpoint: 'https://linear.app/oauth/token', scopesSupported: ['read'], resource: 'https://mcp.linear.app/mcp' }),
     resolveClient: (...args: Parameters<typeof resolveClient>) => resolveClient(...args),
 }))
 
@@ -58,7 +58,7 @@ describe('GET /api/oauth/mobile/start, for a server registered outside the catal
         expect(new URL(res.headers.get('location')!).origin).toBe('https://linear.app')
         expect(getCustomMcpServer).toHaveBeenCalledWith('agent-1', 'linear', { kind: 'workspace', workspaceId: 7 })
         const [cookie] = res.cookies.getAll()
-        expect(decodeContext(cookie.value)).toMatchObject({ agentId: 'agent-1', serverName: 'linear', mcpUrl: 'https://mcp.linear.app/mcp', mobileGrant: expect.any(String) })
+        expect(decodeContext(cookie.value)).toMatchObject({ agentId: 'agent-1', serverName: 'linear', mcpUrl: 'https://mcp.linear.app/mcp', resource: 'https://mcp.linear.app/mcp', mobileGrant: expect.any(String) })
     })
 
     it('spends the ticket as the sign-in starts, and refuses a second start on it', async () => {

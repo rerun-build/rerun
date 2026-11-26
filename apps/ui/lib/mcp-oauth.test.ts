@@ -129,6 +129,34 @@ describe('discoverAuthServer', () => {
         await expect(discoverAuthServer('https://mcp.linear.app/mcp')).resolves.toMatchObject({ tokenEndpoint: 'https://api.linear.app/oauth/token' })
     })
 
+    describe('the resource indicator', () => {
+        const BROWSERACT_MCP = 'https://mcp.browseract.com/mcp/'
+        const PRM = 'https://mcp.browseract.com/.well-known/oauth-protected-resource/mcp'
+        const BROWSERACT_META = { authorization_endpoint: 'https://mcp.browseract.com/oauth2/auth', token_endpoint: 'https://mcp.browseract.com/oauth2/token' }
+        const publishing = (resource: unknown) =>
+            stubFetch({
+                [PRM]: { resource, authorization_servers: ['https://mcp.browseract.com'] },
+                'https://mcp.browseract.com/.well-known/oauth-authorization-server': BROWSERACT_META,
+            })
+
+        it('is the one the server advertises when the typed URL only adds a trailing slash', async () => {
+            publishing('https://mcp.browseract.com/mcp')
+            const meta = await discoverAuthServer(BROWSERACT_MCP)
+            expect(meta.resource).toBe('https://mcp.browseract.com/mcp')
+            const url = new URL(buildAuthorizeUrl(meta, { ...CTX, mcpUrl: BROWSERACT_MCP, resource: meta.resource }, 'c', 's'))
+            expect(url.searchParams.get('resource')).toBe('https://mcp.browseract.com/mcp')
+        })
+
+        it.each([
+            ['another path', 'https://mcp.browseract.com/other'],
+            ['another origin', 'https://evil.example/mcp'],
+            ['something that is not a string', 42],
+        ])('ignores an advertised resource on %s', async (_label, resource) => {
+            publishing(resource)
+            await expect(discoverAuthServer(BROWSERACT_MCP)).resolves.not.toHaveProperty('resource')
+        })
+    })
+
     it('treats a network failure as a missing document', async () => {
         vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('ECONNRESET')))
         await expect(discoverAuthServer('https://acme.com')).rejects.toThrow('does not advertise')
@@ -177,6 +205,7 @@ describe('discoverAuthServer', () => {
                 registrationEndpoint: SUPABASE_META.registration_endpoint,
                 scopesSupported: ['openid', 'email'],
                 clientIdMetadataDocumentSupported: false,
+                resource: MCP_URL,
             })
             const posts = calls.filter(call => call.method === 'POST')
             expect(posts.map(call => call.url)).toEqual([MCP_URL])
@@ -407,6 +436,15 @@ describe('exchangeCode', () => {
         const body = new URLSearchParams((fetchMock.mock.calls[0] as unknown as [string, RequestInit])[1].body as string)
         expect(body.get('client_secret')).toBe('asana-secret')
         vi.unstubAllEnvs()
+    })
+
+    it('sends the advertised resource, or the server URL for a context that has none', async () => {
+        const fetchMock = vi.fn(async () => Response.json({ access_token: 'at' }))
+        vi.stubGlobal('fetch', fetchMock)
+        await exchangeCode({ ...CTX, mcpUrl: 'https://mcp.browseract.com/mcp/', resource: 'https://mcp.browseract.com/mcp' }, 'code')
+        await exchangeCode(CTX, 'code')
+        const resources = fetchMock.mock.calls.map(call => new URLSearchParams((call as unknown as [string, RequestInit])[1].body as string).get('resource'))
+        expect(resources).toEqual(['https://mcp.browseract.com/mcp', CTX.mcpUrl])
     })
 
     it('surfaces the start of the error body on a refused exchange', async () => {
