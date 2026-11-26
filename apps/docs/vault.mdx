@@ -26,14 +26,15 @@ The Vault lives on your workspace's machine. On Rerun Cloud, the entry stays dis
 
 Each entry says who uses it: **Every coworker**, the names of the coworkers, or **No coworker yet**. From 8 entries on, a search field appears on top.
 
-<Shot src="/images/vault/vault-list" alt="The Vault with three apps, Gmail, HubSpot and Stripe, and a secret, each tile showing the coworkers that use it" />
+<Shot src="/images/vault/vault-list" alt="The Vault with three connected apps, Gmail, HubSpot and Stripe, and a secret, each tile showing the coworkers that use it" />
 
 ### Statuses
 
-Most entries show no badge: they are connected and their coworkers use them. Two badges ask for you:
+Each app and each MCP server shows its status, on its tile and in its entry. A secret shows none while it works. The status is the one the Vault last recorded, not a live test of the connection.
 
 | Badge | What it means |
 | --- | --- |
+| **Connected** | It works: its coworkers use it. A paid app's account shows it once it is ready |
 | **Signed out** | Its coworkers can't use the app until someone signs in again. Open the entry and click **Reconnect**: it is signed in again for all of them at once |
 | **Not set up** | The app is waiting for a credential. Open the entry and fill in its form |
 
@@ -136,7 +137,7 @@ An AI assistant connected to your workspace through the [Rerun API](/api/introdu
 
 ## Paid apps
 
-The accounts of paid apps, like LinkedIn Pro and WhatsApp Pro, show in the Vault with a **Paid** badge, and **Paused** or **Connecting** while they are not ready. They are attached coworker by coworker: **Every coworker** stays off (**A paid app is attached coworker by coworker**). A coworker can have several accounts of the same paid app: switching one on adds it to those it has, and switching one off leaves the others and their wake-ups as they are. Their sign-in, slots and billing stay in the app's own window. See [Plans and billing](/billing).
+The accounts of paid apps, like LinkedIn Pro and WhatsApp Pro, show in the Vault next to the other apps, with **Connected** once they are ready, or **Paused** or **Connecting** while they are not. They are attached coworker by coworker: **Every coworker** stays off (**A paid app is attached coworker by coworker**). A coworker can have several accounts of the same paid app: switching one on adds it to those it has, and switching one off leaves the others and their wake-ups as they are. Their sign-in, slots and billing stay in the app's own window. See [Plans and billing](/billing).
 
 ## Who can do what
 

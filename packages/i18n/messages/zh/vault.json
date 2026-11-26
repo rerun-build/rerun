@@ -17,6 +17,7 @@
         "usedByMore": "{names} 及其他 {count, plural, other {# 位}}"
     },
     "status": {
+        "connected": "已连接",
         "needsAuth": "已退出登录",
         "needsConfig": "未设置"
     },
@@ -83,7 +84,6 @@
         "partlyAdded": "{count, plural, other {已添加 # 个服务器，下一个失败：{reason}}}"
     },
     "paid": {
-        "badge": "付费",
         "managedInApp": "它的登录、席位和计费都在“应用”菜单的 {provider} 窗口中。",
         "paused": "已暂停",
         "connecting": "正在连接"

@@ -66,6 +66,13 @@ export function VaultPaidAccountDetail({ account, listing, onBack, onChanged }: 
 
 export function PaidAccountStatusBadge({ account }: { account: Pick<VaultPaidAccount, 'status'> }) {
     const t = useTranslations('vault')
+    if (account.status === 'connected') {
+        return (
+            <Badge size="xs" tone="green" glow={false}>
+                {t('status.connected')}
+            </Badge>
+        )
+    }
     if (account.status === 'needs_reconnect') {
         return (
             <Badge size="xs" tone="orange" glow={false}>

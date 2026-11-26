@@ -17,6 +17,7 @@
         "usedByMore": "{names} و{count, plural, zero {# آخرين} one {آخر واحد} two {اثنان آخران} few {# آخرين} many {# آخرين} other {# آخرين}}"
     },
     "status": {
+        "connected": "متصل",
         "needsAuth": "تم تسجيل الخروج",
         "needsConfig": "غير مُعَد"
     },
@@ -83,7 +84,6 @@
         "partlyAdded": "{count, plural, zero {لم يُضف أي خادم، فشل التالي: {reason}} one {أُضيف خادم واحد، وفشل التالي: {reason}} two {أُضيف خادمان، وفشل التالي: {reason}} few {أُضيفت # خوادم، وفشل التالي: {reason}} many {أُضيف # خادمًا، وفشل التالي: {reason}} other {أُضيف # خادم، وفشل التالي: {reason}}}"
     },
     "paid": {
-        "badge": "مدفوع",
         "managedInApp": "يُدار تسجيل الدخول والخانة والفوترة في نافذة {provider} من قائمة التطبيقات.",
         "paused": "متوقف مؤقتًا",
         "connecting": "جارٍ الربط"

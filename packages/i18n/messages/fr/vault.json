@@ -17,6 +17,7 @@
         "usedByMore": "{names} et {count, plural, one {# autre} other {# autres}}"
     },
     "status": {
+        "connected": "Connectée",
         "needsAuth": "Déconnectée",
         "needsConfig": "À configurer"
     },
@@ -83,7 +84,6 @@
         "partlyAdded": "{count, plural, one {# serveur ajouté, le suivant a échoué : {reason}} other {# serveurs ajoutés, le suivant a échoué : {reason}}}"
     },
     "paid": {
-        "badge": "Payant",
         "managedInApp": "Sa connexion, son slot et sa facture se gèrent dans la fenêtre {provider} du menu Apps.",
         "paused": "En pause",
         "connecting": "Connexion"

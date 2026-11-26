@@ -17,6 +17,7 @@
         "usedByMore": "{names} ועוד {count, plural, one {# נוסף} two {# נוספים} other {# נוספים}}"
     },
     "status": {
+        "connected": "מחובר",
         "needsAuth": "מנותק",
         "needsConfig": "לא הוגדר"
     },
@@ -83,7 +84,6 @@
         "partlyAdded": "{count, plural, one {שרת אחד נוסף, הבא נכשל: {reason}} two {שני שרתים נוספו, הבא נכשל: {reason}} other {# שרתים נוספו, הבא נכשל: {reason}}}"
     },
     "paid": {
-        "badge": "בתשלום",
         "managedInApp": "ההתחברות, המשבצת והחיוב שלה נמצאים בחלון {provider} של תפריט האפליקציות.",
         "paused": "מושהה",
         "connecting": "מתחבר"

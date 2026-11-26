@@ -17,6 +17,7 @@
         "usedByMore": "{names} ve {count, plural, one {# diğeri} other {# diğeri}}"
     },
     "status": {
+        "connected": "Bağlı",
         "needsAuth": "Oturum kapalı",
         "needsConfig": "Kurulmadı"
     },
@@ -83,7 +84,6 @@
         "partlyAdded": "{count, plural, one {# sunucu eklendi, sonraki başarısız oldu: {reason}} other {# sunucu eklendi, sonraki başarısız oldu: {reason}}}"
     },
     "paid": {
-        "badge": "Ücretli",
         "managedInApp": "Oturum açma, yer ve faturalandırma, Uygulamalar menüsündeki {provider} penceresinde yönetilir.",
         "paused": "Duraklatıldı",
         "connecting": "Bağlanıyor"

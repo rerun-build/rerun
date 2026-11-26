@@ -17,6 +17,7 @@
         "usedByMore": "{names} und {count, plural, one {# weiterer} other {# weitere}}"
     },
     "status": {
+        "connected": "Verbunden",
         "needsAuth": "Abgemeldet",
         "needsConfig": "Nicht eingerichtet"
     },
@@ -83,7 +84,6 @@
         "partlyAdded": "{count, plural, one {# Server hinzugefügt, der nächste ist fehlgeschlagen: {reason}} other {# Server hinzugefügt, der nächste ist fehlgeschlagen: {reason}}}"
     },
     "paid": {
-        "badge": "Kostenpflichtig",
         "managedInApp": "Anmeldung, Slot und Abrechnung verwaltest du im Fenster {provider} des Apps-Menüs.",
         "paused": "Pausiert",
         "connecting": "Verbindet"

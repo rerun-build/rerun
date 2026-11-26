@@ -177,14 +177,7 @@ function VaultGroups({ listing, paid, query, iconOf, onOpen, onOpenPaid }: Vault
                                 icon={<AppIcon slug={account.slug} size="md" />}
                                 name={account.name}
                                 label={account.label}
-                                badges={
-                                    <>
-                                        <Badge size="xs" tone="brand" glow={false}>
-                                            {t('paid.badge')}
-                                        </Badge>
-                                        <PaidAccountStatusBadge account={account} />
-                                    </>
-                                }
+                                badges={<PaidAccountStatusBadge account={account} />}
                                 usage={paidUsage(account, coworkerName)}
                                 onClick={() => onOpenPaid(account.connectionId)}
                             />
@@ -225,8 +218,15 @@ function paidUsage(account: VaultPaidAccount, coworkerName: Map<string, string>)
     }
 }
 
-export function VaultStatusBadge({ entry }: { entry: Pick<VaultEntryView, 'status'> }) {
+// A secret has no connection to report, so a working one carries no badge.
+export function VaultStatusBadge({ entry }: { entry: Pick<VaultEntryView, 'status' | 'kind'> }) {
     const t = useTranslations('vault')
+    if (entry.status === 'active')
+        return entry.kind === 'secret' ? null : (
+            <Badge size="xs" tone="green" glow={false}>
+                {t('status.connected')}
+            </Badge>
+        )
     if (entry.status === 'needs_auth')
         return (
             <Badge size="xs" tone="orange" glow={false}>

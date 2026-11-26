@@ -28,6 +28,7 @@
         "usedByMore": "{names} and {count, plural, one {# other} other {# others}}"
     },
     "status": {
+        "connected": "Connected",
         "needsAuth": "Signed out",
         "needsConfig": "Not set up"
     },
@@ -94,7 +95,6 @@
         "partlyAdded": "{count, plural, one {# server added, the next one failed: {reason}} other {# servers added, the next one failed: {reason}}}"
     },
     "paid": {
-        "badge": "Paid",
         "managedInApp": "Its sign-in, slot and billing live in the {provider} window of the Apps menu.",
         "paused": "Paused",
         "connecting": "Connecting"

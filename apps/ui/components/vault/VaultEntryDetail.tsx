@@ -59,11 +59,10 @@ export function VaultEntryDetail({ entry, listing, icon, onBack, onChanged }: Pr
                     <AccountName entry={entry} listing={listing} onChanged={onChanged} />
                 ) : (
                     <div className="flex min-w-0 flex-1 flex-col">
-                        <span className="truncate text-sm font-medium">{entry.name}</span>
+                        <EntryNameWithStatus entry={entry} />
                         {entry.label && <span className="truncate text-[11px] text-muted-foreground">{entry.label}</span>}
                     </div>
                 )}
-                <VaultStatusBadge entry={entry} />
                 {signInKind && entry.status !== 'needs_auth' && !signIn && <ReconnectButton entry={entry} kind={signInKind} canAdd={listing.canAdd} onSignIn={setSignIn} />}
             </div>
 
@@ -102,6 +101,17 @@ export function VaultEntryDetail({ entry, listing, icon, onBack, onChanged }: Pr
     )
 }
 
+// The status rides on the name's line, so the account under it keeps the width the pencil and Reconnect
+// leave; when a long Reconnect label leaves too little, the status wraps under the name instead of eating it.
+function EntryNameWithStatus({ entry }: { entry: VaultEntryView }) {
+    return (
+        <span className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5">
+            <span className="truncate text-sm font-medium">{entry.name}</span>
+            <VaultStatusBadge entry={entry} />
+        </span>
+    )
+}
+
 // The app's name over the account's, and the pencil that renames the account in place. An emptied
 // field gives it back the name its connection reported.
 function AccountName({ entry, listing, onChanged }: { entry: VaultEntryView; listing: VaultListing; onChanged: () => Promise<void> }) {
@@ -128,7 +138,7 @@ function AccountName({ entry, listing, onChanged }: { entry: VaultEntryView; lis
     return (
         <>
             <div className="flex min-w-0 flex-1 flex-col">
-                <span className="truncate text-sm font-medium">{entry.name}</span>
+                <EntryNameWithStatus entry={entry} />
                 {editing ? (
                     <AccountNameField name={label ?? ''} placeholder={entry.label ?? t('detail.namePlaceholder')} busy={saving} onSubmit={name => void save(name)} onCancel={() => setEditing(false)} />
                 ) : (
