@@ -6,6 +6,9 @@ import { InboxSurface, type InboxEntry } from '@rerun/ui/inbox'
 
 const NEEDS = 50
 const HEADS = 70
+// The rest of the rows mount this long after the card opens (InboxSurface). Timers are advanced by it
+// rather than all run: a buddy's blink timer starts again for as long as a face is on the page.
+const REST_OF_ROWS_DELAY_MS = 300
 
 const items: InboxEntry[] = Array.from({ length: NEEDS + HEADS }, (_, i) => ({
     id: `session-${i}`,
@@ -55,7 +58,7 @@ describe.each(['row', 'pill'] as const)('InboxSurface opened as a %s', trigger =
         act(() => vi.advanceTimersByTime(100))
         expect(rows()).toBeLessThanOrEqual(12)
 
-        act(() => vi.runAllTimers())
+        act(() => vi.advanceTimersByTime(REST_OF_ROWS_DELAY_MS - 100))
         expect(rows()).toBe(NEEDS + HEADS)
         expect(section('headsUps')).not.toBeNull()
     })
