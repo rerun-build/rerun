@@ -7,6 +7,9 @@ export const DIAMOND = 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)'
 export const BLOCK_HEIGHT = 7
 export const BUDDY_HEIGHT_RATIO = 15 / 80
 
+// Bounds of the zoom the person drives (buttons, keys, wheel, pinch) and one step of a button or a key.
+export const ISO_ZOOM = { min: 0.3, max: 3, step: 1.2 } as const
+
 // Couleur des quatre murs de lumière d'une tile mise en avant, quand son style n'en impose pas
 // d'autre : la lumière neutre de la grille (violet de marque en clair, blanc en sombre).
 export const ISO_HALO_COLOR = 'var(--iso-halo, #fff)'

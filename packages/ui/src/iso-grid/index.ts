@@ -64,5 +64,6 @@ export type {
     IsoCamera,
     FrameInset,
     IsoFocusRequest,
+    IsoViewRequest,
     IsoGridProps,
 } from './types'

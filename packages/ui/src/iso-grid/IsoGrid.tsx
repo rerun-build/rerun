@@ -1,7 +1,7 @@
 'use client'
 
 import { memo, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
-import { CONTAINER_SIDES, DEFAULT_SPAN, DIAMOND, GRID_SIZE, MIN_CONTAINER_SPAN, TILE_H, TILE_W, clampAnchorToRange, containerCellRange, containerContainsTile, isPlaced, isoPosition, resizedContainerRect, screenToGrid, tileCoversCell, tileTopLift, tileZ, tilesOverlap } from './iso'
+import { CONTAINER_SIDES, DEFAULT_SPAN, DIAMOND, GRID_SIZE, ISO_ZOOM, MIN_CONTAINER_SPAN, TILE_H, TILE_W, clampAnchorToRange, containerCellRange, containerContainsTile, isPlaced, isoPosition, resizedContainerRect, screenToGrid, tileCoversCell, tileTopLift, tileZ, tilesOverlap } from './iso'
 import type { Container, ContainerCellRect, ContainerHandle, ContainerSide, FrameInset, IsoCamera, IsoFocusRequest, IsoGridProps, Tile, TileLink, TileToast } from './types'
 import { TileBlock } from './components/TileBlock'
 import { TileResultsCard } from './components/TileResultsCard'
@@ -62,6 +62,11 @@ const RECENTER_PADDING = TILE_W * 2
 const NO_INSET: FrameInset = { left: 0, right: 0 }
 const FIT_PADDING = TILE_W / 2
 
+// Un zoom au clavier suit la touche, maintenue elle se répète : il doit finir avant la suivante.
+const KEY_ZOOM_TRANSITION_MS = 160
+const CONTAINER_FOCUS_MS = 520
+const CONTAINER_FOCUS_MAX_ZOOM = 2.4
+
 // Marge de navigation (monde) autour du contenu : on peut paner « autour » des spaces sans s'égarer
 // dans un vide immense. Plancher minimal pour garder une petite zone jouable même quand la grille est
 // vide ou ne contient qu'un seul space.
@@ -113,17 +118,28 @@ function contentWorldBox(tiles: Tile[], containers: Container[], worldOffset: { 
         bottom = Math.max(bottom, b.top + b.height)
     }
     for (const c of containers) {
-        const colMin = Math.min(c.col_start, c.col_end)
-        const colMax = Math.max(c.col_start, c.col_end)
-        const rowMin = Math.min(c.row_start, c.row_end)
-        const rowMax = Math.max(c.row_start, c.row_end)
-        left = Math.min(left, isoPosition(colMin, rowMax + 1).left + TILE_W / 2 + worldOffset.left)
-        right = Math.max(right, isoPosition(colMax + 1, rowMin).left + TILE_W / 2 + worldOffset.left)
-        top = Math.min(top, isoPosition(colMin, rowMin).top + worldOffset.top)
-        bottom = Math.max(bottom, isoPosition(colMax + 1, rowMax + 1).top + worldOffset.top)
+        const b = containerWorldBox(c, worldOffset)
+        left = Math.min(left, b.left)
+        right = Math.max(right, b.right)
+        top = Math.min(top, b.top)
+        bottom = Math.max(bottom, b.bottom)
     }
     if (!Number.isFinite(left)) return null
     return { left, right, top, bottom }
+}
+
+// Boîte englobante (monde) du losange d'un container, sans son libellé debout.
+function containerWorldBox(c: Container, worldOffset: { left: number; top: number }): WorldBox {
+    const colMin = Math.min(c.col_start, c.col_end)
+    const colMax = Math.max(c.col_start, c.col_end)
+    const rowMin = Math.min(c.row_start, c.row_end)
+    const rowMax = Math.max(c.row_start, c.row_end)
+    return {
+        left: isoPosition(colMin, rowMax + 1).left + TILE_W / 2 + worldOffset.left,
+        right: isoPosition(colMax + 1, rowMin).left + TILE_W / 2 + worldOffset.left,
+        top: isoPosition(colMin, rowMin).top + worldOffset.top,
+        bottom: isoPosition(colMax + 1, rowMax + 1).top + worldOffset.top,
+    }
 }
 
 // Cadrage qui fait tenir `box` dans `frame` : une seule règle, partagée par le bouton « recentrer »
@@ -133,7 +149,7 @@ function contentWorldBox(tiles: Tile[], containers: Container[], worldOffset: { 
 function fitCamera(box: WorldBox, frame: { width: number; height: number }, maxZoom: number, pad = RECENTER_PADDING, inset: FrameInset = NO_INSET) {
     const covered = inset.left + inset.right < frame.width * 0.75 ? inset : NO_INSET
     const width = frame.width - covered.left - covered.right
-    const zoom = Math.min(maxZoom, Math.max(0.3, Math.min(width / (box.right - box.left + pad * 2), frame.height / (box.bottom - box.top + pad * 2))))
+    const zoom = Math.min(maxZoom, Math.max(ISO_ZOOM.min, Math.min(width / (box.right - box.left + pad * 2), frame.height / (box.bottom - box.top + pad * 2))))
     return { zoom, pan: { x: -(box.left + box.right) / 2 + (covered.left - covered.right) / 2 / zoom, y: -(box.top + box.bottom) / 2 } }
 }
 
@@ -216,6 +232,7 @@ export const IsoGrid = memo(function IsoGrid(props: IsoGridProps) {
         recenterSignal,
         frameInset = NO_INSET,
         focusRequest = null,
+        viewRequest = null,
         mask = DEFAULT_MASK,
         drawColor = DEFAULT_DRAW_COLOR,
         canDraw = true,
@@ -579,11 +596,14 @@ export const IsoGrid = memo(function IsoGrid(props: IsoGridProps) {
         pushedCameraRef.current = null
         cancelAnim()
     }, [cancelAnim])
-    const beginFraming = useCallback(() => {
-        restorePendingRef.current = false
-        userFramedRef.current = true
-        animate()
-    }, [animate])
+    const beginFraming = useCallback(
+        (transitionMs?: number) => {
+            restorePendingRef.current = false
+            userFramedRef.current = true
+            animate(transitionMs)
+        },
+        [animate]
+    )
 
     useEffect(() => {
         const container = containerRef.current
@@ -593,7 +613,7 @@ export const IsoGrid = memo(function IsoGrid(props: IsoGridProps) {
             beginGesture()
             if (e.ctrlKey || e.metaKey) {
                 // Pincement trackpad OU Cmd/Ctrl+molette souris → zoom (feel inchangé)
-                setZoom(z => Math.min(3, Math.max(0.3, z - e.deltaY * 0.001)))
+                setZoom(z => Math.min(ISO_ZOOM.max, Math.max(ISO_ZOOM.min, z - e.deltaY * 0.001)))
             } else {
                 // Balayage 2 doigts → déplacement fluide 2D (inertie macOS gratuite)
                 const z = zoomRef.current
@@ -632,7 +652,7 @@ export const IsoGrid = memo(function IsoGrid(props: IsoGridProps) {
         requestedCameraRef.current = camera
         if (previous && previous.zoom === camera.zoom && previous.pan.x === camera.pan.x && previous.pan.y === camera.pan.y) return
 
-        // Le zoom n'est pas borné aux [0.3, 3] du geste : ce sont des limites de manipulation, pas
+        // Le zoom n'est pas borné aux ISO_ZOOM du geste : ce sont des limites de manipulation, pas
         // une contrainte de scène, et un hôte qui demande davantage sait ce qu'il cadre.
         const nextPan = clampPan(camera.pan, camera.zoom)
         // Un premier cadrage se pose, il ne se joue pas : glisser depuis un défaut arbitraire
@@ -669,7 +689,7 @@ export const IsoGrid = memo(function IsoGrid(props: IsoGridProps) {
             setPan(clampPan({ x: 0, y: 0 }, initialZoomDesktop))
             return
         }
-        const camera = fitCamera(box, rect, 3, RECENTER_PADDING, frameInsetRef.current)
+        const camera = fitCamera(box, rect, ISO_ZOOM.max, RECENTER_PADDING, frameInsetRef.current)
         setZoom(camera.zoom)
         setPan(clampPan(camera.pan, camera.zoom))
     }, [clampPan, initialZoomDesktop, beginFraming])
@@ -743,14 +763,43 @@ export const IsoGrid = memo(function IsoGrid(props: IsoGridProps) {
         return () => observer.disconnect()
     }, [fitToContent, initialZoomDesktop, clampPan, insetLeft, insetRight, animate])
 
-    const zoomIn = useCallback(() => {
-        beginFraming()
-        setZoom(z => Math.min(3, z * 1.2))
-    }, [beginFraming])
-    const zoomOut = useCallback(() => {
-        beginFraming()
-        setZoom(z => Math.max(0.3, z / 1.2))
-    }, [beginFraming])
+    const stepZoom = useCallback(
+        (direction: 'in' | 'out', transitionMs?: number) => {
+            beginFraming(transitionMs)
+            setZoom(z => (direction === 'in' ? Math.min(ISO_ZOOM.max, z * ISO_ZOOM.step) : Math.max(ISO_ZOOM.min, z / ISO_ZOOM.step)))
+        },
+        [beginFraming]
+    )
+    const zoomIn = useCallback(() => stepZoom('in'), [stepZoom])
+    const zoomOut = useCallback(() => stepZoom('out'), [stepZoom])
+
+    const containersRef = useRef(containers)
+    containersRef.current = containers
+
+    const focusContainer = useCallback(
+        (containerId: string, insetRight = 0) => {
+            const container = containerRef.current
+            const target = containersRef.current.find(c => c.id === containerId)
+            if (!container || !target) return
+            beginFraming(CONTAINER_FOCUS_MS)
+            const diamond = containerWorldBox(target, WORLD_OFFSET)
+            // Le libellé se dresse sur l'arête haut-gauche du losange : on lui garde sa hauteur.
+            const box = { ...diamond, top: diamond.top - TILE_W }
+            const inset = { left: frameInsetRef.current.left, right: Math.max(frameInsetRef.current.right, insetRight) }
+            const camera = fitCamera(box, layoutBox(container), CONTAINER_FOCUS_MAX_ZOOM, TILE_W, inset)
+            setZoom(camera.zoom)
+            setPan(clampPan(camera.pan, camera.zoom))
+        },
+        [beginFraming, clampPan]
+    )
+
+    const viewNonceRef = useRef(viewRequest?.nonce)
+    useEffect(() => {
+        if (!viewRequest || viewRequest.nonce === viewNonceRef.current) return
+        viewNonceRef.current = viewRequest.nonce
+        if (viewRequest.kind === 'fitContainer') focusContainer(viewRequest.containerId, viewRequest.insetRight)
+        else stepZoom(viewRequest.kind === 'zoomIn' ? 'in' : 'out', KEY_ZOOM_TRANSITION_MS)
+    }, [viewRequest, focusContainer, stepZoom])
 
     const startPan = useCallback((e: React.PointerEvent) => {
         if (locked) return
@@ -1050,7 +1099,7 @@ export const IsoGrid = memo(function IsoGrid(props: IsoGridProps) {
             },
             onZoom(scaleFactor: number, _centerX: number, _centerY: number) {
                 beginGesture()
-                setZoom(z => Math.min(3, Math.max(0.3, z * scaleFactor)))
+                setZoom(z => Math.min(ISO_ZOOM.max, Math.max(ISO_ZOOM.min, z * scaleFactor)))
             },
             onTap(clientX: number, clientY: number) {
                 // En placement, le tap remplace le hover/clic de la souris. Un tap invalide garde le

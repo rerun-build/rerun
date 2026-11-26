@@ -261,6 +261,10 @@ export type IsoCamera = { pan: { x: number; y: number }; zoom: number }
 // visible, pas sous le panneau.
 export type IsoFocusRequest = { tileId: string; nonce: number; insetRight?: number }
 
+// Ordre de vue venu de l'hôte (le clavier du board) : un zoom d'un cran, ou le cadrage d'un
+// container. `insetRight` a le même sens que dans IsoFocusRequest.
+export type IsoViewRequest = { nonce: number } & ({ kind: 'zoomIn' | 'zoomOut' } | { kind: 'fitContainer'; containerId: string; insetRight?: number })
+
 export type FrameInset = { left: number; right: number }
 
 export type IsoGridProps = {
@@ -333,6 +337,9 @@ export type IsoGridProps = {
     // que recenterSignal : un changement de `nonce` déclenche, la valeur au montage est ignorée. Une
     // tile absente ou non posée ne bouge rien.
     focusRequest?: IsoFocusRequest | null
+    // Zoome d'un cran comme les boutons de la pill, ou cadre un container entier, libellé debout
+    // compris. Même contrat que focusRequest ; un container absent ne bouge rien.
+    viewRequest?: IsoViewRequest | null
     mask?: string | false
     drawColor?: string
     canDraw?: boolean
