@@ -1,0 +1,48 @@
+---
+title: "Account security"
+description: "Turn on two-step verification with an authenticator app or passkeys, keep backup codes, and see where your account is signed in."
+---
+
+Your Rerun account reaches coworkers connected to your mail, your chat, your payments, the [Vault](/vault) and a whole machine. Two-step verification makes sure your email alone is not enough to open it: after your email code, Google, Apple or phone code, Rerun asks for one more step.
+
+Everything below lives in the **Account** dialog: open the workspace pill in the top left corner, then **Account**, then the **Security** tab.
+
+## Two-step verification
+
+Pick one method or both. You can add or remove them at any time.
+
+- **Authenticator app.** A 6-digit code from 1Password, Google Authenticator, Authy or any app that reads a QR code. Click **Set up**, scan the QR code (or type the key under it), then type the code your app shows and click **Confirm**. A code that does not match is refused: check the time on your phone and try the next one.
+- **Passkeys.** Touch ID, Face ID, Windows Hello, an Android phone or a security key such as a YubiKey. Click **Add**, follow your browser's window, then give the passkey a name you will recognise. You can add several, rename them with the pencil and remove them with the bin.
+
+Turning on your first method signs you out of every other browser and app, so each of them goes through the new step at its next sign-in.
+
+Removing your last method turns two-step verification off, and your backup codes stop working.
+
+## Backup codes
+
+When you set up your first method, Rerun shows 10 backup codes, once. Copy them or download them, and keep them somewhere safe, away from your phone.
+
+Each code opens your account once, when no other method is at hand. The **Backup codes** row says how many are left. **New codes** makes 10 new ones: the codes you saved stop working.
+
+## Signing in
+
+After your usual sign-in, Rerun asks for your second step, on the web, in the [desktop app](/desktop-app) and in the [iPhone and Android app](/iphone-app):
+
+- The method you used last comes first: **Use my passkey** opens your device's passkey window, or you type the code from your authenticator app.
+- The other methods are just below: **Use my authenticator app**, **Use my passkey**, **Use a backup code**.
+- **Sign in with another account** leaves this account and goes back to the sign-in.
+
+The desktop app signs in through your browser: the second step happens there, and the app opens already through it.
+
+Passkeys work on app.rerun.build. On an organization's own address, sign in with your authenticator app or a backup code: the passkey options are not offered there.
+
+## Where you're signed in
+
+The same tab lists every browser and app your account is signed in to, with when each was last active. **This device** is the one you are reading it on.
+
+- **Sign out** ends one session: that browser or app has to sign in again.
+- **Sign out everywhere else** ends every session but this one.
+
+## If you lose every method
+
+If you lose your phone, your passkeys and your backup codes, write to [help@rerun.build](mailto:help@rerun.build) from the address of your account. Support checks that the account is yours before turning two-step verification off for you.

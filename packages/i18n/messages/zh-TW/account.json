@@ -9,6 +9,10 @@
             "label": "登入方式",
             "description": "您可用來登入此帳號的方式。"
         },
+        "security": {
+            "label": "安全性",
+            "description": "兩步驟驗證、密碼金鑰，以及您目前在哪裡登入。"
+        },
         "language": {
             "label": "語言",
             "description": "{brand} 與您溝通時使用的語言。"
@@ -89,5 +93,98 @@
         },
         "submit": "刪除帳號",
         "failed": "無法刪除您的帳號。"
+    },
+    "security": {
+        "twoStep": "兩步驟驗證",
+        "hint": "在電子郵件、Google 或 Apple 之後，{brand} 會再多要求一個步驟。請選擇一種方式，或兩種都用。",
+        "on": "已開啟",
+        "remove": "移除",
+        "app": {
+            "title": "驗證器應用程式",
+            "description": "由 1Password、Google Authenticator 或 Authy 產生的 6 位數驗證碼。",
+            "added": "新增於 {date}",
+            "setUp": "設定",
+            "removeTitle": "要移除驗證器應用程式嗎？",
+            "removeDescription": "登入時將不再要求輸入它的驗證碼。"
+        },
+        "passkeys": {
+            "title": "密碼金鑰",
+            "description": "Touch ID、Face ID、Windows Hello、Android 或安全金鑰。",
+            "add": "新增",
+            "addInBrowser": "請從瀏覽器新增密碼金鑰：這個應用程式無法使用 Touch ID 或 Windows Hello。",
+            "notHere": "這個網址無法使用密碼金鑰。",
+            "rename": "重新命名",
+            "used": "新增於 {added} · 上次使用 {used}",
+            "neverUsed": "新增於 {added} · 從未使用",
+            "removeTitle": "要移除 {name} 嗎？",
+            "removeDescription": "這個密碼金鑰將無法再登入您的帳號。",
+            "failed": "未能新增密碼金鑰，請再試一次。"
+        },
+        "lastMethod": "這是您最後一種驗證方式：兩步驟驗證將會關閉，您的備用碼也會失效。",
+        "backup": {
+            "title": "備用碼",
+            "description": "剩下 {left, number} 組，共 {total, number} 組。在沒有其他方式可用時，每組備用碼可登入您的帳號一次。",
+            "newCodes": "產生新備用碼",
+            "newTitle": "要產生新的備用碼嗎？",
+            "newDescription": "您已儲存的備用碼將會失效。"
+        },
+        "sessions": {
+            "title": "您登入的位置",
+            "thisDevice": "這台裝置",
+            "signOut": "登出",
+            "signOutOthers": "登出其他所有裝置",
+            "signOutOthersTitle": "要登出其他所有裝置嗎？",
+            "signOutOthersDescription": "其他所有登入此帳號的瀏覽器與應用程式都必須重新登入。",
+            "signedOut": "已登出",
+            "activeNow": "目前使用中",
+            "device": {
+                "browserOn": "{os} 上的 {browser}",
+                "browser": "{browser}",
+                "browserOnOs": "{os} 上的瀏覽器",
+                "desktopOn": "{os} 上的 {brand} 桌面版",
+                "desktop": "{brand} 桌面版",
+                "ios": "{brand} iPhone 版",
+                "android": "{brand} Android 版",
+                "unknown": "不明裝置"
+            }
+        },
+        "setup": {
+            "app": {
+                "title": "設定驗證器應用程式",
+                "scan": "請用您的應用程式掃描，或手動輸入金鑰。",
+                "copyKey": "複製金鑰",
+                "keyCopied": "已複製金鑰",
+                "codeLabel": "應用程式顯示的 6 位數驗證碼",
+                "confirm": "確認",
+                "wrong": "驗證碼不符。請檢查手機上的時間，再試下一組驗證碼。",
+                "qrAlt": "用驗證器應用程式掃描的 QR 碼"
+            },
+            "codes": {
+                "title": "儲存您的備用碼",
+                "intro": "如果您遺失了手機與密碼金鑰，每組備用碼可登入您的帳號一次。這些備用碼不會再次顯示。",
+                "copy": "複製",
+                "download": "下載",
+                "saved": "我已儲存",
+                "copied": "已複製備用碼",
+                "fileHeading": "{account} 的 {brand} 備用碼。每組備用碼可登入您的帳號一次。"
+            },
+            "passkey": {
+                "title": "為這個密碼金鑰命名",
+                "renameTitle": "重新命名這個密碼金鑰",
+                "added": "已新增密碼金鑰",
+                "hint": "取一個您能在清單中認出的名稱。",
+                "save": "儲存"
+            }
+        },
+        "passkeyNames": {
+            "mac": "Mac (Touch ID)",
+            "iphone": "iPhone (Face ID)",
+            "ipad": "iPad",
+            "windows": "Windows Hello",
+            "android": "Android",
+            "chromebook": "Chromebook",
+            "securityKey": "安全金鑰",
+            "passkey": "密碼金鑰"
+        }
     }
 }

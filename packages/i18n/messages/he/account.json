@@ -9,6 +9,10 @@
             "label": "התחברות",
             "description": "הדרכים שבהן אפשר להתחבר לחשבון הזה."
         },
+        "security": {
+            "label": "אבטחה",
+            "description": "אימות דו-שלבי, מפתחות גישה והמקומות שבהם אתה מחובר."
+        },
         "language": {
             "label": "שפה",
             "description": "השפה שבה {brand} פונה אליך."
@@ -89,5 +93,98 @@
         },
         "submit": "למחוק את החשבון",
         "failed": "לא ניתן למחוק את החשבון שלך."
+    },
+    "security": {
+        "twoStep": "אימות דו-שלבי",
+        "hint": "אחרי האימייל, Google או Apple, {brand} מבקשת שלב נוסף. אפשר לבחור שיטה אחת או את שתיהן.",
+        "on": "פעיל",
+        "remove": "להסיר",
+        "app": {
+            "title": "אפליקציית אימות",
+            "description": "קוד בן 6 ספרות מ-1Password, מ-Google Authenticator או מ-Authy.",
+            "added": "נוספה ב-{date}",
+            "setUp": "להגדיר",
+            "removeTitle": "להסיר את אפליקציית האימות?",
+            "removeDescription": "ההתחברות כבר לא תבקש את הקוד שלה."
+        },
+        "passkeys": {
+            "title": "מפתחות גישה",
+            "description": "Touch ID, Face ID, Windows Hello, Android או מפתח אבטחה.",
+            "add": "להוסיף",
+            "addInBrowser": "צריך להוסיף מפתח גישה מהדפדפן: לאפליקציה הזו אין גישה ל-Touch ID או ל-Windows Hello.",
+            "notHere": "מפתחות גישה אינם זמינים בכתובת הזו.",
+            "rename": "לשנות שם",
+            "used": "נוסף ב-{added} · שימוש אחרון {used}",
+            "neverUsed": "נוסף ב-{added} · לא נעשה בו שימוש",
+            "removeTitle": "להסיר את {name}?",
+            "removeDescription": "מפתח הגישה הזה כבר לא יפתח את החשבון שלך.",
+            "failed": "מפתח הגישה לא נוסף. כדאי לנסות שוב."
+        },
+        "lastMethod": "זו השיטה האחרונה שלך: האימות הדו-שלבי יכובה, וקודי הגיבוי שלך יפסיקו לעבוד.",
+        "backup": {
+            "title": "קודי גיבוי",
+            "description": "נותרו {left, number} מתוך {total, number}. כל קוד פותח את החשבון שלך פעם אחת, כשאין שיטה אחרת בהישג יד.",
+            "newCodes": "קודים חדשים",
+            "newTitle": "ליצור קודי גיבוי חדשים?",
+            "newDescription": "הקודים ששמרת יפסיקו לעבוד."
+        },
+        "sessions": {
+            "title": "איפה אתה מחובר",
+            "thisDevice": "המכשיר הזה",
+            "signOut": "להתנתק",
+            "signOutOthers": "להתנתק מכל שאר המכשירים",
+            "signOutOthersTitle": "להתנתק מכל שאר המכשירים?",
+            "signOutOthersDescription": "כל דפדפן ואפליקציה אחרים שמחוברים לחשבון הזה יצטרכו להתחבר מחדש.",
+            "signedOut": "נותקת",
+            "activeNow": "פעיל עכשיו",
+            "device": {
+                "browserOn": "{browser} ב-{os}",
+                "browser": "{browser}",
+                "browserOnOs": "דפדפן ב-{os}",
+                "desktopOn": "{brand} למחשב ב-{os}",
+                "desktop": "{brand} למחשב",
+                "ios": "{brand} ל-iPhone",
+                "android": "{brand} ל-Android",
+                "unknown": "מכשיר לא מוכר"
+            }
+        },
+        "setup": {
+            "app": {
+                "title": "להגדיר אפליקציית אימות",
+                "scan": "אפשר לסרוק עם האפליקציה שלך, או להקליד את המפתח.",
+                "copyKey": "להעתיק את המפתח",
+                "keyCopied": "המפתח הועתק",
+                "codeLabel": "הקוד בן 6 הספרות שהאפליקציה מציגה",
+                "confirm": "לאשר",
+                "wrong": "הקוד הזה לא תואם. כדאי לבדוק את השעה בטלפון ולנסות את הקוד הבא.",
+                "qrAlt": "קוד QR לסריקה עם אפליקציית האימות"
+            },
+            "codes": {
+                "title": "לשמור את קודי הגיבוי",
+                "intro": "אם הטלפון ומפתחות הגישה שלך יאבדו, כל קוד יפתח את החשבון שלך פעם אחת. הקודים לא יוצגו שוב.",
+                "copy": "להעתיק",
+                "download": "להוריד",
+                "saved": "שמרתי אותם",
+                "copied": "הקודים הועתקו",
+                "fileHeading": "קודי גיבוי של {brand} עבור {account}. כל קוד פותח את החשבון שלך פעם אחת."
+            },
+            "passkey": {
+                "title": "לתת שם למפתח הגישה",
+                "renameTitle": "לשנות את שם מפתח הגישה",
+                "added": "מפתח הגישה נוסף",
+                "hint": "כדאי לתת לו שם שתזהה ברשימה.",
+                "save": "לשמור"
+            }
+        },
+        "passkeyNames": {
+            "mac": "Mac (Touch ID)",
+            "iphone": "iPhone (Face ID)",
+            "ipad": "iPad",
+            "windows": "Windows Hello",
+            "android": "Android",
+            "chromebook": "Chromebook",
+            "securityKey": "מפתח אבטחה",
+            "passkey": "מפתח גישה"
+        }
     }
 }

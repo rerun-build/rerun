@@ -9,6 +9,10 @@
             "label": "Inicio de sesión",
             "description": "Las formas de iniciar sesión en esta cuenta."
         },
+        "security": {
+            "label": "Seguridad",
+            "description": "Verificación en dos pasos, llaves de acceso y dónde tienes la sesión iniciada."
+        },
         "language": {
             "label": "Idioma",
             "description": "El idioma que {brand} usa contigo."
@@ -89,5 +93,98 @@
         },
         "submit": "Eliminar cuenta",
         "failed": "No se pudo eliminar tu cuenta."
+    },
+    "security": {
+        "twoStep": "Verificación en dos pasos",
+        "hint": "Después de tu email, Google o Apple, {brand} pide un paso más. Elige un método o los dos.",
+        "on": "Activada",
+        "remove": "Quitar",
+        "app": {
+            "title": "App de autenticación",
+            "description": "Un código de 6 dígitos de 1Password, Google Authenticator o Authy.",
+            "added": "Añadida el {date}",
+            "setUp": "Configurar",
+            "removeTitle": "¿Quitar la app de autenticación?",
+            "removeDescription": "Al iniciar sesión ya no se pedirá su código."
+        },
+        "passkeys": {
+            "title": "Llaves de acceso",
+            "description": "Touch ID, Face ID, Windows Hello, Android o una llave de seguridad.",
+            "add": "Añadir",
+            "addInBrowser": "Añade una llave de acceso desde tu navegador: esta app no puede acceder a Touch ID ni a Windows Hello.",
+            "notHere": "Las llaves de acceso no están disponibles en esta dirección.",
+            "rename": "Cambiar nombre",
+            "used": "Añadida el {added} · usada {used}",
+            "neverUsed": "Añadida el {added} · nunca usada",
+            "removeTitle": "¿Quitar {name}?",
+            "removeDescription": "Esta llave de acceso ya no abrirá tu cuenta.",
+            "failed": "No se añadió la llave de acceso. Inténtalo de nuevo."
+        },
+        "lastMethod": "Es tu último método: la verificación en dos pasos se desactiva y tus códigos de respaldo dejan de funcionar.",
+        "backup": {
+            "title": "Códigos de respaldo",
+            "description": "Quedan {left, number} de {total, number}. Cada uno abre tu cuenta una vez, cuando no tienes otro método a mano.",
+            "newCodes": "Nuevos códigos",
+            "newTitle": "¿Generar nuevos códigos de respaldo?",
+            "newDescription": "Los códigos que guardaste dejan de funcionar."
+        },
+        "sessions": {
+            "title": "Dónde tienes la sesión iniciada",
+            "thisDevice": "Este dispositivo",
+            "signOut": "Cerrar sesión",
+            "signOutOthers": "Cerrar sesión en los demás",
+            "signOutOthersTitle": "¿Cerrar sesión en los demás?",
+            "signOutOthersDescription": "Todos los demás navegadores y apps con sesión en esta cuenta tendrán que volver a iniciar sesión.",
+            "signedOut": "Sesión cerrada",
+            "activeNow": "Activa ahora",
+            "device": {
+                "browserOn": "{browser} en {os}",
+                "browser": "{browser}",
+                "browserOnOs": "Navegador en {os}",
+                "desktopOn": "{brand} para escritorio en {os}",
+                "desktop": "{brand} para escritorio",
+                "ios": "{brand} para iPhone",
+                "android": "{brand} para Android",
+                "unknown": "Dispositivo desconocido"
+            }
+        },
+        "setup": {
+            "app": {
+                "title": "Configura una app de autenticación",
+                "scan": "Escanéalo con tu app o escribe la clave.",
+                "copyKey": "Copiar la clave",
+                "keyCopied": "Clave copiada",
+                "codeLabel": "El código de 6 dígitos que muestra tu app",
+                "confirm": "Confirmar",
+                "wrong": "Este código no coincide. Revisa la hora de tu teléfono y prueba el siguiente.",
+                "qrAlt": "Código QR para escanear con tu app de autenticación"
+            },
+            "codes": {
+                "title": "Guarda tus códigos de respaldo",
+                "intro": "Si pierdes tu teléfono y tus llaves de acceso, cada código abre tu cuenta una vez. No se volverán a mostrar.",
+                "copy": "Copiar",
+                "download": "Descargar",
+                "saved": "Ya los guardé",
+                "copied": "Códigos copiados",
+                "fileHeading": "Códigos de respaldo de {brand} para {account}. Cada código abre tu cuenta una vez."
+            },
+            "passkey": {
+                "title": "Ponle nombre a esta llave de acceso",
+                "renameTitle": "Cambia el nombre de esta llave de acceso",
+                "added": "Llave de acceso añadida",
+                "hint": "Dale un nombre que reconozcas en la lista.",
+                "save": "Guardar"
+            }
+        },
+        "passkeyNames": {
+            "mac": "Mac (Touch ID)",
+            "iphone": "iPhone (Face ID)",
+            "ipad": "iPad",
+            "windows": "Windows Hello",
+            "android": "Android",
+            "chromebook": "Chromebook",
+            "securityKey": "Llave de seguridad",
+            "passkey": "Llave de acceso"
+        }
     }
 }

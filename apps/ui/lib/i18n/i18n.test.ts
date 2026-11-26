@@ -1,6 +1,6 @@
 import { loadMessages } from '@rerun/i18n/messages'
 import { languageName, localeDirection, localeNativeName, matchLocale, parseAcceptLanguage, resolveLocale } from '@rerun/i18n'
-import { formatBytes, formatDuration, formatNumber, longDate, messageDayLabel, shortDate, shortRelativeTime, shortUntil } from '@rerun/i18n/format'
+import { formatBytes, formatDuration, formatNumber, longDate, messageDayLabel, shortDate, shortRelativeTime, shortUntil, timeAgo } from '@rerun/i18n/format'
 import { pseudoLocalize } from '@rerun/i18n/pseudo'
 import { mergeMessages } from '@rerun/i18n'
 import { describe, expect, it } from 'vitest'
@@ -75,6 +75,11 @@ describe('format', () => {
         expect(shortRelativeTime(ago(3 * HOUR), 'en', NOW)).toBe('3h')
         expect(shortRelativeTime(ago(2 * DAY), 'en', NOW)).toBe('2d')
         expect(shortUntil(ahead(5 * MINUTE + 1000), 'en', NOW)).toBe('in 5m')
+        expect(timeAgo(ago(30_000), 'en', NOW)).toBe('now')
+        expect(timeAgo(ago(2 * HOUR), 'en', NOW)).toBe('2 hours ago')
+        expect(timeAgo(ago(DAY + HOUR), 'en', NOW)).toBe('yesterday')
+        expect(timeAgo(ago(3 * DAY), 'en', NOW)).toBe('3 days ago')
+        expect(timeAgo(ago(10 * DAY), 'en', NOW)).toBe('Oct 30')
         expect(shortDate('2026-03-05T12:00:00Z', 'en')).toBe('Mar 5')
         expect(longDate('2026-03-05T12:00:00Z', 'en')).toBe('Mar 5, 2026')
         expect(formatBytes(1536, 'en')).toBe('1.5 KB')

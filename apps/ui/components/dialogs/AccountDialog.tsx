@@ -21,6 +21,7 @@ import { DeleteAccountPanel } from '@/components/account/DeleteAccountPanel'
 import { LanguagePanel } from '@/components/account/LanguagePanel'
 import { useLanguageChoice } from '@/components/account/useLanguageChoice'
 import { ProfilePanel } from '@/components/account/ProfilePanel'
+import { SecurityTab } from '@/components/account/SecurityTab'
 import { SignInMethodsPanel } from '@/components/account/SignInMethodsPanel'
 import { EmailCodeForm } from '@/components/auth/EmailCodeForm'
 import { useBrand } from '@/components/brand/BrandProvider'
@@ -266,6 +267,7 @@ function LanguageTab() {
 const TAB_CONTENT: Record<AccountTab, () => ReactNode> = {
     profile: ProfileTab,
     'sign-in': SignInTab,
+    security: SecurityTab,
     language: LanguageTab,
     desktop: DesktopAppPanel,
     delete: DeleteAccountTab,

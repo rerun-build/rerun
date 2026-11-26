@@ -9,6 +9,10 @@
             "label": "Connexion",
             "description": "Les moyens de vous connecter à ce compte."
         },
+        "security": {
+            "label": "Sécurité",
+            "description": "Validation en deux étapes, clés d'accès et appareils où vous êtes connecté."
+        },
         "language": {
             "label": "Langue",
             "description": "La langue que {brand} utilise avec vous."
@@ -89,5 +93,98 @@
         },
         "submit": "Supprimer le compte",
         "failed": "Impossible de supprimer votre compte."
+    },
+    "security": {
+        "twoStep": "Validation en deux étapes",
+        "hint": "Après votre e-mail, Google ou Apple, {brand} demande une étape de plus. Choisissez une méthode ou les deux.",
+        "on": "Activée",
+        "remove": "Supprimer",
+        "app": {
+            "title": "Application d'authentification",
+            "description": "Un code à 6 chiffres de 1Password, Google Authenticator ou Authy.",
+            "added": "Ajoutée le {date}",
+            "setUp": "Configurer",
+            "removeTitle": "Supprimer l'application d'authentification ?",
+            "removeDescription": "La connexion ne demandera plus son code."
+        },
+        "passkeys": {
+            "title": "Clés d'accès",
+            "description": "Touch ID, Face ID, Windows Hello, Android ou une clé de sécurité.",
+            "add": "Ajouter",
+            "addInBrowser": "Ajoutez une clé d'accès depuis votre navigateur : cette app ne peut pas accéder à Touch ID ni à Windows Hello.",
+            "notHere": "Les clés d'accès ne sont pas disponibles sur cette adresse.",
+            "rename": "Renommer",
+            "used": "Ajoutée le {added} · utilisée {used}",
+            "neverUsed": "Ajoutée le {added} · jamais utilisée",
+            "removeTitle": "Supprimer {name} ?",
+            "removeDescription": "Cette clé d'accès n'ouvrira plus votre compte.",
+            "failed": "La clé d'accès n'a pas été ajoutée. Réessayez."
+        },
+        "lastMethod": "C'est votre dernière méthode : la validation en deux étapes se désactive et vos codes de secours ne fonctionnent plus.",
+        "backup": {
+            "title": "Codes de secours",
+            "description": "{left, number} sur {total, number} restants. Chacun ouvre votre compte une fois, quand aucune autre méthode n'est sous la main.",
+            "newCodes": "Nouveaux codes",
+            "newTitle": "Générer de nouveaux codes de secours ?",
+            "newDescription": "Les codes que vous avez enregistrés ne fonctionneront plus."
+        },
+        "sessions": {
+            "title": "Où vous êtes connecté",
+            "thisDevice": "Cet appareil",
+            "signOut": "Déconnecter",
+            "signOutOthers": "Déconnecter partout ailleurs",
+            "signOutOthersTitle": "Déconnecter partout ailleurs ?",
+            "signOutOthersDescription": "Tous les autres navigateurs et apps connectés à ce compte devront se reconnecter.",
+            "signedOut": "Déconnecté",
+            "activeNow": "Actif maintenant",
+            "device": {
+                "browserOn": "{browser} sur {os}",
+                "browser": "{browser}",
+                "browserOnOs": "Navigateur sur {os}",
+                "desktopOn": "App de bureau {brand} sur {os}",
+                "desktop": "App de bureau {brand}",
+                "ios": "{brand} pour iPhone",
+                "android": "{brand} pour Android",
+                "unknown": "Appareil inconnu"
+            }
+        },
+        "setup": {
+            "app": {
+                "title": "Configurer une application d'authentification",
+                "scan": "Scannez-le avec votre application, ou saisissez la clé.",
+                "copyKey": "Copier la clé",
+                "keyCopied": "Clé copiée",
+                "codeLabel": "Le code à 6 chiffres affiché par votre application",
+                "confirm": "Confirmer",
+                "wrong": "Ce code ne correspond pas. Vérifiez l'heure de votre téléphone et essayez le suivant.",
+                "qrAlt": "QR code à scanner avec votre application d'authentification"
+            },
+            "codes": {
+                "title": "Enregistrez vos codes de secours",
+                "intro": "Si vous perdez votre téléphone et vos clés d'accès, chaque code ouvre votre compte une fois. Ils ne seront plus affichés.",
+                "copy": "Copier",
+                "download": "Télécharger",
+                "saved": "Je les ai enregistrés",
+                "copied": "Codes copiés",
+                "fileHeading": "Codes de secours {brand} pour {account}. Chaque code ouvre votre compte une fois."
+            },
+            "passkey": {
+                "title": "Nommez cette clé d'accès",
+                "renameTitle": "Renommer cette clé d'accès",
+                "added": "Clé d'accès ajoutée",
+                "hint": "Donnez-lui un nom que vous reconnaîtrez dans la liste.",
+                "save": "Enregistrer"
+            }
+        },
+        "passkeyNames": {
+            "mac": "Mac (Touch ID)",
+            "iphone": "iPhone (Face ID)",
+            "ipad": "iPad",
+            "windows": "Windows Hello",
+            "android": "Android",
+            "chromebook": "Chromebook",
+            "securityKey": "Clé de sécurité",
+            "passkey": "Clé d'accès"
+        }
     }
 }

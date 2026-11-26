@@ -52,6 +52,19 @@ export function shortRelativeTime(iso: string, locale: string = DEFAULT_LOCALE, 
     return dayMonth(date, locale, now)
 }
 
+/** "now", "5 minutes ago", "2 hours ago", "yesterday", "3 days ago", then "Mar 5": how long ago, in words. */
+export function timeAgo(iso: string, locale: string = DEFAULT_LOCALE, now: Date = new Date()): string {
+    const date = new Date(iso)
+    const diff = now.getTime() - date.getTime()
+    const relative = new Intl.RelativeTimeFormat(tag(locale, 'en-US'), { numeric: 'auto' })
+
+    if (diff < MINUTE) return relative.format(0, 'second')
+    if (diff < HOUR) return relative.format(-Math.floor(diff / MINUTE), 'minute')
+    if (diff < DAY) return relative.format(-Math.floor(diff / HOUR), 'hour')
+    if (diff < WEEK) return relative.format(-Math.floor(diff / DAY), 'day')
+    return shortDate(date, locale)
+}
+
 /** "now", "in 5m", "in 3h", then a short date: how long until. */
 export function shortUntil(iso: string, locale: string = DEFAULT_LOCALE, now: Date = new Date()): string {
     const date = new Date(iso)

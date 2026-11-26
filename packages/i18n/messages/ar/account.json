@@ -9,6 +9,10 @@
             "label": "تسجيل الدخول",
             "description": "طرق تسجيل الدخول إلى هذا الحساب."
         },
+        "security": {
+            "label": "الأمان",
+            "description": "التحقق بخطوتين ومفاتيح المرور والأماكن التي سجّلت الدخول منها."
+        },
         "language": {
             "label": "اللغة",
             "description": "اللغة التي يستخدمها {brand} معك."
@@ -89,5 +93,98 @@
         },
         "submit": "حذف الحساب",
         "failed": "تعذّر حذف حسابك."
+    },
+    "security": {
+        "twoStep": "التحقق بخطوتين",
+        "hint": "بعد بريدك الإلكتروني أو Google أو Apple، يطلب {brand} خطوة إضافية. اختر طريقة واحدة أو كلتيهما.",
+        "on": "مفعّل",
+        "remove": "إزالة",
+        "app": {
+            "title": "تطبيق المصادقة",
+            "description": "رمز من 6 أرقام من 1Password أو Google Authenticator أو Authy.",
+            "added": "أُضيف في {date}",
+            "setUp": "إعداد",
+            "removeTitle": "إزالة تطبيق المصادقة؟",
+            "removeDescription": "لن يُطلب رمزه بعد الآن عند تسجيل الدخول."
+        },
+        "passkeys": {
+            "title": "مفاتيح المرور",
+            "description": "Touch ID أو Face ID أو Windows Hello أو Android أو مفتاح أمان.",
+            "add": "إضافة",
+            "addInBrowser": "أضف مفتاح مرور من متصفحك: لا يستطيع هذا التطبيق الوصول إلى Touch ID أو Windows Hello.",
+            "notHere": "مفاتيح المرور غير متاحة على هذا العنوان.",
+            "rename": "إعادة التسمية",
+            "used": "أُضيف في {added} · آخر استخدام {used}",
+            "neverUsed": "أُضيف في {added} · لم يُستخدم بعد",
+            "removeTitle": "إزالة {name}؟",
+            "removeDescription": "لن يفتح مفتاح المرور هذا حسابك بعد الآن.",
+            "failed": "لم تتم إضافة مفتاح المرور. حاول مرة أخرى."
+        },
+        "lastMethod": "هذه آخر طريقة لديك: سيتوقف التحقق بخطوتين، ولن تعمل رموزك الاحتياطية بعد الآن.",
+        "backup": {
+            "title": "الرموز الاحتياطية",
+            "description": "تبقّى {left, number} من {total, number}. يفتح كل رمز حسابك مرة واحدة، عندما لا تتوفر لديك طريقة أخرى.",
+            "newCodes": "رموز جديدة",
+            "newTitle": "إنشاء رموز احتياطية جديدة؟",
+            "newDescription": "ستتوقف الرموز التي حفظتها عن العمل."
+        },
+        "sessions": {
+            "title": "الأماكن التي سجّلت الدخول منها",
+            "thisDevice": "هذا الجهاز",
+            "signOut": "تسجيل الخروج",
+            "signOutOthers": "تسجيل الخروج من كل مكان آخر",
+            "signOutOthersTitle": "تسجيل الخروج من كل مكان آخر؟",
+            "signOutOthersDescription": "سيتعيّن على كل متصفح وتطبيق آخر مسجّل الدخول إلى هذا الحساب تسجيل الدخول مجددًا.",
+            "signedOut": "تم تسجيل الخروج",
+            "activeNow": "نشط الآن",
+            "device": {
+                "browserOn": "{browser} على {os}",
+                "browser": "{browser}",
+                "browserOnOs": "متصفح على {os}",
+                "desktopOn": "{brand} لسطح المكتب على {os}",
+                "desktop": "{brand} لسطح المكتب",
+                "ios": "{brand} لـ iPhone",
+                "android": "{brand} لـ Android",
+                "unknown": "جهاز غير معروف"
+            }
+        },
+        "setup": {
+            "app": {
+                "title": "إعداد تطبيق المصادقة",
+                "scan": "امسحه بتطبيقك، أو اكتب المفتاح.",
+                "copyKey": "نسخ المفتاح",
+                "keyCopied": "تم نسخ المفتاح",
+                "codeLabel": "الرمز المكوّن من 6 أرقام الذي يعرضه تطبيقك",
+                "confirm": "تأكيد",
+                "wrong": "هذا الرمز غير مطابق. تحقق من الوقت على هاتفك وجرّب الرمز التالي.",
+                "qrAlt": "رمز QR لمسحه بتطبيق المصادقة"
+            },
+            "codes": {
+                "title": "احفظ رموزك الاحتياطية",
+                "intro": "إذا فقدت هاتفك ومفاتيح المرور، يفتح كل رمز حسابك مرة واحدة. لن تظهر هذه الرموز مرة أخرى.",
+                "copy": "نسخ",
+                "download": "تنزيل",
+                "saved": "لقد حفظتها",
+                "copied": "تم نسخ الرموز",
+                "fileHeading": "رموز {brand} الاحتياطية للحساب {account}. يفتح كل رمز حسابك مرة واحدة."
+            },
+            "passkey": {
+                "title": "سمِّ مفتاح المرور هذا",
+                "renameTitle": "إعادة تسمية مفتاح المرور هذا",
+                "added": "تمت إضافة مفتاح المرور",
+                "hint": "امنحه اسمًا تتعرّف عليه في القائمة.",
+                "save": "حفظ"
+            }
+        },
+        "passkeyNames": {
+            "mac": "Mac (Touch ID)",
+            "iphone": "iPhone (Face ID)",
+            "ipad": "iPad",
+            "windows": "Windows Hello",
+            "android": "Android",
+            "chromebook": "Chromebook",
+            "securityKey": "مفتاح أمان",
+            "passkey": "مفتاح مرور"
+        }
     }
 }

@@ -38,7 +38,7 @@
           },
           {
             "group": "Your workspace",
-            "pages": ["chief-of-staff", "brain", "vault", "teams", "usage", "billing", "organizations"]
+            "pages": ["chief-of-staff", "brain", "vault", "teams", "account-security", "usage", "billing", "organizations"]
           },
           {
             "group": "Build a coworker",

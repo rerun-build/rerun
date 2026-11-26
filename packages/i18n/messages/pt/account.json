@@ -9,6 +9,10 @@
             "label": "Login",
             "description": "As formas de entrar nesta conta."
         },
+        "security": {
+            "label": "Segurança",
+            "description": "Verificação em duas etapas, chaves de acesso e onde você está conectado."
+        },
         "language": {
             "label": "Idioma",
             "description": "O idioma que o {brand} usa com você."
@@ -89,5 +93,98 @@
         },
         "submit": "Excluir conta",
         "failed": "Não foi possível excluir sua conta."
+    },
+    "security": {
+        "twoStep": "Verificação em duas etapas",
+        "hint": "Depois do seu e-mail, Google ou Apple, o {brand} pede mais uma etapa. Escolha um método ou os dois.",
+        "on": "Ativada",
+        "remove": "Remover",
+        "app": {
+            "title": "App autenticador",
+            "description": "Um código de 6 dígitos do 1Password, Google Authenticator ou Authy.",
+            "added": "Adicionado em {date}",
+            "setUp": "Configurar",
+            "removeTitle": "Remover o app autenticador?",
+            "removeDescription": "O login não vai mais pedir o código dele."
+        },
+        "passkeys": {
+            "title": "Chaves de acesso",
+            "description": "Touch ID, Face ID, Windows Hello, Android ou uma chave de segurança.",
+            "add": "Adicionar",
+            "addInBrowser": "Adicione uma chave de acesso pelo seu navegador: este app não consegue acessar o Touch ID nem o Windows Hello.",
+            "notHere": "As chaves de acesso não estão disponíveis neste endereço.",
+            "rename": "Renomear",
+            "used": "Adicionada em {added} · usada {used}",
+            "neverUsed": "Adicionada em {added} · nunca usada",
+            "removeTitle": "Remover {name}?",
+            "removeDescription": "Esta chave de acesso não vai mais abrir sua conta.",
+            "failed": "A chave de acesso não foi adicionada. Tente de novo."
+        },
+        "lastMethod": "Este é seu último método: a verificação em duas etapas é desativada e seus códigos de backup param de funcionar.",
+        "backup": {
+            "title": "Códigos de backup",
+            "description": "Restam {left, number} de {total, number}. Cada um abre sua conta uma vez, quando nenhum outro método está à mão.",
+            "newCodes": "Novos códigos",
+            "newTitle": "Gerar novos códigos de backup?",
+            "newDescription": "Os códigos que você salvou param de funcionar."
+        },
+        "sessions": {
+            "title": "Onde você está conectado",
+            "thisDevice": "Este dispositivo",
+            "signOut": "Sair",
+            "signOutOthers": "Sair de todos os outros",
+            "signOutOthersTitle": "Sair de todos os outros?",
+            "signOutOthersDescription": "Todos os outros navegadores e apps conectados a esta conta vão precisar entrar de novo.",
+            "signedOut": "Sessão encerrada",
+            "activeNow": "Ativo agora",
+            "device": {
+                "browserOn": "{browser} no {os}",
+                "browser": "{browser}",
+                "browserOnOs": "Navegador no {os}",
+                "desktopOn": "{brand} para desktop no {os}",
+                "desktop": "{brand} para desktop",
+                "ios": "{brand} para iPhone",
+                "android": "{brand} para Android",
+                "unknown": "Dispositivo desconhecido"
+            }
+        },
+        "setup": {
+            "app": {
+                "title": "Configurar um app autenticador",
+                "scan": "Escaneie com seu app ou digite a chave.",
+                "copyKey": "Copiar a chave",
+                "keyCopied": "Chave copiada",
+                "codeLabel": "O código de 6 dígitos que seu app mostra",
+                "confirm": "Confirmar",
+                "wrong": "Este código não confere. Verifique a hora do seu celular e tente o próximo.",
+                "qrAlt": "QR code para escanear com seu app autenticador"
+            },
+            "codes": {
+                "title": "Salve seus códigos de backup",
+                "intro": "Se você perder seu celular e suas chaves de acesso, cada código abre sua conta uma vez. Eles não serão mostrados de novo.",
+                "copy": "Copiar",
+                "download": "Baixar",
+                "saved": "Já salvei",
+                "copied": "Códigos copiados",
+                "fileHeading": "Códigos de backup do {brand} para {account}. Cada código abre sua conta uma vez."
+            },
+            "passkey": {
+                "title": "Dê um nome a esta chave de acesso",
+                "renameTitle": "Renomear esta chave de acesso",
+                "added": "Chave de acesso adicionada",
+                "hint": "Dê um nome que você vai reconhecer na lista.",
+                "save": "Salvar"
+            }
+        },
+        "passkeyNames": {
+            "mac": "Mac (Touch ID)",
+            "iphone": "iPhone (Face ID)",
+            "ipad": "iPad",
+            "windows": "Windows Hello",
+            "android": "Android",
+            "chromebook": "Chromebook",
+            "securityKey": "Chave de segurança",
+            "passkey": "Chave de acesso"
+        }
     }
 }

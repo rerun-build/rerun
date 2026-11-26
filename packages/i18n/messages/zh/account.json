@@ -9,6 +9,10 @@
             "label": "登录方式",
             "description": "您可以用来登录此账号的方式。"
         },
+        "security": {
+            "label": "安全",
+            "description": "两步验证、通行密钥，以及您在哪些地方已登录。"
+        },
         "language": {
             "label": "语言",
             "description": "{brand} 与您交流时使用的语言。"
@@ -89,5 +93,98 @@
         },
         "submit": "删除账号",
         "failed": "无法删除您的账号。"
+    },
+    "security": {
+        "twoStep": "两步验证",
+        "hint": "在邮箱、Google 或 Apple 之后，{brand} 会再要求一步验证。选择一种方式，或两种都用。",
+        "on": "已开启",
+        "remove": "移除",
+        "app": {
+            "title": "身份验证器应用",
+            "description": "来自 1Password、Google Authenticator 或 Authy 的 6 位验证码。",
+            "added": "添加于 {date}",
+            "setUp": "设置",
+            "removeTitle": "移除身份验证器应用？",
+            "removeDescription": "登录时将不再要求输入它的验证码。"
+        },
+        "passkeys": {
+            "title": "通行密钥",
+            "description": "Touch ID、Face ID、Windows Hello、Android 或安全密钥。",
+            "add": "添加",
+            "addInBrowser": "请在浏览器中添加通行密钥：此应用无法调用 Touch ID 或 Windows Hello。",
+            "notHere": "此地址不支持通行密钥。",
+            "rename": "重命名",
+            "used": "添加于 {added} · 上次使用 {used}",
+            "neverUsed": "添加于 {added} · 从未使用",
+            "removeTitle": "移除 {name}？",
+            "removeDescription": "此通行密钥将无法再登录您的账号。",
+            "failed": "未能添加通行密钥，请重试。"
+        },
+        "lastMethod": "这是您最后一种验证方式：两步验证将关闭，您的备用码也将失效。",
+        "backup": {
+            "title": "备用码",
+            "description": "剩余 {left, number} 个，共 {total, number} 个。每个备用码可在没有其他方式时登录您的账号一次。",
+            "newCodes": "生成新备用码",
+            "newTitle": "生成新的备用码？",
+            "newDescription": "您已保存的备用码将失效。"
+        },
+        "sessions": {
+            "title": "已登录的设备",
+            "thisDevice": "此设备",
+            "signOut": "退出登录",
+            "signOutOthers": "退出其他所有设备",
+            "signOutOthersTitle": "退出其他所有设备？",
+            "signOutOthersDescription": "已登录此账号的其他浏览器和应用都需要重新登录。",
+            "signedOut": "已退出登录",
+            "activeNow": "当前活跃",
+            "device": {
+                "browserOn": "{os} 上的 {browser}",
+                "browser": "{browser}",
+                "browserOnOs": "{os} 上的浏览器",
+                "desktopOn": "{os} 上的 {brand} 桌面版",
+                "desktop": "{brand} 桌面版",
+                "ios": "{brand} iPhone 版",
+                "android": "{brand} Android 版",
+                "unknown": "未知设备"
+            }
+        },
+        "setup": {
+            "app": {
+                "title": "设置身份验证器应用",
+                "scan": "用您的应用扫描，或手动输入密钥。",
+                "copyKey": "复制密钥",
+                "keyCopied": "密钥已复制",
+                "codeLabel": "应用中显示的 6 位验证码",
+                "confirm": "确认",
+                "wrong": "验证码不匹配。请检查手机上的时间，然后试试下一个验证码。",
+                "qrAlt": "用身份验证器应用扫描的二维码"
+            },
+            "codes": {
+                "title": "保存您的备用码",
+                "intro": "如果您丢失了手机和通行密钥，每个备用码可登录您的账号一次。这些备用码不会再次显示。",
+                "copy": "复制",
+                "download": "下载",
+                "saved": "我已保存",
+                "copied": "备用码已复制",
+                "fileHeading": "{account} 的 {brand} 备用码。每个备用码可登录您的账号一次。"
+            },
+            "passkey": {
+                "title": "为此通行密钥命名",
+                "renameTitle": "重命名此通行密钥",
+                "added": "通行密钥已添加",
+                "hint": "起一个您在列表中能认出的名称。",
+                "save": "保存"
+            }
+        },
+        "passkeyNames": {
+            "mac": "Mac (Touch ID)",
+            "iphone": "iPhone (Face ID)",
+            "ipad": "iPad",
+            "windows": "Windows Hello",
+            "android": "Android",
+            "chromebook": "Chromebook",
+            "securityKey": "安全密钥",
+            "passkey": "通行密钥"
+        }
     }
 }

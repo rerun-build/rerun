@@ -9,6 +9,10 @@
             "label": "Anmeldung",
             "description": "Wie du dich bei diesem Konto anmelden kannst."
         },
+        "security": {
+            "label": "Sicherheit",
+            "description": "Bestätigung in zwei Schritten, Passkeys und wo du angemeldet bist."
+        },
         "language": {
             "label": "Sprache",
             "description": "Die Sprache, in der {brand} mit dir spricht."
@@ -89,5 +93,98 @@
         },
         "submit": "Konto löschen",
         "failed": "Dein Konto konnte nicht gelöscht werden."
+    },
+    "security": {
+        "twoStep": "Bestätigung in zwei Schritten",
+        "hint": "Nach deiner E-Mail, Google oder Apple fragt {brand} nach einem weiteren Schritt. Wähle eine Methode oder beide.",
+        "on": "An",
+        "remove": "Entfernen",
+        "app": {
+            "title": "Authenticator-App",
+            "description": "Ein 6-stelliger Code aus 1Password, Google Authenticator oder Authy.",
+            "added": "Hinzugefügt am {date}",
+            "setUp": "Einrichten",
+            "removeTitle": "Authenticator-App entfernen?",
+            "removeDescription": "Bei der Anmeldung wird ihr Code nicht mehr abgefragt."
+        },
+        "passkeys": {
+            "title": "Passkeys",
+            "description": "Touch ID, Face ID, Windows Hello, Android oder ein Sicherheitsschlüssel.",
+            "add": "Hinzufügen",
+            "addInBrowser": "Füge einen Passkey in deinem Browser hinzu: Diese App kann Touch ID und Windows Hello nicht erreichen.",
+            "notHere": "Passkeys sind unter dieser Adresse nicht verfügbar.",
+            "rename": "Umbenennen",
+            "used": "Hinzugefügt am {added} · zuletzt genutzt {used}",
+            "neverUsed": "Hinzugefügt am {added} · nie genutzt",
+            "removeTitle": "{name} entfernen?",
+            "removeDescription": "Dieser Passkey öffnet dein Konto nicht mehr.",
+            "failed": "Der Passkey wurde nicht hinzugefügt. Versuch es erneut."
+        },
+        "lastMethod": "Das ist deine letzte Methode: Die Bestätigung in zwei Schritten wird ausgeschaltet und deine Backup-Codes funktionieren nicht mehr.",
+        "backup": {
+            "title": "Backup-Codes",
+            "description": "{left, number} von {total, number} übrig. Jeder Code öffnet dein Konto einmal, wenn keine andere Methode zur Hand ist.",
+            "newCodes": "Neue Codes",
+            "newTitle": "Neue Backup-Codes erstellen?",
+            "newDescription": "Die Codes, die du gespeichert hast, funktionieren nicht mehr."
+        },
+        "sessions": {
+            "title": "Wo du angemeldet bist",
+            "thisDevice": "Dieses Gerät",
+            "signOut": "Abmelden",
+            "signOutOthers": "Überall sonst abmelden",
+            "signOutOthersTitle": "Überall sonst abmelden?",
+            "signOutOthersDescription": "Jeder andere Browser und jede andere App, die bei diesem Konto angemeldet ist, muss sich neu anmelden.",
+            "signedOut": "Abgemeldet",
+            "activeNow": "Gerade aktiv",
+            "device": {
+                "browserOn": "{browser} auf {os}",
+                "browser": "{browser}",
+                "browserOnOs": "Browser auf {os}",
+                "desktopOn": "{brand}-Desktop-App auf {os}",
+                "desktop": "{brand}-Desktop-App",
+                "ios": "{brand} für iPhone",
+                "android": "{brand} für Android",
+                "unknown": "Unbekanntes Gerät"
+            }
+        },
+        "setup": {
+            "app": {
+                "title": "Authenticator-App einrichten",
+                "scan": "Scanne ihn mit deiner App oder gib den Schlüssel ein.",
+                "copyKey": "Schlüssel kopieren",
+                "keyCopied": "Schlüssel kopiert",
+                "codeLabel": "Der 6-stellige Code aus deiner App",
+                "confirm": "Bestätigen",
+                "wrong": "Dieser Code stimmt nicht. Prüfe die Uhrzeit auf deinem Handy und versuch den nächsten.",
+                "qrAlt": "QR-Code zum Scannen mit deiner Authenticator-App"
+            },
+            "codes": {
+                "title": "Speichere deine Backup-Codes",
+                "intro": "Wenn du dein Handy und deine Passkeys verlierst, öffnet jeder Code dein Konto einmal. Sie werden nicht noch einmal angezeigt.",
+                "copy": "Kopieren",
+                "download": "Herunterladen",
+                "saved": "Ich habe sie gespeichert",
+                "copied": "Codes kopiert",
+                "fileHeading": "{brand}-Backup-Codes für {account}. Jeder Code öffnet dein Konto einmal."
+            },
+            "passkey": {
+                "title": "Benenne diesen Passkey",
+                "renameTitle": "Diesen Passkey umbenennen",
+                "added": "Passkey hinzugefügt",
+                "hint": "Gib ihm einen Namen, den du in der Liste wiedererkennst.",
+                "save": "Speichern"
+            }
+        },
+        "passkeyNames": {
+            "mac": "Mac (Touch ID)",
+            "iphone": "iPhone (Face ID)",
+            "ipad": "iPad",
+            "windows": "Windows Hello",
+            "android": "Android",
+            "chromebook": "Chromebook",
+            "securityKey": "Sicherheitsschlüssel",
+            "passkey": "Passkey"
+        }
     }
 }

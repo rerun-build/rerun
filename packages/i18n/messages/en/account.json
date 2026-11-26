@@ -7,7 +7,13 @@
         "profile.photo": "Field label: the profile photo.",
         "delete.consequences.signIn.title": "Heading of what happens to sign-in once the account is deleted.",
         "delete.submit": "Button that opens the final confirmation.",
-        "signIn.linkError.failed": "Toast after linking a sign-in provider to the account failed. {provider} is Google or Apple."
+        "signIn.linkError.failed": "Toast after linking a sign-in provider to the account failed. {provider} is Google or Apple.",
+        "security.hint": "Help line of the Security tab when no second step is set up. {brand} is the product name.",
+        "security.passkeys.used": "Under a passkey's name. {added} is a short date (\"Nov 12\"), {used} a time in words (\"3 days ago\", \"yesterday\").",
+        "security.sessions.device.browserOn": "A signed-in session. {browser} is a browser brand (Chrome, Safari), {os} a system (macOS, Windows).",
+        "security.sessions.device.desktopOn": "{brand} is the product name, {os} a system (macOS, Windows).",
+        "security.passkeyNames": "Default names given to a new passkey, from the device it was made on. Touch ID, Face ID and Windows Hello are Apple and Microsoft feature names.",
+        "security.setup.codes.fileHeading": "First line of the downloaded text file. {account} is the person's email address."
     },
     "title": "Account",
     "tabs": {
@@ -18,6 +24,10 @@
         "signIn": {
             "label": "Sign-in",
             "description": "The ways you can sign into this account."
+        },
+        "security": {
+            "label": "Security",
+            "description": "Two-step verification, passkeys and where you are signed in."
         },
         "language": {
             "label": "Language",
@@ -99,5 +109,98 @@
         },
         "submit": "Delete account",
         "failed": "Could not delete your account."
+    },
+    "security": {
+        "twoStep": "Two-step verification",
+        "hint": "After your email, Google or Apple, {brand} asks for one more step. Pick one method or both.",
+        "on": "On",
+        "remove": "Remove",
+        "app": {
+            "title": "Authenticator app",
+            "description": "A 6-digit code from 1Password, Google Authenticator or Authy.",
+            "added": "Added {date}",
+            "setUp": "Set up",
+            "removeTitle": "Remove the authenticator app?",
+            "removeDescription": "Signing in will no longer ask for its code."
+        },
+        "passkeys": {
+            "title": "Passkeys",
+            "description": "Touch ID, Face ID, Windows Hello, Android or a security key.",
+            "add": "Add",
+            "addInBrowser": "Add a passkey from your browser: this app cannot reach Touch ID or Windows Hello.",
+            "notHere": "Passkeys are not available on this address.",
+            "rename": "Rename",
+            "used": "Added {added} · used {used}",
+            "neverUsed": "Added {added} · never used",
+            "removeTitle": "Remove {name}?",
+            "removeDescription": "This passkey will no longer open your account.",
+            "failed": "The passkey was not added. Try again."
+        },
+        "lastMethod": "This is your last method: two-step verification turns off, and your backup codes stop working.",
+        "backup": {
+            "title": "Backup codes",
+            "description": "{left, number} of {total, number} left. Each one opens your account once, when no other method is at hand.",
+            "newCodes": "New codes",
+            "newTitle": "Make new backup codes?",
+            "newDescription": "The codes you saved stop working."
+        },
+        "sessions": {
+            "title": "Where you're signed in",
+            "thisDevice": "This device",
+            "signOut": "Sign out",
+            "signOutOthers": "Sign out everywhere else",
+            "signOutOthersTitle": "Sign out everywhere else?",
+            "signOutOthersDescription": "Every other browser and app signed in to this account will have to sign in again.",
+            "signedOut": "Signed out",
+            "activeNow": "Active now",
+            "device": {
+                "browserOn": "{browser} on {os}",
+                "browser": "{browser}",
+                "browserOnOs": "Browser on {os}",
+                "desktopOn": "{brand} desktop on {os}",
+                "desktop": "{brand} desktop",
+                "ios": "{brand} for iPhone",
+                "android": "{brand} for Android",
+                "unknown": "Unknown device"
+            }
+        },
+        "setup": {
+            "app": {
+                "title": "Set up an authenticator app",
+                "scan": "Scan it with your app, or type the key.",
+                "copyKey": "Copy the key",
+                "keyCopied": "Key copied",
+                "codeLabel": "The 6-digit code your app shows",
+                "confirm": "Confirm",
+                "wrong": "This code does not match. Check the time on your phone and try the next one.",
+                "qrAlt": "QR code to scan with your authenticator app"
+            },
+            "codes": {
+                "title": "Save your backup codes",
+                "intro": "If you lose your phone and your passkeys, each code opens your account once. They will not be shown again.",
+                "copy": "Copy",
+                "download": "Download",
+                "saved": "I saved them",
+                "copied": "Codes copied",
+                "fileHeading": "{brand} backup codes for {account}. Each code opens your account once."
+            },
+            "passkey": {
+                "title": "Name this passkey",
+                "renameTitle": "Rename this passkey",
+                "added": "Passkey added",
+                "hint": "Give it a name you will recognise in the list.",
+                "save": "Save"
+            }
+        },
+        "passkeyNames": {
+            "mac": "Mac (Touch ID)",
+            "iphone": "iPhone (Face ID)",
+            "ipad": "iPad",
+            "windows": "Windows Hello",
+            "android": "Android",
+            "chromebook": "Chromebook",
+            "securityKey": "Security key",
+            "passkey": "Passkey"
+        }
     }
 }
