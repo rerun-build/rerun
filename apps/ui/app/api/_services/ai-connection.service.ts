@@ -56,7 +56,7 @@ import { NoPlanError } from '@/app/api/_services/capacity.service'
 import type { BoxBackupModels, BoxConnection, BoxConnectionsList, BoxConnectionUsage, BoxDefault, CreateBoxConnectionInput, EngineConnection, UpdateBoxConnectionInput } from '@/lib/engine/types'
 import { providerKeyProblem } from '@/lib/engine/verify-provider-key'
 import { assertPublicUrl } from '@/lib/net/public-fetch'
-import { AppError, type ErrorCode, type ErrorParams } from '@/lib/i18n/action-error'
+import { AppError, type ActionFailure, type ErrorCode, type ErrorParams } from '@/lib/i18n/action-error'
 import { recipientLocale } from '@/lib/i18n/recipient-locale'
 import { translatorFor } from '@/lib/i18n/server-translator'
 import { CONNECTION_SATELLITE_KEYS, CONNECTION_TOKEN_KEY, DEFAULT_CONNECTION_MODELS, NO_BOX_BACKUPS, RERUN_CONNECTION_ID, canonicalModelId, canonicalModelIds, claudeTokenIssue, type AddableProvider, type AiConnectionView, type AiConnectionsView, type CustomProbeInput, type CustomProbeResult } from '@rerun/contracts'
@@ -73,13 +73,22 @@ export class ConnectionInputError extends AppError {
     }
 }
 
+// A workspace without a machine whose claim failed: the message stays the claim's own (no free machine,
+// a restore under way, no server paired on a self-hosted install).
+class MachineUnavailableError extends Error {
+    constructor(readonly failure: ActionFailure) {
+        super(failure.error)
+        this.name = 'MachineUnavailableError'
+    }
+}
+
 // A workspace on a plan only claims its machine the first time something needs it, and plugging in
 // a provider can be that first time.
 async function connectionForCreate(workspaceId: number): Promise<EngineConnection> {
     const engine = await findWorkspaceEngine(workspaceId)
     if (engine) return engine.conn
     const claimed = await ensureWorkspaceEngine(workspaceId)
-    if (!claimed.ok) throw new Error(claimed.error)
+    if (!claimed.ok) throw new MachineUnavailableError(claimed)
     return getWorkspaceConnection(workspaceId)
 }
 
@@ -348,6 +357,10 @@ export async function storeGrokSignIn(workspaceId: number, keys: Record<string, 
     try {
         return await storeSignInKeys(workspaceId, 'grok', keys, target)
     } catch (err) {
+        if (err instanceof MachineUnavailableError) {
+            await revokeGrokKeys(keys)
+            throw new ConnectionInputError(err.failure.code ?? 'noMachine', err.failure.params)
+        }
         const outcome = refusedBeforeStoring(err) ? 'not-stored' : await grokStoreOutcome(workspaceId, target, before)
         if (typeof outcome === 'object') return outcome.storedOn
         if (outcome === 'not-stored') await revokeGrokKeys(keys)

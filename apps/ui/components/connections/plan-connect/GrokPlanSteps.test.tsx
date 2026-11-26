@@ -85,6 +85,29 @@ describe('the Grok sign-in of the AI providers panel', () => {
         expect(container.textContent).toContain('Linked')
     })
 
+    it('reaches Linked when the caller takes the connection after a round trip of its own', async () => {
+        let take: (result: Mutation) => void = () => undefined
+        onSignedIn.mockImplementation(() => new Promise<Mutation>(resolve => (take = resolve)))
+        await getCode()
+        actions.pollGrokSignInAction.mockResolvedValue({ status: 'connected', connectionId: 'cnx-grok' })
+        await tick()
+        expect(onSignedIn).toHaveBeenCalledWith('cnx-grok')
+        expect(container.textContent).not.toContain('Grab a code first')
+
+        await act(async () => take({ success: true }))
+        expect(container.textContent).toContain('Linked')
+        expect(actions.pollGrokSignInAction).toHaveBeenCalledTimes(1)
+    })
+
+    it('stops at once when no machine is free, rather than playing the spent code again', async () => {
+        await getCode()
+        actions.pollGrokSignInAction.mockResolvedValue({ status: 'error', error: 'No machine is available right now', code: 'noMachine' })
+        await tick()
+        await tick()
+        expect(container.textContent).toContain('No machine is available right now')
+        expect(actions.pollGrokSignInAction).toHaveBeenCalledTimes(1)
+    })
+
     it('says why the sign-in did not go through, and offers a new code', async () => {
         await getCode()
         actions.pollGrokSignInAction.mockResolvedValue({ status: 'error', error: 'The sign-in was declined on xAI. Start it again to connect Grok.', code: 'grokSignInDenied' })

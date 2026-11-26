@@ -219,7 +219,7 @@ export function ChatGptConnect({ reconnectId }: { reconnectId: string | null }) 
 // The web's Grok sign-in: a code typed on xAI's page while the hub polls and stores the connection
 // itself. A refusal of the moment (a hub out of reach) is polled through, so an approval given
 // meanwhile still lands, up to this many in a row; xAI's own answers end the wait.
-const GROK_FINAL_REFUSALS: ReadonlySet<string> = new Set(['grokSignInDenied', 'grokSignInExpired', 'grokSignInNotStored', 'grokNeedsUpdate', 'signInOtherProvider'])
+const GROK_FINAL_REFUSALS: ReadonlySet<string> = new Set(['grokSignInDenied', 'grokSignInExpired', 'grokSignInNotStored', 'noMachine', 'workspaceRestoring', 'grokNeedsUpdate', 'signInOtherProvider'])
 const GROK_MAX_FAILED_POLLS = 6
 
 export function GrokConnect({ reconnectId }: { reconnectId: string | null }) {

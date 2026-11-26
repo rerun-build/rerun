@@ -58,6 +58,11 @@ vi.mock('@rerun/cloud/billing', async () => ({
 }))
 vi.mock('@/lib/engine/client', async importOriginal => ({ ...(await importOriginal<EngineClient>()), ...engine }))
 vi.mock('@/lib/engine/verify-provider-key', () => ({ providerKeyProblem }))
+// An empty pool, whichever side @rerun/cloud/engines resolves to.
+vi.mock('@rerun/cloud/engines', async importOriginal => ({
+    ...(await importOriginal<typeof import('@rerun/cloud/engines')>()),
+    claimPoolEngine: async () => ({ ok: false, raced: false, error: 'No machine is available right now, new ones are being prepared. Please try again in a few minutes.' }),
+}))
 
 function boxConnection(fields: Pick<BoxConnection, 'id' | 'name' | 'provider' | 'models'> & Partial<BoxConnection>): BoxConnection {
     return { extraModels: [], createdAt: '2026-11-02T09:00:00.000Z', connected: true, credentialRejected: false, planLimits: null, cliModels: null, providerModels: null, discoveredModels: null, ...fields }
@@ -469,6 +474,16 @@ describe('the Grok sign-in of the mobile app', () => {
         const { POST } = await import('@/app/api/v1/ai-connections/grok/poll/route')
         const res = await callRoute(POST, mobileApi.pollGrokSignIn, { body: { ticket: mintGrokSignIn('user-ada', 7, { deviceCode: grokDeviceCode, expiresAt: Date.now() + 1_800_000 }) } })
         expect(await expectContract(mobileApi.pollGrokSignIn, res, 403)).toMatchObject({ reason: 'no_plan' })
+    })
+
+    it('says no machine is free when a workspace on a plan has none to claim, and hands the sign-in back', async () => {
+        openDatabase({ engine_pool: [] })
+        providerEndpoints({ ...grokPoll(grokApproved), 'https://auth.x.ai/oauth2/revoke': () => new Response(null, { status: 200 }) })
+        const { POST } = await import('@/app/api/v1/ai-connections/grok/poll/route')
+        const res = await callRoute(POST, mobileApi.pollGrokSignIn, { body: { ticket: grokTicket() } })
+        expect(await expectContract(mobileApi.pollGrokSignIn, res, 400)).toMatchObject({ code: 'noMachine' })
+        expect(engine.createConnection).not.toHaveBeenCalled()
+        expect(revokedTokens()).toHaveLength(2)
     })
 
     it('never takes a Grok token pasted by hand, to add a connection or to replace its key', async () => {
