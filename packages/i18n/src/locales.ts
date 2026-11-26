@@ -11,7 +11,7 @@ export const SUPPORTED_LOCALES = {
     tr: 'stable',
     ar: 'stable',
     zh: 'stable',
-    'zh-TW': 'beta',
+    'zh-TW': 'stable',
     he: 'stable',
 } as const satisfies Record<string, LocaleStatus>
 

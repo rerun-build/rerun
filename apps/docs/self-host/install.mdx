@@ -45,7 +45,7 @@ Pick one. The first is simpler to keep running, the second is the full open sour
     6. Once SMTP is saved, in **Authentication > Email Templates**, paste the content of `supabase/templates/magic_link.html` from your clone into **Magic Link**, **Confirm signup** and **Change Email Address**, with the subject `Your Rerun code`. Rerun signs people in with a 6-digit code, and Supabase's default templates only carry a link.
     7. In **Authentication > URL Configuration**, set the **Site URL** to the address people open, the same as `NEXT_PUBLIC_APP_URL` below.
 
-    The template carries the code (`{{ .Token }}`) and a sign-in link, in the language of the account: English, French, Spanish, Portuguese, German, Turkish, Arabic, Simplified Chinese or Hebrew, read from the `locale` the app writes on the account, English otherwise. It says the code works for 15 minutes: set **Email OTP Expiration** to `900` seconds in the email provider settings to match, and keep **Email OTP Length** at 6.
+    The template carries the code (`{{ .Token }}`) and a sign-in link, in the language of the account: English, French, Spanish, Portuguese, German, Turkish, Arabic, Simplified Chinese, Traditional Chinese (Taiwan) or Hebrew, read from the `locale` the app writes on the account, English otherwise. It says the code works for 15 minutes: set **Email OTP Expiration** to `900` seconds in the email provider settings to match, and keep **Email OTP Length** at 6.
 
     Fill `.env` with what you copied:
 
