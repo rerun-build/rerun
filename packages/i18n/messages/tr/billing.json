@@ -464,6 +464,7 @@
         "plan": {
             "title": "Pro planı",
             "freeTrialLine": "Ücretsiz deneme, ardından sınırsız coworker",
+            "freeTrialShort": "Ücretsiz deneme",
             "unlimited": "Sınırsız coworker",
             "billedYearly": "yıllık <amount></amount> faturalandırılır",
             "billedMonthly": "aylık faturalandırılır",
@@ -486,7 +487,8 @@
             "line": "Sınırsız coworker · bir kez ödenir",
             "paidOnce": "Bir kez ödenir",
             "forGood": "sonsuza dek sizin"
-        }
+        },
+        "included": "Neler dahil ({count})"
     },
     "stripe": {
         "orPayWithCard": "veya kartla ödeyin",
@@ -1208,5 +1210,9 @@
             "cancelPlan": "Planı iptal et",
             "cancelTrial": "Denemeyi iptal et"
         }
+    },
+    "onboardingTrial": {
+        "addCardFree": "Kart ekleyin, bugün {amount}",
+        "addCard": "Kart ekleyin"
     }
 }

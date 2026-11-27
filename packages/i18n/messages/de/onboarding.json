@@ -197,9 +197,10 @@
         }
     },
     "trial": {
-        "title": "Starte deine kostenlose Testphase",
-        "description": "Deine Coworker legen los, sobald sie beginnt.",
-        "start": "Meine kostenlose Testphase starten"
+        "proof": {
+            "title": "Schließ dich {count} Teams an, die ihre Coworker eingestellt haben",
+            "line": "Sie haben genauso angefangen: ein paar Tage Testphase, danach haben ihre Coworker einfach weitergearbeitet."
+        }
     },
     "engine": {
         "title": "Dein Workspace wird eingerichtet",

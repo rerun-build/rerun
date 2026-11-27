@@ -218,9 +218,10 @@
         }
     },
     "trial": {
-        "title": "Start your free trial",
-        "description": "Your coworkers start working the moment it begins.",
-        "start": "Start my free trial"
+        "proof": {
+            "title": "Join {count} teams who hired their coworkers",
+            "line": "They started the same way: a few days of trial, then their coworkers kept working."
+        }
     },
     "engine": {
         "title": "Setting up your workspace",

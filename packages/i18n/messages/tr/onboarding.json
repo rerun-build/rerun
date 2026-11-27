@@ -197,9 +197,10 @@
         }
     },
     "trial": {
-        "title": "Ücretsiz denemenizi başlatın",
-        "description": "Coworker'larınız deneme başladığı anda çalışmaya başlar.",
-        "start": "Ücretsiz denememi başlat"
+        "proof": {
+            "title": "Coworker'larını işe alan {count} ekibe katılın",
+            "line": "Onlar da aynı şekilde başladı: birkaç günlük deneme, ardından coworker'ları çalışmaya devam etti."
+        }
     },
     "engine": {
         "title": "Çalışma alanınız hazırlanıyor",

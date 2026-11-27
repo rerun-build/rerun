@@ -3,13 +3,12 @@
 import { claimWelcomeEngineAction, finishWelcomeAction, welcomeEngineAnswersAction } from '@/app/api/_actions/welcome-engine.actions'
 import { finishWelcomeTeamAction, saveWelcomeSectorAction, saveWelcomeViewAction } from '@/app/api/_actions/welcome.actions'
 import { OnboardingPage } from '@/components/onboarding/OnboardingPage'
-import { LazyMembersPanel, LazyShowcase, LazyTeamPanel, LazyViewPanel } from '@/components/onboarding/panels/LazyPanels'
+import { LazyMembersPanel, LazyProofPanel, LazyShowcase, LazyTeamPanel, LazyViewPanel } from '@/components/onboarding/panels/LazyPanels'
 import { WelcomeWorkspaceSwitcher } from '@/components/onboarding/WelcomeWorkspaceSwitcher'
 import { EngineWaitlistDialog } from '@/components/dialogs/EngineWaitlistDialog'
 import { EngineStep, type EngineProgress } from '@/components/onboarding/welcome/EngineStep'
 import { SectorStep, type SectorAnswer } from '@/components/onboarding/welcome/SectorStep'
 import { TeamStep, type SentInvite } from '@/components/onboarding/welcome/TeamStep'
-import { TrialStep } from '@/components/onboarding/welcome/TrialStep'
 import { ViewStep } from '@/components/onboarding/welcome/ViewStep'
 import { useErrorText } from '@/hooks/useErrorText'
 import { accountLabel } from '@/lib/auth/placeholder-email'
@@ -18,9 +17,9 @@ import { sectorById, type SectorId } from '@/lib/onboarding/sectors'
 import type { StarterRole } from '@/lib/onboarding/starter-roles.server'
 import { ONBOARDING_STEPS, type OnboardingStep } from '@/lib/onboarding/step'
 import { rememberWorkspaceView, type WorkspaceView } from '@/lib/workspace-view'
-import { useBillingStore } from '@/stores/billing.store'
 import { track } from '@rerun/analytics/client'
 import { isSubscriptionEntitled } from '@rerun/cloud/billing'
+import { OnboardingTrialStep } from '@rerun/cloud/billing.client'
 import type { TemplateCategory } from '@rerun/contracts'
 import { PhoneStep } from '@/components/onboarding/welcome/PhoneStep'
 import { useSession } from '@/supabase/session/SessionProvider'
@@ -45,12 +44,12 @@ const ENGINE_PATIENCE_MS = 90_000
 const ENGINE_POLL_MS = 2_000
 
 // The three questions, one at a time in the onboarding page: each answer is saved as it is given and
-// moves to the next. A number still owed after a Google sign-up is asked first. Then the trial,
-// through today's checkout, and the machine, whose milestones the Chief of Staff's orb reads out
-// before it hands them over to the app. `afterQuestions` is the step the server resolved for the end
-// of the questions: the trial, or the machine where the workspace is already entitled or nothing is
-// sold. With no machine left in the pool, the waitlist wall stands before the trial. The billing
-// dialog and the waitlist wall open over the page.
+// moves to the next. A number still owed after a Google sign-up is asked first. Then the trial, paid
+// for in the page with the billing dialog's checkout, and the machine, whose milestones the Chief of
+// Staff's orb reads out before it hands them over to the app. `afterQuestions` is the step the server
+// resolved for the end of the questions: the trial, or the machine where the workspace is already
+// entitled or nothing is sold. With no machine left in the pool, the waitlist wall opens over the
+// trial.
 export function WelcomeFlow({ initialStep, afterQuestions, initial, starterRoles, firstName, next, phonePending, waitlisted, canSwitchWorkspace }: { initialStep: OnboardingStep; afterQuestions: OnboardingStep; initial: WelcomeAnswers; starterRoles: Record<string, StarterRole>; firstName: string | null; next: string; phonePending: boolean; waitlisted: boolean; canSwitchWorkspace: boolean }) {
     const errorText = useErrorText()
     const router = useRouter()
@@ -112,21 +111,10 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, starterRoles
         saved(await saveWelcomeViewAction(view), 'view', afterQuestions, false, view)
     }
 
-    const startTrial = useCallback(() => {
-        track('checkout_started', { plan: 'base', source: 'onboarding' })
-        useBillingStore.getState().openBilling(undefined, 'onboarding')
-    }, [])
-
-    // Once on arrival at the trial: a checkout they closed stays closed until they ask for it again.
-    useEffect(() => {
-        if (step === 'trial' && !waitlisted && !entitled) startTrial()
-    }, [step, waitlisted, entitled, startTrial])
-
     // The webhook writes the trial onto the workspace, which the session follows in realtime: the
-    // dialog over the page is closed for them and the machine starts.
+    // machine starts.
     useEffect(() => {
         if (step !== 'trial' || !entitled) return
-        useBillingStore.getState().setOpen(false)
         track('onboarding_step_completed', { step: 'trial' })
         setError(null)
         setDirection(1)
@@ -196,7 +184,7 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, starterRoles
     ) : step === 'view' ? (
         <ViewStep view={view} onView={setView} onSubmit={() => void submitView()} onBack={back} saving={saving} error={error} />
     ) : step === 'trial' ? (
-        <TrialStep onBack={() => go('view')} onStart={startTrial} />
+        <OnboardingTrialStep onBack={() => go('view')} waitlisted={waitlisted} />
     ) : (
         <EngineStep firstName={firstName} progress={engine} error={error} onRetry={() => void startEngine()} onEnter={() => void enter()} entering={entering} />
     )
@@ -211,6 +199,8 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, starterRoles
             <LazyMembersPanel name={firstName ?? email ?? ''} email={email} invites={invites.map(invite => invite.email)} />
         ) : !askPhone && step === 'view' ? (
             <LazyViewPanel view={view} onView={setView} person={firstName ?? email ?? ''} />
+        ) : !askPhone && step === 'trial' ? (
+            <LazyProofPanel />
         ) : (
             <LazyShowcase />
         )

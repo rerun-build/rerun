@@ -464,6 +464,7 @@
         "plan": {
             "title": "Pro 套餐",
             "freeTrialLine": "免费试用，之后无限同事",
+            "freeTrialShort": "免费试用",
             "unlimited": "无限同事",
             "billedYearly": "按年收取 <amount></amount>",
             "billedMonthly": "按月计费",
@@ -486,7 +487,8 @@
             "line": "无限同事 · 一次性付款",
             "paidOnce": "一次性付款",
             "forGood": "永久拥有"
-        }
+        },
+        "included": "包含内容（{count}）"
     },
     "stripe": {
         "orPayWithCard": "或使用银行卡付款",
@@ -1208,5 +1210,9 @@
             "cancelPlan": "取消套餐",
             "cancelTrial": "取消试用"
         }
+    },
+    "onboardingTrial": {
+        "addCardFree": "添加银行卡，今天 {amount}",
+        "addCard": "添加银行卡"
     }
 }

@@ -464,6 +464,7 @@
         "plan": {
             "title": "خطة Pro",
             "freeTrialLine": "تجربة مجانية، ثم زملاء بلا حدود",
+            "freeTrialShort": "تجربة مجانية",
             "unlimited": "زملاء بلا حدود",
             "billedYearly": "<amount></amount> تُفوتر سنويًا",
             "billedMonthly": "فوترة شهرية",
@@ -486,7 +487,8 @@
             "line": "زملاء بلا حدود · دفعة واحدة",
             "paidOnce": "دفعة واحدة",
             "forGood": "ملكك إلى الأبد"
-        }
+        },
+        "included": "ما الذي يتضمنه ({count})"
     },
     "stripe": {
         "orPayWithCard": "أو ادفع بالبطاقة",
@@ -1208,5 +1210,9 @@
             "cancelPlan": "إلغاء الخطة",
             "cancelTrial": "إلغاء التجربة"
         }
+    },
+    "onboardingTrial": {
+        "addCardFree": "أضف بطاقة، {amount} اليوم",
+        "addCard": "أضف بطاقة"
     }
 }

@@ -19,7 +19,7 @@ import { Input } from '@/components/ui/input'
 import { Progress } from '@/components/ui/progress'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { BASE_PLAN_CREDITS, DEFAULT_PRICE_ARM, PLAN_CURRENCY, TRIAL_ACTIVE_AGENTS, TRIAL_CREDITS, TRIAL_DAYS, ZERO_QUANTITIES, perMonthCents, planPriceCents, yearlyDiscountPercent, type BillingInterval, type PriceArm } from '@/ee/lib/billing/plans'
-import { ArrowLeft, BrainIcon, CheckIcon, CoinsIcon, CpuIcon, CreditCardIcon, KeyIcon, Loader2Icon, Package, Repeat, TicketIcon, TriangleAlertIcon, UserPlus, XIcon, ZapIcon, type LucideIcon } from '@/lib/icons'
+import { ArrowLeft, BrainIcon, CheckIcon, ChevronDownIcon, CoinsIcon, CpuIcon, CreditCardIcon, KeyIcon, Loader2Icon, Package, Repeat, TicketIcon, TriangleAlertIcon, UserPlus, XIcon, ZapIcon, type LucideIcon } from '@/lib/icons'
 import { TESTIMONIALS, testimonialCopy } from '@rerun/cloud/testimonials'
 import { useTimedRotation } from '@/hooks/useTimedRotation'
 import { landingUrl } from '@/lib/site'
@@ -149,11 +149,30 @@ function features(t: ReturnType<typeof useTranslations<'billing.parts.features'>
     ]
 }
 
-function FeatureGrid({ variant }: { variant: FeatureVariant }) {
+// `compact` is the plan in a narrow column: two columns from `sm`, and under it the list folds behind
+// a line that says how much it holds.
+function FeatureGrid({ variant, compact = false }: { variant: FeatureVariant; compact?: boolean }) {
     const t = useTranslations('billing.parts.features')
+    const tParts = useTranslations('billing.parts')
+    const [open, setOpen] = useState(false)
+    const list = features(t, variant)
     return (
-        <ul className="grid grid-cols-1 gap-x-6 gap-y-2.5 lg:grid-cols-2">
-            {features(t, variant).map(feature => (
+        <>
+            {compact && (
+                <button type="button" aria-expanded={open} onClick={() => setOpen(!open)} className="-my-1 flex items-center justify-between rounded-lg py-1 text-sm text-muted-foreground sm:hidden">
+                    {tParts('included', { count: list.length })}
+                    <ChevronDownIcon className={cn('size-4 transition-transform', open && 'rotate-180')} />
+                </button>
+            )}
+            <FeatureList list={list} className={compact ? cn('grid-cols-1 sm:grid sm:grid-cols-2', open ? 'grid' : 'hidden') : 'grid grid-cols-1 lg:grid-cols-2'} />
+        </>
+    )
+}
+
+function FeatureList({ list, className }: { list: ReturnType<typeof features>; className: string }) {
+    return (
+        <ul className={cn('gap-x-6 gap-y-2.5', className)}>
+            {list.map(feature => (
                 <li key={feature.id} className="flex items-center gap-3 text-sm text-muted-foreground">
                     <Icon size="sm" icon={feature.icon} />
                     <span>{feature.text}</span>
@@ -166,8 +185,9 @@ function FeatureGrid({ variant }: { variant: FeatureVariant }) {
 // The plan: its name and billing on the left, the price per month on the right. `discountCents` is
 // what comes off each invoice for a workspace grandfathered on a legacy price or holding a permanent
 // promo. `freeTrial` prices the card at what the trial costs, the plan's price struck beside it.
-// `priceArm` is the price this workspace is sold the base plan at.
-export function PlanCard({ interval, priceArm = DEFAULT_PRICE_ARM, discountCents = 0, freeTrial = false }: { interval: BillingInterval; priceArm?: PriceArm; discountCents?: number; freeTrial?: boolean }) {
+// `priceArm` is the price this workspace is sold the base plan at. `compact` keeps the name and the
+// price on one line, the name's line cut short, for a column narrower than the dialog's.
+export function PlanCard({ interval, priceArm = DEFAULT_PRICE_ARM, discountCents = 0, freeTrial = false, compact = false }: { interval: BillingInterval; priceArm?: PriceArm; discountCents?: number; freeTrial?: boolean; compact?: boolean }) {
     const t = useTranslations('billing.parts.plan')
     const quantities = ZERO_QUANTITIES
     const periodCents = Math.max(0, planPriceCents(quantities, interval, priceArm) - discountCents)
@@ -177,17 +197,21 @@ export function PlanCard({ interval, priceArm = DEFAULT_PRICE_ARM, discountCents
     return (
         <div className="relative flex flex-col gap-5 rounded-2xl bg-background/60 p-5 ring-1 ring-border sm:p-6">
             <BorderBeam />
-            <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
-                <div className="flex min-w-0 items-center gap-4">
+            <div className={cn('flex justify-between gap-x-4', compact ? 'items-center' : 'flex-wrap items-start gap-y-3')}>
+                <div className={cn('flex min-w-0 items-center gap-4', compact && 'flex-1')}>
                     <Icon size="lg" icon={Package} />
                     <div className="min-w-0">
-                        <p className="text-lg font-medium">{t('title')}</p>
-                        <p className="text-sm text-muted-foreground">
-                            {freeTrial ? t('freeTrialLine') : t('unlimited')} · {billing}
-                        </p>
+                        <p className={cn('text-lg font-medium', compact && 'truncate')}>{t('title')}</p>
+                        {compact ? (
+                            <p className="text-sm text-muted-foreground">{freeTrial ? t('freeTrialShort') : t('unlimited')}</p>
+                        ) : (
+                            <p className="text-sm text-muted-foreground">
+                                {freeTrial ? t('freeTrialLine') : t('unlimited')} · {billing}
+                            </p>
+                        )}
                     </div>
                 </div>
-                <div className="ms-auto min-w-0 text-end">
+                <div className={cn('min-w-0 text-end', compact ? 'shrink-0' : 'ms-auto')}>
                     <p className="flex items-baseline justify-end gap-2">
                         <span className="text-2xl font-semibold sm:text-3xl tracking-tight tabular-nums">
                             <UsdFlow cents={freeTrial ? 0 : monthCents} />
@@ -202,7 +226,7 @@ export function PlanCard({ interval, priceArm = DEFAULT_PRICE_ARM, discountCents
                     <p className="text-sm text-muted-foreground">{freeTrial ? t('forDays', { days: TRIAL_DAYS }) : t('perMonth')}</p>
                 </div>
             </div>
-            <FeatureGrid variant={freeTrial ? 'trial' : 'pro'} />
+            <FeatureGrid variant={freeTrial ? 'trial' : 'pro'} compact={compact} />
         </div>
     )
 }

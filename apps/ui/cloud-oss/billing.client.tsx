@@ -51,6 +51,10 @@ export function BudgetExhaustedNotice(_props: {
     return null
 }
 
+export function OnboardingTrialStep(_props: { onBack: () => void; waitlisted: boolean }) {
+    return null
+}
+
 export function ForemanTrialGate(_props: { step: TrialStep }) {
     return null
 }

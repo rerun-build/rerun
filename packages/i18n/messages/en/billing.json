@@ -569,6 +569,7 @@
         "plan": {
             "title": "Pro plan",
             "freeTrialLine": "Free trial, then unlimited coworkers",
+            "freeTrialShort": "Free trial",
             "unlimited": "Unlimited coworkers",
             "billedYearly": "billed <amount></amount> yearly",
             "billedMonthly": "billed monthly",
@@ -591,7 +592,8 @@
             "line": "Unlimited coworkers · paid once",
             "paidOnce": "Paid once",
             "forGood": "yours for good"
-        }
+        },
+        "included": "What's included ({count})"
     },
     "stripe": {
         "orPayWithCard": "or pay with card",
@@ -1313,5 +1315,9 @@
             "cancelPlan": "Cancel plan",
             "cancelTrial": "Cancel trial"
         }
+    },
+    "onboardingTrial": {
+        "addCardFree": "Add a card, {amount} today",
+        "addCard": "Add a card"
     }
 }

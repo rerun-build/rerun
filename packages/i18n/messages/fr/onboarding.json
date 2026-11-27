@@ -197,9 +197,10 @@
         }
     },
     "trial": {
-        "title": "Démarrez votre essai gratuit",
-        "description": "Vos coworkers se mettent au travail dès qu'il commence.",
-        "start": "Démarrer mon essai gratuit"
+        "proof": {
+            "title": "Rejoignez {count} équipes qui ont recruté leurs coworkers",
+            "line": "Elles ont commencé de la même façon : quelques jours d'essai, puis leurs coworkers ont continué à travailler."
+        }
     },
     "engine": {
         "title": "Préparation de votre workspace",

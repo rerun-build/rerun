@@ -16,7 +16,6 @@ import { SessionProvider } from '@/supabase/session/SessionProvider'
 import { WorkspaceSwitchLoader } from '@/components/layout/WorkspaceSwitchLoader'
 import { selectMany } from '@/supabase/supabase-helpers'
 import { BILLING_ENABLED, isSubscriptionEntitled } from '@rerun/cloud/billing'
-import { BillingDialog } from '@rerun/cloud/billing.client'
 import { isPhoneStepPending } from '@rerun/cloud/phone.server'
 import { isTemplateCategory } from '@rerun/contracts'
 import { WelcomeFlow } from './WelcomeFlow'
@@ -86,7 +85,6 @@ export default async function WelcomePage({ searchParams }: { searchParams: Prom
                 waitlisted={waitlisted}
                 canSwitchWorkspace={canSwitchWorkspace}
             />
-            <BillingDialog />
             <WorkspaceSwitchLoader />
         </SessionProvider>
     )

@@ -464,6 +464,7 @@
         "plan": {
             "title": "Plan Pro",
             "freeTrialLine": "Prueba gratis, luego coworkers ilimitados",
+            "freeTrialShort": "Prueba gratis",
             "unlimited": "Coworkers ilimitados",
             "billedYearly": "facturado <amount></amount> al año",
             "billedMonthly": "facturado cada mes",
@@ -486,7 +487,8 @@
             "line": "Coworkers ilimitados · pagado una vez",
             "paidOnce": "Pagado una vez",
             "forGood": "tuyo para siempre"
-        }
+        },
+        "included": "Qué incluye ({count})"
     },
     "stripe": {
         "orPayWithCard": "o paga con tarjeta",
@@ -1208,5 +1210,9 @@
             "cancelPlan": "Cancelar plan",
             "cancelTrial": "Cancelar prueba"
         }
+    },
+    "onboardingTrial": {
+        "addCardFree": "Añadir una tarjeta, {amount} hoy",
+        "addCard": "Añadir una tarjeta"
     }
 }

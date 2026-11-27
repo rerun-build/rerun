@@ -464,6 +464,7 @@
         "plan": {
             "title": "תוכנית Pro",
             "freeTrialLine": "תקופת ניסיון חינם, ואז עמיתים ללא הגבלה",
+            "freeTrialShort": "ניסיון חינם",
             "unlimited": "עמיתים ללא הגבלה",
             "billedYearly": "חיוב של <amount></amount> בשנה",
             "billedMonthly": "חיוב חודשי",
@@ -486,7 +487,8 @@
             "line": "עמיתים ללא הגבלה · תשלום חד-פעמי",
             "paidOnce": "תשלום חד-פעמי",
             "forGood": "שלך לתמיד"
-        }
+        },
+        "included": "מה כלול ({count})"
     },
     "stripe": {
         "orPayWithCard": "או לשלם בכרטיס",
@@ -1208,5 +1210,9 @@
             "cancelPlan": "לבטל את התוכנית",
             "cancelTrial": "לבטל את תקופת הניסיון"
         }
+    },
+    "onboardingTrial": {
+        "addCardFree": "להוסיף כרטיס, {amount} היום",
+        "addCard": "להוסיף כרטיס"
     }
 }

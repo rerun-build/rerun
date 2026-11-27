@@ -197,9 +197,10 @@
         }
     },
     "trial": {
-        "title": "Comece seu teste grátis",
-        "description": "Seus coworkers começam a trabalhar assim que ele começa.",
-        "start": "Começar meu teste grátis"
+        "proof": {
+            "title": "Junte-se a {count} equipes que contrataram seus coworkers",
+            "line": "Elas começaram do mesmo jeito: alguns dias de teste, e depois seus coworkers continuaram trabalhando."
+        }
     },
     "engine": {
         "title": "Preparando seu workspace",

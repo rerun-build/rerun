@@ -464,6 +464,7 @@
         "plan": {
             "title": "Pro-Tarif",
             "freeTrialLine": "Kostenlos testen, dann unbegrenzte Coworker",
+            "freeTrialShort": "Kostenlos testen",
             "unlimited": "Unbegrenzte Coworker",
             "billedYearly": "<amount></amount> jährlich abgerechnet",
             "billedMonthly": "monatlich abgerechnet",
@@ -486,7 +487,8 @@
             "line": "Unbegrenzte Coworker · einmal bezahlt",
             "paidOnce": "Einmal bezahlt",
             "forGood": "für immer deins"
-        }
+        },
+        "included": "Was enthalten ist ({count})"
     },
     "stripe": {
         "orPayWithCard": "oder mit Karte bezahlen",
@@ -1208,5 +1210,9 @@
             "cancelPlan": "Tarif kündigen",
             "cancelTrial": "Testphase kündigen"
         }
+    },
+    "onboardingTrial": {
+        "addCardFree": "Karte hinzufügen, heute {amount}",
+        "addCard": "Karte hinzufügen"
     }
 }

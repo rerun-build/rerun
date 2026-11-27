@@ -8,3 +8,4 @@ export const LazyShowcase = dynamic(() => import('../showcase/Showcase').then(mo
 export const LazyMembersPanel = dynamic(() => import('./MembersPanel').then(module => module.MembersPanel), { ssr: false })
 export const LazyViewPanel = dynamic(() => import('./ViewPanel').then(module => module.ViewPanel), { ssr: false })
 export const LazyTeamPanel = dynamic(() => import('./TeamPanel').then(module => module.TeamPanel), { ssr: false })
+export const LazyProofPanel = dynamic(() => import('./ProofPanel').then(module => module.ProofPanel), { ssr: false })
