@@ -4419,7 +4419,6 @@ export type Database = {
           organization_id: string | null
           payment_failed_at: string | null
           plan: string
-          price_arm: string | null
           publish_policy: string | null
           renewal_reminder_at: string | null
           renewal_reminder_user_id: string | null
@@ -4467,7 +4466,6 @@ export type Database = {
           organization_id?: string | null
           payment_failed_at?: string | null
           plan?: string
-          price_arm?: string | null
           publish_policy?: string | null
           renewal_reminder_at?: string | null
           renewal_reminder_user_id?: string | null
@@ -4515,7 +4513,6 @@ export type Database = {
           organization_id?: string | null
           payment_failed_at?: string | null
           plan?: string
-          price_arm?: string | null
           publish_policy?: string | null
           renewal_reminder_at?: string | null
           renewal_reminder_user_id?: string | null
