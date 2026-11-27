@@ -1,5 +1,5 @@
 import type Stripe from 'stripe'
-import { ADDON_MAX_QUANTITIES, INCLUDED_MACHINE_SIZE, PLAN_CURRENCY, TRIAL_DAYS, ZERO_QUANTITIES, isMachineSize, parseMachineSize, type AddonKey, type AddonQuantities, type MachineSize } from '@rerun/contracts'
+import { ADDON_MAX_QUANTITIES, INCLUDED_MACHINE_SIZE, PLAN_CURRENCY, TRIAL_DAYS, ZERO_QUANTITIES, isMachineSize, parseMachineSize, type AddonKey, type AddonQuantities, type MachineReading, type MachineSize } from '@rerun/contracts'
 import type { Database } from '@/app/api/database.types'
 import { requireWorkspaceId } from '@/app/api/_auth/ownership'
 import { LIFETIME_ADDONS_CONSENT, LIFETIME_MACHINE_CONSENT } from '@/ee/lib/billing/consent'
@@ -17,7 +17,8 @@ import { PAID_APP_PARAM, SLOTS_CHECKOUT_PARAM, type AppSlug } from '@/lib/apps/t
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { machineColumns, planItemChanges } from '@/ee/lib/billing/plan-items'
-import { businessDetailsOf, ensureStripeCustomer, findWorkspaceId, PLAN_PAYMENT_METHOD_TYPES, readNextInvoice, updateWithPayment, type BusinessDetails } from './billing.service'
+import { applyMachineSize, readMachine } from '@rerun/cloud/engines'
+import { assertMachineFits, businessDetailsOf, ensureStripeCustomer, findWorkspaceId, PLAN_PAYMENT_METHOD_TYPES, readNextInvoice, updateWithPayment, type BusinessDetails } from './billing.service'
 
 type WorkspaceUpdate = Database['public']['Tables']['workspaces']['Update']
 
@@ -57,6 +58,7 @@ export async function applyLifetimeAddonsSubscription(subscription: Stripe.Subsc
 
     const { quantities } = quantitiesFromItems(subscription.items?.data ?? [])
     await syncWorkspaceAppSlots(supabase, workspaceId, live ? quantities : ZERO_QUANTITIES, { periodAdvanced })
+    await applyMachineSize(workspaceId)
 }
 
 // A live add-ons subscription Stripe holds for the workspace that the workspace row does not know
@@ -135,6 +137,7 @@ export type LifetimeBillingState = {
     // until the renewal when it gave some back.
     machineSize: MachineSize
     heldMachine: { machineSize: MachineSize; storagePacks: number }
+    machine: MachineReading | null
     // The renewal of the add-ons subscription, null without one.
     periodEnd: string | null
     nextInvoice: { at: string; amountCents: number } | null
@@ -159,9 +162,10 @@ export async function getLifetimeBillingState(): Promise<LifetimeBillingState> {
         ['stripe_customer_id', 'stripe_addons_subscription_id', 'addons_current_period_end', 'machine_size', 'storage_packs'] as const,
         { id: workspaceId },
     )
-    const [customer, subscription] = await Promise.all([
+    const [customer, subscription, machine] = await Promise.all([
         workspace?.stripe_customer_id ? stripe.customers.retrieve(workspace.stripe_customer_id, { expand: ['tax_ids'] }) : null,
         workspace?.stripe_addons_subscription_id ? stripe.subscriptions.retrieve(workspace.stripe_addons_subscription_id) : null,
+        readMachine(workspaceId),
     ])
     const live = subscription && isSubscriptionEntitled(subscription.status) ? subscription : null
     const liveCustomer = customer && !customer.deleted ? customer : null
@@ -170,6 +174,7 @@ export async function getLifetimeBillingState(): Promise<LifetimeBillingState> {
         quantities: live ? quantitiesFromItems(live.items.data).quantities : ZERO_QUANTITIES,
         machineSize: live ? machineOfItems(live.items.data).size : INCLUDED_MACHINE_SIZE,
         heldMachine: { machineSize: parseMachineSize(workspace?.machine_size), storagePacks: workspace?.storage_packs ?? 0 },
+        machine,
         periodEnd: live ? (workspace?.addons_current_period_end ?? null) : null,
         nextInvoice: live && !live.cancel_at_period_end ? await readNextInvoice(live) : null,
         cancelAtPeriodEnd: !!live?.cancel_at_period_end,
@@ -228,6 +233,7 @@ export async function changeLifetimeMachine(selection: LifetimeMachineSelection,
     const { workspaceId, addonsSubscriptionId } = await requireLifetimeMachineBuyer()
     const current = addonsSubscriptionId ? await stripe.subscriptions.retrieve(addonsSubscriptionId) : null
     const subscription = current && isSubscriptionEntitled(current.status) ? current : null
+    await assertMachineFits(workspaceId, selection, subscription?.items.data ?? [])
 
     if (!subscription) {
         const lineItems = machineLineItems(selection)

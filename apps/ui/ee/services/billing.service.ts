@@ -74,7 +74,7 @@ import {
     stripe,
     subscriptionOfInvoice,
 } from '@/ee/lib/billing/stripe'
-import { TRIAL_ACTIVE_AGENTS, TRIAL_DAYS, type ForemanClient } from '@rerun/contracts'
+import { TRIAL_ACTIVE_AGENTS, TRIAL_DAYS, fitsOnDisk, machineDiskGib, type ForemanClient, type MachineReading } from '@rerun/contracts'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { getServerSession, getSessionWorkspace } from '@/supabase/session/getServerSession'
 import { reconcileAgentActivation, wakePlanLimitedAgents } from '@/app/api/_services/agent-activation.service'
@@ -89,7 +89,7 @@ import { selectMany, selectMaybeSingle, selectSingle } from '@/supabase/supabase
 import { sendPaymentFailedNotice } from '@/ee/lib/lifecycle/payment-failed-notice'
 import { sendTrialStartedReceipt } from '@/ee/lib/lifecycle/trial-receipt'
 import { reportSubscriptionCancelled, reportSubscriptionTransition, reportTrialConverted, reportTrialPaymentFailed } from './billing-analytics.service'
-import { requestBoxRestore } from '@rerun/cloud/engines'
+import { applyMachineSize, readMachine, requestBoxRestore } from '@rerun/cloud/engines'
 import { resolveEngineWaitlist } from '@/app/api/_services/waitlist.service'
 import type Stripe from 'stripe'
 
@@ -538,8 +538,10 @@ export type SubscriptionState = {
     status: Stripe.Subscription.Status
     quantities: AddonQuantities
     interval: BillingInterval
-    // The machine size the subscription pays for.
+    // The machine size the subscription pays for, and what the machine has right now: they differ while
+    // a resize is under way. null where machines are not sold in sizes.
     machineSize: MachineSize
+    machine: MachineReading | null
     // A switch to monthly waiting for the end of the paid year, with the plan it lands on.
     pendingSwitch: { selection: FullPlanSelection; at: string } | null
     // Flat amount taken off the list price on every invoice of the current interval, for a workspace
@@ -616,10 +618,11 @@ export async function getSubscriptionState(): Promise<SubscriptionState | null> 
     if (compareMachineSizes(parseMachineSize(workspace.machine_size), machineSize) > 0) pendingDowngrade.machine_size = machineSize
     if (workspace.storage_packs > quantities.storage_pack) pendingDowngrade.storage_packs = quantities.storage_pack
 
-    const [pendingSwitch, nextInvoice, openInvoice] = await Promise.all([
+    const [pendingSwitch, nextInvoice, openInvoice, machine] = await Promise.all([
         readPendingSwitch(subscription),
         subscription.cancel_at_period_end ? null : readNextInvoice(subscription),
         subscription.status === 'past_due' ? readOpenInvoice(subscription) : null,
+        readMachine(workspaceId),
     ])
 
     return {
@@ -628,6 +631,7 @@ export async function getSubscriptionState(): Promise<SubscriptionState | null> 
         quantities,
         interval: intervalOfItems(subscription.items.data),
         machineSize,
+        machine,
         pendingSwitch,
         monthlyDiscountCents: permanentDiscountCents(subscription) + legacyBaseDiscountCents(subscription.items.data),
         pendingDowngrade,
@@ -803,6 +807,18 @@ function assertValidQuantities(target: AddonQuantities): void {
     for (const key of ADDON_KEYS) {
         if (!Number.isInteger(target[key]) || target[key] < 0 || target[key] > ADDON_MAX_QUANTITIES[key]) throw new AppError('invalidAddonQuantity')
     }
+}
+
+// A machine is only made smaller once what it holds fits on the smaller disk: the move at the renewal
+// copies everything across. Read off the machine itself, so a disk the workspace filled since is seen.
+// Only a change that pays for less disk than `items` do is judged: adding a slot to a workspace whose
+// disk is full, or keeping its size, is never refused for it.
+export async function assertMachineFits(workspaceId: number, target: { machineSize: MachineSize; storagePacks: number }, items: Stripe.SubscriptionItem[]): Promise<void> {
+    const diskGib = machineDiskGib(target.machineSize, target.storagePacks)
+    if (diskGib >= machineDiskGib(machineOfItems(items).size, quantitiesFromItems(items).quantities.storage_pack)) return
+    const machine = await readMachine(workspaceId)
+    if (!machine || diskGib >= machine.diskGib || fitsOnDisk(machine.usedDiskGib, diskGib)) return
+    throw new AppError('machineDataTooBig', { used: Math.ceil(machine.usedDiskGib ?? 0), size: diskGib })
 }
 
 // A trial runs on the included machine: a size or storage is bought once the plan is paid, from the
@@ -1196,6 +1212,7 @@ export async function changePlan(requested: PlanSelection): Promise<PlanChangeRe
     assertValidSelection(selection)
     assertMachineOutsideTrial(loaded, selection)
     await assertSlotRemovalLeavesConnections(workspaceId, loaded, selection.quantities)
+    await assertMachineFits(workspaceId, { machineSize: selection.machineSize, storagePacks: selection.quantities.storage_pack }, loaded.items.data)
     const subscription = await releasePendingSwitch(loaded)
     const kind = planChangeKind(subscription.status, intervalOfItems(subscription.items.data), selection.interval)
 
@@ -1365,6 +1382,7 @@ export async function previewPlanChange(requested: PlanSelection): Promise<PlanQ
     const selection = selectionOfSubscription(subscription, requested)
     assertValidSelection(selection)
     assertMachineOutsideTrial(subscription, selection)
+    await assertMachineFits(workspaceId, { machineSize: selection.machineSize, storagePacks: selection.quantities.storage_pack }, subscription.items.data)
     const kind = planChangeKind(subscription.status, intervalOfItems(subscription.items.data), selection.interval)
 
     if (kind === 'end_trial' || kind === 'switch_now') {
@@ -1557,6 +1575,7 @@ export async function applySubscriptionToWorkspace(subscription: Stripe.Subscrip
     if (error) throw error
 
     await syncWorkspaceAppSlots(supabase, workspaceId, quantities, { periodAdvanced: advanced })
+    await applyMachineSize(workspaceId)
 
     // The held-limits merge means max_agents only ever falls when the period advances, so this is
     // exactly where a downgrade lands: whatever no longer fits is switched off, never deleted.

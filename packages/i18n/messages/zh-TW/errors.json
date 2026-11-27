@@ -449,6 +449,7 @@
     "machineAfterTrial": "機器規格與儲存空間隨付費方案提供。立即開始 Pro 即可選擇。",
     "machineNotOffered": "此方案不提供機器規格。",
     "lifetimeMachineDuringTrial": "你的應用程式試用仍在進行中。試用結束後再選擇機器規格。",
+    "machineDataTooBig": "你的機器已使用 {used} GB，超出 {size} GB 磁碟的容量。請先釋放一些空間。",
     "trialNothingToCancel": "您的試用會自動結束，無需取消。",
     "readBillingPeriodFailed": "無法讀取您的計費週期。",
     "alreadyCancelling": "您的訂閱已設定為取消。",

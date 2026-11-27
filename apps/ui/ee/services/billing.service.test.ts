@@ -55,6 +55,8 @@ const m = vi.hoisted(() => ({
     reportTrialConverted: vi.fn(),
     reportTrialPaymentFailed: vi.fn(),
     requestBoxRestore: vi.fn(),
+    readMachine: vi.fn(),
+    applyMachineSize: vi.fn(),
     resolveEngineWaitlist: vi.fn(),
     isPhoneStepPending: vi.fn(),
 }))
@@ -79,7 +81,7 @@ vi.mock('./billing-analytics.service', () => ({
     reportTrialConverted: m.reportTrialConverted,
     reportTrialPaymentFailed: m.reportTrialPaymentFailed,
 }))
-vi.mock('@rerun/cloud/engines', () => ({ requestBoxRestore: m.requestBoxRestore }))
+vi.mock('@rerun/cloud/engines', () => ({ requestBoxRestore: m.requestBoxRestore, readMachine: m.readMachine, applyMachineSize: m.applyMachineSize }))
 vi.mock('@/app/api/_services/waitlist.service', () => ({ resolveEngineWaitlist: m.resolveEngineWaitlist }))
 vi.mock('@/app/api/_services/phone-gate.service', () => ({ isPhoneStepPending: m.isPhoneStepPending }))
 vi.mock('@/ee/lib/billing/trial-experiment', async importOriginal => {
@@ -134,6 +136,7 @@ beforeEach(() => {
     m.affiliateReferralMetadata.mockResolvedValue({})
     m.resolveEngineWaitlist.mockResolvedValue(false)
     m.wakePlanLimitedAgents.mockResolvedValue({ woken: [], active: [] })
+    m.readMachine.mockResolvedValue(null)
     vi.mocked(stripe.subscriptions.update).mockResolvedValue({ pending_update: null } as never)
     vi.mocked(stripe.paymentIntents.retrieve).mockResolvedValue({ status: 'requires_action' } as never)
     vi.spyOn(console, 'warn').mockImplementation(() => {})
@@ -917,6 +920,7 @@ describe('getSubscriptionState', () => {
             quantities: { linkedin_slot: 0, whatsapp_slot: 0, storage_pack: 0 },
             interval: 'monthly',
             machineSize: 'small',
+            machine: null,
             pendingSwitch: null,
             monthlyDiscountCents: 300 + 500,
             pendingDowngrade: { rerun_budget_micros: 5 * MICROS_PER_USD },
@@ -1857,6 +1861,50 @@ describe('the machine size and the storage packs', () => {
 
             expect(state).toMatchObject({ machineSize: 'medium', quantities: { storage_pack: 0 }, pendingDowngrade: { machine_size: 'medium', storage_packs: 0 } })
         })
+
+        it('reads what the machine has right now beside what is paid for', async () => {
+            useDb({ row: { stripe_subscription_id: 'sub_1', subscription_status: 'active', current_period_end: iso(PERIOD_END), rerun_budget_micros: 5 * MICROS_PER_USD, machine_size: 'large', storage_packs: 0 } })
+            vi.mocked(stripe.subscriptions.retrieve).mockResolvedValue(on({ price: 'price_machine_large', quantity: 1 }) as never)
+            vi.mocked(stripe.invoices.createPreview).mockResolvedValue({ amount_due: 9900, period_end: PERIOD_END } as never)
+            m.readMachine.mockResolvedValue({ size: 'small', diskGib: 20, usedDiskGib: 6 })
+
+            await expect(getSubscriptionState()).resolves.toMatchObject({ machineSize: 'large', machine: { size: 'small', diskGib: 20, usedDiskGib: 6 } })
+            expect(m.readMachine).toHaveBeenCalledWith(WORKSPACE_ID)
+        })
+    })
+
+    describe('a machine made smaller', () => {
+        beforeEach(() => {
+            useDb({ row: editable })
+            vi.mocked(stripe.subscriptions.retrieve).mockResolvedValue(on({ price: 'price_machine_large', quantity: 1, id: 'si_machine' }) as never)
+        })
+
+        it('is refused while what the machine holds would fill the smaller disk', async () => {
+            m.readMachine.mockResolvedValue({ size: 'large', diskGib: 150, usedDiskGib: 55 })
+            await expect(changePlan(select('medium'))).rejects.toThrow('Your machine holds 55 GB, too much for a 60 GB disk. Free some space first.')
+            await expect(previewPlanChange(select('medium'))).rejects.toThrow(/too much for a 60 GB disk/)
+            expect(stripe.subscriptions.update).not.toHaveBeenCalled()
+        })
+
+        it('goes through when it fits, or when the machine never reported its disk', async () => {
+            m.readMachine.mockResolvedValueOnce({ size: 'large', diskGib: 150, usedDiskGib: 40 })
+            await changePlan(select('medium'))
+            m.readMachine.mockResolvedValueOnce({ size: 'large', diskGib: 150, usedDiskGib: null })
+            await changePlan(select('small'))
+            expect(stripe.subscriptions.update).toHaveBeenCalledTimes(2)
+        })
+
+        it('reads nothing off the machine for a larger size', async () => {
+            m.readMachine.mockResolvedValue({ size: 'medium', diskGib: 60, usedDiskGib: 59 })
+            vi.mocked(stripe.subscriptions.retrieve).mockResolvedValue(on({ price: 'price_machine_medium', quantity: 1, id: 'si_machine' }) as never)
+            await expect(changePlan(select('large'))).resolves.toBeTruthy()
+        })
+    })
+
+    it('asks for the machine to be brought to what the subscription pays for, every time it is synced', async () => {
+        useDb({ row: { current_period_end: iso(PERIOD_END), subscription_status: 'active', max_agents: null, max_seats: null, rerun_budget_micros: 5 * MICROS_PER_USD, machine_size: 'small', storage_packs: 0 } })
+        await applySubscriptionToWorkspace(on({ price: 'price_machine_medium', quantity: 1 }))
+        expect(m.applyMachineSize).toHaveBeenCalledWith(WORKSPACE_ID)
     })
 
     describe('createPlanCheckoutSession', () => {

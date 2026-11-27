@@ -1,5 +1,6 @@
 import 'server-only'
 
+import type { MachineReading } from '@rerun/contracts'
 import type { Database } from '@/app/api/database.types'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
@@ -57,3 +58,10 @@ export async function restartManagedEngine(_instanceId: string): Promise<void> {
 export async function poolHasRoom(): Promise<boolean> {
     return true
 }
+
+// A self-hosted server is the size of the machine it runs on: nothing here is sold in sizes.
+export async function readMachine(_workspaceId: number): Promise<MachineReading | null> {
+    return null
+}
+
+export async function applyMachineSize(_workspaceId: number): Promise<void> {}

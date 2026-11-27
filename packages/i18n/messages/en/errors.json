@@ -56,7 +56,8 @@
         "organizationOwnerOnly": "Owner is the highest role in the team of an organization.",
         "managedWorkspace": "Refusal of anything to buy, in a workspace run by an organization (an agency) for its people.",
         "managedWorkspacePaused": "Same workspace, put away by its organization.",
-        "grokSignInOnly": "Grok is xAI's assistant; xAI is the company. A plan is a paid subscription."
+        "grokSignInOnly": "Grok is xAI's assistant; xAI is the company. A plan is a paid subscription.",
+        "machineDataTooBig": "{used} and {size} are whole numbers of gigabytes: what the machine holds and the disk of the smaller size asked for."
     },
     "generic": "Something went wrong. Please try again.",
     "notAuthenticated": "Not authenticated",
@@ -508,6 +509,7 @@
     "machineAfterTrial": "Machine sizes and storage come with the paid plan. Start Pro now to pick one.",
     "machineNotOffered": "Machine sizes are not sold on this plan.",
     "lifetimeMachineDuringTrial": "Your app trial is still running. Pick a machine size once it ends.",
+    "machineDataTooBig": "Your machine holds {used} GB, too much for a {size} GB disk. Free some space first.",
     "trialNothingToCancel": "Your trial ends on its own, there is nothing to cancel.",
     "readBillingPeriodFailed": "Could not read your billing period.",
     "alreadyCancelling": "Your subscription is already set to cancel.",

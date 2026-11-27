@@ -5,7 +5,7 @@ import { fakeSupabase, type FakeSupabase, type SupabaseResult } from '@/test/sup
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 
 const { createServiceRoleClient } = await import('@/supabase/serviceRole')
-const { claimPoolEngine, desktopRelayBase } = await import('./engines')
+const { applyMachineSize, claimPoolEngine, desktopRelayBase, readMachine } = await import('./engines')
 
 let db: FakeSupabase
 let claimed: unknown
@@ -59,3 +59,12 @@ describe('desktopRelayBase', () => {
         await expect(desktopRelayBase('http://10.0.0.5:3000', null, null)).resolves.toBeNull()
     })
 })
+
+describe('the machine sizes', () => {
+    it('are not sold on a self-hosted install: nothing to read, nothing to resize', async () => {
+        await expect(readMachine(4)).resolves.toBeNull()
+        await expect(applyMachineSize(4)).resolves.toBeUndefined()
+        expect(db.calls).toEqual([])
+    })
+})
+

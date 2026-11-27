@@ -54,3 +54,15 @@ export function largerMachineSize(a: MachineSize, b: MachineSize): MachineSize {
 export function machineDiskGib(size: MachineSize, storagePacks: number): number {
     return MACHINE_SPECS[size].diskGib + storagePacks * STORAGE_PACK_GIB
 }
+
+// What the machine of a workspace really has, read off the machine rather than the bill: a size
+// just bought shows here once the resize is done. `usedDiskGib` is null until the machine reported it.
+export type MachineReading = { size: MachineSize; diskGib: number; usedDiskGib: number | null }
+
+// A smaller disk is only taken when what the machine holds today fills at most this share of it: the
+// move to a smaller machine copies everything across, and a full disk stops the coworkers.
+export const MACHINE_DISK_FILL_LIMIT = 0.8
+
+export function fitsOnDisk(usedDiskGib: number | null, diskGib: number): boolean {
+    return usedDiskGib === null || usedDiskGib <= diskGib * MACHINE_DISK_FILL_LIMIT
+}

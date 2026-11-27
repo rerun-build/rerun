@@ -449,6 +449,7 @@
     "machineAfterTrial": "גדלי מכונה ואחסון מגיעים עם התוכנית בתשלום. התחילו את Pro עכשיו כדי לבחור אחד.",
     "machineNotOffered": "גדלי מכונה לא נמכרים בתוכנית הזו.",
     "lifetimeMachineDuringTrial": "תקופת הניסיון של האפליקציות עדיין פעילה. בחרו גודל מכונה כשהיא תסתיים.",
+    "machineDataTooBig": "המכונה שלך מחזיקה {used} GB, יותר מדי לדיסק של {size} GB. פנו קודם מקום.",
     "trialNothingToCancel": "תקופת הניסיון שלך מסתיימת מעצמה, אין מה לבטל.",
     "readBillingPeriodFailed": "לא ניתן היה לקרוא את תקופת החיוב שלך.",
     "alreadyCancelling": "המינוי שלך כבר מוגדר להתבטל.",

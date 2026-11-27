@@ -449,6 +449,7 @@
     "machineAfterTrial": "Makine boyutları ve depolama ücretli planla gelir. Birini seçmek için Pro’yu şimdi başlatın.",
     "machineNotOffered": "Bu planda makine boyutları satılmıyor.",
     "lifetimeMachineDuringTrial": "Uygulama denemeniz hâlâ sürüyor. Bittiğinde bir makine boyutu seçin.",
+    "machineDataTooBig": "Makinenizde {used} GB veri var, bu {size} GB boyutundaki bir disk için fazla. Önce yer açın.",
     "trialNothingToCancel": "Denemeniz kendiliğinden sona erer, iptal edilecek bir şey yok.",
     "readBillingPeriodFailed": "Faturalandırma döneminiz okunamadı.",
     "alreadyCancelling": "Aboneliğiniz zaten iptal edilecek şekilde ayarlandı.",

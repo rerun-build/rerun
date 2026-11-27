@@ -449,6 +449,7 @@
     "machineAfterTrial": "Os tamanhos de máquina e o armazenamento vêm com o plano pago. Comece o Pro agora para escolher um.",
     "machineNotOffered": "Os tamanhos de máquina não são vendidos neste plano.",
     "lifetimeMachineDuringTrial": "Seu teste de apps ainda está em andamento. Escolha um tamanho de máquina quando ele terminar.",
+    "machineDataTooBig": "Sua máquina contém {used} GB, demais para um disco de {size} GB. Libere espaço primeiro.",
     "trialNothingToCancel": "Seu teste termina sozinho, não há nada para cancelar.",
     "readBillingPeriodFailed": "Não foi possível ler seu período de cobrança.",
     "alreadyCancelling": "Sua assinatura já está programada para ser cancelada.",

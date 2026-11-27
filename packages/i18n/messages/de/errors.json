@@ -449,6 +449,7 @@
     "machineAfterTrial": "Maschinengrößen und Speicher gibt es mit dem bezahlten Plan. Starte jetzt Pro, um eine zu wählen.",
     "machineNotOffered": "Maschinengrößen werden in diesem Plan nicht verkauft.",
     "lifetimeMachineDuringTrial": "Deine App-Testphase läuft noch. Wähle eine Maschinengröße, sobald sie endet.",
+    "machineDataTooBig": "Deine Maschine enthält {used} GB, zu viel für eine Festplatte mit {size} GB. Gib zuerst Speicher frei.",
     "trialNothingToCancel": "Dein Test endet von selbst, es gibt nichts zu kündigen.",
     "readBillingPeriodFailed": "Dein Abrechnungszeitraum konnte nicht gelesen werden.",
     "alreadyCancelling": "Dein Abo ist bereits zur Kündigung vorgemerkt.",

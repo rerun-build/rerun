@@ -4,7 +4,7 @@ import { fakeSupabase, writeMethodOf } from '@/test/supabase-fake'
 import { stripe } from '@/ee/lib/billing/stripe'
 import { applyLifetimeAddonsSubscription, changeLifetimeMachine, createLifetimeAddonsCheckout, finishPendingLifetimeMachineChange, getLifetimeBillingState, removeLifetimeAddonSlot, resumeLifetimeAddons, settleLifetimeAddonsCheckout } from './lifetime-addons.service'
 
-const m = vi.hoisted(() => ({ createServiceRoleClient: vi.fn(), findWorkspaceId: vi.fn(), syncWorkspaceAppSlots: vi.fn(), ensureStripeCustomer: vi.fn(), readNextInvoice: vi.fn(), updateWithPayment: vi.fn() }))
+const m = vi.hoisted(() => ({ createServiceRoleClient: vi.fn(), findWorkspaceId: vi.fn(), syncWorkspaceAppSlots: vi.fn(), ensureStripeCustomer: vi.fn(), readNextInvoice: vi.fn(), updateWithPayment: vi.fn(), assertMachineFits: vi.fn(), readMachine: vi.fn(), applyMachineSize: vi.fn() }))
 
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: m.createServiceRoleClient }))
 vi.mock('./billing.service', () => ({
@@ -14,7 +14,9 @@ vi.mock('./billing.service', () => ({
     businessDetailsOf: (customer: { name?: string } | null) => ({ name: customer?.name ?? null, country: null, taxId: null }),
     PLAN_PAYMENT_METHOD_TYPES: ['card', 'link'],
     updateWithPayment: m.updateWithPayment,
+    assertMachineFits: m.assertMachineFits,
 }))
+vi.mock('@rerun/cloud/engines', () => ({ readMachine: m.readMachine, applyMachineSize: m.applyMachineSize }))
 vi.mock('@/app/api/_auth/ownership', () => ({ requireWorkspaceId: async () => 7 }))
 vi.mock('@/lib/apps/slots-sync', () => ({ syncWorkspaceAppSlots: m.syncWorkspaceAppSlots }))
 vi.mock('@/lib/app-origin', () => ({ getAppOrigin: async () => 'https://app.rerun.test' }))
@@ -54,6 +56,7 @@ beforeEach(() => {
     vi.resetAllMocks()
     m.findWorkspaceId.mockResolvedValue(WORKSPACE_ID)
     m.ensureStripeCustomer.mockResolvedValue({ workspaceId: WORKSPACE_ID, customerId: 'cus_1' })
+    m.readMachine.mockResolvedValue(null)
     vi.spyOn(console, 'warn').mockImplementation(() => {})
 })
 
@@ -190,6 +193,7 @@ describe('getLifetimeBillingState', () => {
             business: { name: null, country: null, taxId: null },
             machineSize: 'small',
             heldMachine: { machineSize: 'small', storagePacks: 0 },
+            machine: null,
         })
         expect(stripe.customers.retrieve).not.toHaveBeenCalled()
     })
@@ -311,6 +315,14 @@ describe('the machine of a lifetime workspace', () => {
 
     const MEDIUM_ITEM = { id: 'si_m', price: { id: 'price_machine_medium' }, quantity: 1, current_period_end: PERIOD_END }
     const STORAGE_ITEM = { id: 'si_s', price: { id: 'price_storage_pack' }, quantity: 3, current_period_end: PERIOD_END }
+
+    it('judges the disk against what the subscription pays for now', async () => {
+        useDb(LIFETIME)
+        const live = withMachine(MEDIUM_ITEM)
+        vi.mocked(stripe.subscriptions.retrieve).mockResolvedValue(live as never)
+        await changeLifetimeMachine({ machineSize: 'small', storagePacks: 0 }, 'req-1')
+        expect(m.assertMachineFits).toHaveBeenCalledWith(WORKSPACE_ID, { machineSize: 'small', storagePacks: 0 }, live.items.data)
+    })
 
     it('bills a larger size first, and gives storage back only once it is paid', async () => {
         useDb(LIFETIME)
