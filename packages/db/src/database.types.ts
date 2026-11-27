@@ -760,9 +760,12 @@ export type Database = {
           disk_used_mb: number | null
           engine_ok: boolean
           host_id: string
+          memory_gib: number | null
+          root_gib: number | null
           rss_mb: number | null
           running: boolean
           sampled_at: string
+          vcpus: number | null
         }
         Insert: {
           active_runs?: number | null
@@ -772,9 +775,12 @@ export type Database = {
           disk_used_mb?: number | null
           engine_ok: boolean
           host_id: string
+          memory_gib?: number | null
+          root_gib?: number | null
           rss_mb?: number | null
           running: boolean
           sampled_at: string
+          vcpus?: number | null
         }
         Update: {
           active_runs?: number | null
@@ -784,9 +790,12 @@ export type Database = {
           disk_used_mb?: number | null
           engine_ok?: boolean
           host_id?: string
+          memory_gib?: number | null
+          root_gib?: number | null
           rss_mb?: number | null
           running?: boolean
           sampled_at?: string
+          vcpus?: number | null
         }
         Relationships: [
           {
@@ -960,6 +969,7 @@ export type Database = {
           box_index: number | null
           claimed_by_workspace_id: number | null
           created_at: string
+          disk_gib: number
           engine_api_key: string
           engine_host: string | null
           error_message: string | null
@@ -970,6 +980,7 @@ export type Database = {
           last_update_status:
             | Database["public"]["Enums"]["engine_update_status"]
             | null
+          machine_size: string
           provider: Database["public"]["Enums"]["cloud_provider"]
           provider_server_id: string | null
           region: string | null
@@ -981,6 +992,7 @@ export type Database = {
           box_index?: number | null
           claimed_by_workspace_id?: number | null
           created_at?: string
+          disk_gib?: number
           engine_api_key: string
           engine_host?: string | null
           error_message?: string | null
@@ -991,6 +1003,7 @@ export type Database = {
           last_update_status?:
             | Database["public"]["Enums"]["engine_update_status"]
             | null
+          machine_size?: string
           provider?: Database["public"]["Enums"]["cloud_provider"]
           provider_server_id?: string | null
           region?: string | null
@@ -1002,6 +1015,7 @@ export type Database = {
           box_index?: number | null
           claimed_by_workspace_id?: number | null
           created_at?: string
+          disk_gib?: number
           engine_api_key?: string
           engine_host?: string | null
           error_message?: string | null
@@ -1012,6 +1026,7 @@ export type Database = {
           last_update_status?:
             | Database["public"]["Enums"]["engine_update_status"]
             | null
+          machine_size?: string
           provider?: Database["public"]["Enums"]["cloud_provider"]
           provider_server_id?: string | null
           region?: string | null
@@ -4393,6 +4408,7 @@ export type Database = {
           lifetime_purchase_id: string | null
           lifetime_tier: number | null
           locale: string
+          machine_size: string
           max_agents: number | null
           max_seats: number | null
           model_access: string | null
@@ -4412,6 +4428,7 @@ export type Database = {
           rerun_period_anchor: string | null
           rerun_topup_micros: number
           rerun_used_micros: number
+          storage_packs: number
           stripe_addons_subscription_id: string | null
           stripe_customer_id: string | null
           stripe_price_id: string | null
@@ -4439,6 +4456,7 @@ export type Database = {
           lifetime_purchase_id?: string | null
           lifetime_tier?: number | null
           locale?: string
+          machine_size?: string
           max_agents?: number | null
           max_seats?: number | null
           model_access?: string | null
@@ -4458,6 +4476,7 @@ export type Database = {
           rerun_period_anchor?: string | null
           rerun_topup_micros?: number
           rerun_used_micros?: number
+          storage_packs?: number
           stripe_addons_subscription_id?: string | null
           stripe_customer_id?: string | null
           stripe_price_id?: string | null
@@ -4485,6 +4504,7 @@ export type Database = {
           lifetime_purchase_id?: string | null
           lifetime_tier?: number | null
           locale?: string
+          machine_size?: string
           max_agents?: number | null
           max_seats?: number | null
           model_access?: string | null
@@ -4504,6 +4524,7 @@ export type Database = {
           rerun_period_anchor?: string | null
           rerun_topup_micros?: number
           rerun_used_micros?: number
+          storage_packs?: number
           stripe_addons_subscription_id?: string | null
           stripe_customer_id?: string | null
           stripe_price_id?: string | null
@@ -4838,7 +4859,7 @@ export type Database = {
         | "published"
         | "unlisted"
         | "archived"
-      workspace_archive_reason: "access_ended" | "inactivity" | "manual"
+      workspace_archive_reason: "access_ended" | "inactivity" | "manual" | "resize"
       workspace_archive_status:
         | "archiving"
         | "archived"
@@ -5048,7 +5069,7 @@ export const Constants = {
         "unlisted",
         "archived",
       ],
-      workspace_archive_reason: ["access_ended", "inactivity", "manual"],
+      workspace_archive_reason: ["access_ended", "inactivity", "manual", "resize"],
       workspace_archive_status: [
         "archiving",
         "archived",
