@@ -12,8 +12,9 @@ function showPage(state: DocumentVisibilityState) {
     document.dispatchEvent(new Event('visibilitychange'))
 }
 
+let socketConnected = true
 function fakeChannel(state = 'joined') {
-    return { state } as unknown as RealtimeChannel & { state: string }
+    return { state, socket: { isConnected: () => socketConnected } } as unknown as RealtimeChannel & { state: string }
 }
 
 describe('createChannelRecovery', () => {
@@ -23,6 +24,7 @@ describe('createChannelRecovery', () => {
     beforeEach(() => {
         vi.useFakeTimers()
         visibility = 'visible'
+        socketConnected = true
         vi.spyOn(document, 'visibilityState', 'get').mockImplementation(() => visibility)
         replace.mockReset()
         recovery = createChannelRecovery(replace)
@@ -52,6 +54,28 @@ describe('createChannelRecovery', () => {
         vi.advanceTimersByTime(30 * SECOND)
         expect(replace).not.toHaveBeenCalled()
         vi.advanceTimersByTime(1 * SECOND)
+        expect(replace).toHaveBeenCalledTimes(1)
+    })
+
+    it('replaces nothing while the socket is down, however long: realtime-js rejoins the channel when it reopens', () => {
+        const channel = fakeChannel('errored')
+        recovery.watch(channel)
+        socketConnected = false
+        recovery.onStatus(channel, 'CHANNEL_ERROR')
+        vi.advanceTimersByTime(10 * 60 * SECOND)
+        expect(replace).not.toHaveBeenCalled()
+    })
+
+    it('replaces a channel still not joined a while after the socket came back', () => {
+        const channel = fakeChannel('errored')
+        recovery.watch(channel)
+        socketConnected = false
+        recovery.onStatus(channel, 'CHANNEL_ERROR')
+        vi.advanceTimersByTime(45 * SECOND)
+        socketConnected = true
+        vi.advanceTimersByTime(14 * SECOND)
+        expect(replace).not.toHaveBeenCalled()
+        vi.advanceTimersByTime(2 * SECOND)
         expect(replace).toHaveBeenCalledTimes(1)
     })
 

@@ -12,6 +12,8 @@ type Waiting = 'replace' | 'check' | null
 // on one socket until Realtime refused them ("Too many joins on this socket") and the cycle began
 // again, and its `subscribe()` reopened sockets in background tabs. So a channel is replaced only when
 // Realtime will not bring it back: closed by the server, or still not joined a while after an error.
+// While the socket itself is down nothing is replaced either: realtime-js rejoins the channel when the
+// socket reopens, and each channel subscribed meanwhile would queue one more join for that moment.
 // A hidden page waits until it is shown, like realtime-js. The desktop app keeps its window visible to
 // the document, so its channels go on recovering in the tray.
 export function createChannelRecovery(replace: () => void) {
@@ -48,6 +50,7 @@ export function createChannelRecovery(replace: () => void) {
             timer = null
             if (channel !== watched || channel.state === REALTIME_CHANNEL_STATES.joined) return
             if (pageHidden()) waiting = 'check'
+            else if (!channel.socket.isConnected()) checkLater(channel)
             else replaceSoon()
         }, REJOIN_GRACE_MS)
     }
