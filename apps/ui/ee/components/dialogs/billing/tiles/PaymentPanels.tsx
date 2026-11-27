@@ -97,11 +97,14 @@ export function BusinessPanel({ state, onDone }: PanelProps) {
 }
 
 type TilesT = ReturnType<typeof useTranslations<'billing.tiles'>>
+type MachineSizeT = ReturnType<typeof useTranslations<'billing.machine.sizes'>>
 
 // "Pro + LinkedIn Pro", "2 credit packs", "LinkedIn Pro (prorated)": what an invoice charged for.
-export function invoiceLabel(invoice: Pick<InvoiceSummary, 'items' | 'prorated'>, t: TilesT): string {
+export function invoiceLabel(invoice: Pick<InvoiceSummary, 'items' | 'prorated'>, t: TilesT, tSize: MachineSizeT): string {
     const names = invoice.items.map(item => {
         if (item.kind === 'plan') return t('invoice.plan')
+        if (item.kind === 'machine') return t('invoice.machine', { size: tSize(item.size) })
+        if (item.kind === 'storage') return t('invoice.storage', { count: item.quantity })
         if (item.kind === 'credit_pack') return t('invoice.creditPacks', { count: item.quantity })
         return t('invoice.appSlots', { app: appInfo(item.app).name, count: item.quantity })
     })
@@ -134,6 +137,7 @@ export function InvoiceBadge({ status }: { status: string }) {
 
 export function InvoiceRows({ invoices, limit, download }: { invoices: InvoiceSummary[] | null; limit?: number; download?: boolean }) {
     const t = useTranslations('billing.tiles')
+    const tSize = useTranslations('billing.machine.sizes')
     const locale = useLocale()
     if (!invoices) {
         return (
@@ -156,7 +160,7 @@ export function InvoiceRows({ invoices, limit, download }: { invoices: InvoiceSu
                 return (
                     <div key={invoice.id} className={cn('flex items-center gap-3 px-4 text-sm', download ? 'py-2' : 'py-2.5')}>
                         <span className="min-w-14 shrink-0 whitespace-nowrap text-muted-foreground">{billingDate(invoice.createdAt, locale)}</span>
-                        <span className="min-w-0 flex-1 truncate">{invoiceLabel(invoice, t)}</span>
+                        <span className="min-w-0 flex-1 truncate">{invoiceLabel(invoice, t, tSize)}</span>
                         <span className="tabular-nums">{usd(invoice.amountCents)}</span>
                         <InvoiceBadge status={invoice.status} />
                         {download && href && (

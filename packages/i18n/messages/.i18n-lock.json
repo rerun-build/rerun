@@ -12169,7 +12169,16 @@
         "workspaceView.tile.more": "f608d3348f5f",
         "workspaceView.tile.newConversation": "396c946f0c79",
         "workspaceView.tile.pin": "e961fa7ba885",
-        "workspaceView.tile.unpin": "ee3c71613054"
+        "workspaceView.tile.unpin": "ee3c71613054",
+        "billing.tiles.invoice.machine": "a05f34130462",
+        "billing.machine.sizes.medium": "8e588cd18774",
+        "errors.lifetimeMachineDuringTrial": "abb1903b33ee",
+        "errors.machineNotOffered": "1d22c60c45b3",
+        "billing.machine.sizes.small": "5263293fc202",
+        "errors.machineAfterTrial": "d59e06d41975",
+        "errors.invalidMachineSize": "61d15c5f948c",
+        "billing.tiles.invoice.storage": "1854235683ca",
+        "billing.machine.sizes.large": "ab80540d98d2"
     },
     "de": {
         "account.delete.blocker.current": "9c398562fda6",
@@ -24341,7 +24350,16 @@
         "workspaceView.tile.more": "f608d3348f5f",
         "workspaceView.tile.newConversation": "396c946f0c79",
         "workspaceView.tile.pin": "e961fa7ba885",
-        "workspaceView.tile.unpin": "ee3c71613054"
+        "workspaceView.tile.unpin": "ee3c71613054",
+        "billing.tiles.invoice.machine": "a05f34130462",
+        "billing.machine.sizes.medium": "8e588cd18774",
+        "errors.lifetimeMachineDuringTrial": "abb1903b33ee",
+        "errors.machineNotOffered": "1d22c60c45b3",
+        "billing.machine.sizes.small": "5263293fc202",
+        "errors.machineAfterTrial": "d59e06d41975",
+        "errors.invalidMachineSize": "61d15c5f948c",
+        "billing.tiles.invoice.storage": "1854235683ca",
+        "billing.machine.sizes.large": "ab80540d98d2"
     },
     "es": {
         "account.delete.blocker.current": "9c398562fda6",
@@ -36513,7 +36531,16 @@
         "workspaceView.tile.more": "f608d3348f5f",
         "workspaceView.tile.newConversation": "396c946f0c79",
         "workspaceView.tile.pin": "e961fa7ba885",
-        "workspaceView.tile.unpin": "ee3c71613054"
+        "workspaceView.tile.unpin": "ee3c71613054",
+        "billing.tiles.invoice.machine": "a05f34130462",
+        "billing.machine.sizes.medium": "8e588cd18774",
+        "errors.lifetimeMachineDuringTrial": "abb1903b33ee",
+        "errors.machineNotOffered": "1d22c60c45b3",
+        "billing.machine.sizes.small": "5263293fc202",
+        "errors.machineAfterTrial": "d59e06d41975",
+        "errors.invalidMachineSize": "61d15c5f948c",
+        "billing.tiles.invoice.storage": "1854235683ca",
+        "billing.machine.sizes.large": "ab80540d98d2"
     },
     "fr": {
         "account.delete.blocker.current": "9c398562fda6",
@@ -48685,7 +48712,16 @@
         "workspaceView.tile.more": "f608d3348f5f",
         "workspaceView.tile.newConversation": "396c946f0c79",
         "workspaceView.tile.pin": "e961fa7ba885",
-        "workspaceView.tile.unpin": "ee3c71613054"
+        "workspaceView.tile.unpin": "ee3c71613054",
+        "billing.tiles.invoice.machine": "a05f34130462",
+        "billing.machine.sizes.medium": "8e588cd18774",
+        "errors.lifetimeMachineDuringTrial": "abb1903b33ee",
+        "errors.machineNotOffered": "1d22c60c45b3",
+        "billing.machine.sizes.small": "5263293fc202",
+        "errors.machineAfterTrial": "d59e06d41975",
+        "errors.invalidMachineSize": "61d15c5f948c",
+        "billing.tiles.invoice.storage": "1854235683ca",
+        "billing.machine.sizes.large": "ab80540d98d2"
     },
     "he": {
         "account.delete.blocker.current": "9c398562fda6",
@@ -60857,7 +60893,16 @@
         "workspaceView.tile.more": "f608d3348f5f",
         "workspaceView.tile.newConversation": "396c946f0c79",
         "workspaceView.tile.pin": "e961fa7ba885",
-        "workspaceView.tile.unpin": "ee3c71613054"
+        "workspaceView.tile.unpin": "ee3c71613054",
+        "billing.tiles.invoice.machine": "a05f34130462",
+        "billing.machine.sizes.medium": "8e588cd18774",
+        "errors.lifetimeMachineDuringTrial": "abb1903b33ee",
+        "errors.machineNotOffered": "1d22c60c45b3",
+        "billing.machine.sizes.small": "5263293fc202",
+        "errors.machineAfterTrial": "d59e06d41975",
+        "errors.invalidMachineSize": "61d15c5f948c",
+        "billing.tiles.invoice.storage": "1854235683ca",
+        "billing.machine.sizes.large": "ab80540d98d2"
     },
     "pt": {
         "account.delete.blocker.current": "9c398562fda6",
@@ -73029,7 +73074,16 @@
         "workspaceView.tile.more": "f608d3348f5f",
         "workspaceView.tile.newConversation": "396c946f0c79",
         "workspaceView.tile.pin": "e961fa7ba885",
-        "workspaceView.tile.unpin": "ee3c71613054"
+        "workspaceView.tile.unpin": "ee3c71613054",
+        "billing.tiles.invoice.machine": "a05f34130462",
+        "billing.machine.sizes.medium": "8e588cd18774",
+        "errors.lifetimeMachineDuringTrial": "abb1903b33ee",
+        "errors.machineNotOffered": "1d22c60c45b3",
+        "billing.machine.sizes.small": "5263293fc202",
+        "errors.machineAfterTrial": "d59e06d41975",
+        "errors.invalidMachineSize": "61d15c5f948c",
+        "billing.tiles.invoice.storage": "1854235683ca",
+        "billing.machine.sizes.large": "ab80540d98d2"
     },
     "tr": {
         "account.delete.blocker.current": "9c398562fda6",
@@ -85201,7 +85255,16 @@
         "workspaceView.tile.more": "f608d3348f5f",
         "workspaceView.tile.newConversation": "396c946f0c79",
         "workspaceView.tile.pin": "e961fa7ba885",
-        "workspaceView.tile.unpin": "ee3c71613054"
+        "workspaceView.tile.unpin": "ee3c71613054",
+        "billing.tiles.invoice.machine": "a05f34130462",
+        "billing.machine.sizes.medium": "8e588cd18774",
+        "errors.lifetimeMachineDuringTrial": "abb1903b33ee",
+        "errors.machineNotOffered": "1d22c60c45b3",
+        "billing.machine.sizes.small": "5263293fc202",
+        "errors.machineAfterTrial": "d59e06d41975",
+        "errors.invalidMachineSize": "61d15c5f948c",
+        "billing.tiles.invoice.storage": "1854235683ca",
+        "billing.machine.sizes.large": "ab80540d98d2"
     },
     "zh": {
         "account.delete.blocker.current": "9c398562fda6",
@@ -97373,7 +97436,16 @@
         "workspaceView.tile.more": "f608d3348f5f",
         "workspaceView.tile.newConversation": "396c946f0c79",
         "workspaceView.tile.pin": "e961fa7ba885",
-        "workspaceView.tile.unpin": "ee3c71613054"
+        "workspaceView.tile.unpin": "ee3c71613054",
+        "billing.tiles.invoice.machine": "a05f34130462",
+        "billing.machine.sizes.medium": "8e588cd18774",
+        "errors.lifetimeMachineDuringTrial": "abb1903b33ee",
+        "errors.machineNotOffered": "1d22c60c45b3",
+        "billing.machine.sizes.small": "5263293fc202",
+        "errors.machineAfterTrial": "d59e06d41975",
+        "errors.invalidMachineSize": "61d15c5f948c",
+        "billing.tiles.invoice.storage": "1854235683ca",
+        "billing.machine.sizes.large": "ab80540d98d2"
     },
     "zh-TW": {
         "account.delete.blocker.current": "9c398562fda6",
@@ -109545,6 +109617,15 @@
         "workspaceView.tile.more": "f608d3348f5f",
         "workspaceView.tile.newConversation": "396c946f0c79",
         "workspaceView.tile.pin": "e961fa7ba885",
-        "workspaceView.tile.unpin": "ee3c71613054"
+        "workspaceView.tile.unpin": "ee3c71613054",
+        "billing.tiles.invoice.machine": "a05f34130462",
+        "billing.machine.sizes.medium": "8e588cd18774",
+        "errors.lifetimeMachineDuringTrial": "abb1903b33ee",
+        "errors.machineNotOffered": "1d22c60c45b3",
+        "billing.machine.sizes.small": "5263293fc202",
+        "errors.machineAfterTrial": "d59e06d41975",
+        "errors.invalidMachineSize": "61d15c5f948c",
+        "billing.tiles.invoice.storage": "1854235683ca",
+        "billing.machine.sizes.large": "ab80540d98d2"
     }
 }

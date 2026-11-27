@@ -16,7 +16,7 @@ import { BilledFlow, PlanCard, usd } from '@/ee/components/dialogs/billing/parts
 import { SubscribePane, type SubscribeSubmit } from '@/ee/components/dialogs/billing/SubscribeCheckout'
 import { checkoutRouteFor, trialOffer } from '@/ee/lib/billing/checkout-variant'
 import { isSubscriptionEntitled } from '@/ee/lib/billing/entitlement'
-import { BASE_PLAN_SLUG, ZERO_QUANTITIES, planPriceCents, trialEndDate } from '@/ee/lib/billing/plans'
+import { BASE_PLAN_SLUG, INCLUDED_MACHINE_SIZE, ZERO_QUANTITIES, planPriceCents, trialEndDate } from '@/ee/lib/billing/plans'
 import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess'
 import { ArrowLeftIcon, CheckIcon, LockIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
@@ -104,7 +104,7 @@ export function OnboardingTrialStep({ onBack, waitlisted }: { onBack: () => void
                 <div className="flex flex-col">
                     <SubscribePane
                         key={variant}
-                        selection={{ quantities: ZERO_QUANTITIES, interval: 'monthly' }}
+                        selection={{ quantities: ZERO_QUANTITIES, interval: 'monthly', machineSize: INCLUDED_MACHINE_SIZE }}
                         copy={copy}
                         onDone={() => {
                             setStarted(true)

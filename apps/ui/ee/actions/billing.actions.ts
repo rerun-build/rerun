@@ -38,12 +38,12 @@ import {
 import { loadCancelFlowActivity, type CancelFlowActivity } from '@/ee/services/cancel-flow-activity.service'
 import { abandonCreditInvoice, buyCredit, confirmCreditCheckout, quoteCreditPurchase, settleCreditInvoice, type CreditPurchaseResult, type CreditQuote } from '@/ee/services/credit-purchase.service'
 import { getCreditUsage } from '@/ee/services/credit-usage.service'
-import { getLifetimeBillingState, type LifetimeBillingState } from '@/ee/services/lifetime-addons.service'
+import { changeLifetimeMachine, getLifetimeBillingState, settleLifetimeAddonsCheckout, type LifetimeBillingState, type LifetimeMachineChange, type LifetimeMachineSelection } from '@/ee/services/lifetime-addons.service'
 import { markPaymentMethodAdded } from '@/app/api/_services/getting-started.service'
 import { CANCEL_COMEBACKS, cancelReasonTextSchema, type CancelReason, type RetentionOfferKind } from '@/ee/lib/billing/cancel-flow'
 import { readCancelReason } from '@/ee/lib/billing/read-cancel-reason'
 import type { CreditUsage } from '@/ee/lib/billing/credit-usage'
-import { BILLING_INTERVALS } from '@/ee/lib/billing/plans'
+import { ADDON_MAX_QUANTITIES, BILLING_INTERVALS, MACHINE_SIZES } from '@/ee/lib/billing/plans'
 import { MAX_CREDIT_PACKS_PER_PURCHASE } from '@rerun/contracts'
 import { stripe } from '@/ee/lib/billing/stripe'
 import type { TaxIdType } from '@/ee/lib/billing/tax-id'
@@ -65,8 +65,13 @@ async function requireBuyer(): Promise<WorkspaceContext> {
 const creditPacksSchema = z.number().int().min(1).max(MAX_CREDIT_PACKS_PER_PURCHASE)
 
 const planSelectionSchema = z.object({
-    quantities: z.object({ linkedin_slot: z.number().int().min(0).max(1000), whatsapp_slot: z.number().int().min(0).max(1000) }),
+    quantities: z.object({
+        linkedin_slot: z.number().int().min(0).max(ADDON_MAX_QUANTITIES.linkedin_slot),
+        whatsapp_slot: z.number().int().min(0).max(ADDON_MAX_QUANTITIES.whatsapp_slot),
+        storage_pack: z.number().int().min(0).max(ADDON_MAX_QUANTITIES.storage_pack).optional(),
+    }),
     interval: z.enum(BILLING_INTERVALS),
+    machineSize: z.enum(MACHINE_SIZES).optional(),
 })
 
 // What an embedded checkout ended up doing to the workspace. The widget polls this beside the
@@ -282,6 +287,33 @@ export async function changePlanAction(selection: PlanSelection): Promise<({ ok:
         return { ok: true, ...(await changePlan(planSelectionSchema.parse(selection))) }
     } catch (err) {
         return planChargeFailure(err)
+    }
+}
+
+const lifetimeMachineSchema = z.object({
+    machineSize: z.enum(MACHINE_SIZES),
+    storagePacks: z.number().int().min(0).max(ADDON_MAX_QUANTITIES.storage_pack),
+})
+
+// `requestId` is minted by the button, once per click: a retry of the same click opens one Checkout.
+export async function changeLifetimeMachineAction(selection: LifetimeMachineSelection, requestId: string): Promise<({ ok: true } & LifetimeMachineChange) | ActionFailure> {
+    try {
+        await requireBuyer()
+        return { ok: true, ...(await changeLifetimeMachine(lifetimeMachineSchema.parse(selection), z.string().uuid().parse(requestId))) }
+    } catch (err) {
+        return planChargeFailure(err)
+    }
+}
+
+// Back from the Checkout of a lifetime workspace's first machine size: the size lands now rather than
+// when the webhook does, which repeats the same idempotent sync.
+export async function settleLifetimeMachineCheckoutAction(sessionId: string): Promise<{ ok: true } | ActionFailure> {
+    try {
+        await requireBuyer()
+        await settleLifetimeAddonsCheckout(stripeIdSchema.parse(sessionId))
+        return { ok: true }
+    } catch (err) {
+        return failureOf(err, 'changePlanFailed')
     }
 }
 

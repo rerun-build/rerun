@@ -102,7 +102,9 @@
         "tiles.invoice.appSlots": "An app on an invoice: {app} is its name, like LinkedIn Pro, {count} its slots.",
         "tiles.invoice.prorated": "{items} is the list of what the invoice charged for, like \"LinkedIn Pro\".",
         "tiles.apps.addedLine": "A change of slots: {app} is the app's name, like LinkedIn Pro.",
-        "tiles.pages.card.description": "Under the title of the page where a card is added or replaced."
+        "tiles.pages.card.description": "Under the title of the page where a card is added or replaced.",
+        "tiles.invoice.machine": "A machine size on an invoice. {size} is the name of the size: Small, Medium or Large.",
+        "machine.sizes.small": "Name of the smallest machine size a workspace runs on, included in the plan."
     },
     "credits": "{count, plural, one {# credit} other {# credits}}",
     "plan": {
@@ -1282,6 +1284,8 @@
         },
         "invoice": {
             "plan": "{brand} Pro",
+            "machine": "{size} machine",
+            "storage": "{count, plural, one {Storage pack} other {Storage packs × #}}",
             "appSlots": "{count, plural, one {{app}} other {{app} × #}}",
             "creditPacks": "{count, plural, one {Credit pack} other {Credit packs × #}}",
             "prorated": "{items} (prorated)",
@@ -1319,5 +1323,12 @@
     "onboardingTrial": {
         "addCardFree": "Add a card, {amount} today",
         "addCard": "Add a card"
+    },
+    "machine": {
+        "sizes": {
+            "small": "Small",
+            "medium": "Medium",
+            "large": "Large"
+        }
     }
 }

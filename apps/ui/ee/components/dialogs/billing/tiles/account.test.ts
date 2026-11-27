@@ -37,24 +37,29 @@ describe('planBadge', () => {
     })
 
     it('shows a switch to monthly waiting for the renewal', () => {
-        expect(planBadge({ ...ACTIVE, interval: 'yearly', pendingSwitch: { selection: { quantities: { linkedin_slot: 0, whatsapp_slot: 0 }, interval: 'monthly' }, at: '2027-01-01' } })).toEqual({ kind: 'monthlyFrom', tone: 'yellow' })
+        expect(planBadge({ ...ACTIVE, interval: 'yearly', pendingSwitch: { selection: { quantities: { linkedin_slot: 0, whatsapp_slot: 0, storage_pack: 0 }, interval: 'monthly', machineSize: 'small' }, at: '2027-01-01' } })).toEqual({ kind: 'monthlyFrom', tone: 'yellow' })
     })
 })
 
 describe('planBillCents', () => {
-    const quantities = { linkedin_slot: 1, whatsapp_slot: 0 }
+    const quantities = { linkedin_slot: 1, whatsapp_slot: 0, storage_pack: 0 }
 
     it('bills the base plan plus its slots', () => {
-        expect(planBillCents({ interval: 'monthly', monthlyDiscountCents: 0 }, quantities, 'monthly')).toBe(2900 + 900)
+        expect(planBillCents({ interval: 'monthly', monthlyDiscountCents: 0, machineSize: 'small' }, quantities, 'monthly')).toBe(2900 + 900)
     })
 
     it('brings a workspace still on $49 back up to what it is billed', () => {
-        expect(planBillCents({ interval: 'monthly', monthlyDiscountCents: -2000 }, quantities, 'monthly')).toBe(4900 + 900)
+        expect(planBillCents({ interval: 'monthly', monthlyDiscountCents: -2000, machineSize: 'small' }, quantities, 'monthly')).toBe(4900 + 900)
+    })
+
+    it('adds the machine size the plan pays for', () => {
+        expect(planBillCents({ interval: 'monthly', monthlyDiscountCents: 0, machineSize: 'medium' }, quantities, 'monthly')).toBe(2900 + 900 + 2000)
+        expect(planBillCents({ interval: 'yearly', monthlyDiscountCents: 0, machineSize: 'large' }, quantities, 'yearly')).toBe(27600 + 10800 + 67200)
     })
 
     it('keeps a discount only on the interval it was given on', () => {
-        expect(planBillCents({ interval: 'monthly', monthlyDiscountCents: 500 }, quantities, 'monthly')).toBe(3300)
-        expect(planBillCents({ interval: 'monthly', monthlyDiscountCents: 500 }, quantities, 'yearly')).toBe(27600 + 10800)
+        expect(planBillCents({ interval: 'monthly', monthlyDiscountCents: 500, machineSize: 'small' }, quantities, 'monthly')).toBe(3300)
+        expect(planBillCents({ interval: 'monthly', monthlyDiscountCents: 500, machineSize: 'small' }, quantities, 'yearly')).toBe(27600 + 10800)
     })
 })
 

@@ -1,18 +1,27 @@
 import type Stripe from 'stripe'
 
 import { APP_ADDON_KEYS, APP_SLUGS, type AppSlug } from '@/lib/apps/types'
-import type { AddonKey } from '@/ee/lib/billing/plans'
+import type { AddonKey, PaidMachineSize } from '@/ee/lib/billing/plans'
 
 export const CREDIT_PURCHASE_KIND = 'credit_purchase'
 
 // What an invoice charged for, so a list of invoices can name each one ("Pro + LinkedIn Pro",
-// "Credit pack × 2"). `prorated` marks an invoice that only carries the part of a period an add-on
-// was bought for.
-export type InvoiceItem = { kind: 'plan' } | { kind: 'app'; app: AppSlug; quantity: number } | { kind: 'credit_pack'; quantity: number }
+// "Credit pack × 2", "Pro + Medium machine"). `prorated` marks an invoice that only carries the part
+// of a period an add-on was bought for.
+export type InvoiceItem =
+    | { kind: 'plan' }
+    | { kind: 'machine'; size: PaidMachineSize }
+    | { kind: 'storage'; quantity: number }
+    | { kind: 'app'; app: AppSlug; quantity: number }
+    | { kind: 'credit_pack'; quantity: number }
 
 export type InvoiceItems = { items: InvoiceItem[]; prorated: boolean }
 
-type PriceReaders = { isBasePriceId: (priceId: string) => boolean; addonForPriceId: (priceId: string) => AddonKey | undefined }
+type PriceReaders = {
+    isBasePriceId: (priceId: string) => boolean
+    addonForPriceId: (priceId: string) => AddonKey | undefined
+    machineSizeForPriceId: (priceId: string) => PaidMachineSize | undefined
+}
 
 function linePriceId(line: Stripe.InvoiceLineItem): string | null {
     const price = line.pricing?.price_details?.price
@@ -45,7 +54,19 @@ export function invoiceItemsOf(invoice: Pick<Stripe.Invoice, 'metadata' | 'lines
             if (!items.some(item => item.kind === 'plan')) items.unshift({ kind: 'plan' })
             continue
         }
-        const app = appOfAddon(prices.addonForPriceId(priceId))
+        const machineSize = prices.machineSizeForPriceId(priceId)
+        if (machineSize) {
+            if (!items.some(item => item.kind === 'machine')) items.push({ kind: 'machine', size: machineSize })
+            continue
+        }
+        const addon = prices.addonForPriceId(priceId)
+        if (addon === 'storage_pack') {
+            const storage = items.find(item => item.kind === 'storage')
+            if (storage && storage.kind === 'storage') storage.quantity += line.quantity ?? 1
+            else items.push({ kind: 'storage', quantity: line.quantity ?? 1 })
+            continue
+        }
+        const app = appOfAddon(addon)
         if (!app) continue
         const quantity = line.quantity ?? 1
         const existing = items.find(item => item.kind === 'app' && item.app === app)

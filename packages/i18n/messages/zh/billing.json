@@ -1177,6 +1177,8 @@
         },
         "invoice": {
             "plan": "{brand} Pro",
+            "machine": "{size}机器",
+            "storage": "{count, plural, =1 {存储包} other {存储包 × #}}",
             "appSlots": "{count, plural, =1 {{app}} other {{app} × #}}",
             "creditPacks": "{count, plural, =1 {积分包} other {积分包 × #}}",
             "prorated": "{items}（按比例计费）",
@@ -1214,5 +1216,12 @@
     "onboardingTrial": {
         "addCardFree": "添加银行卡，今天 {amount}",
         "addCard": "添加银行卡"
+    },
+    "machine": {
+        "sizes": {
+            "small": "小型",
+            "medium": "中型",
+            "large": "大型"
+        }
     }
 }

@@ -1,7 +1,7 @@
 import { BASE_PLAN_SLUG, perMonthCents } from '@/ee/lib/billing/plans'
 import { CANCEL_COMEBACK_METADATA_KEY, CANCEL_REASON_CHECK_METADATA_KEY } from '@/ee/lib/billing/cancel-flow'
 import { isTemplateSubscription, stripeTimestampIso } from '@/ee/lib/billing/marketplace'
-import { intervalOfItems, legacyBaseDiscountCents, quantitiesFromItems, subscriptionOfInvoice } from '@/ee/lib/billing/stripe'
+import { intervalOfItems, legacyBaseDiscountCents, machineOfItems, quantitiesFromItems, subscriptionOfInvoice } from '@/ee/lib/billing/stripe'
 import { resolveWorkspaceMemberEmail, resolveWorkspaceOwner, type WorkspaceOwner } from '@/app/api/_services/workspace-owner.service'
 import { captureServer, deterministicUuid } from '@rerun/analytics/server'
 import type { BillingPeriod, SubscriptionLifecycleProps } from '@rerun/analytics'
@@ -27,7 +27,7 @@ function lifecycleProps(subscription: Stripe.Subscription, workspaceId: number, 
     // amount, which says nothing about what a subscription minted in another currency is billed.
     // Only a legacy base price, checked on its currency, is taken off it.
     const interval = intervalOfItems(items)
-    const mrr = (perMonthCents(quantities, interval) - legacyBaseDiscountCents(items) / (interval === 'yearly' ? 12 : 1)) / 100
+    const mrr = (perMonthCents(quantities, interval, machineOfItems(items).size) - legacyBaseDiscountCents(items) / (interval === 'yearly' ? 12 : 1)) / 100
     const billing_period: BillingPeriod = interval === 'yearly' ? 'annual' : 'monthly'
     return {
         plan: BASE_PLAN_SLUG,

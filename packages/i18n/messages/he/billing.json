@@ -1177,6 +1177,8 @@
         },
         "invoice": {
             "plan": "{brand} Pro",
+            "machine": "מכונה {size}",
+            "storage": "{count, plural, one {חבילת אחסון} two {חבילות אחסון × #} other {חבילות אחסון × #}}",
             "appSlots": "{count, plural, one {{app}} two {{app} × #} other {{app} × #}}",
             "creditPacks": "{count, plural, one {חבילת קרדיטים} two {חבילות קרדיטים × #} other {חבילות קרדיטים × #}}",
             "prorated": "{items} (יחסי)",
@@ -1214,5 +1216,12 @@
     "onboardingTrial": {
         "addCardFree": "להוסיף כרטיס, {amount} היום",
         "addCard": "להוסיף כרטיס"
+    },
+    "machine": {
+        "sizes": {
+            "small": "קטנה",
+            "medium": "בינונית",
+            "large": "גדולה"
+        }
     }
 }

@@ -1177,6 +1177,8 @@
         },
         "invoice": {
             "plan": "{brand} Pro",
+            "machine": "Makine: {size}",
+            "storage": "{count, plural, one {Depolama paketi} other {Depolama paketi × #}}",
             "appSlots": "{count, plural, one {{app}} other {{app} × #}}",
             "creditPacks": "{count, plural, one {Kredi paketi} other {Kredi paketi × #}}",
             "prorated": "{items} (orantılı)",
@@ -1214,5 +1216,12 @@
     "onboardingTrial": {
         "addCardFree": "Kart ekleyin, bugün {amount}",
         "addCard": "Kart ekleyin"
+    },
+    "machine": {
+        "sizes": {
+            "small": "Küçük",
+            "medium": "Orta",
+            "large": "Büyük"
+        }
     }
 }

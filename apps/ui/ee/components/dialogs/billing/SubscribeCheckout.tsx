@@ -8,7 +8,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 
 import { acceptPlanTermsAction, createPlanCheckoutAction, readCheckoutOutcomeAction, updatePlanCheckoutAction } from '@/ee/actions/billing.actions'
-import type { PlanSelection } from '@/ee/services/billing.service'
+import type { FullPlanSelection } from '@/ee/services/billing.service'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TRIAL_DAYS, planPriceCents, trialEndDate } from '@/ee/lib/billing/plans'
 
@@ -59,7 +59,7 @@ export function SubscribePane({
     onTrialRefused,
     footer,
 }: {
-    selection: PlanSelection
+    selection: FullPlanSelection
     copy: PaneCopy
     onDone: (trialStarted: boolean) => void
     onTrialRefused: () => void
@@ -112,8 +112,8 @@ function SubscribeForm({
 }: {
     sessionId: string
     // The selection the session was created with: anything picked since is still to be sent.
-    sessionSelection: PlanSelection
-    selection: PlanSelection
+    sessionSelection: FullPlanSelection
+    selection: FullPlanSelection
     trial: boolean
     copy: PaneCopy
     onDone: () => void
@@ -147,7 +147,7 @@ function SubscribeForm({
             inFlight.current = key
             setUpdating(true)
             const result = await checkout.checkout.runServerUpdate(async () => {
-                const update = await updatePlanCheckoutAction(sessionId, JSON.parse(key) as PlanSelection)
+                const update = await updatePlanCheckoutAction(sessionId, JSON.parse(key) as FullPlanSelection)
                 if (!update.ok) throw new Error(errorText(update))
             })
             inFlight.current = null
@@ -174,10 +174,10 @@ function SubscribeForm({
     const interval = selection.interval
     const referrer = usePendingReferrer(trial)
     const [trialEnds] = useState(() => trialEndDate(new Date()))
-    const amount = trial ? usd(0) : <UsdFlow cents={loaded?.total.total.minorUnitsAmount ?? planPriceCents(selection.quantities, interval)} />
+    const amount = trial ? usd(0) : <UsdFlow cents={loaded?.total.total.minorUnitsAmount ?? planPriceCents(selection.quantities, interval, selection.machineSize)} />
     // The price after the trial follows a promotion code; without one it stays the list price.
     const nextInvoice = loaded?.discountAmounts?.length ? loaded.recurring?.dueNext : null
-    const afterTrialCents = nextInvoice ? Math.max(0, nextInvoice.subtotal.minorUnitsAmount - nextInvoice.discount.minorUnitsAmount) : planPriceCents(selection.quantities, 'monthly')
+    const afterTrialCents = nextInvoice ? Math.max(0, nextInvoice.subtotal.minorUnitsAmount - nextInvoice.discount.minorUnitsAmount) : planPriceCents(selection.quantities, 'monthly', selection.machineSize)
 
     // Recorded when the box is ticked, never on the pay click: Safari only opens the Apple Pay sheet
     // inside the tap itself, so nothing may be awaited between that tap and `confirm`.

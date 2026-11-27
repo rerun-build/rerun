@@ -30,9 +30,10 @@ export function planBadge(state: Pick<SubscriptionState, 'status' | 'cancelAtPer
     return { kind: state.interval === 'yearly' ? 'yearly' : 'monthly', tone: 'green' }
 }
 
-// What the plan bills each interval at `quantities`, with the legacy price and the promos it keeps.
-export function planBillCents(state: Pick<SubscriptionState, 'interval' | 'monthlyDiscountCents'>, quantities: AddonQuantities, interval: BillingInterval): number {
-    return Math.max(0, planPriceCents(quantities, interval) - planDiscountCents(state, interval))
+// What the plan bills each interval at `quantities` and the machine size it pays for, with the legacy
+// price and the promos it keeps.
+export function planBillCents(state: Pick<SubscriptionState, 'interval' | 'monthlyDiscountCents' | 'machineSize'>, quantities: AddonQuantities, interval: BillingInterval): number {
+    return Math.max(0, planPriceCents(quantities, interval, state.machineSize) - planDiscountCents(state, interval))
 }
 
 // What a year billed yearly saves on twelve months of the base plan.

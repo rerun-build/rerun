@@ -211,6 +211,17 @@ describe('slots of a lifetime workspace', () => {
         expect(addPaidSlot).not.toHaveBeenCalled()
     })
 
+    it('runs on a subscription set to end with nothing but a size given back, once it carries the new slot', async () => {
+        useWorkspace({ ...LIFETIME, stripe_addons_subscription_id: 'sub_addons' })
+        const ending = slotsSubscription('active', 0, { cancel_at_period_end: true })
+        vi.mocked(stripe.subscriptions.retrieve).mockResolvedValue(ending as never)
+        vi.mocked(resumeLifetimeAddons).mockResolvedValue(ending as never)
+
+        await expect(addAppSlot('linkedin', 'req-1')).resolves.toEqual({ trialSlot: false, checkoutUrl: null })
+        expect(addPaidSlot).toHaveBeenCalledWith(ending, 'linkedin_slot', 'slot-req-1')
+        expect(resumeLifetimeAddons).toHaveBeenCalledTimes(2)
+    })
+
     it('gives back a slot no account holds', async () => {
         useWorkspace({ ...LIFETIME, stripe_addons_subscription_id: 'sub_addons' }, [{ id: 'c1', status: 'connected', pause_reason: null }])
         const subscription = slotsSubscription('active', 2)

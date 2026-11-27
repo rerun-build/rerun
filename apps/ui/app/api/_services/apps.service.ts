@@ -250,6 +250,8 @@ export async function addAppSlot(slug: AppSlug, requestId: string): Promise<AddS
         return { trialSlot: true, checkoutUrl: null }
     }
     await addPaidSlot(subscription, app.addonKey, `slot-${requestId}`)
+    // Set to end with nothing but a machine size given back on it: it runs on now that it carries the slot.
+    if (state.lifetime && subscription.cancel_at_period_end) await resumeLifetimeAddons(await stripe.subscriptions.retrieve(subscription.id))
     await reportWorkspaceEvent(supabase, workspace.id, 'app_slot_added', { app: slug, trial_slot: false })
     return { trialSlot: false, checkoutUrl: null }
 }

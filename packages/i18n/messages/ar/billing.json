@@ -1177,6 +1177,8 @@
         },
         "invoice": {
             "plan": "{brand} Pro",
+            "machine": "جهاز {size}",
+            "storage": "{count, plural, zero {حزم تخزين × #} one {حزمة تخزين} two {حزم تخزين × #} few {حزم تخزين × #} many {حزم تخزين × #} other {حزم تخزين × #}}",
             "appSlots": "{count, plural, zero {{app} × #} one {{app}} two {{app} × #} few {{app} × #} many {{app} × #} other {{app} × #}}",
             "creditPacks": "{count, plural, zero {حزم أرصدة × #} one {حزمة أرصدة} two {حزم أرصدة × #} few {حزم أرصدة × #} many {حزم أرصدة × #} other {حزم أرصدة × #}}",
             "prorated": "{items} (بالتناسب)",
@@ -1214,5 +1216,12 @@
     "onboardingTrial": {
         "addCardFree": "أضف بطاقة، {amount} اليوم",
         "addCard": "أضف بطاقة"
+    },
+    "machine": {
+        "sizes": {
+            "small": "صغير",
+            "medium": "متوسط",
+            "large": "كبير"
+        }
     }
 }

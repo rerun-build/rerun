@@ -5,7 +5,8 @@ import { CREDIT_PURCHASE_KIND, invoiceItemsOf } from './invoice-items'
 
 const prices = {
     isBasePriceId: (priceId: string) => priceId === 'price_base',
-    addonForPriceId: (priceId: string) => (priceId === 'price_linkedin' ? ('linkedin_slot' as const) : priceId === 'price_whatsapp' ? ('whatsapp_slot' as const) : undefined),
+    addonForPriceId: (priceId: string) => (priceId === 'price_linkedin' ? ('linkedin_slot' as const) : priceId === 'price_whatsapp' ? ('whatsapp_slot' as const) : priceId === 'price_storage' ? ('storage_pack' as const) : undefined),
+    machineSizeForPriceId: (priceId: string) => (priceId === 'price_machine_large' ? ('large' as const) : undefined),
 }
 
 function line(price: string, amount: number, { quantity = 1, proration = false } = {}): Stripe.InvoiceLineItem {
@@ -20,6 +21,13 @@ describe('invoiceItemsOf', () => {
     it('names the plan first, then each app with its slots', () => {
         expect(invoiceItemsOf(invoice([line('price_linkedin', 900, { quantity: 2 }), line('price_base', 2900)]), prices)).toEqual({
             items: [{ kind: 'plan' }, { kind: 'app', app: 'linkedin', quantity: 2 }],
+            prorated: false,
+        })
+    })
+
+    it('names the machine size and the storage packs beside the plan', () => {
+        expect(invoiceItemsOf(invoice([line('price_base', 2900), line('price_machine_large', 7000), line('price_storage', 1000, { quantity: 2 }), line('price_storage', 1000)]), prices)).toEqual({
+            items: [{ kind: 'plan' }, { kind: 'machine', size: 'large' }, { kind: 'storage', quantity: 3 }],
             prorated: false,
         })
     })

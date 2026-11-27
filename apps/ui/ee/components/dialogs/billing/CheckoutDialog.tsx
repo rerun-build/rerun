@@ -11,13 +11,13 @@ import { toast } from 'sonner'
 
 import { confirmCardSetupAction, createPlanCardSetupAction, resumeSubscriptionAction } from '@/ee/actions/billing.actions'
 import { runPlanChange } from '@/ee/lib/billing/plan-payment'
-import type { PlanSelection, SubscriptionState } from '@/ee/services/billing.service'
+import type { FullPlanSelection, SubscriptionState } from '@/ee/services/billing.service'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess'
 import type { CheckoutRoute } from '@/ee/lib/billing/checkout-variant'
 import { isSubscriptionEntitled } from '@/ee/lib/billing/entitlement'
-import { BASE_PLAN_CREDITS, PLAN_PRICES_CENTS, TRIAL_ACTIVE_AGENTS, TRIAL_CREDITS, ZERO_QUANTITIES, planPriceCents, trialEndDate, type AddonQuantities, type BillingInterval } from '@/ee/lib/billing/plans'
+import { BASE_PLAN_CREDITS, INCLUDED_MACHINE_SIZE, PLAN_PRICES_CENTS, TRIAL_ACTIVE_AGENTS, TRIAL_CREDITS, ZERO_QUANTITIES, planPriceCents, trialEndDate, type BillingInterval } from '@/ee/lib/billing/plans'
 import { TRIAL_ENDING_LEAD_MS } from '@/ee/lib/lifecycle/sequences'
 import { useStartPending } from '@/lib/onboarding/useStartPending'
 import { AGENT_LIMIT_TRIGGER, useBillingStore, type BillingUpgrade } from '@/stores/billing.store'
@@ -44,10 +44,10 @@ type Done = 'paid' | 'card_saved' | 'trial_started' | 'restoring'
 
 const DAY_MS = 86_400_000
 
-// A plan already running keeps its add-ons: an app slot put on during the trial would otherwise be
-// dropped by the change that ends it.
-function selectionOf(interval: BillingInterval, current?: AddonQuantities): PlanSelection {
-    return { quantities: current ?? ZERO_QUANTITIES, interval }
+// A plan already running keeps its add-ons and its machine size: an app slot put on during the trial
+// would otherwise be dropped by the change that ends it.
+function selectionOf(interval: BillingInterval, state: SubscriptionState | null): FullPlanSelection {
+    return { quantities: state?.quantities ?? ZERO_QUANTITIES, interval, machineSize: state?.machineSize ?? INCLUDED_MACHINE_SIZE }
 }
 
 function billedLabel(t: BillingTranslator, interval: BillingInterval): ReactNode {
@@ -101,7 +101,7 @@ export function CheckoutDialog({
     const planFixed = fixedPlan || trialView
     const trialEndsAt = workspace?.trial_ends_at ? new Date(workspace.trial_ends_at) : null
     const reminderAt = trialEndsAt ? new Date(trialEndsAt.getTime() - TRIAL_ENDING_LEAD_MS) : null
-    const firstChargeCents = state?.nextInvoice?.amountCents ?? planPriceCents(state?.quantities ?? ZERO_QUANTITIES, state?.interval ?? 'monthly')
+    const firstChargeCents = state?.nextInvoice?.amountCents ?? planPriceCents(state?.quantities ?? ZERO_QUANTITIES, state?.interval ?? 'monthly', state?.machineSize)
     const startTrialEnds = trialEndDate(new Date(openedAt))
     const context: CheckoutContext = {
         billed: <BilledFlow cents={planPriceCents(ZERO_QUANTITIES, interval)} interval={interval} />,
@@ -116,7 +116,7 @@ export function CheckoutDialog({
         coworker: upgrade?.coworker ?? null,
     }
     const copy = checkoutCopy(t, route.variant === 'trial_card' && payNow ? 'trial_card_pay_now' : route.variant, context)
-    const selection = selectionOf(interval, state?.quantities)
+    const selection = selectionOf(interval, state)
 
     // On a trial, more credit comes with Pro: the card's button leads to paying now, or back to the
     // pane that already sells it.
@@ -261,7 +261,7 @@ type SessionState = { clientSecret: string; sessionId: string } | { error: strin
 
 // --- A trial without a card: the card form, then paying now or at the end of the trial ---
 
-function CardFormPane({ selection, copy, trialEnds, onDone }: { selection: PlanSelection; copy: PaneCopy; trialEnds: string | null; onDone: (outcome: 'paid' | 'card_saved') => void }) {
+function CardFormPane({ selection, copy, trialEnds, onDone }: { selection: FullPlanSelection; copy: PaneCopy; trialEnds: string | null; onDone: (outcome: 'paid' | 'card_saved') => void }) {
     const [session, setSession] = useState<SessionState>(null)
     const errorText = useErrorText()
 
@@ -286,7 +286,7 @@ function CardFormPane({ selection, copy, trialEnds, onDone }: { selection: PlanS
     )
 }
 
-function CardForm({ sessionId, selection, copy, trialEnds, onDone }: { sessionId: string; selection: PlanSelection; copy: PaneCopy; trialEnds: string | null; onDone: (outcome: 'paid' | 'card_saved') => void }) {
+function CardForm({ sessionId, selection, copy, trialEnds, onDone }: { sessionId: string; selection: FullPlanSelection; copy: PaneCopy; trialEnds: string | null; onDone: (outcome: 'paid' | 'card_saved') => void }) {
     const t = useTranslations('billing')
     const errorText = useErrorText()
     const checkout = useCheckout()
@@ -319,7 +319,7 @@ function CardForm({ sessionId, selection, copy, trialEnds, onDone }: { sessionId
 
     return (
         <>
-            <PayHeader title={t('checkout.pay.subscribe')} amount={<UsdFlow cents={planPriceCents(selection.quantities, interval)} />} unit={interval === 'yearly' ? t('checkout.pay.perYear') : t('checkout.pay.perMonth')} />
+            <PayHeader title={t('checkout.pay.subscribe')} amount={<UsdFlow cents={planPriceCents(selection.quantities, interval, selection.machineSize)} />} unit={interval === 'yearly' ? t('checkout.pay.perYear') : t('checkout.pay.perMonth')} />
             <p className="mt-2 text-sm text-muted-foreground">{t('checkout.card.exclVat')}</p>
             <div className="mt-6">
                 <StripePaymentFields wallet={{ onConfirm: event => void save('now', event), disabledReason: !accepted ? t('checkout.pay.acceptTerms') : submitting ? t('checkout.pay.pleaseWait') : undefined }} />
@@ -358,7 +358,7 @@ function CardOnFilePane({
     onCancelTrial,
     onResumed,
 }: {
-    selection: PlanSelection
+    selection: FullPlanSelection
     state: SubscriptionState | null
     copy: PaneCopy
     trialEnds: string | null
@@ -386,7 +386,7 @@ function CardOnFilePane({
         onDone()
     }
 
-    const listCents = planPriceCents(selection.quantities, interval)
+    const listCents = planPriceCents(selection.quantities, interval, selection.machineSize)
     const dueToday = quote === 'loading' ? null : usd(quote?.dueTodayCents ?? listCents)
     const amount = dueToday ?? <Skeleton className="inline-block h-7 w-24 align-middle" />
 

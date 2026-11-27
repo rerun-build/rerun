@@ -1,5 +1,5 @@
 import Stripe from 'stripe'
-import { ADDON_KEYS, BILLING_INTERVALS, PLAN_CURRENCY, ZERO_QUANTITIES, basePriceCents, type AddonKey, type AddonQuantities, type BillingInterval } from './plans'
+import { ADDON_KEYS, BILLING_INTERVALS, INCLUDED_MACHINE_SIZE, PAID_MACHINE_SIZES, PLAN_CURRENCY, ZERO_QUANTITIES, basePriceCents, compareMachineSizes, type AddonKey, type AddonQuantities, type BillingInterval, type MachineSize, type PaidMachineSize } from './plans'
 
 // A deployment that sells nothing has no key. The client still builds, so the routes that import it
 // load (Next evaluates them at build time), and a call it should never make fails on authentication.
@@ -14,12 +14,20 @@ type PlanPriceKey = 'base' | AddonKey
 // products/prices and prints these values). The prices carry metadata in Stripe; the
 // env mapping keeps the lookup cheap and avoids a round-trip on every checkout.
 const PRICE_ENV_NAMES: Record<BillingInterval, Record<PlanPriceKey, string>> = {
-    monthly: { base: 'STRIPE_PRICE_BASE', linkedin_slot: 'STRIPE_PRICE_LINKEDIN_SLOT', whatsapp_slot: 'STRIPE_PRICE_WHATSAPP_SLOT' },
+    monthly: { base: 'STRIPE_PRICE_BASE', linkedin_slot: 'STRIPE_PRICE_LINKEDIN_SLOT', whatsapp_slot: 'STRIPE_PRICE_WHATSAPP_SLOT', storage_pack: 'STRIPE_PRICE_STORAGE_PACK' },
     yearly: {
         base: 'STRIPE_PRICE_BASE_YEARLY',
         linkedin_slot: 'STRIPE_PRICE_LINKEDIN_SLOT_YEARLY',
         whatsapp_slot: 'STRIPE_PRICE_WHATSAPP_SLOT_YEARLY',
+        storage_pack: 'STRIPE_PRICE_STORAGE_PACK_YEARLY',
     },
+}
+
+// One price per size above the included one: the machine is a single item of the subscription, whose
+// price is swapped when the size changes.
+const MACHINE_PRICE_ENV_NAMES: Record<BillingInterval, Record<PaidMachineSize, string>> = {
+    monthly: { medium: 'STRIPE_PRICE_MACHINE_MEDIUM', large: 'STRIPE_PRICE_MACHINE_LARGE' },
+    yearly: { medium: 'STRIPE_PRICE_MACHINE_MEDIUM_YEARLY', large: 'STRIPE_PRICE_MACHINE_LARGE_YEARLY' },
 }
 
 // Read on every call rather than captured at import, so a test can stub one variable.
@@ -37,6 +45,10 @@ function legacyBasePriceIds(): string[] {
         .filter(Boolean)
 }
 
+function configuredMachinePriceId(size: PaidMachineSize, interval: BillingInterval): string | undefined {
+    return process.env[MACHINE_PRICE_ENV_NAMES[interval][size]] || undefined
+}
+
 function requirePriceId(key: PlanPriceKey, interval: BillingInterval): string {
     const id = configuredPriceId(key, interval)
     if (!id) throw new Error(`No Stripe price configured for "${key}" billed ${interval} (set ${PRICE_ENV_NAMES[interval][key]})`)
@@ -49,6 +61,28 @@ export function basePriceId(interval: BillingInterval = 'monthly'): string {
 
 export function priceIdForAddon(key: AddonKey, interval: BillingInterval = 'monthly'): string {
     return requirePriceId(key, interval)
+}
+
+export function machinePriceId(size: PaidMachineSize, interval: BillingInterval = 'monthly'): string {
+    const id = configuredMachinePriceId(size, interval)
+    if (!id) throw new Error(`No Stripe price configured for the ${size} machine billed ${interval} (set ${MACHINE_PRICE_ENV_NAMES[interval][size]})`)
+    return id
+}
+
+export function machineSizeForPriceId(priceId?: string | null): PaidMachineSize | undefined {
+    if (!priceId) return undefined
+    return PAID_MACHINE_SIZES.find(size => BILLING_INTERVALS.some(interval => configuredMachinePriceId(size, interval) === priceId))
+}
+
+// The machine item of a subscription and the size it pays for: none means the included size. A
+// subscription never carries two, but if one did, the larger is what it pays for.
+export function machineOfItems(items: Stripe.SubscriptionItem[]): { size: MachineSize; item: Stripe.SubscriptionItem | null } {
+    let found: { size: MachineSize; item: Stripe.SubscriptionItem | null } = { size: INCLUDED_MACHINE_SIZE, item: null }
+    for (const item of items) {
+        const size = machineSizeForPriceId(item.price?.id)
+        if (size && compareMachineSizes(size, found.size) > 0) found = { size, item }
+    }
+    return found
 }
 
 export function addonForPriceId(priceId?: string | null): AddonKey | undefined {
@@ -122,11 +156,11 @@ export function baseItemCents(items: Stripe.SubscriptionItem[]): number {
     return basePriceCents(intervalOfItems(items)) - legacyBaseDiscountCents(items)
 }
 
-// A price belonging to the Rerun plan subscription: the base plan or one of its
-// add-ons. Anything else on the customer is a marketplace template purchase.
+// A price belonging to the Rerun plan subscription: the base plan, one of its add-ons or the size of
+// its machine. Anything else on the customer is a marketplace template purchase.
 export function isPlanPriceId(priceId?: string | null): boolean {
     if (!priceId) return false
-    return isBasePriceId(priceId) || !!addonForPriceId(priceId) || isLegacyPlanItemPriceId(priceId)
+    return isBasePriceId(priceId) || !!addonForPriceId(priceId) || !!machineSizeForPriceId(priceId) || isLegacyPlanItemPriceId(priceId)
 }
 
 // The one-time price of a credit pack, bought on its own and never renewed.

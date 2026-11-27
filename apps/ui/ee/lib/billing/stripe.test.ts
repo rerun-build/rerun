@@ -20,19 +20,19 @@ describe('quantitiesFromItems', () => {
     it('adds up the quantities of duplicate add-on items and counts nothing for a legacy seat or agent pack', () => {
         const { hasBase, quantities } = quantitiesFromItems([item('price_base', 1), item('price_whatsapp_slot', 2), item('price_whatsapp_slot', 3), item('price_agent_pack', 2), item('price_agent_pack_yearly', 1), item('price_seat', 1)])
         expect(hasBase).toBe(true)
-        expect(quantities).toEqual({ linkedin_slot: 0, whatsapp_slot: 5 })
+        expect(quantities).toEqual({ linkedin_slot: 0, whatsapp_slot: 5, storage_pack: 0 })
     })
 
     it('counts nothing for a legacy recurring credit pack, in either interval', () => {
-        expect(quantitiesFromItems([item('price_base', 1), item('price_credit_pack', 3), item('price_credit_pack_yearly', 1)])).toEqual({ hasBase: true, quantities: { linkedin_slot: 0, whatsapp_slot: 0 } })
+        expect(quantitiesFromItems([item('price_base', 1), item('price_credit_pack', 3), item('price_credit_pack_yearly', 1)])).toEqual({ hasBase: true, quantities: { linkedin_slot: 0, whatsapp_slot: 0, storage_pack: 0 } })
     })
 
     it('reads a yearly plan like a monthly one', () => {
-        expect(quantitiesFromItems([item('price_base_yearly', 1), item('price_agent_pack_yearly', 2), item('price_whatsapp_slot_yearly', 1)])).toEqual({ hasBase: true, quantities: { linkedin_slot: 0, whatsapp_slot: 1 } })
+        expect(quantitiesFromItems([item('price_base_yearly', 1), item('price_agent_pack_yearly', 2), item('price_whatsapp_slot_yearly', 1)])).toEqual({ hasBase: true, quantities: { linkedin_slot: 0, whatsapp_slot: 1, storage_pack: 0 } })
     })
 
     it('ignores an item on a price that is not part of the plan', () => {
-        expect(quantitiesFromItems([item('price_template', 4), item(null, 2)])).toEqual({ hasBase: false, quantities: { linkedin_slot: 0, whatsapp_slot: 0 } })
+        expect(quantitiesFromItems([item('price_template', 4), item(null, 2)])).toEqual({ hasBase: false, quantities: { linkedin_slot: 0, whatsapp_slot: 0, storage_pack: 0 } })
     })
 
     it('counts an add-on item without a quantity as zero', () => {
@@ -82,7 +82,7 @@ describe('baseItemCents', () => {
 
 describe('the LinkedIn slot', () => {
     it('reads as a plan add-on, never as a template purchase', () => {
-        expect(quantitiesFromItems([item('price_base', 1), item('price_linkedin_slot', 2)])).toEqual({ hasBase: true, quantities: { linkedin_slot: 2, whatsapp_slot: 0 } })
+        expect(quantitiesFromItems([item('price_base', 1), item('price_linkedin_slot', 2)])).toEqual({ hasBase: true, quantities: { linkedin_slot: 2, whatsapp_slot: 0, storage_pack: 0 } })
         expect(isPlanPriceId('price_linkedin_slot_yearly')).toBe(true)
     })
 })
@@ -94,7 +94,7 @@ describe('the legacy base prices', () => {
             expect(isBasePriceId(id)).toBe(true)
             expect(isPlanPriceId(id)).toBe(true)
         }
-        expect(quantitiesFromItems([item('price_base_49', 1), item('price_whatsapp_slot', 1)])).toEqual({ hasBase: true, quantities: { linkedin_slot: 0, whatsapp_slot: 1 } })
+        expect(quantitiesFromItems([item('price_base_49', 1), item('price_whatsapp_slot', 1)])).toEqual({ hasBase: true, quantities: { linkedin_slot: 0, whatsapp_slot: 1, storage_pack: 0 } })
     })
 
     it('never counts the current base price as legacy', () => {

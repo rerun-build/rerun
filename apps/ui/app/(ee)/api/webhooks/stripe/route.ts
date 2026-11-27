@@ -23,7 +23,7 @@ import { isCreditCheckoutSession, recordCreditCheckoutSession, recordCreditInvoi
 import { deliverLifetimeCheckout, isLifetimeCheckoutSession, refundLifetimePurchase } from '@/ee/services/lifetime-deal.service'
 import { idOf, stripe, subscriptionOfInvoice } from '@/ee/lib/billing/stripe'
 import { isLifetimeAddonsCheckoutSession, isLifetimeAddonsSubscription } from '@/ee/lib/billing/lifetime-addons'
-import { applyLifetimeAddonsSubscription } from '@/ee/services/lifetime-addons.service'
+import { applyLifetimeAddonsSubscription, finishPendingLifetimeMachineChange } from '@/ee/services/lifetime-addons.service'
 import { rewardReferral } from '@/ee/services/referral.service'
 import type Stripe from 'stripe'
 import { claimStripeEvent, markStripeEventProcessed, releaseStripeEvent, unclaimedResponse } from './idempotency'
@@ -143,11 +143,12 @@ export async function POST(req: Request) {
                 else if (isTemplateSubscription(event.data.object)) await revokeTemplateSubscription(event.data.object)
                 else await markSubscriptionCanceled(event.data.object)
                 break
-            // The bank confirmed a plan increase Stripe had held: the rest of that change (its
-            // decreases, its switch at renewal) was waiting for this. The `updated` event alongside
+            // The bank confirmed a plan increase, or a lifetime machine size, Stripe had held: the rest of
+            // that change (its decreases, its switch at renewal) was waiting for this. The `updated` event alongside
             // refreshes the workspace as usual.
             case 'customer.subscription.pending_update_applied':
-                if (!isTemplateSubscription(event.data.object)) await finishPendingPlanChange(event.data.object)
+                if (isLifetimeAddonsSubscription(event.data.object)) await finishPendingLifetimeMachineChange(event.data.object)
+                else if (!isTemplateSubscription(event.data.object)) await finishPendingPlanChange(event.data.object)
                 break
             // The ledger line of every template subscription cycle, first invoice included: a
             // checkout only ever fires once, renewals only show up here.

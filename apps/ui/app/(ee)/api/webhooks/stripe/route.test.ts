@@ -14,7 +14,7 @@ import { enforceTrialCardClaim } from '@/ee/services/trial-card.service'
 import { applyTemplateSubscription, recordTemplatePurchase, recordTemplateRenewal, refundTemplatePurchase, revokeTemplateSubscription } from '@/ee/services/template-purchase.service'
 import { recordCreditCheckoutSession, recordCreditInvoice, refundCreditPurchase } from '@/ee/services/credit-purchase.service'
 import { deliverLifetimeCheckout, refundLifetimePurchase } from '@/ee/services/lifetime-deal.service'
-import { applyLifetimeAddonsSubscription } from '@/ee/services/lifetime-addons.service'
+import { applyLifetimeAddonsSubscription, finishPendingLifetimeMachineChange } from '@/ee/services/lifetime-addons.service'
 import { rewardReferral } from '@/ee/services/referral.service'
 import { stripe, subscriptionOfInvoice } from '@/ee/lib/billing/stripe'
 import { signedStripeRequest, TEST_WEBHOOK_SECRET } from '@/ee/test/stripe-fake'
@@ -57,7 +57,7 @@ vi.mock('@/ee/services/lifetime-deal.service', async importOriginal => ({
     deliverLifetimeCheckout: vi.fn(),
     refundLifetimePurchase: vi.fn(),
 }))
-vi.mock('@/ee/services/lifetime-addons.service', () => ({ applyLifetimeAddonsSubscription: vi.fn() }))
+vi.mock('@/ee/services/lifetime-addons.service', () => ({ applyLifetimeAddonsSubscription: vi.fn(), finishPendingLifetimeMachineChange: vi.fn() }))
 vi.mock('@/ee/services/referral.service', () => ({ rewardReferral: vi.fn() }))
 vi.mock('./idempotency', async importOriginal => ({ ...(await importOriginal<typeof import('./idempotency')>()), claimStripeEvent: vi.fn(), markStripeEventProcessed: vi.fn(), releaseStripeEvent: vi.fn() }))
 
@@ -311,6 +311,12 @@ describe('customer.subscription.*', () => {
     it('finishes the plan change the bank held once its pending update is applied', async () => {
         await deliver('customer.subscription.pending_update_applied', planSubscription)
         expect(finishPendingPlanChange).toHaveBeenCalledWith(expect.objectContaining({ id: 'sub_plan' }))
+    })
+
+    it('finishes the lifetime machine change the bank held on an add-ons subscription', async () => {
+        await deliver('customer.subscription.pending_update_applied', lifetimeAddonsSubscription)
+        expect(finishPendingLifetimeMachineChange).toHaveBeenCalledWith(expect.objectContaining({ id: 'sub_addons' }))
+        expect(finishPendingPlanChange).not.toHaveBeenCalled()
     })
 
     it('finishes nothing for an applied pending update on a template subscription', async () => {

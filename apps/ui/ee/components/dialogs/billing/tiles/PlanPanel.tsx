@@ -10,7 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { cancelPendingSwitchAction } from '@/ee/actions/billing.actions'
 import { runPlanChange } from '@/ee/lib/billing/plan-payment'
-import { PLAN_PRICES_CENTS, ZERO_QUANTITIES, type BillingInterval } from '@/ee/lib/billing/plans'
+import { INCLUDED_MACHINE_SIZE, PLAN_PRICES_CENTS, ZERO_QUANTITIES, type BillingInterval } from '@/ee/lib/billing/plans'
 import { useErrorText } from '@/hooks/useErrorText'
 import { appInfo } from '@/lib/apps/catalog'
 import { APP_ADDON_KEYS, APP_SLUGS } from '@/lib/apps/types'
@@ -53,7 +53,7 @@ export function PlanPanel({ state, data, onDone }: PanelProps) {
     const quote = usePlanQuote(selection, paying)
     const renewal = state.periodEnd ? billingDate(state.periodEnd, locale) : t('yourRenewal')
     const trialEnds = data.trialEndsAt ? billingDate(data.trialEndsAt, locale) : renewal
-    const baseCents = planBillCents(state, ZERO_QUANTITIES, interval)
+    const baseCents = planBillCents({ ...state, machineSize: INCLUDED_MACHINE_SIZE }, ZERO_QUANTITIES, interval)
 
     const apply = async () => {
         if (submitting) return

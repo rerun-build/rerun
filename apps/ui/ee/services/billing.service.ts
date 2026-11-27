@@ -8,15 +8,22 @@ import { Database } from '@/app/api/database.types'
 import { getAppOrigin } from '@/lib/app-origin'
 import {
     ADDON_KEYS,
+    ADDON_MAX_QUANTITIES,
     BASE_PLAN_SLUG,
     BILLING_INTERVALS,
+    INCLUDED_MACHINE_SIZE,
     PLAN_CURRENCY,
     ZERO_QUANTITIES,
     baseLimitsToColumns,
+    compareMachineSizes,
     isLifetimePlan,
+    isMachineSize,
+    largerMachineSize,
+    parseMachineSize,
     planPriceCents,
     type AddonQuantities,
     type BillingInterval,
+    type MachineSize,
     type WorkspaceLimitColumns,
 } from '@/ee/lib/billing/plans'
 import { affiliateReferralMetadata } from '@/ee/lib/billing/affiliate'
@@ -45,6 +52,7 @@ import { BOX_DELETION_GRACE_MS } from '@/ee/lib/billing/grace'
 import { isTemplateSubscription, stripeTimestampIso, subscriptionPeriodEndIso } from '@/ee/lib/billing/marketplace'
 import { invoiceItemsOf, type InvoiceItems } from '@/ee/lib/billing/invoice-items'
 import { isLifetimeAddonsSubscription } from '@/ee/lib/billing/lifetime-addons'
+import { machineColumns, planItemChanges, type PlanItemChange } from '@/ee/lib/billing/plan-items'
 import { isSameSubscription, shouldAdoptSubscription } from '@/ee/lib/billing/ownership'
 import { hasPeriodAdvanced, rerunPeriodUpdate } from '@/ee/lib/billing/period'
 import { trialArm } from '@/ee/lib/billing/trial-experiment'
@@ -58,6 +66,9 @@ import {
     isLegacyPlanItemPriceId,
     isYearlyBasePriceId,
     legacyBaseDiscountCents,
+    machineOfItems,
+    machinePriceId,
+    machineSizeForPriceId,
     priceIdForAddon,
     quantitiesFromItems,
     stripe,
@@ -272,23 +283,48 @@ export async function startCardlessTrial(client: ForemanClient = 'web'): Promise
 
 // --- The plan dialogs: a selection of agents and an interval, the card form in the app's own UI ---
 
-export type PlanSelection = { quantities: AddonQuantities; interval: BillingInterval }
+// What the dialogs send. A selection that leaves out the machine size or the storage packs keeps the
+// ones the subscription already pays for: a tab opened before they were sold changes its app slots
+// without taking them away.
+export type PlanSelection = {
+    quantities: Omit<AddonQuantities, 'storage_pack'> & { storage_pack?: number }
+    interval: BillingInterval
+    machineSize?: MachineSize
+}
+
+// A selection with every part of the plan said.
+export type FullPlanSelection = { quantities: AddonQuantities; interval: BillingInterval; machineSize: MachineSize }
 
 // The card trial sells one plan, with nothing to pick: the base plan, billed monthly once it ends.
-const CARD_TRIAL_SELECTION: PlanSelection = { quantities: ZERO_QUANTITIES, interval: 'monthly' }
+const CARD_TRIAL_SELECTION: FullPlanSelection = { quantities: ZERO_QUANTITIES, interval: 'monthly', machineSize: INCLUDED_MACHINE_SIZE }
+
+// Fills what a selection leaves out with what `current` already pays for: nothing on a new subscription.
+function fullSelection(selection: PlanSelection, current: { quantities: AddonQuantities; machineSize: MachineSize } = { quantities: ZERO_QUANTITIES, machineSize: INCLUDED_MACHINE_SIZE }): FullPlanSelection {
+    return {
+        quantities: { ...selection.quantities, storage_pack: selection.quantities.storage_pack ?? current.quantities.storage_pack },
+        interval: selection.interval,
+        machineSize: selection.machineSize ?? current.machineSize,
+    }
+}
+
+function selectionOfSubscription(subscription: Stripe.Subscription, selection: PlanSelection): FullPlanSelection {
+    return fullSelection(selection, { quantities: quantitiesFromItems(subscription.items.data).quantities, machineSize: machineOfItems(subscription.items.data).size })
+}
 
 // Marks the session of a card trial, whose line items the dialog may not change.
 const CARD_TRIAL_METADATA_KEY = 'card_trial'
 const TERMS_ACCEPTED_METADATA_KEY = 'terms_accepted_at'
 
-function assertValidSelection(selection: PlanSelection): void {
+function assertValidSelection(selection: FullPlanSelection): void {
     assertValidQuantities(selection.quantities)
     if (!BILLING_INTERVALS.includes(selection.interval)) throw new AppError('invalidBillingInterval')
+    if (!isMachineSize(selection.machineSize)) throw new AppError('invalidMachineSize')
 }
 
-function planLineItems({ quantities, interval }: PlanSelection): { price: string; quantity: number }[] {
+function planLineItems({ quantities, interval, machineSize }: FullPlanSelection): { price: string; quantity: number }[] {
     return [
         { price: basePriceId(interval), quantity: 1 },
+        ...(machineSize === INCLUDED_MACHINE_SIZE ? [] : [{ price: machinePriceId(machineSize, interval), quantity: 1 }]),
         ...ADDON_KEYS.filter(key => quantities[key] > 0).map(key => ({ price: priceIdForAddon(key, interval), quantity: quantities[key] })),
     ]
 }
@@ -303,7 +339,8 @@ export type PlanCheckoutSession = { clientSecret: string; sessionId: string; tri
 // are shown by the dialog, because this mode refuses `custom_text`, and recorded on the session by
 // acceptPlanTerms as the box is ticked. And the line items can change while the session is open
 // (updatePlanCheckoutSession), so the agents slider and the interval toggle need no new session.
-export async function createPlanCheckoutSession(selection: PlanSelection): Promise<PlanCheckoutSession> {
+export async function createPlanCheckoutSession(requested: PlanSelection): Promise<PlanCheckoutSession> {
+    const selection = fullSelection(requested)
     assertValidSelection(selection)
     const params = await basePlanCheckoutParams()
     const trial = !!params.subscription_data?.trial_period_days
@@ -334,7 +371,8 @@ async function requireOpenPlanSession(sessionId: string): Promise<Stripe.Checkou
 // The line items are sent whole, every time: Stripe drops whatever the list leaves out, which is how
 // an interval switch replaces every price at once. The browser then reloads the session through
 // `runServerUpdate`, so the totals it shows are Stripe's own.
-export async function updatePlanCheckoutSession(sessionId: string, selection: PlanSelection): Promise<void> {
+export async function updatePlanCheckoutSession(sessionId: string, requested: PlanSelection): Promise<void> {
+    const selection = fullSelection(requested)
     assertValidSelection(selection)
     const session = await requireOpenPlanSession(sessionId)
     if (session.mode !== 'subscription') throw new AppError('checkoutNotPlan')
@@ -428,13 +466,13 @@ export async function createPlanCardSetupSession(): Promise<{ clientSecret: stri
 }
 
 // A selection stored as a JSON string in Stripe metadata, read back defensively.
-function parsePlanSelection(raw: string | undefined): PlanSelection | null {
+function parsePlanSelection(raw: string | undefined): FullPlanSelection | null {
     if (!raw) return null
     try {
-        const parsed = JSON.parse(raw) as PlanSelection
+        const parsed = JSON.parse(raw) as Partial<FullPlanSelection>
         // Only the add-ons still sold: a selection stored before the agent pack was retired still carries it.
         const quantities = Object.fromEntries(ADDON_KEYS.map(key => [key, parsed.quantities?.[key] ?? ZERO_QUANTITIES[key]])) as AddonQuantities
-        const selection = { quantities, interval: parsed.interval }
+        const selection = { quantities, interval: parsed.interval as BillingInterval, machineSize: parseMachineSize(parsed.machineSize) }
         assertValidSelection(selection)
         return selection
     } catch {
@@ -500,14 +538,16 @@ export type SubscriptionState = {
     status: Stripe.Subscription.Status
     quantities: AddonQuantities
     interval: BillingInterval
+    // The machine size the subscription pays for.
+    machineSize: MachineSize
     // A switch to monthly waiting for the end of the paid year, with the plan it lands on.
-    pendingSwitch: { selection: PlanSelection; at: string } | null
+    pendingSwitch: { selection: FullPlanSelection; at: string } | null
     // Flat amount taken off the list price on every invoice of the current interval, for a workspace
     // grandfathered on a legacy base price or holding a permanent promo on the whole subscription.
     monthlyDiscountCents: number
     // Columns that are currently higher than what the live subscription pays for: a
     // downgrade landing at the next renewal.
-    pendingDowngrade: Partial<Pick<WorkspaceLimitColumns, 'rerun_budget_micros'>>
+    pendingDowngrade: Partial<Pick<WorkspaceLimitColumns, 'rerun_budget_micros'> & { machine_size: MachineSize; storage_packs: number }>
     periodEnd: string | null
     card: SavedCard | null
     // What the next invoice bills, tax included. null once the plan is set to end.
@@ -554,7 +594,7 @@ export async function getSubscriptionState(): Promise<SubscriptionState | null> 
     const { data: workspace } = await selectSingle(
         supabase,
         'workspaces',
-        ['stripe_subscription_id', 'subscription_status', 'current_period_end', 'rerun_budget_micros'] as const,
+        ['stripe_subscription_id', 'subscription_status', 'current_period_end', 'rerun_budget_micros', 'machine_size', 'storage_packs'] as const,
         { id: workspaceId },
     )
     if (!workspace?.stripe_subscription_id) return null
@@ -570,8 +610,11 @@ export async function getSubscriptionState(): Promise<SubscriptionState | null> 
     const hasPaymentMethod = !!paymentMethod
 
     const derived = baseLimitsToColumns()
+    const machineSize = machineOfItems(subscription.items.data).size
     const pendingDowngrade: SubscriptionState['pendingDowngrade'] = {}
     if (subscription.status !== 'trialing' && workspace.rerun_budget_micros > derived.rerun_budget_micros) pendingDowngrade.rerun_budget_micros = derived.rerun_budget_micros
+    if (compareMachineSizes(parseMachineSize(workspace.machine_size), machineSize) > 0) pendingDowngrade.machine_size = machineSize
+    if (workspace.storage_packs > quantities.storage_pack) pendingDowngrade.storage_packs = quantities.storage_pack
 
     const [pendingSwitch, nextInvoice, openInvoice] = await Promise.all([
         readPendingSwitch(subscription),
@@ -584,6 +627,7 @@ export async function getSubscriptionState(): Promise<SubscriptionState | null> 
         status: subscription.status,
         quantities,
         interval: intervalOfItems(subscription.items.data),
+        machineSize,
         pendingSwitch,
         monthlyDiscountCents: permanentDiscountCents(subscription) + legacyBaseDiscountCents(subscription.items.data),
         pendingDowngrade,
@@ -641,7 +685,7 @@ export async function listInvoices(): Promise<InvoiceSummary[]> {
             status: invoice.status ?? 'open',
             pdfUrl: invoice.invoice_pdf ?? null,
             hostedUrl: invoice.hosted_invoice_url ?? null,
-            ...invoiceItemsOf(invoice, { isBasePriceId, addonForPriceId }),
+            ...invoiceItemsOf(invoice, { isBasePriceId, addonForPriceId, machineSizeForPriceId }),
         }))
 }
 
@@ -733,41 +777,6 @@ function pendingRetentionOffer(subscription: Stripe.Subscription): RetentionOffe
     return null
 }
 
-// Shape both the subscription update and the invoice preview accept, so a single diff can
-// feed the two calls: quoting a price from one set of items and charging another is how a
-// confirmation dialog ends up lying about the amount.
-type PlanItemChange = { id?: string; price?: string; quantity?: number; deleted?: boolean }
-
-// Split the move from the subscription's current add-on quantities to `target` into the items
-// that cost more and the items that cost less. `endingTrial` reports the case where the change
-// cuts a trial short: a trial bills nothing and prorates nothing, so an add-on bought during
-// one would be charged for but only delivered at conversion.
-function planItemChanges(subscription: Stripe.Subscription, target: AddonQuantities): { increases: PlanItemChange[]; decreases: PlanItemChange[]; endingTrial: boolean } {
-    const { quantities: current } = quantitiesFromItems(subscription.items.data)
-    const interval = intervalOfItems(subscription.items.data)
-
-    const itemIdByAddon = new Map<string, string>()
-    for (const item of subscription.items.data) {
-        const addon = addonForPriceId(item.price?.id)
-        if (addon) itemIdByAddon.set(addon, item.id)
-    }
-
-    const increases: PlanItemChange[] = []
-    const decreases: PlanItemChange[] = []
-    for (const key of ADDON_KEYS) {
-        if (target[key] === current[key]) continue
-        const existingItemId = itemIdByAddon.get(key)
-        const item: PlanItemChange = existingItemId
-            ? target[key] === 0
-                ? { id: existingItemId, deleted: true }
-                : { id: existingItemId, quantity: target[key] }
-            : { price: priceIdForAddon(key, interval), quantity: target[key] }
-        ;(target[key] > current[key] ? increases : decreases).push(item)
-    }
-
-    return { increases, decreases, endingTrial: subscription.status === 'trialing' && increases.length > 0 }
-}
-
 // Load the plan subscription the caller is allowed to edit, with the same guards for the
 // preview and the update: quoting an amount on a subscription the update would refuse is
 // worse than refusing upfront.
@@ -792,8 +801,15 @@ async function requireEditablePlanSubscription({ allowPastDue = false }: { allow
 
 function assertValidQuantities(target: AddonQuantities): void {
     for (const key of ADDON_KEYS) {
-        if (!Number.isInteger(target[key]) || target[key] < 0) throw new AppError('invalidAddonQuantity')
+        if (!Number.isInteger(target[key]) || target[key] < 0 || target[key] > ADDON_MAX_QUANTITIES[key]) throw new AppError('invalidAddonQuantity')
     }
+}
+
+// A trial runs on the included machine: a size or storage is bought once the plan is paid, from the
+// same dialog that ends the trial.
+function assertMachineOutsideTrial(subscription: Stripe.Subscription, target: FullPlanSelection): void {
+    if (subscription.status !== 'trialing') return
+    if (target.machineSize !== INCLUDED_MACHINE_SIZE || target.quantities.storage_pack > 0) throw new AppError('machineAfterTrial')
 }
 
 // What the card is about to be charged for a set of quantities, before anything is applied.
@@ -817,11 +833,13 @@ function lineTaxCents(line: Stripe.InvoiceLineItem): number {
     return (line.taxes ?? []).reduce((sum, tax) => sum + tax.amount, 0)
 }
 
-// Dry-run of updateSubscriptionQuantities: same items, same proration, no write. Returns null
-// when the change costs nothing today (a decrease only), which needs no confirmation.
-export async function previewSubscriptionUpdate(target: AddonQuantities): Promise<PlanChangePreview | null> {
-    assertValidQuantities(target)
+// Dry-run of a change on the same interval: same items, same proration, no write. Returns null when
+// the change costs nothing today (a decrease only), which needs no confirmation.
+export async function previewSubscriptionUpdate(requested: Pick<PlanSelection, 'quantities' | 'machineSize'>): Promise<PlanChangePreview | null> {
     const { subscription } = await requireEditablePlanSubscription()
+    const target = selectionOfSubscription(subscription, { ...requested, interval: intervalOfItems(subscription.items.data) })
+    assertValidSelection(target)
+    assertMachineOutsideTrial(subscription, target)
     const { increases, endingTrial } = planItemChanges(subscription, target)
     if (increases.length === 0) return null
 
@@ -933,7 +951,7 @@ async function requireCancellableSubscription(): Promise<CancellableSubscription
 // What one period of the plan costs this workspace before tax, a grandfathered base price included.
 function planPeriodCents(subscription: Stripe.Subscription): number {
     const { quantities } = quantitiesFromItems(subscription.items.data)
-    return planPriceCents(quantities, intervalOfItems(subscription.items.data)) - legacyBaseDiscountCents(subscription.items.data)
+    return planPriceCents(quantities, intervalOfItems(subscription.items.data), machineOfItems(subscription.items.data).size) - legacyBaseDiscountCents(subscription.items.data)
 }
 
 // The offers are priced on a month: a yearly plan gets none.
@@ -1068,16 +1086,22 @@ export async function requestRenewalReminder(): Promise<string> {
 
 // --- Plan changes from the plan dialog: agents and interval together ---
 
-// Every plan item moved onto `selection`: the base and add-on items keep their ids and change price,
-// add-ons appear or go, and a legacy seat, agent pack or credit pack item goes with the old interval, since a
-// subscription bills every item on the same one.
-function replacementItems(subscription: Stripe.Subscription, { quantities, interval }: PlanSelection): PlanItemChange[] {
+// Every plan item moved onto `selection`: the base, machine and add-on items keep their ids and change
+// price, add-ons and the machine appear or go, and a legacy seat, agent pack or credit pack item goes
+// with the old interval, since a subscription bills every item on the same one.
+function replacementItems(subscription: Stripe.Subscription, { quantities, interval, machineSize }: FullPlanSelection): PlanItemChange[] {
     const changes: PlanItemChange[] = []
     const kept = new Set<string>()
+    const machine = machineOfItems(subscription.items.data)
     for (const item of subscription.items.data) {
         const priceId = item.price?.id
         if (isBasePriceId(priceId)) {
             changes.push({ id: item.id, price: basePriceId(interval), quantity: 1 })
+            continue
+        }
+        if (machineSizeForPriceId(priceId)) {
+            if (item.id === machine.item?.id && machineSize !== INCLUDED_MACHINE_SIZE) changes.push({ id: item.id, price: machinePriceId(machineSize, interval), quantity: 1 })
+            else changes.push({ id: item.id, deleted: true })
             continue
         }
         const addon = addonForPriceId(priceId)
@@ -1088,6 +1112,7 @@ function replacementItems(subscription: Stripe.Subscription, { quantities, inter
         }
         if (addon || isLegacyPlanItemPriceId(priceId)) changes.push({ id: item.id, deleted: true })
     }
+    if (!machine.item && machineSize !== INCLUDED_MACHINE_SIZE) changes.push({ price: machinePriceId(machineSize, interval), quantity: 1 })
     for (const key of ADDON_KEYS) {
         if (quantities[key] > 0 && !kept.has(key)) changes.push({ price: priceIdForAddon(key, interval), quantity: quantities[key] })
     }
@@ -1120,7 +1145,7 @@ const PLAN_CHANGE_AFTER_PAYMENT_KEY = 'plan_change_after_payment'
 // asks for 3-D Secure would make `error_if_incomplete` throw and the customer could never pay; a
 // pending update instead hands the browser the invoice's client secret, and Stripe voids the invoice
 // and drops the change on its own if nobody confirms it.
-async function updateWithPayment(subscriptionId: string, params: Stripe.SubscriptionUpdateParams, afterPayment: PlanSelection | null = null): Promise<string | null> {
+export async function updateWithPayment(subscriptionId: string, params: Stripe.SubscriptionUpdateParams, afterPayment: FullPlanSelection | null = null): Promise<string | null> {
     const updated = await stripe.subscriptions.update(subscriptionId, {
         ...params,
         ...(afterPayment ? { metadata: { [PLAN_CHANGE_AFTER_PAYMENT_KEY]: JSON.stringify(afterPayment) } } : {}),
@@ -1164,9 +1189,12 @@ async function assertSlotRemovalLeavesConnections(workspaceId: number, subscript
     }
 }
 
-export async function changePlan(selection: PlanSelection): Promise<PlanChangeResult> {
-    assertValidSelection(selection)
+export async function changePlan(requested: PlanSelection): Promise<PlanChangeResult> {
+    assertValidSelection(fullSelection(requested))
     const { workspaceId, subscription: loaded } = await requireEditablePlanSubscription()
+    const selection = selectionOfSubscription(loaded, requested)
+    assertValidSelection(selection)
+    assertMachineOutsideTrial(loaded, selection)
     await assertSlotRemovalLeavesConnections(workspaceId, loaded, selection.quantities)
     const subscription = await releasePendingSwitch(loaded)
     const kind = planChangeKind(subscription.status, intervalOfItems(subscription.items.data), selection.interval)
@@ -1194,7 +1222,7 @@ export async function changePlan(selection: PlanSelection): Promise<PlanChangeRe
     // of a switch at renewal) only follows once they are paid. A later update carrying `items` would
     // make Stripe drop a pending increase and void its invoice, so while the bank is asked the rest
     // waits in the pending update's metadata for `finishPendingPlanChange`.
-    const { increases, decreases } = planItemChanges(subscription, selection.quantities)
+    const { increases, decreases } = planItemChanges(subscription, selection)
     const finishesLater = decreases.length > 0 || kind === 'switch_at_renewal'
     let paymentClientSecret: string | null = null
     if (increases.length > 0) {
@@ -1211,8 +1239,8 @@ export async function changePlan(selection: PlanSelection): Promise<PlanChangeRe
 // of a yearly plan going monthly at its renewal. Runs at once when the card paid on the spot, from
 // the webhook once the bank confirmed otherwise, and recomputes everything from the subscription it
 // is given so a replay finds nothing left to do.
-async function finishPlanChange(subscription: Stripe.Subscription, selection: PlanSelection, { clearAfterPayment }: { clearAfterPayment: boolean }): Promise<string | null> {
-    const { decreases } = planItemChanges(subscription, selection.quantities)
+async function finishPlanChange(subscription: Stripe.Subscription, selection: FullPlanSelection, { clearAfterPayment }: { clearAfterPayment: boolean }): Promise<string | null> {
+    const { decreases } = planItemChanges(subscription, selection)
     if (decreases.length > 0 || clearAfterPayment) {
         await stripe.subscriptions.update(subscription.id, {
             ...(decreases.length > 0 ? { items: decreases } : {}),
@@ -1268,7 +1296,7 @@ function scheduleDiscountParam(discount: Stripe.SubscriptionSchedule.Phase.Disco
 // items to the end of the period, then the monthly ones, and releases the subscription after one
 // monthly cycle so it is a plain subscription again. Phase one is copied whole, discounts included,
 // because a phase written without them drops them.
-async function scheduleIntervalSwitch(subscription: Stripe.Subscription, selection: PlanSelection): Promise<string> {
+async function scheduleIntervalSwitch(subscription: Stripe.Subscription, selection: FullPlanSelection): Promise<string> {
     const schedule = await stripe.subscriptionSchedules.create({ from_subscription: subscription.id })
     const current = schedule.phases[0]
     if (!current) throw new AppError('readCurrentBillingPeriodFailed')
@@ -1306,13 +1334,16 @@ async function readPendingSwitch(subscription: Stripe.Subscription): Promise<Sub
 
     const quantities: AddonQuantities = { ...ZERO_QUANTITIES }
     let interval: BillingInterval = 'monthly'
+    let machineSize: MachineSize = INCLUDED_MACHINE_SIZE
     for (const item of next.items) {
         const priceId = typeof item.price === 'string' ? item.price : item.price.id
         if (isYearlyBasePriceId(priceId)) interval = 'yearly'
         const addon = addonForPriceId(priceId)
         if (addon) quantities[addon] += item.quantity ?? 0
+        const size = machineSizeForPriceId(priceId)
+        if (size) machineSize = largerMachineSize(machineSize, size)
     }
-    return { selection: { quantities, interval }, at: new Date(next.start_date * 1000).toISOString() }
+    return { selection: { quantities, interval, machineSize }, at: new Date(next.start_date * 1000).toISOString() }
 }
 
 export async function cancelPendingSwitch(): Promise<void> {
@@ -1328,9 +1359,12 @@ export type PlanQuote = PlanChangePreview & {
     unusedCreditCents: number
 }
 
-export async function previewPlanChange(selection: PlanSelection): Promise<PlanQuote | null> {
+export async function previewPlanChange(requested: PlanSelection): Promise<PlanQuote | null> {
+    assertValidSelection(fullSelection(requested))
+    const { workspaceId, subscription } = await requireEditablePlanSubscription()
+    const selection = selectionOfSubscription(subscription, requested)
     assertValidSelection(selection)
-    const { subscription } = await requireEditablePlanSubscription()
+    assertMachineOutsideTrial(subscription, selection)
     const kind = planChangeKind(subscription.status, intervalOfItems(subscription.items.data), selection.interval)
 
     if (kind === 'end_trial' || kind === 'switch_now') {
@@ -1346,7 +1380,7 @@ export async function previewPlanChange(selection: PlanSelection): Promise<PlanQ
         return { ...trialEndPreview(invoice, subscription), kind, unusedCreditCents }
     }
 
-    const preview = await previewSubscriptionUpdate(selection.quantities)
+    const preview = await previewSubscriptionUpdate(selection)
     return preview ? { ...preview, kind, unusedCreditCents: 0 } : null
 }
 
@@ -1429,6 +1463,8 @@ type ExistingWorkspaceRow = {
     max_agents: number | null
     max_seats: number | null
     rerun_budget_micros: number
+    machine_size: string
+    storage_packs: number
 }
 
 // Sync a Stripe subscription onto its workspace: derived limits + subscription state.
@@ -1465,7 +1501,7 @@ export async function applySubscriptionToWorkspace(subscription: Stripe.Subscrip
     const { data: existing } = await selectMaybeSingle(
         supabase,
         'workspaces',
-        ['current_period_end', 'subscription_status', 'stripe_subscription_id', 'max_agents', 'max_seats', 'rerun_budget_micros', 'organization_id'] as const,
+        ['current_period_end', 'subscription_status', 'stripe_subscription_id', 'max_agents', 'max_seats', 'rerun_budget_micros', 'machine_size', 'storage_packs', 'organization_id'] as const,
         { id: workspaceId },
     )
     // Its organization pays for it: a subscription left over never writes a plan back over it.
@@ -1500,6 +1536,7 @@ export async function applySubscriptionToWorkspace(subscription: Stripe.Subscrip
         ...(trialStartedAt ? { trial_started_at: trialStartedAt } : {}),
         plan: BASE_PLAN_SLUG,
         ...limits,
+        ...machineColumns(subscription.items.data, existing, { held: !advanced }),
         // Spread, never Object.assign: assigning after the literal is what let these two columns
         // through unchecked, and one of them is the workspace's credit.
         ...rerunPeriodUpdate(advanced, subscription.status, new Date().toISOString()),

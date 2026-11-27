@@ -1,4 +1,5 @@
 import { creditsFromUsd } from './credits.js'
+import { INCLUDED_MACHINE_SIZE, MAX_STORAGE_PACKS, type MachineSize, type PaidMachineSize } from './machine.js'
 
 // The subscription plan Rerun sells: one base plan extended by add-on quantities carried as items
 // on the same Stripe subscription. Shared rather than app-local because the landing quotes the same
@@ -56,15 +57,30 @@ export const BILLING_INTERVALS = ['monthly', 'yearly'] as const
 
 export type BillingInterval = (typeof BILLING_INTERVALS)[number]
 
-export const ADDON_KEYS = ['linkedin_slot', 'whatsapp_slot'] as const
+// The app slots and the storage packs: quantities of items on the plan subscription.
+export const ADDON_KEYS = ['linkedin_slot', 'whatsapp_slot', 'storage_pack'] as const
 
 export type AddonKey = (typeof ADDON_KEYS)[number]
 
 // Every price, per billing interval. An app slot carries no yearly discount: each one is an account
-// Rerun pays for by the month.
+// Rerun pays for by the month. Nor does a storage pack: the disk is rented by the month too.
 export const PLAN_PRICES_CENTS: Record<BillingInterval, Record<'base' | AddonKey, number>> = {
-    monthly: { base: 2900, linkedin_slot: 900, whatsapp_slot: 900 },
-    yearly: { base: 27600, linkedin_slot: 10800, whatsapp_slot: 10800 },
+    monthly: { base: 2900, linkedin_slot: 900, whatsapp_slot: 900, storage_pack: 1000 },
+    yearly: { base: 27600, linkedin_slot: 10800, whatsapp_slot: 10800, storage_pack: 12000 },
+}
+
+// How many of each add-on one workspace may hold.
+export const ADDON_MAX_QUANTITIES: Record<AddonKey, number> = { linkedin_slot: 1000, whatsapp_slot: 1000, storage_pack: MAX_STORAGE_PACKS }
+
+// What a size above the included one adds to the plan, per billing interval: one item on the
+// subscription, whose price changes with the size. Yearly carries the plan's discount.
+export const MACHINE_PRICES_CENTS: Record<BillingInterval, Record<PaidMachineSize, number>> = {
+    monthly: { medium: 2000, large: 7000 },
+    yearly: { medium: 19200, large: 67200 },
+}
+
+export function machinePriceCents(size: MachineSize, interval: BillingInterval = 'monthly'): number {
+    return size === INCLUDED_MACHINE_SIZE ? 0 : MACHINE_PRICES_CENTS[interval][size]
 }
 
 export function basePriceCents(interval: BillingInterval = 'monthly'): number {
@@ -95,16 +111,17 @@ export const MAX_CREDIT_PACKS_PER_PURCHASE = 100
 export const ADDONS: Record<AddonKey, { priceCents: number }> = {
     linkedin_slot: { priceCents: PLAN_PRICES_CENTS.monthly.linkedin_slot },
     whatsapp_slot: { priceCents: PLAN_PRICES_CENTS.monthly.whatsapp_slot },
+    storage_pack: { priceCents: PLAN_PRICES_CENTS.monthly.storage_pack },
 }
 
 export type AddonQuantities = Record<AddonKey, number>
 
-export const ZERO_QUANTITIES: AddonQuantities = { linkedin_slot: 0, whatsapp_slot: 0 }
+export const ZERO_QUANTITIES: AddonQuantities = { linkedin_slot: 0, whatsapp_slot: 0, storage_pack: 0 }
 
 // What one invoice of the interval bills, before tax and discounts.
-export function planPriceCents(quantities: AddonQuantities, interval: BillingInterval): number {
+export function planPriceCents(quantities: AddonQuantities, interval: BillingInterval, machineSize: MachineSize = INCLUDED_MACHINE_SIZE): number {
     const prices = PLAN_PRICES_CENTS[interval]
-    return basePriceCents(interval) + ADDON_KEYS.reduce((sum, key) => sum + quantities[key] * prices[key], 0)
+    return basePriceCents(interval) + machinePriceCents(machineSize, interval) + ADDON_KEYS.reduce((sum, key) => sum + quantities[key] * prices[key], 0)
 }
 
 export function monthlyTotalCents(quantities: AddonQuantities): number {
@@ -112,8 +129,8 @@ export function monthlyTotalCents(quantities: AddonQuantities): number {
 }
 
 // The same plan brought back to one month, for "$39/mo, billed yearly" and for MRR.
-export function perMonthCents(quantities: AddonQuantities, interval: BillingInterval): number {
-    const total = planPriceCents(quantities, interval)
+export function perMonthCents(quantities: AddonQuantities, interval: BillingInterval, machineSize: MachineSize = INCLUDED_MACHINE_SIZE): number {
+    const total = planPriceCents(quantities, interval, machineSize)
     return interval === 'yearly' ? Math.round(total / 12) : total
 }
 

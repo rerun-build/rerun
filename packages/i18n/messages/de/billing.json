@@ -1177,6 +1177,8 @@
         },
         "invoice": {
             "plan": "{brand} Pro",
+            "machine": "Maschine {size}",
+            "storage": "{count, plural, one {Speicherpaket} other {Speicherpakete × #}}",
             "appSlots": "{count, plural, one {{app}} other {{app} × #}}",
             "creditPacks": "{count, plural, one {Guthabenpaket} other {Guthabenpakete × #}}",
             "prorated": "{items} (anteilig)",
@@ -1214,5 +1216,12 @@
     "onboardingTrial": {
         "addCardFree": "Karte hinzufügen, heute {amount}",
         "addCard": "Karte hinzufügen"
+    },
+    "machine": {
+        "sizes": {
+            "small": "Klein",
+            "medium": "Mittel",
+            "large": "Groß"
+        }
     }
 }

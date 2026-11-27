@@ -26,13 +26,13 @@ describe('baseLimitsToColumns', () => {
 
 describe('plan prices', () => {
     it('bills the base plus every add-on, monthly or yearly', () => {
-        expect(planPriceCents({ linkedin_slot: 2, whatsapp_slot: 1 }, 'monthly')).toBe(2900 + 2 * 900 + 900)
-        expect(planPriceCents({ linkedin_slot: 2, whatsapp_slot: 1 }, 'yearly')).toBe(27600 + 2 * 10800 + 10800)
+        expect(planPriceCents({ linkedin_slot: 2, whatsapp_slot: 1, storage_pack: 0 }, 'monthly')).toBe(2900 + 2 * 900 + 900)
+        expect(planPriceCents({ linkedin_slot: 2, whatsapp_slot: 1, storage_pack: 0 }, 'yearly')).toBe(27600 + 2 * 10800 + 10800)
     })
 
     it('brings a yearly plan back to one month', () => {
-        expect(perMonthCents({ linkedin_slot: 0, whatsapp_slot: 0 }, 'yearly')).toBe(2300)
-        expect(perMonthCents({ linkedin_slot: 1, whatsapp_slot: 0 }, 'monthly')).toBe(3800)
+        expect(perMonthCents({ linkedin_slot: 0, whatsapp_slot: 0, storage_pack: 0 }, 'yearly')).toBe(2300)
+        expect(perMonthCents({ linkedin_slot: 1, whatsapp_slot: 0, storage_pack: 0 }, 'monthly')).toBe(3800)
     })
 
     it('rounds the yearly saving down to a whole percentage, never promising more than it gives', () => {
@@ -125,7 +125,7 @@ describe('planDiscountCents', () => {
 
     it('keeps a legacy base price or a permanent promo on the same interval', () => {
         expect(planDiscountCents(legacy, 'monthly')).toBe(2500)
-        expect(planPriceCents({ linkedin_slot: 1, whatsapp_slot: 0 }, 'monthly') - planDiscountCents(legacy, 'monthly')).toBe(1300)
+        expect(planPriceCents({ linkedin_slot: 1, whatsapp_slot: 0, storage_pack: 0 }, 'monthly') - planDiscountCents(legacy, 'monthly')).toBe(1300)
     })
 
     it('promises nothing past a change of interval', () => {
