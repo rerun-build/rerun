@@ -15,8 +15,10 @@ async function currentUserId(): Promise<string | null> {
 }
 
 // The presence must stay fresh to the beat, the sandbox activity only to the hour: the database
-// already refuses a second stamp within the hour, so the call itself is spared too.
-const SANDBOX_ACTIVITY_INTERVAL_MS = 60 * 60_000
+// already refuses a second stamp within the hour, so most calls are spared too. The memory is per
+// user while the database stamps the workspace that user is in now, so it stays short: a few minutes
+// in a sandbox right after another workspace must still count as a visit.
+const SANDBOX_ACTIVITY_INTERVAL_MS = 5 * 60_000
 
 export async function POST(): Promise<Response> {
     const userId = await currentUserId()

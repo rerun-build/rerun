@@ -62,7 +62,7 @@ describe('/api/presence', () => {
         expect(mocks.getUser).not.toHaveBeenCalled()
     })
 
-    it('touches the presence on every beat, the sandbox activity once an hour', async () => {
+    it('touches the presence on every beat, the sandbox activity once every five minutes', async () => {
         vi.useFakeTimers()
         mocks.getClaims.mockResolvedValue(claimsOf({ sub: 'u1', is_anonymous: false }))
         await POST()
@@ -70,7 +70,7 @@ describe('/api/presence', () => {
         await POST()
         expect(mocks.touchPresence).toHaveBeenCalledTimes(2)
         expect(mocks.touchSandboxActivity).toHaveBeenCalledTimes(1)
-        vi.advanceTimersByTime(60 * 60_000)
+        vi.advanceTimersByTime(5 * 60_000)
         await POST()
         expect(mocks.touchSandboxActivity).toHaveBeenCalledTimes(2)
         vi.useRealTimers()

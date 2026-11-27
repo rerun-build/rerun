@@ -16,7 +16,7 @@ export async function touchPresence(userId: string): Promise<void> {
 }
 
 // A visible tab is the sign of life the sandbox idle sweep reads. The function throttles itself to
-// one write an hour, and a failure costs nothing: the next heartbeat is thirty seconds away.
+// one write an hour, and a failure costs nothing: the presence route calls again a few minutes later.
 export async function touchSandboxActivity(userId: string): Promise<void> {
     const { error } = await createServiceRoleClient().rpc('touch_sandbox_activity', { p_user_id: userId })
     if (error) console.error('[presence] sandbox activity stamp failed', error)
