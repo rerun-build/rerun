@@ -106,12 +106,9 @@ export const checkinStartedSchema = z.object({ runId: z.string(), sessionId: z.s
 // prompt of each of their turns, and answers it on GET/PUT /agents/foreman/members/:id/instructions.
 export const FOREMAN_INSTRUCTIONS_MAX = 2000
 export const foremanInstructionsSchema = z.object({ instructions: z.string().nullable() })
-export type ForemanInstructions = z.infer<typeof foremanInstructionsSchema>
-
-export type ParsedForemanInstructions = { ok: true; instructions: string | null } | { ok: false; reason: 'tooLong' | 'notText' }
 
 // `null` is no instructions at all: an empty text clears them.
-export function parseForemanInstructions(raw: unknown): ParsedForemanInstructions {
+export function parseForemanInstructions(raw: unknown): { ok: true; instructions: string | null } | { ok: false; reason: 'tooLong' | 'notText' } {
     if (raw === null || raw === undefined) return { ok: true, instructions: null }
     if (typeof raw !== 'string') return { ok: false, reason: 'notText' }
     const text = raw

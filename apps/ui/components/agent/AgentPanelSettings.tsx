@@ -63,8 +63,10 @@ export function AgentPanelSettings({ agent }: AgentPanelSettingsProps) {
 
     const form = useForm<ConfigValues>({ defaultValues: { soul: '', verbosity: 'normal', instructions: '' } })
     const {
-        formState: { isSubmitting },
+        formState: { isSubmitting, dirtyFields },
     } = form
+    // A member who cannot manage it saves their own instructions and nothing else.
+    const canSave = canManage || (ownInstructions && !instructionsUnreadable && Boolean(dirtyFields.instructions))
 
     useEffect(() => {
         setName(agent.name)
@@ -245,7 +247,7 @@ export function AgentPanelSettings({ agent }: AgentPanelSettingsProps) {
                     </TooltipDisabledReason>
                 )}
                 <TooltipDisabledReason reason={ownInstructions ? undefined : manageReason} className="flex-1">
-                    <Button type="submit" form={SETTINGS_FORM_ID} size="sm" className="flex-1" loading={isSubmitting} disabled={!canManage && !ownInstructions}>
+                    <Button type="submit" form={SETTINGS_FORM_ID} size="sm" className="flex-1" loading={isSubmitting} disabled={!canSave && !saved}>
                         {saved ? (
                             <>
                                 <CheckIcon className="size-3.5 me-1.5 text-emerald-500" /> {t('saved')}

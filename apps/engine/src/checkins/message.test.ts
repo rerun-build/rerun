@@ -29,20 +29,19 @@ describe('buildCheckinMessage', () => {
         expect(message).toContain('- Cy (id u-cy): it is Thursday 17:30 where they are (Asia/Tokyo), last wrote 7 days ago')
     })
 
-    it("carries each member's own instructions under their line, and nothing for one who wrote none", () => {
+    it("never carries a member's own instructions: the message stays in the thread of whoever it reports to", () => {
         const message = buildCheckinMessage({
             slug: 'checkin',
             name: 'Check-in',
             reason: 'manual',
             now,
             members: [
-                { id: 'u-ana', name: 'Ana', timezone: 'Europe/Paris', instructions: "Don't call me by my first name.\nBe brief.", firstSeenAt: '2026-11-01T00:00:00.000Z', lastSeenAt: '2026-11-19T07:00:00.000Z' },
+                { id: 'u-ana', name: 'Ana', timezone: 'Europe/Paris', instructions: "Don't call me by my first name.", firstSeenAt: '2026-11-01T00:00:00.000Z', lastSeenAt: '2026-11-19T07:00:00.000Z' },
                 { id: 'u-bo', name: 'Bo', timezone: null, instructions: null, firstSeenAt: '2026-11-01T00:00:00.000Z', lastSeenAt: '2026-11-18T07:00:00.000Z' },
             ],
         })
-        expect(message).toContain('wrote today. Their own instructions to you, for whatever you write to them, over the first name and everything else about them:\n  """\n  Don\'t call me by my first name.\n  Be brief.\n  """')
-        expect(message).toContain('- Bo (id u-bo): their time zone is not known, last wrote yesterday')
-        expect(message).not.toContain('last wrote yesterday. Their own instructions')
+        expect(message).toContain('- Ana (id u-ana): it is Thursday 09:30 where they are (Europe/Paris), wrote today\n- Bo (id u-bo)')
+        expect(message).not.toContain("Don't call me by my first name.")
     })
 
     it('carries what a promise said it would come back to', () => {

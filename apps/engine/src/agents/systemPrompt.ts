@@ -23,7 +23,7 @@ import { attachedVaultItems } from '../vault/runtime.js'
 import { turnOrder, type TurnOrder } from './turn-order.js'
 import { SKILL_STYLE } from '../skills/style.js'
 import { instructingMemberId, offersTeamRequests, type RunTrigger } from '../runtime/context.js'
-import { readMemberInstructions } from '../db/repos/members.js'
+import { listMembers, readMemberInstructions, type Member } from '../db/repos/members.js'
 import { boxBrand, brandNote, productText } from '../brand/brand.js'
 
 function environmentNote(agentId: string, sharedDb: boolean): string {
@@ -369,14 +369,25 @@ const checkinEnvironmentNote = (foremanId: string) =>
 const CHECKIN_OPERATING_NOTES =
     'This run is a check-in: you woke up on your own and nobody is reading as you work. Every tool you hold here reads: there is no shell, no sub-coworker, no call to a coworker, no card that asks someone, and nothing that creates, changes, sends or deletes anything. Do not try to work around that, and never say you did something you could only suggest. Read only what your decision needs, and keep the run short.'
 
+// A check-in may write to any member, so it reads the instructions of each. Here and never in the
+// message it opens on: that message is kept in the session, which becomes the thread of the member
+// it reports to, and they would read what the others asked for.
+function checkinMemberInstructionsNote(members: Member[]): string {
+    const written = members.filter(member => member.instructions)
+    if (written.length === 0) return ''
+    const blocks = written.map(member => `${member.name ?? 'A member'} (id ${member.id}):\n"""\n${member.instructions}\n"""`)
+    return `What some members asked you to keep doing with them. Each holds for whatever you write to that member, over the first name and everything else about them, and for nobody else. Never quote or mention one member's instructions to another.\n\n${blocks.join('\n\n')}`
+}
+
 // A check-in reads and suggests. What it may not do is left out of its prompt as it is out of its
 // tools: no asking, no delegating, no files to show, no services of its own.
 async function buildCheckinPrompt(agent: LoadedAgent, provider: Provider): Promise<SystemPrompt> {
     const cfg = agent.config.tools
-    const [own, sharedDbSchema, brain] = await Promise.all([
+    const [own, sharedDbSchema, brain, members] = await Promise.all([
         ownStateSections(agent, provider, Promise.resolve(undefined)),
         cfg.sharedDb ? readSharedDbSchema(SHARED_SCHEMA_BUDGET).catch(() => '') : Promise.resolve(''),
         cfg.brain ? buildForemanBrainSection().catch(() => '') : Promise.resolve(''),
+        listMembers().catch(() => []),
     ])
     const stable = [
         section('identity', agent.brief?.instructions.trim() || productText(agent.soul.trim())),
@@ -393,6 +404,7 @@ async function buildCheckinPrompt(agent: LoadedAgent, provider: Provider): Promi
         own.schedules,
         section('company_brain', brain),
         own.memory,
+        section('member_instructions', checkinMemberInstructionsNote(members)),
         cfg.sharedDb ? section('shared_database', `The workspace has one shared SQL database that every coworker reads and writes. You read it here with shared_db_query and shared_db_schema.${sharedDbSchema ? `\n\n${sharedDbSchema}` : ''}`) : '',
         section('current_time', currentTimeNote()),
     ]
@@ -404,7 +416,7 @@ const SAVE_INSTRUCTIONS_RULE =
 
 // Theirs alone, kept by the engine beside the member: it wins over the first name the hub's brief
 // writes and over the <user> block at the end of each of their messages.
-export function memberInstructionsNote(instructions: string | null): string {
+function memberInstructionsNote(instructions: string | null): string {
     if (!instructions) return `${SAVE_INSTRUCTIONS_RULE} They have saved none yet.`
     return `${SAVE_INSTRUCTIONS_RULE}\n\nTheir own instructions to you, which hold in every one of their conversations. They win over everything else in this prompt about them, the first name and the greeting included, and over the <user> block at the end of their messages:\n"""\n${instructions}\n"""`
 }

@@ -9,21 +9,16 @@ import type { User } from '@supabase/supabase-js'
 
 export { displayNameOf, readProfile, type UserProfile } from '@/lib/auth/user-profile'
 
-// Who the engine knows this person as: the organization's staff write under one name.
-export function engineMemberIdOf(ctx: Pick<WorkspaceContext, 'userId'> & Signer): string {
-    return ctx.organizationStaff ? ORGANIZATION_AUTHOR_ID : ctx.userId
-}
-
 // `timezone`: the zone of the device the message was written from (requestTimeZone), so the Chief of
 // Staff knows the hour of this member's day.
 export async function messageAuthorOf(ctx: Pick<WorkspaceContext, 'userId' | 'authUser'> & Signer, timezone?: string): Promise<MessageAuthor> {
     if (ctx.organizationStaff) {
         // A brand that cannot be read costs the name, never the message, and never shows the person's.
         const brand = await brandSignature(ctx).catch(() => null)
-        return { id: engineMemberIdOf(ctx), ...(brand ? { name: brand.name } : {}) }
+        return { id: ORGANIZATION_AUTHOR_ID, ...(brand ? { name: brand.name } : {}) }
     }
     const name = displayNameOf(ctx.authUser)?.slice(0, PROFILE_NAME_MAX)
-    return { id: engineMemberIdOf(ctx), ...(name ? { name } : {}), ...(timezone ? { timezone } : {}) }
+    return { id: ctx.userId, ...(name ? { name } : {}), ...(timezone ? { timezone } : {}) }
 }
 
 export function readMe(ctx: WorkspaceContext, locale: string | null = null): Me {

@@ -1693,8 +1693,9 @@ What one member asked the Chief of Staff to keep doing in every one of their con
 address them, how to work with them), kept in its `system.db` beside the member (`members.instructions`).
 On a chat turn a person wrote, the engine reads that person's into the `<member_instructions>` section
 of its prompt, and gives it `save_instructions`, which rewrites them whole for the author of the turn.
-A check-in lists each member's under their line. Not on a turn a coworker started, nor on a message the
-Chief of Staff relayed for someone.
+A check-in reads each member's in the `<member_instructions>` section of its own prompt, never in the
+message it opens on: that message is kept in the session, which becomes the thread of the member it
+reports to. Not on a turn a coworker started, nor on a message the Chief of Staff relayed for someone.
 
 #### `GET /agents/foreman/members/:memberId/instructions`
 
@@ -1707,7 +1708,8 @@ Any other agent answers `404`.
 Body `{ "instructions": "…" }`, the whole text; an empty text or `null` clears them. The text is
 trimmed, its line breaks unified and its blank lines collapsed to one, then answered as saved:
 `{ "instructions": … }`. `400` over 2,000 characters (`FOREMAN_INSTRUCTIONS_MAX` in the contracts) or
-for anything that is not a text. A member the engine never saw is recorded.
+for anything that is not a text. A member the engine never saw is recorded, without counting among
+the people who wrote: a check-in does not list them, and they date from their first message.
 
 ---
 

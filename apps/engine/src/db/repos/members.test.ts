@@ -55,9 +55,16 @@ describe('the instructions of a member', () => {
         expect((await listMembers()).find(m => m.id === 'u-fa')).toMatchObject({ name: 'Fa', timezone: 'Europe/Paris', firstSeenAt: '2026-11-19T08:00:00.000Z' })
     })
 
-    it('records a member who sets theirs before they ever wrote, and a later message keeps them', async () => {
+    it('keeps the instructions of a member who never wrote, without counting them among the people who wrote', async () => {
         await saveMemberInstructions('u-gi', 'Use formal French.', '2026-11-20T08:00:00.000Z')
-        await touchMember({ id: 'u-gi', name: 'Gi' }, '2026-11-21T08:00:00.000Z')
-        expect((await listMembers()).find(m => m.id === 'u-gi')).toEqual({ id: 'u-gi', name: 'Gi', timezone: null, instructions: 'Use formal French.', firstSeenAt: '2026-11-20T08:00:00.000Z', lastSeenAt: '2026-11-21T08:00:00.000Z' })
+        expect(await readMemberInstructions('u-gi')).toBe('Use formal French.')
+        expect((await listMembers()).some(m => m.id === 'u-gi')).toBe(false)
+    })
+
+    it('dates a member from their first message, not from the instructions they saved before it', async () => {
+        await saveMemberInstructions('u-ha', 'Be brief.', '2026-11-20T08:00:00.000Z')
+        await touchMember({ id: 'u-ha', name: 'Ha' }, '2026-11-21T08:00:00.000Z')
+        await touchMember({ id: 'u-ha' }, '2026-11-22T08:00:00.000Z')
+        expect((await listMembers()).find(m => m.id === 'u-ha')).toEqual({ id: 'u-ha', name: 'Ha', timezone: null, instructions: 'Be brief.', firstSeenAt: '2026-11-21T08:00:00.000Z', lastSeenAt: '2026-11-22T08:00:00.000Z' })
     })
 })

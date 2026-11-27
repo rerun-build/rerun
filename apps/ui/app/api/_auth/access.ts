@@ -74,6 +74,8 @@ export function signedInUserId(actor: Actor): string {
 
 // Who the machine of the workspace is told did something: what it stores is read by its coworkers and
 // by its members, who know no one in the team of their organization.
+export function signerIdOf(actor: UserActor): string
+export function signerIdOf(actor: Actor): string | null
 export function signerIdOf(actor: Actor): string | null {
     if (actor.kind !== 'user') return null
     return actor.organizationStaff ? ORGANIZATION_AUTHOR_ID : actor.userId
