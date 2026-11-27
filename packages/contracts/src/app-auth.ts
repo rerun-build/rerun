@@ -34,6 +34,27 @@ export const backupCodeRequestSchema = z.object({ code: z.string().trim().min(8)
 export const raisedSessionSchema = z.object({ session: z.object({ accessToken: z.string(), refreshToken: z.string() }) })
 export type RaisedSession = z.infer<typeof raisedSessionSchema>
 
+// The second step by a passkey, checked by the hub: the options of a WebAuthn sign-in (every passkey
+// of the account, null when it has none or this hub cannot offer them), then the device's signed
+// answer, handed over with the session like a backup code. Both in the WebAuthn JSON form.
+export const passkeyRequestOptionsSchema = z.object({
+    challenge: z.string(),
+    rpId: z.string().optional(),
+    timeout: z.number().optional(),
+    userVerification: z.enum(['required', 'preferred', 'discouraged']).optional(),
+    allowCredentials: z.array(z.object({ id: z.string(), type: z.literal('public-key'), transports: z.array(z.string()).optional() })).optional(),
+})
+export const passkeyOptionsSchema = z.object({ options: passkeyRequestOptionsSchema.nullable() })
+export type PasskeyOptions = z.infer<typeof passkeyOptionsSchema>
+export const passkeyAssertionSchema = z.object({
+    id: z.string(),
+    rawId: z.string(),
+    type: z.literal('public-key'),
+    response: z.object({ clientDataJSON: z.string(), authenticatorData: z.string(), signature: z.string(), userHandle: z.string().nullish() }),
+    authenticatorAttachment: z.enum(['platform', 'cross-platform']).nullish(),
+})
+export const passkeySignInRequestSchema = z.object({ assertion: passkeyAssertionSchema, refreshToken: z.string().min(1) })
+
 export const emailCodeRequestSchema = z.object({ email: z.string().trim().email().max(320) })
 
 // `mailed` when the hub sent the code still good for this address again, or holds it back because it

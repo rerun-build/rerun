@@ -1,10 +1,10 @@
 import * as SecureStore from 'expo-secure-store'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslations } from 'use-intl'
 
-import { passkeyDomain, readSecondStepMethods, spendBackupCode, verifyAppCode, verifyWithPasskey, type SecondStepMethods } from '@/auth/second-step'
+import { readSecondStepMethods, spendBackupCode, verifyAppCode, verifyWithPasskey, type SecondStepMethods } from '@/auth/second-step'
 import { CodeField } from '@/components/auth/CodeField'
 import { StepTitle } from '@/components/auth/steps/StepTitle'
 import { TextLink } from '@/components/auth/TextLink'
@@ -34,15 +34,14 @@ export function SecondFactor({ onSignOut }: { onSignOut: () => void }) {
     const [backupCode, setBackupCode] = useState('')
     const [error, setError] = useState<string | null>(null)
     const [busy, setBusy] = useState(false)
-    const passkeyTry = useRef(0)
-    const passkeysHere = methods !== null && methods.passkeyFactorIds.length > 0 && passkeyDomain() !== null
+    const passkeysHere = methods !== null && methods.hasPasskeys
 
     useEffect(() => {
         let cancelled = false
         void Promise.all([readSecondStepMethods(), SecureStore.getItemAsync(LAST_METHOD_KEY).catch(() => null)]).then(([read, last]) => {
             if (cancelled) return
             setMethods(read)
-            const passkeyFirst = read.passkeyFactorIds.length > 0 && passkeyDomain() !== null && (last === 'passkey' || !read.appFactorId)
+            const passkeyFirst = read.hasPasskeys && (last === 'passkey' || !read.appFactorId)
             setScreen(passkeyFirst ? 'passkey' : read.appFactorId ? 'app' : 'backup')
         })
         return () => {
@@ -64,16 +63,13 @@ export function SecondFactor({ onSignOut }: { onSignOut: () => void }) {
         if (!methods || busy) return
         setBusy(true)
         setError(null)
-        // A challenge names one passkey: each new try moves to the next one the account holds.
-        const factorId = methods.passkeyFactorIds[passkeyTry.current % methods.passkeyFactorIds.length]
-        const confirmed = await verifyWithPasskey(factorId)
-        if (confirmed) {
+        const outcome = await verifyWithPasskey()
+        if (outcome === 'ok') {
             await remember('passkey')
             return
         }
-        passkeyTry.current += 1
         setBusy(false)
-        setError(t('passkey.failed'))
+        setError(outcome === 'too_many' ? t('backup.tooMany') : t('passkey.failed'))
     }
 
     const verifyCode = async (value: string) => {

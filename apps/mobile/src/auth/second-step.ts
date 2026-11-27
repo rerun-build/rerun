@@ -1,11 +1,12 @@
 import { mobileApi, TWO_STEP_RECOVERY_FACTOR_NAME } from '@rerun/contracts'
-import type { AuthenticatorAssuranceLevels, Factor, MFAVerifyWebauthnParams, User } from '@supabase/supabase-js'
+import type { AuthenticatorAssuranceLevels, Factor, User } from '@supabase/supabase-js'
 
 import { ApiError, hub } from '@/api/client'
 import { supabase } from '@/auth/supabase'
 import { environment } from '@/config/environment'
 
-export type SecondStepMethods = { appFactorId: string | null; passkeyFactorIds: string[] }
+// The passkeys are the hub's, never Supabase factors: whether the account has any comes from the hub.
+export type SecondStepMethods = { appFactorId: string | null; hasPasskeys: boolean }
 
 const own = (factor: Factor) => factor.status === 'verified' && factor.friendly_name !== TWO_STEP_RECOVERY_FACTOR_NAME
 
@@ -22,16 +23,13 @@ export async function readOwesSecondStep(): Promise<boolean> {
     return owesSecondStep(level?.currentLevel, data.session?.user)
 }
 
-// The most recently used passkey first: a challenge names one of them.
-export function methodsOf(factors: Factor[]): SecondStepMethods {
-    const mine = factors.filter(own)
-    const passkeys = mine.filter(factor => factor.factor_type === 'webauthn').sort((a, b) => (b.last_challenged_at ?? b.created_at).localeCompare(a.last_challenged_at ?? a.created_at))
-    return { appFactorId: mine.find(factor => factor.factor_type === 'totp')?.id ?? null, passkeyFactorIds: passkeys.map(factor => factor.id) }
+export function appFactorOf(factors: Factor[]): string | null {
+    return factors.find(factor => own(factor) && factor.factor_type === 'totp')?.id ?? null
 }
 
 export async function readSecondStepMethods(): Promise<SecondStepMethods> {
-    const { data } = await supabase.auth.mfa.listFactors()
-    return methodsOf(data?.all ?? [])
+    const [{ data }, options] = await Promise.all([supabase.auth.mfa.listFactors(), passkeyDomain() ? readPasskeyOptions() : null])
+    return { appFactorId: appFactorOf(data?.all ?? []), hasPasskeys: options !== null }
 }
 
 export async function verifyAppCode(factorId: string, code: string): Promise<boolean> {
@@ -62,8 +60,6 @@ const PASSKEY_DOMAINS = (process.env.EXPO_PUBLIC_PASSKEY_DOMAINS ?? '')
     .split(',')
     .map((domain: string) => domain.trim())
     .filter(Boolean)
-// The origin Android signs a passkey assertion with: its app's signing key, `android:apk-key-hash:…`.
-const ANDROID_ORIGIN = process.env.EXPO_PUBLIC_PASSKEY_ANDROID_ORIGIN
 
 type PasskeysModule = typeof import('react-native-passkeys')
 
@@ -83,32 +79,33 @@ export function passkeyDomain(): string | null {
     return PASSKEY_DOMAINS.includes(host) && nativePasskeys()?.isSupported() ? host : null
 }
 
-function base64url(buffer: ArrayBuffer | ArrayBufferView): string {
-    const bytes = buffer instanceof ArrayBuffer ? new Uint8Array(buffer) : new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength)
-    let binary = ''
-    for (const byte of bytes) binary += String.fromCharCode(byte)
-    return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+// The options of a sign-in by passkey for this session, null when the account has none.
+async function readPasskeyOptions() {
+    const { data } = await supabase.auth.getSession()
+    if (!data.session) return null
+    try {
+        return (await hub(mobileApi.passkeyOptions, { accessToken: data.session.access_token })).options
+    } catch {
+        return null
+    }
 }
 
-// Supabase's client turns the challenge into the browser's buffers; the native passkey sheet takes
-// the JSON form back, and its answer goes to Supabase as a credential that serializes itself.
-export async function verifyWithPasskey(factorId: string): Promise<boolean> {
-    const rpId = passkeyDomain()
+export type PasskeyOutcome = 'ok' | 'refused' | 'too_many'
+
+// The hub checks the passkey: its options go to the native passkey sheet as they are, and the sheet's
+// signed answer goes back with the session, which the hub raises and hands back.
+export async function verifyWithPasskey(): Promise<PasskeyOutcome> {
     const Passkeys = nativePasskeys()
-    if (!rpId || !Passkeys) return false
-    const rpOrigins = [`https://${rpId}`, ...(ANDROID_ORIGIN ? [ANDROID_ORIGIN] : [])]
-    const { data: challenge, error } = await supabase.auth.mfa.challenge({ factorId, webauthn: { rpId, rpOrigins } })
-    if (error || !challenge || challenge.type !== 'webauthn' || challenge.webauthn.type !== 'request') return false
-    const options = challenge.webauthn.credential_options.publicKey
-    const assertion = await Passkeys.get({
-        rpId,
-        challenge: base64url(options.challenge),
-        timeout: options.timeout,
-        userVerification: options.userVerification,
-        allowCredentials: options.allowCredentials?.map(credential => ({ id: base64url(credential.id), type: 'public-key' as const })),
-    }).catch(() => null)
-    if (!assertion) return false
-    const credential = { toJSON: () => assertion } as unknown as MFAVerifyWebauthnParams<'request'>['webauthn']['credential_response']
-    const { error: verifyError } = await supabase.auth.mfa.verify({ factorId, challengeId: challenge.id, webauthn: { type: 'request', rpId, rpOrigins, credential_response: credential } })
-    return !verifyError
+    const options = Passkeys && passkeyDomain() ? await readPasskeyOptions() : null
+    if (!Passkeys || !options) return 'refused'
+    const assertion = await Passkeys.get(options).catch(() => null)
+    const { data } = await supabase.auth.getSession()
+    if (!assertion || !data.session) return 'refused'
+    try {
+        const { session } = await hub(mobileApi.signInWithPasskey, { accessToken: data.session.access_token, body: { assertion, refreshToken: data.session.refresh_token } })
+        const { error } = await supabase.auth.setSession({ access_token: session.accessToken, refresh_token: session.refreshToken })
+        return error ? 'refused' : 'ok'
+    } catch (error) {
+        return error instanceof ApiError && error.status === 429 ? 'too_many' : 'refused'
+    }
 }

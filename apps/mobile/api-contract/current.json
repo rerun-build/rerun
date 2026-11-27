@@ -6955,6 +6955,290 @@
                 "x-mobile-api": "spendBackupCode"
             }
         },
+        "/api/v1/auth/two-step/passkey": {
+            "post": {
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "assertion": {
+                                        "properties": {
+                                            "authenticatorAttachment": {
+                                                "enum": [
+                                                    "platform",
+                                                    "cross-platform"
+                                                ],
+                                                "nullable": true,
+                                                "type": "string"
+                                            },
+                                            "id": {
+                                                "type": "string"
+                                            },
+                                            "rawId": {
+                                                "type": "string"
+                                            },
+                                            "response": {
+                                                "properties": {
+                                                    "authenticatorData": {
+                                                        "type": "string"
+                                                    },
+                                                    "clientDataJSON": {
+                                                        "type": "string"
+                                                    },
+                                                    "signature": {
+                                                        "type": "string"
+                                                    },
+                                                    "userHandle": {
+                                                        "nullable": true,
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "clientDataJSON",
+                                                    "authenticatorData",
+                                                    "signature"
+                                                ],
+                                                "type": "object"
+                                            },
+                                            "type": {
+                                                "enum": [
+                                                    "public-key"
+                                                ],
+                                                "type": "string"
+                                            }
+                                        },
+                                        "required": [
+                                            "id",
+                                            "rawId",
+                                            "type",
+                                            "response"
+                                        ],
+                                        "type": "object"
+                                    },
+                                    "refreshToken": {
+                                        "minLength": 1,
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "assertion",
+                                    "refreshToken"
+                                ],
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "session": {
+                                            "properties": {
+                                                "accessToken": {
+                                                    "type": "string"
+                                                },
+                                                "refreshToken": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "accessToken",
+                                                "refreshToken"
+                                            ],
+                                            "type": "object"
+                                        }
+                                    },
+                                    "required": [
+                                        "session"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "Success"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "additionalProperties": {},
+                                    "properties": {
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "error"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "A failure the app tells apart"
+                    },
+                    "401": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "additionalProperties": {},
+                                    "properties": {
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "error"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "A failure the app tells apart"
+                    },
+                    "429": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "additionalProperties": {},
+                                    "properties": {
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "error"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "A failure the app tells apart"
+                    },
+                    "default": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HubError"
+                                }
+                            }
+                        },
+                        "description": "Any other failure"
+                    }
+                },
+                "x-mobile-api": "signInWithPasskey"
+            }
+        },
+        "/api/v1/auth/two-step/passkey/options": {
+            "post": {
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "options": {
+                                            "nullable": true,
+                                            "properties": {
+                                                "allowCredentials": {
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "transports": {
+                                                                "items": {
+                                                                    "type": "string"
+                                                                },
+                                                                "type": "array"
+                                                            },
+                                                            "type": {
+                                                                "enum": [
+                                                                    "public-key"
+                                                                ],
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "type"
+                                                        ],
+                                                        "type": "object"
+                                                    },
+                                                    "type": "array"
+                                                },
+                                                "challenge": {
+                                                    "type": "string"
+                                                },
+                                                "rpId": {
+                                                    "type": "string"
+                                                },
+                                                "timeout": {
+                                                    "type": "number"
+                                                },
+                                                "userVerification": {
+                                                    "enum": [
+                                                        "required",
+                                                        "preferred",
+                                                        "discouraged"
+                                                    ],
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "challenge"
+                                            ],
+                                            "type": "object"
+                                        }
+                                    },
+                                    "required": [
+                                        "options"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "Success"
+                    },
+                    "401": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "additionalProperties": {},
+                                    "properties": {
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "error"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "A failure the app tells apart"
+                    },
+                    "default": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HubError"
+                                }
+                            }
+                        },
+                        "description": "Any other failure"
+                    }
+                },
+                "x-mobile-api": "passkeyOptions"
+            }
+        },
         "/api/v1/bootstrap": {
             "post": {
                 "parameters": [],
