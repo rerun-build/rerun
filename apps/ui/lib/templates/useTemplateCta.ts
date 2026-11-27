@@ -10,7 +10,7 @@ import { startTemplateCheckoutAction } from '@rerun/cloud/marketplace.client'
 import { useWorkspaceManager } from '@/components/brand/useWorkspaceManager'
 import { useIsAdmin } from '@/hooks/useIsAdmin'
 import { isSubscriptionEntitled, PLAN_CURRENCY, basePriceCents, trialOffer, trialOfferLine } from '@rerun/cloud/billing'
-import { usePriceArm, startPlan } from '@rerun/cloud/billing.client'
+import { startPlan } from '@rerun/cloud/billing.client'
 import { CreditCard, LayoutGridIcon, ShoppingBagIcon, type LucideIcon } from '@/lib/icons'
 import { useBoardStore } from '@/stores/board.store'
 import { useOnboardingStore } from '@/stores/onboarding.store'
@@ -62,8 +62,7 @@ export function useTemplateCta(template: LibraryTemplate, onDone: () => void): T
     const paid = isPaid(template.pricing)
     const recurring = template.pricing.model === 'recurring'
     const price = formatAmount(template.pricing.amountCents, template.pricing.currency, locale)
-    const priceArm = usePriceArm()
-    const planPrice = formatAmount(basePriceCents(priceArm), PLAN_CURRENCY, locale)
+    const planPrice = formatAmount(basePriceCents(), PLAN_CURRENCY, locale)
     const hireLabel = priceCtaLabel(template.pricing, count, tPrice, locale)
 
     const placeLabel = t('place', { count })
@@ -72,7 +71,7 @@ export function useTemplateCta(template: LibraryTemplate, onDone: () => void): T
     // libellé seulement : le serveur tranche au clic.
     const offer = trialOffer(workspace)
     const trialEligible = offer !== 'paid'
-    const trialTerms = trialOfferLine(priceArm, offer, tTrial, locale)
+    const trialTerms = trialOfferLine(offer, tTrial, locale)
 
     const trialStep: TemplateStep = trialEligible
         ? { label: tTrial('startTrial', { days: TRIAL_DAYS }), caption: trialLimitsCaption(tTrial), icon: CreditCard }

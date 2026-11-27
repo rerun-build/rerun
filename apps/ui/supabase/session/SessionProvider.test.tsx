@@ -61,7 +61,7 @@ vi.mock('@/lib/workspace/workspace-switch', () => ({ enterActiveWorkspace: () =>
 vi.mock('posthog-js', () => ({ default: { register: () => {}, unregister: () => {}, reset: () => {}, setPersonProperties: () => {} } }))
 vi.mock('@rerun/analytics/client', () => ({ track: () => {}, readAttribution: () => ({}), getCookie: () => undefined, identifyPerson: () => {}, setSharedCookie: () => {}, deleteSharedCookie: () => {} }))
 vi.mock('@rerun/analytics/experiments', () => ({ experimentProperties: () => ({}), readExperimentCookie: () => ({}), STALE_EXPERIMENT_PROPERTIES: [], writeExperimentVariants: () => {} }))
-vi.mock('@rerun/cloud/billing', () => ({ parsePriceArm: () => null, PRICE_EXPERIMENT_KEY: 'price', PRICE_PROPERTY: 'price', isSubscriptionEntitled: () => false, TRIAL_CARD_PROPERTY: 'trial', trialArm: () => null }))
+vi.mock('@rerun/cloud/billing', () => ({ isSubscriptionEntitled: () => false, TRIAL_CARD_PROPERTY: 'trial', trialArm: () => null }))
 vi.mock('@/lib/crisp', () => ({ resetCrisp: mocks.resetCrisp }))
 vi.mock('@rerun/cloud/phone', () => ({ PHONE_STATUS_COLUMNS: ['user_id'], phoneStatusOf: () => 'verified' }))
 

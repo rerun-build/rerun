@@ -19,7 +19,6 @@ const state = {
     entitled: true,
     trialSpent: false,
     trialNeedsCard: true,
-    priceArm: '49',
     client: 'web',
     workspaceName: 'Acme',
     workspacePlan: 'pro',

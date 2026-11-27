@@ -63,12 +63,13 @@ describe('reportSubscriptionTransition', () => {
         expect(captureServer).toHaveBeenCalledWith('owner@rerun.test', 'trial_started', expect.objectContaining({ origin: reported }), expect.anything())
     })
 
-    it('reports the monthly revenue of the arm the subscription was sold on', async () => {
-        await reportSubscriptionTransition(subscription({ items: { data: [{ price: { id: 'price_base_29', recurring: { interval: 'month' } }, quantity: 1 }] } }), WORKSPACE_ID, null)
-        await reportSubscriptionTransition(subscription({ id: 'sub_2', items: { data: [{ price: { id: 'price_base_29_yearly', recurring: { interval: 'year' } }, quantity: 1 }] } }), WORKSPACE_ID, null)
-        await reportSubscriptionTransition(subscription({ id: 'sub_3' }), WORKSPACE_ID, null)
+    it('reports the monthly revenue of the subscription, a legacy price included', async () => {
+        await reportSubscriptionTransition(subscription(), WORKSPACE_ID, null)
+        await reportSubscriptionTransition(subscription({ id: 'sub_2', items: { data: [{ price: { id: 'price_base_yearly', recurring: { interval: 'year' } }, quantity: 1 }] } }), WORKSPACE_ID, null)
+        await reportSubscriptionTransition(subscription({ id: 'sub_3', items: { data: [{ price: { id: 'price_base_49', currency: 'usd', unit_amount: 4900, recurring: { interval: 'month' } }, quantity: 1 }] } }), WORKSPACE_ID, null)
+        await reportSubscriptionTransition(subscription({ id: 'sub_4', items: { data: [{ price: { id: 'price_base_49_yearly', currency: 'usd', unit_amount: 46800, recurring: { interval: 'year' } }, quantity: 1 }] } }), WORKSPACE_ID, null)
 
-        expect(vi.mocked(captureServer).mock.calls.map(([, , properties]) => (properties as { mrr: number }).mrr)).toEqual([29, 23, 49])
+        expect(vi.mocked(captureServer).mock.calls.map(([, , properties]) => (properties as { mrr: number }).mrr)).toEqual([29, 23, 49, 39])
     })
 
     it('reports a subscription started straight from nothing', async () => {

@@ -1,7 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 import type { Database, Json } from '@/app/api/database.types'
-import { BASE_PLAN_SLUG, baseLimitsToColumns, type PriceArm } from '@rerun/cloud/billing'
+import { BASE_PLAN_SLUG, baseLimitsToColumns } from '@rerun/cloud/billing'
 import { randomBlob } from '@/lib/blobs/catalog'
 import { ensureForemanAgentRow } from '@/lib/foreman/agent-row'
 import { DEFAULT_WORKSPACE_NAME } from '@/lib/naming/workspace-name'
@@ -13,7 +13,7 @@ type Client = SupabaseClient<Database>
 
 // The workspace of someone who has none. The plan's credit belongs to the plan: with no subscription
 // there is none, or a visitor who never pays walks off with it.
-export function insertDefaultWorkspace(supabase: Client, { priceArm, locale }: { priceArm: PriceArm | null; locale: Locale }) {
+export function insertDefaultWorkspace(supabase: Client, { locale }: { locale: Locale }) {
     return supabase
         .from('workspaces')
         .insert<Database['public']['Tables']['workspaces']['Insert']>({
@@ -22,7 +22,6 @@ export function insertDefaultWorkspace(supabase: Client, { priceArm, locale }: {
             plan: BASE_PLAN_SLUG,
             ...baseLimitsToColumns(),
             rerun_budget_micros: 0,
-            price_arm: priceArm,
             locale,
         })
         .select()
@@ -35,7 +34,7 @@ export const NO_RERUN_EMAIL = { categories: { product: false, billing: false } }
 
 async function openDefaultWorkspace(supabase: Client, userId: string): Promise<number> {
     const { data: user } = await selectMaybeSingle(supabase, 'users', ['locale', 'email_notification_prefs'] as const, { id: userId })
-    const { data: workspace, error } = await insertDefaultWorkspace(supabase, { priceArm: null, locale: isStableLocale(user?.locale) ? user.locale : DEFAULT_LOCALE })
+    const { data: workspace, error } = await insertDefaultWorkspace(supabase, { locale: isStableLocale(user?.locale) ? user.locale : DEFAULT_LOCALE })
     if (error || !workspace) throw new Error(`Could not open a workspace for ${userId}: ${error?.message}`)
 
     const { error: memberError } = await supabase.from('workspace_members').insert<Database['public']['Tables']['workspace_members']['Insert']>({ user_id: userId, workspace_id: workspace.id, role: 'admin' })

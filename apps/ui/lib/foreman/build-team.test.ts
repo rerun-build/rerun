@@ -35,7 +35,6 @@ function stateWith(foreman: ForemanState['foreman'], spaces: ForemanState['space
         entitled: true,
         trialSpent: false,
         trialNeedsCard: true,
-        priceArm: '49',
         client: 'web',
         workspaceName: 'Retalk',
         workspacePlan: 'base',

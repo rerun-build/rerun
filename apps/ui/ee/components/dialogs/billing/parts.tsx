@@ -18,7 +18,7 @@ import { Icon } from '@/components/ui/icon'
 import { Input } from '@/components/ui/input'
 import { Progress } from '@/components/ui/progress'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
-import { BASE_PLAN_CREDITS, DEFAULT_PRICE_ARM, PLAN_CURRENCY, TRIAL_ACTIVE_AGENTS, TRIAL_CREDITS, TRIAL_DAYS, ZERO_QUANTITIES, perMonthCents, planPriceCents, yearlyDiscountPercent, type BillingInterval, type PriceArm } from '@/ee/lib/billing/plans'
+import { BASE_PLAN_CREDITS, PLAN_CURRENCY, TRIAL_ACTIVE_AGENTS, TRIAL_CREDITS, TRIAL_DAYS, ZERO_QUANTITIES, perMonthCents, planPriceCents, yearlyDiscountPercent, type BillingInterval } from '@/ee/lib/billing/plans'
 import { ArrowLeft, BrainIcon, CheckIcon, ChevronDownIcon, CoinsIcon, CpuIcon, CreditCardIcon, KeyIcon, Loader2Icon, Package, Repeat, TicketIcon, TriangleAlertIcon, UserPlus, XIcon, ZapIcon, type LucideIcon } from '@/lib/icons'
 import { TESTIMONIALS, testimonialCopy } from '@rerun/cloud/testimonials'
 import { useTimedRotation } from '@/hooks/useTimedRotation'
@@ -185,12 +185,12 @@ function FeatureList({ list, className }: { list: ReturnType<typeof features>; c
 // The plan: its name and billing on the left, the price per month on the right. `discountCents` is
 // what comes off each invoice for a workspace grandfathered on a legacy price or holding a permanent
 // promo. `freeTrial` prices the card at what the trial costs, the plan's price struck beside it.
-// `priceArm` is the price this workspace is sold the base plan at. `compact` keeps the name and the
-// price on one line, the name's line cut short, for a column narrower than the dialog's.
-export function PlanCard({ interval, priceArm = DEFAULT_PRICE_ARM, discountCents = 0, freeTrial = false, compact = false }: { interval: BillingInterval; priceArm?: PriceArm; discountCents?: number; freeTrial?: boolean; compact?: boolean }) {
+// `compact` keeps the name and the price on one line, the name's line cut short, for a column
+// narrower than the dialog's.
+export function PlanCard({ interval, discountCents = 0, freeTrial = false, compact = false }: { interval: BillingInterval; discountCents?: number; freeTrial?: boolean; compact?: boolean }) {
     const t = useTranslations('billing.parts.plan')
     const quantities = ZERO_QUANTITIES
-    const periodCents = Math.max(0, planPriceCents(quantities, interval, priceArm) - discountCents)
+    const periodCents = Math.max(0, planPriceCents(quantities, interval) - discountCents)
     const monthCents = interval === 'yearly' ? Math.round(periodCents / 12) : periodCents
     const struckListPrice = freeTrial || interval === 'yearly' || discountCents > 0
     const billing = interval === 'yearly' ? t.rich('billedYearly', { amount: () => <UsdFlow cents={periodCents} /> }) : t('billedMonthly')
@@ -219,7 +219,7 @@ export function PlanCard({ interval, priceArm = DEFAULT_PRICE_ARM, discountCents
                         {struckListPrice && (
                             // A drawn strike: `line-through` does not reach NumberFlow's inline-block digits.
                             <span className="relative text-base text-muted-foreground tabular-nums after:absolute after:inset-x-0 after:top-1/2 after:h-px after:bg-current">
-                                <UsdFlow cents={perMonthCents(quantities, 'monthly', priceArm)} />
+                                <UsdFlow cents={perMonthCents(quantities, 'monthly')} />
                             </span>
                         )}
                     </p>

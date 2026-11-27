@@ -154,7 +154,7 @@ export function PlanPanel({ state, data, onDone }: PanelProps) {
                             {error && <p className="text-sm text-destructive">{error}</p>}
                         </div>
                     )}
-                    {!lockedReason && !state.pendingSwitch && state.interval === 'monthly' && <Note>{t('yearlySaves', { amount: usd(yearlySavingsCents(state.priceArm)) })}</Note>}
+                    {!lockedReason && !state.pendingSwitch && state.interval === 'monthly' && <Note>{t('yearlySaves', { amount: usd(yearlySavingsCents()) })}</Note>}
                 </>
             )}
         </Panel>

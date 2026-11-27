@@ -1,7 +1,7 @@
 import type Stripe from 'stripe'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { BASE_PLAN } from './plans'
-import { addonForPriceId, basePriceId, intervalOfItems, isBasePriceId, isLegacyAgentPackPriceId, isLegacyCreditPackPriceId, isLegacyPlanItemPriceId, isPlanPriceId, isYearlyBasePriceId, legacyBaseDiscountCents, priceArmOfItems, priceIdForAddon, quantitiesFromItems, stripe, subscriptionOfInvoice } from './stripe'
+import { BASE_PLAN, PLAN_PRICES_CENTS } from './plans'
+import { addonForPriceId, basePriceId, intervalOfItems, isBasePriceId, isLegacyAgentPackPriceId, isLegacyCreditPackPriceId, isLegacyPlanItemPriceId, isPlanPriceId, isLegacyBasePriceId, isYearlyBasePriceId, baseItemCents, legacyBaseDiscountCents, priceIdForAddon, quantitiesFromItems, stripe, subscriptionOfInvoice } from './stripe'
 
 function item(priceId: string | null, quantity?: number, price: Partial<Stripe.Price> = {}): Stripe.SubscriptionItem {
     return { id: `si_${priceId}`, quantity, price: priceId === null ? null : { id: priceId, currency: 'usd', unit_amount: BASE_PLAN.priceCents, ...price } } as unknown as Stripe.SubscriptionItem
@@ -53,7 +53,7 @@ describe('legacyBaseDiscountCents', () => {
         expect(legacyBaseDiscountCents([item('price_base_legacy', 1, { unit_amount: null })])).toBe(0)
     })
 
-    it('never turns a price above the list price into a negative discount', () => {
+    it('never reads a discount off the current base price, whatever its amount says', () => {
         expect(legacyBaseDiscountCents([item('price_base', 1, { unit_amount: BASE_PLAN.priceCents + 1000 })])).toBe(0)
     })
 
@@ -61,9 +61,22 @@ describe('legacyBaseDiscountCents', () => {
         expect(legacyBaseDiscountCents([item('price_seat', 1)])).toBe(0)
     })
 
-    it('never reads the $29 arm of the price test as a grandfathered price', () => {
-        expect(legacyBaseDiscountCents([item('price_base_29', 1, { unit_amount: 2900 })])).toBe(0)
-        expect(legacyBaseDiscountCents([item('price_base_29_yearly', 1, { unit_amount: 27600 })])).toBe(0)
+    it('turns the $49 a workspace still pays into a negative discount, on its own interval', () => {
+        expect(legacyBaseDiscountCents([item('price_base_49', 1, { unit_amount: 4900 })])).toBe(PLAN_PRICES_CENTS.monthly.base - 4900)
+        expect(legacyBaseDiscountCents([item('price_base_49_yearly', 1, { unit_amount: 46800, recurring: { interval: 'year' } as Stripe.Price.Recurring })])).toBe(PLAN_PRICES_CENTS.yearly.base - 46800)
+    })
+})
+
+describe('baseItemCents', () => {
+    it('is the list price on the current base price', () => {
+        expect(baseItemCents([item('price_base', 1)])).toBe(PLAN_PRICES_CENTS.monthly.base)
+        expect(baseItemCents([item('price_base_yearly', 1, { unit_amount: 27600 })])).toBe(PLAN_PRICES_CENTS.yearly.base)
+    })
+
+    it('is what a legacy price bills', () => {
+        expect(baseItemCents([item('price_base_legacy', 1, { unit_amount: 2400 })])).toBe(2400)
+        expect(baseItemCents([item('price_base_49', 1, { unit_amount: 4900 })])).toBe(4900)
+        expect(baseItemCents([item('price_base_49_yearly', 1, { unit_amount: 46800, recurring: { interval: 'year' } as Stripe.Price.Recurring })])).toBe(46800)
     })
 })
 
@@ -74,40 +87,35 @@ describe('the LinkedIn slot', () => {
     })
 })
 
-describe('the arms of the price test', () => {
-    it('gives each arm its own base price, per interval', () => {
-        expect(basePriceId('monthly', '49')).toBe('price_base')
-        expect(basePriceId('monthly', '29')).toBe('price_base_29')
-        expect(basePriceId('yearly', '29')).toBe('price_base_29_yearly')
+describe('the legacy base prices', () => {
+    it('reads every price of the comma-separated list as the base plan', () => {
+        for (const id of ['price_base_legacy', 'price_base_49', 'price_base_49_yearly']) {
+            expect(isLegacyBasePriceId(id)).toBe(true)
+            expect(isBasePriceId(id)).toBe(true)
+            expect(isPlanPriceId(id)).toBe(true)
+        }
+        expect(quantitiesFromItems([item('price_base_49', 1), item('price_whatsapp_slot', 1)])).toEqual({ hasBase: true, quantities: { linkedin_slot: 0, whatsapp_slot: 1 } })
     })
 
-    it('names the missing variable of an arm that is not configured', () => {
-        vi.stubEnv('STRIPE_PRICE_BASE_29_YEARLY', '')
-        expect(() => basePriceId('yearly', '29')).toThrow(/STRIPE_PRICE_BASE_29_YEARLY/)
+    it('never counts the current base price as legacy', () => {
+        expect(isLegacyBasePriceId('price_base')).toBe(false)
+        expect(isLegacyBasePriceId('price_base_yearly')).toBe(false)
+        expect(isLegacyBasePriceId(null)).toBe(false)
     })
 
-    it('counts a $29 base price as the base plan', () => {
-        expect(isBasePriceId('price_base_29')).toBe(true)
-        expect(isBasePriceId('price_base_29_yearly')).toBe(true)
-        expect(quantitiesFromItems([item('price_base_29', 1), item('price_agent_pack', 2)])).toEqual({ hasBase: true, quantities: { linkedin_slot: 0, whatsapp_slot: 0 } })
+    it('reads the interval of a legacy price off the price itself', () => {
+        expect(isYearlyBasePriceId('price_base_49_yearly')).toBe(false)
+        expect(intervalOfItems([item('price_base_49_yearly', 1, { recurring: { interval: 'year' } as Stripe.Price.Recurring })])).toBe('yearly')
+        expect(intervalOfItems([item('price_base_49', 1, { recurring: { interval: 'month' } as Stripe.Price.Recurring })])).toBe('monthly')
     })
 
-    it('knows the yearly price of either arm', () => {
-        expect(isYearlyBasePriceId('price_base_yearly')).toBe(true)
-        expect(isYearlyBasePriceId('price_base_29_yearly')).toBe(true)
-        expect(isYearlyBasePriceId('price_base_29')).toBe(false)
-        expect(intervalOfItems([item('price_base_29_yearly', 1)])).toBe('yearly')
-    })
-
-    it('reads the arm a subscription was sold on off its base item', () => {
-        expect(priceArmOfItems([item('price_agent_pack', 1), item('price_base_29', 1)])).toBe('29')
-        expect(priceArmOfItems([item('price_base_29_yearly', 1)])).toBe('29')
-        expect(priceArmOfItems([item('price_base_yearly', 1)])).toBe('49')
-    })
-
-    it('reads a legacy base price, or no base item at all, as the list price', () => {
-        expect(priceArmOfItems([item('price_base_legacy', 1)])).toBe('49')
-        expect(priceArmOfItems([item('price_seat', 1)])).toBe('49')
+    it('tolerates spaces and empty entries in the list, and an unset variable', () => {
+        vi.stubEnv('STRIPE_PRICE_BASE_LEGACY', ' price_a , ,price_b ')
+        expect(isLegacyBasePriceId('price_a')).toBe(true)
+        expect(isLegacyBasePriceId('price_b')).toBe(true)
+        expect(isLegacyBasePriceId('')).toBe(false)
+        vi.stubEnv('STRIPE_PRICE_BASE_LEGACY', '')
+        expect(isLegacyBasePriceId('price_a')).toBe(false)
     })
 })
 

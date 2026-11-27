@@ -98,7 +98,6 @@ export const CONTRACT_WORKSPACE = {
     boxes_disabled_at: null,
     boxes_archived_at: null,
     onboarded_at: '2026-11-02T09:00:00.000Z',
-    price_arm: null,
     locale: 'en',
     organization_id: null,
 } satisfies WorkspaceContext['workspace']

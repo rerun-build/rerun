@@ -11,7 +11,7 @@ import { AlertBlock } from '@/components/chat/AlertBlock'
 import { McpSignInBlock } from '@/components/chat/McpSignInBlock'
 import { SecretRequestBlock } from '@/components/chat/SecretRequestBlock'
 import { ChatScreen } from '@/components/chat/ChatScreen'
-import { BudgetExhaustedNotice, usePriceArm } from '@rerun/cloud/billing.client'
+import { BudgetExhaustedNotice } from '@rerun/cloud/billing.client'
 import { useWorkspaceManager } from '@/components/brand/useWorkspaceManager'
 import { ProviderErrorNotice } from '@/components/chat/ProviderErrorNotice'
 import { ComposerSubscriptionCta } from '@/components/chat/ComposerSubscriptionCta'
@@ -929,7 +929,6 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
 
     // Paid from the trial's notice. The plan lands through Stripe's webhook, not the payment itself, so
     // the stopped task waits for the credit to have room before it picks back up.
-    const priceArm = usePriceArm()
     const [resumeAfterUpgrade, setResumeAfterUpgrade] = useState(false)
     const [resumeStalled, setResumeStalled] = useState(false)
     const pickTaskBackUp = useCallback(() => {
@@ -960,7 +959,6 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
     }, [sessionId])
     const trialUpgrade = {
         coworker: agentName,
-        priceArm,
         onPaid: () => {
             setResumeStalled(false)
             setResumeAfterUpgrade(true)

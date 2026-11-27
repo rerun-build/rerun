@@ -4,7 +4,7 @@ import type { AgentSharePreview } from '@rerun/contracts'
 import { useLocale, useTranslations } from 'next-intl'
 import { useTransition } from 'react'
 import { isSubscriptionEntitled, PLAN_CURRENCY, basePriceCents, trialOffer, trialOfferLine } from '@rerun/cloud/billing'
-import { usePriceArm, startPlan } from '@rerun/cloud/billing.client'
+import { startPlan } from '@rerun/cloud/billing.client'
 import { CreditCard, LayoutGridIcon, type LucideIcon } from '@/lib/icons'
 import { TRIAL_DAYS, formatAmount, trialLimitsCaption } from '@rerun/contracts'
 import { useWorkspaceManager } from '@/components/brand/useWorkspaceManager'
@@ -43,8 +43,7 @@ export function useAgentShareCta(token: string, preview: AgentSharePreview, onDo
     const manager = useWorkspaceManager()
     const locale = useLocale()
 
-    const priceArm = usePriceArm()
-    const planPrice = formatAmount(basePriceCents(priceArm), PLAN_CURRENCY, locale)
+    const planPrice = formatAmount(basePriceCents(), PLAN_CURRENCY, locale)
     const offer = trialOffer(workspace)
     const trialEligible = offer !== 'paid'
 
@@ -75,7 +74,7 @@ export function useAgentShareCta(token: string, preview: AgentSharePreview, onDo
         return {
             gate: 'plan',
             label: trialEligible ? t('trialAdd') : t('planAdd', { price: planPrice }),
-            note: trialEligible ? trialOfferLine(priceArm, offer, tTrial, locale) : tTrial('trialUsed'),
+            note: trialEligible ? trialOfferLine(offer, tTrial, locale) : tTrial('trialUsed'),
             steps: [trialStep, placeStep],
             pending,
             run: startTrial,

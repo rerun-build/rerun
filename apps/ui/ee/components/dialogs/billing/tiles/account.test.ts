@@ -44,21 +44,23 @@ describe('planBadge', () => {
 describe('planBillCents', () => {
     const quantities = { linkedin_slot: 1, whatsapp_slot: 0 }
 
-    it('bills the arm of the workspace plus its slots', () => {
-        expect(planBillCents({ priceArm: '29', interval: 'monthly', monthlyDiscountCents: 0 }, quantities, 'monthly')).toBe(2900 + 900)
-        expect(planBillCents({ priceArm: '49', interval: 'monthly', monthlyDiscountCents: 0 }, quantities, 'monthly')).toBe(4900 + 900)
+    it('bills the base plan plus its slots', () => {
+        expect(planBillCents({ interval: 'monthly', monthlyDiscountCents: 0 }, quantities, 'monthly')).toBe(2900 + 900)
+    })
+
+    it('brings a workspace still on $49 back up to what it is billed', () => {
+        expect(planBillCents({ interval: 'monthly', monthlyDiscountCents: -2000 }, quantities, 'monthly')).toBe(4900 + 900)
     })
 
     it('keeps a discount only on the interval it was given on', () => {
-        expect(planBillCents({ priceArm: '29', interval: 'monthly', monthlyDiscountCents: 500 }, quantities, 'monthly')).toBe(3300)
-        expect(planBillCents({ priceArm: '29', interval: 'monthly', monthlyDiscountCents: 500 }, quantities, 'yearly')).toBe(27600 + 10800)
+        expect(planBillCents({ interval: 'monthly', monthlyDiscountCents: 500 }, quantities, 'monthly')).toBe(3300)
+        expect(planBillCents({ interval: 'monthly', monthlyDiscountCents: 500 }, quantities, 'yearly')).toBe(27600 + 10800)
     })
 })
 
 describe('yearlySavingsCents', () => {
-    it('reads the saving off the price the workspace pays', () => {
-        expect(yearlySavingsCents('29')).toBe(7200)
-        expect(yearlySavingsCents('49')).toBe(12000)
+    it('is twelve months of the base plan less a year of it', () => {
+        expect(yearlySavingsCents()).toBe(7200)
     })
 })
 

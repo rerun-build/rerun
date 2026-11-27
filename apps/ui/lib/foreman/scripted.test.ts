@@ -47,7 +47,6 @@ function stateAt(phase: ForemanState['phase'], patch: Partial<ForemanState> = {}
         entitled: false,
         trialSpent: false,
         trialNeedsCard: true,
-        priceArm: '49',
         client: 'web',
         workspaceName: 'Retalk',
         workspacePlan: 'none',

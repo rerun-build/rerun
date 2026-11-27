@@ -13,9 +13,9 @@ describe('trial terms', () => {
         expect(cardlessTrialLine(t, '$29', '14/11/2026')).toBe('No card needed, $0 today. Add one before 14/11/2026 to keep going at $29/month.')
     })
 
-    it('quotes the price arm and the day the trial ends', () => {
+    it('quotes the plan price and the day the trial ends', () => {
         const now = new Date('2026-11-09T12:00:00Z')
-        expect(trialOfferLine('49', 'card_trial', t, 'en', now)).toBe('Card required, $0 today. $49 charged on Nov 14 unless you cancel before.')
-        expect(trialOfferLine('29', 'cardless', t, 'en', now)).toBe('No card needed, $0 today. Add one before Nov 14 to keep going at $29/month.')
+        expect(trialOfferLine('card_trial', t, 'en', now)).toBe('Card required, $0 today. $29 charged on Nov 14 unless you cancel before.')
+        expect(trialOfferLine('cardless', t, 'en', now)).toBe('No card needed, $0 today. Add one before Nov 14 to keep going at $29/month.')
     })
 })

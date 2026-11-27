@@ -14,7 +14,7 @@ export const dynamic = 'force-dynamic'
 // never sees a bearer request, so this is the mobile counterpart. Safe to repeat.
 export const POST = apiRoute(mobileApi.bootstrap, { auth: 'user' }, async ({ ctx }) => {
     if (!(await isRerunHost())) return notOnThisHost()
-    await provisionUser(ctx.supabase, ctx.user, { phoneStep: false, priceArm: null, locale: resolveLocale({ acceptLanguage: (await headers()).get('accept-language') }) })
+    await provisionUser(ctx.supabase, ctx.user, { phoneStep: false, locale: resolveLocale({ acceptLanguage: (await headers()).get('accept-language') }) })
     try {
         return loadMe(await requireWorkspaceContext())
     } catch (err) {

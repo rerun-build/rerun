@@ -14,7 +14,6 @@ const fresh: ForemanState = {
     entitled: false,
     trialSpent: false,
     trialNeedsCard: true,
-    priceArm: '49',
     client: 'web',
     workspaceName: 'Retalk',
     workspacePlan: 'base',

@@ -10,7 +10,7 @@ import { toast } from 'sonner'
 import { acceptPlanTermsAction, createPlanCheckoutAction, readCheckoutOutcomeAction, updatePlanCheckoutAction } from '@/ee/actions/billing.actions'
 import type { PlanSelection } from '@/ee/services/billing.service'
 import { Skeleton } from '@/components/ui/skeleton'
-import { TRIAL_DAYS, planPriceCents, trialEndDate, type PriceArm } from '@/ee/lib/billing/plans'
+import { TRIAL_DAYS, planPriceCents, trialEndDate } from '@/ee/lib/billing/plans'
 
 import { shortDate } from './checkout-copy'
 import { PayFooter, PayHeader, SummaryRows, TermsConsent, UsdFlow, usd } from './parts'
@@ -54,14 +54,12 @@ type PlanSessionState = { clientSecret: string; sessionId: string; trial: boolea
 
 export function SubscribePane({
     selection,
-    priceArm,
     copy,
     onDone,
     onTrialRefused,
     footer,
 }: {
     selection: PlanSelection
-    priceArm: PriceArm
     copy: PaneCopy
     onDone: (trialStarted: boolean) => void
     onTrialRefused: () => void
@@ -97,7 +95,7 @@ export function SubscribePane({
 
     return (
         <StripeCheckoutProvider clientSecret={session.clientSecret}>
-            <SubscribeForm sessionId={session.sessionId} sessionSelection={sessionSelection} selection={selection} priceArm={priceArm} trial={session.trial} copy={copy} onDone={() => onDone(session.trial)} onTrialRefused={onTrialRefused} footer={footer} />
+            <SubscribeForm sessionId={session.sessionId} sessionSelection={sessionSelection} selection={selection} trial={session.trial} copy={copy} onDone={() => onDone(session.trial)} onTrialRefused={onTrialRefused} footer={footer} />
         </StripeCheckoutProvider>
     )
 }
@@ -106,7 +104,6 @@ function SubscribeForm({
     sessionId,
     sessionSelection,
     selection,
-    priceArm,
     trial,
     copy,
     onDone,
@@ -117,7 +114,6 @@ function SubscribeForm({
     // The selection the session was created with: anything picked since is still to be sent.
     sessionSelection: PlanSelection
     selection: PlanSelection
-    priceArm: PriceArm
     trial: boolean
     copy: PaneCopy
     onDone: () => void
@@ -178,10 +174,10 @@ function SubscribeForm({
     const interval = selection.interval
     const referrer = usePendingReferrer(trial)
     const [trialEnds] = useState(() => trialEndDate(new Date()))
-    const amount = trial ? usd(0) : <UsdFlow cents={loaded?.total.total.minorUnitsAmount ?? planPriceCents(selection.quantities, interval, priceArm)} />
+    const amount = trial ? usd(0) : <UsdFlow cents={loaded?.total.total.minorUnitsAmount ?? planPriceCents(selection.quantities, interval)} />
     // The price after the trial follows a promotion code; without one it stays the list price.
     const nextInvoice = loaded?.discountAmounts?.length ? loaded.recurring?.dueNext : null
-    const afterTrialCents = nextInvoice ? Math.max(0, nextInvoice.subtotal.minorUnitsAmount - nextInvoice.discount.minorUnitsAmount) : planPriceCents(selection.quantities, 'monthly', priceArm)
+    const afterTrialCents = nextInvoice ? Math.max(0, nextInvoice.subtotal.minorUnitsAmount - nextInvoice.discount.minorUnitsAmount) : planPriceCents(selection.quantities, 'monthly')
 
     // Recorded when the box is ticked, never on the pay click: Safari only opens the Apple Pay sheet
     // inside the tap itself, so nothing may be awaited between that tap and `confirm`.

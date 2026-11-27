@@ -1,14 +1,14 @@
 import type { Database } from '@/app/api/database.types'
 import { resolveMemberIdentities } from '@/app/api/_services/members.service'
 import { REFERRAL_FRIENDS_SHOWN, REFERRAL_MONTHS_CAP, REFERRAL_STATUS_ORDER, referralLink, referralStatus, type ReferralOverview } from '@/ee/lib/billing/referral'
-import { idOf, legacyBaseDiscountCents, priceArmOfItems, stripe } from '@/ee/lib/billing/stripe'
+import { baseItemCents, idOf, intervalOfItems, stripe } from '@/ee/lib/billing/stripe'
 import { paidPlanInvoiceWorkspace } from '@/ee/services/billing.service'
 import { firstNameOf } from '@/ee/services/referral-attach.service'
 import { getAppOrigin } from '@/lib/app-origin'
 import { slugify } from '@/lib/slugify'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
-import { planPriceCents, ZERO_QUANTITIES } from '@/ee/lib/billing/plans'
+import { basePriceCents } from '@/ee/lib/billing/plans'
 import type { User } from '@supabase/supabase-js'
 import type Stripe from 'stripe'
 
@@ -74,11 +74,12 @@ export async function getReferralOverview(workspaceId: number, user: Pick<User, 
     }
 }
 
-// A month of the plan at the price the subscription was sold on, a legacy price included: a
-// subscriber on $49 gets $49 back, not the price the test offers today.
+// A month of the base plan at the price the subscription is billed, a legacy price included: a
+// subscriber still on $49 a month gets $49 back, not the list price. A yearly plan gets a month of
+// the monthly list price.
 function monthOfSubscription(subscription: Stripe.Subscription): number {
     const items = subscription.items.data
-    return Math.max(0, planPriceCents(ZERO_QUANTITIES, 'monthly', priceArmOfItems(items)) - legacyBaseDiscountCents(items))
+    return Math.max(0, intervalOfItems(items) === 'monthly' ? baseItemCents(items) : basePriceCents('monthly'))
 }
 
 // A negative line on the plan subscription's next invoice: neither a credit pack nor a template,

@@ -3,7 +3,6 @@ import { provisionUser } from '@/app/api/_services/user-provisioning.service'
 import type { HostSite } from '@/lib/brand/site'
 import { PENDING_INVITE_COOKIE } from '@/lib/auth/pending-invite'
 import { REFERRAL_COOKIE, REFERRAL_PATH } from '@/ee/lib/billing/referral'
-import { drawPriceArm } from '@rerun/cloud/billing'
 import { joinOrganization, reachesBeyondOrganization } from '@rerun/cloud/organizations.server'
 import { internalPath } from '@/lib/auth/internal-path'
 import { callerUserAgent } from '@/lib/auth/two-step/devices'
@@ -12,8 +11,7 @@ import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { requestHost, requestProtocol } from '@/lib/request-host'
 import { MOVED_PARAM } from '@/lib/brand/host-paths'
 import { routes } from '@/lib/routes'
-import { EXPERIMENT_COOKIE } from '@rerun/analytics/experiments'
-import { CONSENT_COOKIE, DESKTOP_AUTH_PATH, SESSION_HINT_COOKIE, SESSION_HINT_MAX_AGE, SESSION_HINT_VALUE, parseSessionHintCookie } from '@rerun/contracts'
+import { DESKTOP_AUTH_PATH, SESSION_HINT_COOKIE, SESSION_HINT_MAX_AGE, SESSION_HINT_VALUE, parseSessionHintCookie } from '@rerun/contracts'
 import { createServerClient } from '@supabase/ssr'
 import type { SupabaseClient, User } from '@supabase/supabase-js'
 import { LOCALE_COOKIE, resolveLocale } from '@rerun/i18n'
@@ -186,11 +184,6 @@ async function provision(request: NextRequest, supabase: SupabaseClient<Database
     if (site.kind === 'organization') return joinOrganization(user, site.organizationId, { locale })
     return provisionUser(supabase, user, {
         phoneStep: !arrivesByInvite(request),
-        priceArm: drawPriceArm({
-            experimentCookie: request.cookies.get(EXPERIMENT_COOKIE)?.value,
-            consentCookie: request.cookies.get(CONSENT_COOKIE)?.value,
-            userAgent: request.headers.get('user-agent'),
-        }),
         locale,
         referralCode: request.cookies.get(REFERRAL_COOKIE)?.value,
     })

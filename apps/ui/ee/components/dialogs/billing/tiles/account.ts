@@ -1,6 +1,6 @@
 import { MICROS_PER_CREDIT } from '@rerun/contracts'
 
-import { basePriceCents, planDiscountCents, planPriceCents, type AddonQuantities, type BillingInterval, type PriceArm } from '@/ee/lib/billing/plans'
+import { basePriceCents, planDiscountCents, planPriceCents, type AddonQuantities, type BillingInterval } from '@/ee/lib/billing/plans'
 import type { SubscriptionState } from '@/ee/services/billing.service'
 
 // The state the billing home opens on, the first that applies: what needs the user goes before what
@@ -31,13 +31,13 @@ export function planBadge(state: Pick<SubscriptionState, 'status' | 'cancelAtPer
 }
 
 // What the plan bills each interval at `quantities`, with the legacy price and the promos it keeps.
-export function planBillCents(state: Pick<SubscriptionState, 'priceArm' | 'interval' | 'monthlyDiscountCents'>, quantities: AddonQuantities, interval: BillingInterval): number {
-    return Math.max(0, planPriceCents(quantities, interval, state.priceArm) - planDiscountCents(state, interval))
+export function planBillCents(state: Pick<SubscriptionState, 'interval' | 'monthlyDiscountCents'>, quantities: AddonQuantities, interval: BillingInterval): number {
+    return Math.max(0, planPriceCents(quantities, interval) - planDiscountCents(state, interval))
 }
 
-// What a year billed yearly saves on twelve months of the base plan, at the price this workspace pays.
-export function yearlySavingsCents(arm: PriceArm): number {
-    return basePriceCents(arm, 'monthly') * 12 - basePriceCents(arm, 'yearly')
+// What a year billed yearly saves on twelve months of the base plan.
+export function yearlySavingsCents(): number {
+    return basePriceCents('monthly') * 12 - basePriceCents('yearly')
 }
 
 const DAY_MS = 86_400_000

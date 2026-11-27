@@ -1,7 +1,7 @@
 import type { Database, Json } from '@/app/api/database.types'
 import { grantRerunTopup } from '@rerun/cloud/billing.server'
 import { insertDefaultWorkspace, NO_RERUN_EMAIL } from '@/app/api/_services/default-workspace.service'
-import { SIGNUP_BUDGET_MICROS, type PriceArm } from '@rerun/cloud/billing'
+import { SIGNUP_BUDGET_MICROS } from '@rerun/cloud/billing'
 import { attachReferral } from '@/ee/services/referral-attach.service'
 import { DEFAULT_NOTIFICATION_PREFS, mergeNotificationPrefs } from '@/lib/notifications/prefs'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
@@ -21,9 +21,6 @@ import { ensureForemanAgentRow } from '@/lib/foreman/agent-row'
 // `phoneStep` says whether an account born on this request owes a verified phone number before it
 // enters the app: the web asks for one, an invitee and the mobile app do not.
 //
-// `priceArm` is the arm of the price test a workspace born on this request is frozen on, null to
-// leave it out of the test.
-//
 // `locale` is the language of the request (the visitor's cookie, else the browser): a workspace born
 // on it has its coworkers write in that language when they work on their own.
 //
@@ -35,7 +32,7 @@ import { ensureForemanAgentRow } from '@/lib/foreman/agent-row'
 export async function provisionUser(
     supabase: SupabaseClient<Database>,
     user: User,
-    { phoneStep, priceArm, locale = DEFAULT_LOCALE, ownWorkspace = 'full', referralCode }: { phoneStep: boolean; priceArm: PriceArm | null; locale?: Locale; ownWorkspace?: 'full' | 'bare'; referralCode?: string | null },
+    { phoneStep, locale = DEFAULT_LOCALE, ownWorkspace = 'full', referralCode }: { phoneStep: boolean; locale?: Locale; ownWorkspace?: 'full' | 'bare'; referralCode?: string | null },
 ): Promise<{ signedUp: boolean } | null> {
     const existingUser = await selectMaybeSingle(supabase, 'users', ['id', 'workspace_id', 'signed_up_at'] as const, { id: user.id })
 
@@ -54,7 +51,7 @@ export async function provisionUser(
 
     const serviceSupabase = createServiceRoleClient()
 
-    const { data: workspace, error: workspaceError } = await insertDefaultWorkspace(serviceSupabase, { priceArm, locale })
+    const { data: workspace, error: workspaceError } = await insertDefaultWorkspace(serviceSupabase, { locale })
 
     // Without a workspace the users row cannot satisfy its NOT NULL workspace_id, so bail out
     // and let the next request retry the whole provisioning rather than leave a half-seeded user.

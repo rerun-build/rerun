@@ -26,7 +26,7 @@ const REFEREE_WS = 20
 const REFERRER_WS = 10
 const REFERRAL = { id: 'ref_1', referrer_workspace_id: REFERRER_WS, referee_credit_cents: null, referrer_credit_cents: null }
 const invoice = { id: 'in_1', customer: 'cus_referee', amount_paid: 2900 } as Stripe.Invoice
-const subscriptionOn = (price: string, customer: string, id = `sub_${customer}`, status = 'active') => ({ id, status, customer, items: { data: [{ price: { id: price, recurring: { interval: 'month' } } }] } })
+const subscriptionOn = (price: string, customer: string, id = `sub_${customer}`, status = 'active') => ({ id, status, customer, items: { data: [{ price: { id: price, currency: 'usd', unit_amount: price === 'price_base_49' ? 4900 : 2900, recurring: { interval: 'month' } } }] } })
 
 function withDb(resolve: SupabaseResolver) {
     const fake = fakeSupabase(resolve)
@@ -49,8 +49,8 @@ const recorded = (db: ReturnType<typeof rewardDb>) => db.writes('referrals').map
 
 beforeEach(() => {
     vi.resetAllMocks()
-    vi.stubEnv('STRIPE_PRICE_BASE', 'price_base_49')
-    vi.stubEnv('STRIPE_PRICE_BASE_29', 'price_base_29')
+    vi.stubEnv('STRIPE_PRICE_BASE', 'price_base_29')
+    vi.stubEnv('STRIPE_PRICE_BASE_LEGACY', 'price_base_49')
     m.paidPlanInvoiceWorkspace.mockResolvedValue({ workspaceId: REFEREE_WS, subscription: subscriptionOn('price_base_29', 'cus_referee') })
     vi.mocked(stripe.subscriptions.retrieve).mockResolvedValue(subscriptionOn('price_base_29', 'cus_referrer', 'sub_referrer') as never)
     m.getUserById.mockResolvedValue({ data: { user: { id: 'user-referrer', email: 'clement@example.com', user_metadata: { full_name: 'Clément Janssens' }, app_metadata: {} } } })

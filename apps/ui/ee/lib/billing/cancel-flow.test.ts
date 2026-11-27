@@ -66,39 +66,41 @@ describe('retentionOfferFor', () => {
 
 describe('offerPriceCents', () => {
     it('takes the base plan down to $1 and leaves the add-ons at full price', () => {
-        expect(offerPriceCents('base_1usd', 4900, '49')).toBe(100)
-        expect(offerPriceCents('base_1usd', 6900, '49')).toBe(2100)
+        expect(offerPriceCents('base_1usd', 4900, 4900)).toBe(100)
+        expect(offerPriceCents('base_1usd', 6900, 4900)).toBe(2100)
     })
 
     it('takes a $29 base plan down to $1 too, never below', () => {
-        expect(offerPriceCents('base_1usd', 2900, '29')).toBe(100)
-        expect(offerPriceCents('base_1usd', 3900, '29')).toBe(1100)
+        expect(offerPriceCents('base_1usd', 2900, 2900)).toBe(100)
+        expect(offerPriceCents('base_1usd', 3900, 2900)).toBe(1100)
     })
 
     it('halves the whole first invoice of a trial', () => {
-        expect(offerPriceCents('trial_half', 4900, '49')).toBe(2450)
-        expect(offerPriceCents('trial_half', 2900, '29')).toBe(1450)
+        expect(offerPriceCents('trial_half', 4900, 4900)).toBe(2450)
+        expect(offerPriceCents('trial_half', 2900, 2900)).toBe(1450)
     })
 })
 
-describe('the retention coupon of each arm of the price test', () => {
-    it('keeps the id from before the test on the list price and mints another for $29', () => {
-        expect(retentionCouponId('base_1usd', '49')).toBe('rerun_retention_base_1usd')
-        expect(retentionCouponId('base_1usd', '29')).toBe('rerun_retention_base_1usd_29')
-        expect(retentionCouponId('trial_half', '29')).toBe('rerun_retention_trial_half')
+describe('the retention coupon of each base price', () => {
+    it('keeps the historic id for a workspace still on $49 and names the others after their dollars', () => {
+        expect(retentionCouponId('base_1usd', 4900)).toBe('rerun_retention_base_1usd')
+        expect(retentionCouponId('base_1usd', 2900)).toBe('rerun_retention_base_1usd_29')
+        expect(retentionCouponId('trial_half', 2900)).toBe('rerun_retention_trial_half')
     })
 
-    it('sizes the amount off on the price of the arm', () => {
-        expect(retentionCouponParams('base_1usd', '49')).toMatchObject({ amount_off: 4800 })
-        expect(retentionCouponParams('base_1usd', '29')).toMatchObject({ amount_off: 2800 })
-        expect(retentionCouponParams('trial_half', '29')).toMatchObject({ percent_off: 50 })
+    it('sizes the amount off on the base the subscription is billed', () => {
+        expect(retentionCouponParams('base_1usd', 4900)).toMatchObject({ amount_off: 4800 })
+        expect(retentionCouponParams('base_1usd', 2900)).toMatchObject({ amount_off: 2800 })
+        expect(retentionCouponParams('trial_half', 2900)).toMatchObject({ percent_off: 50 })
     })
 })
 
 describe('retentionOfferOfCoupon', () => {
-    it('recognises only the two retention coupons', () => {
+    it('recognises only the retention coupons', () => {
         expect(retentionOfferOfCoupon('rerun_retention_base_1usd')).toBe('base_1usd')
         expect(retentionOfferOfCoupon('rerun_retention_base_1usd_29')).toBe('base_1usd')
+        expect(retentionOfferOfCoupon('rerun_retention_base_1usd_39')).toBe('base_1usd')
+        expect(retentionOfferOfCoupon('rerun_retention_base_1usdx')).toBeNull()
         expect(retentionOfferOfCoupon('rerun_retention_trial_half')).toBe('trial_half')
         expect(retentionOfferOfCoupon('LAUNCH20')).toBeNull()
         expect(retentionOfferOfCoupon(null)).toBeNull()

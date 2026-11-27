@@ -4,7 +4,7 @@ import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('@/supabase/session/SessionProvider', () => ({ useSession: () => ({ workspace: null }) }))
-vi.mock('@rerun/cloud/billing.client', () => ({ BudgetExhaustedNotice: () => null, usePriceArm: () => null }))
+vi.mock('@rerun/cloud/billing.client', () => ({ BudgetExhaustedNotice: () => null }))
 vi.mock('@/supabase/client', () => ({ createClient: () => ({}) }))
 vi.mock('./useForemanMentionAgents', () => ({ useForemanMentionAgents: () => [] }))
 

@@ -110,8 +110,6 @@ export async function createWorkspaceAction(name: string, iconUrl?: string): Pro
             // No subscription behind this workspace yet, so no monthly budget either: the plan's
             // budget lands when the plan does. It starts on the signup allowance, granted below.
             rerun_budget_micros: 0,
-            // One person is quoted one price, whichever of their workspaces they stand in.
-            price_arm: current?.price_arm ?? null,
         })
         .select('id')
         .single()

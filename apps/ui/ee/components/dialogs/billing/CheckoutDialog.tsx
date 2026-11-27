@@ -17,8 +17,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess'
 import type { CheckoutRoute } from '@/ee/lib/billing/checkout-variant'
 import { isSubscriptionEntitled } from '@/ee/lib/billing/entitlement'
-import { BASE_PLAN_CREDITS, PLAN_PRICES_CENTS, TRIAL_ACTIVE_AGENTS, TRIAL_CREDITS, ZERO_QUANTITIES, planPriceCents, trialEndDate, type AddonQuantities, type BillingInterval, type PriceArm } from '@/ee/lib/billing/plans'
-import { usePriceArm } from '@/ee/lib/billing/usePriceArm'
+import { BASE_PLAN_CREDITS, PLAN_PRICES_CENTS, TRIAL_ACTIVE_AGENTS, TRIAL_CREDITS, ZERO_QUANTITIES, planPriceCents, trialEndDate, type AddonQuantities, type BillingInterval } from '@/ee/lib/billing/plans'
 import { TRIAL_ENDING_LEAD_MS } from '@/ee/lib/lifecycle/sequences'
 import { useStartPending } from '@/lib/onboarding/useStartPending'
 import { AGENT_LIMIT_TRIGGER, useBillingStore, type BillingUpgrade } from '@/stores/billing.store'
@@ -51,8 +50,8 @@ function selectionOf(interval: BillingInterval, current?: AddonQuantities): Plan
     return { quantities: current ?? ZERO_QUANTITIES, interval }
 }
 
-function billedLabel(t: BillingTranslator, interval: BillingInterval, priceArm: PriceArm): ReactNode {
-    const amount = usd(planPriceCents(ZERO_QUANTITIES, interval, priceArm))
+function billedLabel(t: BillingTranslator, interval: BillingInterval): ReactNode {
+    const amount = usd(planPriceCents(ZERO_QUANTITIES, interval))
     return t.rich(interval === 'yearly' ? 'parts.interval.perYear' : 'parts.interval.perMonth', { amount: () => amount })
 }
 
@@ -84,10 +83,6 @@ export function CheckoutDialog({
     const parkedTemplate = useOnboardingStore(s => s.pendingTemplate)
     const parked = useOnboardingStore(s => hasPendingStart(s))
     const startPending = useStartPending()
-    // A subscription keeps the price it was sold at; before there is one, the workspace's arm prices it.
-    const workspacePriceArm = usePriceArm()
-    const priceArm = state?.priceArm ?? workspacePriceArm
-
     const fixedPlan = route.variant === 'start_trial'
     const [interval, setBillingInterval] = useState<BillingInterval>(fixedPlan || workspace?.subscription_status === 'trialing' ? 'monthly' : DEFAULT_INTERVAL)
     const [done, setDone] = useState<Done | null>(null)
@@ -106,10 +101,10 @@ export function CheckoutDialog({
     const planFixed = fixedPlan || trialView
     const trialEndsAt = workspace?.trial_ends_at ? new Date(workspace.trial_ends_at) : null
     const reminderAt = trialEndsAt ? new Date(trialEndsAt.getTime() - TRIAL_ENDING_LEAD_MS) : null
-    const firstChargeCents = state?.nextInvoice?.amountCents ?? planPriceCents(state?.quantities ?? ZERO_QUANTITIES, state?.interval ?? 'monthly', priceArm)
+    const firstChargeCents = state?.nextInvoice?.amountCents ?? planPriceCents(state?.quantities ?? ZERO_QUANTITIES, state?.interval ?? 'monthly')
     const startTrialEnds = trialEndDate(new Date(openedAt))
     const context: CheckoutContext = {
-        billed: <BilledFlow cents={planPriceCents(ZERO_QUANTITIES, interval, priceArm)} interval={interval} />,
+        billed: <BilledFlow cents={planPriceCents(ZERO_QUANTITIES, interval)} interval={interval} />,
         nextInvoice: invoiceDateLabel(interval, locale),
         trialEnds: route.variant === 'start_trial' ? shortDate(startTrialEnds, locale) : trialEndsAt ? shortDate(trialEndsAt, locale) : null,
         trialDaysLeft: trialEndsAt ? Math.ceil((trialEndsAt.getTime() - openedAt) / DAY_MS) : null,
@@ -152,7 +147,7 @@ export function CheckoutDialog({
                     <PerksComparison />
                 ) : (
                     <>
-                        <PlanCard interval={planFixed ? 'monthly' : interval} priceArm={priceArm} freeTrial={planFixed} />
+                        <PlanCard interval={planFixed ? 'monthly' : interval} freeTrial={planFixed} />
                         {credit.trial && <CreditCard credit={credit} onAdd={startProNow} onOpenUsage={done ? undefined : () => setUsageOpen(true)} />}
                     </>
                 )}
@@ -174,7 +169,7 @@ export function CheckoutDialog({
                 setPlacing(false)
             }
         }
-        const success = creditLocked && done === 'paid' ? creditUnlockedCopy(t, interval, priceArm, upgrade, locale) : successCopy(t, done, { interval, priceArm, trialEnds: context.trialEnds, firstCharge: context.firstCharge, locale })
+        const success = creditLocked && done === 'paid' ? creditUnlockedCopy(t, interval, upgrade, locale) : successCopy(t, done, { interval, trialEnds: context.trialEnds, firstCharge: context.firstCharge, locale })
         return (
             <BillingDialogShell
                 title={success.title}
@@ -190,16 +185,15 @@ export function CheckoutDialog({
         if (usageOpen) return <UsagePane credit={credit} onBack={() => setUsageOpen(false)} backLabel={trialView ? t('checkout.usageBack.trial') : t('checkout.usageBack.back')} />
         switch (route.payment) {
             case 'subscribe':
-                return <SubscribePane key={route.variant} selection={selection} priceArm={priceArm} copy={copy} onDone={trialStarted => void finish(route.variant === 'paused' ? 'restoring' : trialStarted ? 'trial_started' : 'paid')} onTrialRefused={onTrialRefused} />
+                return <SubscribePane key={route.variant} selection={selection} copy={copy} onDone={trialStarted => void finish(route.variant === 'paused' ? 'restoring' : trialStarted ? 'trial_started' : 'paid')} onTrialRefused={onTrialRefused} />
             case 'card_form':
-                return <CardFormPane selection={selection} priceArm={priceArm} copy={copy} trialEnds={context.trialEnds} onDone={outcome => void finish(outcome)} />
+                return <CardFormPane selection={selection} copy={copy} trialEnds={context.trialEnds} onDone={outcome => void finish(outcome)} />
             case 'card_on_file':
-                if (newCard) return <CardFormPane selection={selection} priceArm={priceArm} copy={copy} trialEnds={context.trialEnds} onDone={outcome => void finish(outcome)} />
+                if (newCard) return <CardFormPane selection={selection} copy={copy} trialEnds={context.trialEnds} onDone={outcome => void finish(outcome)} />
                 if (trialView) return <TrialPane state={state} copy={copy} trialEnds={context.trialEnds} reminderOn={context.reminderOn} firstCharge={context.firstCharge} onContinue={onClose} onCancelTrial={onCancelTrial} onPayNow={() => setPayNow(true)} onResumed={onChanged} />
                 return (
                     <CardOnFilePane
                         selection={selection}
-                        priceArm={priceArm}
                         state={state}
                         copy={copy}
                         trialEnds={context.trialEnds}
@@ -216,10 +210,10 @@ export function CheckoutDialog({
     return <BillingDialogShell title={copy.title} mobileOrder={planFixed ? 'payment-first' : 'plan-first'} intro={intro} left={left} right={right} />
 }
 
-function successCopy(t: BillingTranslator, done: Done, { interval, priceArm, trialEnds, firstCharge, locale }: { interval: BillingInterval; priceArm: PriceArm; trialEnds: string | null; firstCharge: string; locale: string }) {
+function successCopy(t: BillingTranslator, done: Done, { interval, trialEnds, firstCharge, locale }: { interval: BillingInterval; trialEnds: string | null; firstCharge: string; locale: string }) {
     const next = (
         <>
-            {invoiceDateLabel(interval, locale)} · {billedLabel(t, interval, priceArm)}
+            {invoiceDateLabel(interval, locale)} · {billedLabel(t, interval)}
         </>
     )
     const planRow = { label: t('checkout.success.plan'), value: t('checkout.success.planValue') }
@@ -243,7 +237,7 @@ function successCopy(t: BillingTranslator, done: Done, { interval, priceArm, tri
 }
 
 // Paying from a chat that ran out of trial credit: what came with Pro, and the way back to the task.
-function creditUnlockedCopy(t: BillingTranslator, interval: BillingInterval, priceArm: PriceArm, upgrade: BillingUpgrade | null, locale: string) {
+function creditUnlockedCopy(t: BillingTranslator, interval: BillingInterval, upgrade: BillingUpgrade | null, locale: string) {
     return {
         title: t('checkout.success.paid.title'),
         body: upgrade?.coworker ? t('checkout.success.creditUnlocked.body', { coworker: upgrade.coworker }) : t('checkout.success.creditUnlocked.bodyNoCoworker'),
@@ -254,7 +248,7 @@ function creditUnlockedCopy(t: BillingTranslator, interval: BillingInterval, pri
                 label: t('checkout.success.nextInvoice'),
                 value: (
                     <>
-                        {invoiceDateLabel(interval, locale)} · {billedLabel(t, interval, priceArm)}
+                        {invoiceDateLabel(interval, locale)} · {billedLabel(t, interval)}
                     </>
                 ),
             },
@@ -267,7 +261,7 @@ type SessionState = { clientSecret: string; sessionId: string } | { error: strin
 
 // --- A trial without a card: the card form, then paying now or at the end of the trial ---
 
-function CardFormPane({ selection, priceArm, copy, trialEnds, onDone }: { selection: PlanSelection; priceArm: PriceArm; copy: PaneCopy; trialEnds: string | null; onDone: (outcome: 'paid' | 'card_saved') => void }) {
+function CardFormPane({ selection, copy, trialEnds, onDone }: { selection: PlanSelection; copy: PaneCopy; trialEnds: string | null; onDone: (outcome: 'paid' | 'card_saved') => void }) {
     const [session, setSession] = useState<SessionState>(null)
     const errorText = useErrorText()
 
@@ -287,12 +281,12 @@ function CardFormPane({ selection, priceArm, copy, trialEnds, onDone }: { select
 
     return (
         <StripeCheckoutProvider clientSecret={session.clientSecret}>
-            <CardForm sessionId={session.sessionId} selection={selection} priceArm={priceArm} copy={copy} trialEnds={trialEnds} onDone={onDone} />
+            <CardForm sessionId={session.sessionId} selection={selection} copy={copy} trialEnds={trialEnds} onDone={onDone} />
         </StripeCheckoutProvider>
     )
 }
 
-function CardForm({ sessionId, selection, priceArm, copy, trialEnds, onDone }: { sessionId: string; selection: PlanSelection; priceArm: PriceArm; copy: PaneCopy; trialEnds: string | null; onDone: (outcome: 'paid' | 'card_saved') => void }) {
+function CardForm({ sessionId, selection, copy, trialEnds, onDone }: { sessionId: string; selection: PlanSelection; copy: PaneCopy; trialEnds: string | null; onDone: (outcome: 'paid' | 'card_saved') => void }) {
     const t = useTranslations('billing')
     const errorText = useErrorText()
     const checkout = useCheckout()
@@ -325,7 +319,7 @@ function CardForm({ sessionId, selection, priceArm, copy, trialEnds, onDone }: {
 
     return (
         <>
-            <PayHeader title={t('checkout.pay.subscribe')} amount={<UsdFlow cents={planPriceCents(selection.quantities, interval, priceArm)} />} unit={interval === 'yearly' ? t('checkout.pay.perYear') : t('checkout.pay.perMonth')} />
+            <PayHeader title={t('checkout.pay.subscribe')} amount={<UsdFlow cents={planPriceCents(selection.quantities, interval)} />} unit={interval === 'yearly' ? t('checkout.pay.perYear') : t('checkout.pay.perMonth')} />
             <p className="mt-2 text-sm text-muted-foreground">{t('checkout.card.exclVat')}</p>
             <div className="mt-6">
                 <StripePaymentFields wallet={{ onConfirm: event => void save('now', event), disabledReason: !accepted ? t('checkout.pay.acceptTerms') : submitting ? t('checkout.pay.pleaseWait') : undefined }} />
@@ -355,7 +349,6 @@ function CardForm({ sessionId, selection, priceArm, copy, trialEnds, onDone }: {
 
 function CardOnFilePane({
     selection,
-    priceArm,
     state,
     copy,
     trialEnds,
@@ -366,7 +359,6 @@ function CardOnFilePane({
     onResumed,
 }: {
     selection: PlanSelection
-    priceArm: PriceArm
     state: SubscriptionState | null
     copy: PaneCopy
     trialEnds: string | null
@@ -394,7 +386,7 @@ function CardOnFilePane({
         onDone()
     }
 
-    const listCents = planPriceCents(selection.quantities, interval, priceArm)
+    const listCents = planPriceCents(selection.quantities, interval)
     const dueToday = quote === 'loading' ? null : usd(quote?.dueTodayCents ?? listCents)
     const amount = dueToday ?? <Skeleton className="inline-block h-7 w-24 align-middle" />
 

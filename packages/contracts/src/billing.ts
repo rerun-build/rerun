@@ -63,36 +63,12 @@ export type AddonKey = (typeof ADDON_KEYS)[number]
 // Every price, per billing interval. An app slot carries no yearly discount: each one is an account
 // Rerun pays for by the month.
 export const PLAN_PRICES_CENTS: Record<BillingInterval, Record<'base' | AddonKey, number>> = {
-    monthly: { base: 4900, linkedin_slot: 900, whatsapp_slot: 900 },
-    yearly: { base: 46800, linkedin_slot: 10800, whatsapp_slot: 10800 },
+    monthly: { base: 2900, linkedin_slot: 900, whatsapp_slot: 900 },
+    yearly: { base: 27600, linkedin_slot: 10800, whatsapp_slot: 10800 },
 }
 
-// The base plan is sold at two prices while the price test runs: a workspace is drawn into an arm
-// when it is created and keeps it. The arm is named after its monthly price in dollars, and that
-// name is what travels in the experiment cookie and sits in `workspaces.price_arm`.
-export const PRICE_ARMS = ['49', '29'] as const
-
-export type PriceArm = (typeof PRICE_ARMS)[number]
-
-// The arm of the original Stripe prices: the env names without a suffix, the retention coupons
-// without one, and what a legacy base price reads as. Not a price anyone is quoted any more.
-export const LIST_PRICE_ARM: PriceArm = '49'
-
-// The price of everyone the test never drew: the workspaces from before it, a crawler, a visitor
-// who refused the cookie, a workspace provisioned from the mobile app.
-export const DEFAULT_PRICE_ARM: PriceArm = '29'
-
-export const BASE_PRICE_CENTS: Record<PriceArm, Record<BillingInterval, number>> = {
-    '49': { monthly: PLAN_PRICES_CENTS.monthly.base, yearly: PLAN_PRICES_CENTS.yearly.base },
-    '29': { monthly: 2900, yearly: 27600 },
-}
-
-export function parsePriceArm(raw: string | null | undefined): PriceArm {
-    return PRICE_ARMS.find(arm => arm === raw) ?? DEFAULT_PRICE_ARM
-}
-
-export function basePriceCents(arm: PriceArm = LIST_PRICE_ARM, interval: BillingInterval = 'monthly'): number {
-    return BASE_PRICE_CENTS[arm][interval]
+export function basePriceCents(interval: BillingInterval = 'monthly'): number {
+    return PLAN_PRICES_CENTS[interval].base
 }
 
 // The plan runs as many coworkers as the workspace builds: there is no agent count to sell.
@@ -126,9 +102,9 @@ export type AddonQuantities = Record<AddonKey, number>
 export const ZERO_QUANTITIES: AddonQuantities = { linkedin_slot: 0, whatsapp_slot: 0 }
 
 // What one invoice of the interval bills, before tax and discounts.
-export function planPriceCents(quantities: AddonQuantities, interval: BillingInterval, arm: PriceArm = LIST_PRICE_ARM): number {
+export function planPriceCents(quantities: AddonQuantities, interval: BillingInterval): number {
     const prices = PLAN_PRICES_CENTS[interval]
-    return basePriceCents(arm, interval) + ADDON_KEYS.reduce((sum, key) => sum + quantities[key] * prices[key], 0)
+    return basePriceCents(interval) + ADDON_KEYS.reduce((sum, key) => sum + quantities[key] * prices[key], 0)
 }
 
 export function monthlyTotalCents(quantities: AddonQuantities): number {
@@ -136,14 +112,13 @@ export function monthlyTotalCents(quantities: AddonQuantities): number {
 }
 
 // The same plan brought back to one month, for "$39/mo, billed yearly" and for MRR.
-export function perMonthCents(quantities: AddonQuantities, interval: BillingInterval, arm: PriceArm = LIST_PRICE_ARM): number {
-    const total = planPriceCents(quantities, interval, arm)
+export function perMonthCents(quantities: AddonQuantities, interval: BillingInterval): number {
+    const total = planPriceCents(quantities, interval)
     return interval === 'yearly' ? Math.round(total / 12) : total
 }
 
-// The yearly saving on the base plan, as a whole percentage, for the interval toggle. Read off the
-// list price for both arms of the price test, so the toggle promises the same figure to everyone:
-// $276 a year on $29 a month is a shade over it.
+// The yearly saving on the base plan, as a whole percentage, for the interval toggle. Rounded down:
+// $276 a year on $29 a month is a shade over 20 %, and the toggle never promises more than it gives.
 export function yearlyDiscountPercent(): number {
-    return Math.round((1 - PLAN_PRICES_CENTS.yearly.base / (12 * PLAN_PRICES_CENTS.monthly.base)) * 100)
+    return Math.floor((1 - PLAN_PRICES_CENTS.yearly.base / (12 * PLAN_PRICES_CENTS.monthly.base)) * 100)
 }

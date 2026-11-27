@@ -6,7 +6,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { selectWorkspaceMembers } from '@/app/api/_auth/workspace-members'
 import type { Database } from '@/app/api/database.types'
-import { PLAN_CURRENCY, basePriceCents, parsePriceArm } from '@/ee/lib/billing/plans'
+import { PLAN_CURRENCY, basePriceCents } from '@/ee/lib/billing/plans'
 import { BANNER_WARM_INLINE_MS, emailBoardBanner } from '@/lib/email/board-banner'
 import { brandAppUrl } from '@/lib/brand/urls'
 import { workspaceBrand } from '@/lib/brand/workspace'
@@ -32,7 +32,7 @@ const SEQUENCE_KEY = 'trial_started' as const
  */
 export async function sendTrialStartedReceipt(supabase: SupabaseClient<Database>, workspaceId: number, trialEndsAt: string, trialDays: number, hasCard: boolean): Promise<void> {
     try {
-        const { data: workspace } = await selectSingle(supabase, 'workspaces', ['id', 'name', 'is_sandbox', 'price_arm', 'organization_id'] as const, { id: workspaceId })
+        const { data: workspace } = await selectSingle(supabase, 'workspaces', ['id', 'name', 'is_sandbox', 'organization_id'] as const, { id: workspaceId })
         if (!workspace || workspace.is_sandbox || isManagedWorkspace(workspace)) return
 
         const { data: members } = await selectWorkspaceMembers(supabase, ['user_id'] as const, { workspace_id: workspaceId })
@@ -59,9 +59,9 @@ export async function sendTrialStartedReceipt(supabase: SupabaseClient<Database>
                 workspaceName: workspace.name,
                 trialDays,
                 trialEndsLabel: emailDateLabel(new Date(trialEndsAt), locale),
-                // The price this workspace is sold the plan at, before any promotion code entered at
-                // Checkout: it lowers the first charge, and overstating is the safe direction for a receipt.
-                monthlyPriceLabel: formatAmount(basePriceCents(parsePriceArm(workspace.price_arm)), PLAN_CURRENCY),
+                // The list price, before any promotion code entered at Checkout: it lowers the first
+                // charge, and overstating is the safe direction for a receipt.
+                monthlyPriceLabel: formatAmount(basePriceCents(), PLAN_CURRENCY),
                 includedLabel: emailTranslator(locale, brand.name)('trialStarted.included', { coworkers: TRIAL_ACTIVE_AGENTS, credits: TRIAL_CREDITS }),
                 hasCard,
                 workspaceUrl: appUrl,

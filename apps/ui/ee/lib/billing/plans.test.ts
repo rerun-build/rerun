@@ -11,7 +11,6 @@ import {
     lifetimeLimitsToColumns,
     lifetimeTier,
     lifetimeTierToColumns,
-    parsePriceArm,
     perMonthCents,
     planDiscountCents,
     planPriceCents,
@@ -27,43 +26,25 @@ describe('baseLimitsToColumns', () => {
 
 describe('plan prices', () => {
     it('bills the base plus every add-on, monthly or yearly', () => {
-        expect(planPriceCents({ linkedin_slot: 2, whatsapp_slot: 1 }, 'monthly')).toBe(4900 + 2 * 900 + 900)
-        expect(planPriceCents({ linkedin_slot: 2, whatsapp_slot: 1 }, 'yearly')).toBe(46800 + 2 * 10800 + 10800)
+        expect(planPriceCents({ linkedin_slot: 2, whatsapp_slot: 1 }, 'monthly')).toBe(2900 + 2 * 900 + 900)
+        expect(planPriceCents({ linkedin_slot: 2, whatsapp_slot: 1 }, 'yearly')).toBe(27600 + 2 * 10800 + 10800)
     })
 
     it('brings a yearly plan back to one month', () => {
-        expect(perMonthCents({ linkedin_slot: 0, whatsapp_slot: 0 }, 'yearly')).toBe(3900)
-        expect(perMonthCents({ linkedin_slot: 1, whatsapp_slot: 0 }, 'monthly')).toBe(5800)
+        expect(perMonthCents({ linkedin_slot: 0, whatsapp_slot: 0 }, 'yearly')).toBe(2300)
+        expect(perMonthCents({ linkedin_slot: 1, whatsapp_slot: 0 }, 'monthly')).toBe(3800)
     })
 
-    it('rounds the yearly saving to a whole percentage', () => {
+    it('rounds the yearly saving down to a whole percentage, never promising more than it gives', () => {
         expect(yearlyDiscountPercent()).toBe(20)
     })
 })
 
-describe('the arms of the price test', () => {
-    it('prices the base plan per arm and leaves the add-ons alone', () => {
-        expect(basePriceCents('49')).toBe(4900)
-        expect(basePriceCents('29')).toBe(2900)
-        expect(planPriceCents({ linkedin_slot: 1, whatsapp_slot: 0 }, 'monthly', '29')).toBe(2900 + 900)
-        expect(planPriceCents({ linkedin_slot: 1, whatsapp_slot: 0 }, 'yearly', '29')).toBe(27600 + 10800)
-    })
-
-    it('brings the yearly plan of the $29 arm back to $23 a month', () => {
-        expect(basePriceCents('29', 'yearly')).toBe(27600)
-        expect(perMonthCents({ linkedin_slot: 0, whatsapp_slot: 0 }, 'yearly', '29')).toBe(2300)
-    })
-
-    it('prices at the list price whoever passes no arm', () => {
-        expect(planPriceCents({ linkedin_slot: 0, whatsapp_slot: 0 }, 'monthly')).toBe(4900)
-    })
-
-    it('reads a missing or unknown arm as the default price, not the list price', () => {
-        expect(parsePriceArm('29')).toBe('29')
-        expect(parsePriceArm('49')).toBe('49')
-        expect(parsePriceArm(null)).toBe('29')
-        expect(parsePriceArm('39')).toBe('29')
-        expect(basePriceCents(parsePriceArm(null))).toBe(2900)
+describe('the base price', () => {
+    it('is $29 a month or $276 a year', () => {
+        expect(basePriceCents()).toBe(2900)
+        expect(basePriceCents('monthly')).toBe(2900)
+        expect(basePriceCents('yearly')).toBe(27600)
     })
 })
 
@@ -144,7 +125,7 @@ describe('planDiscountCents', () => {
 
     it('keeps a legacy base price or a permanent promo on the same interval', () => {
         expect(planDiscountCents(legacy, 'monthly')).toBe(2500)
-        expect(planPriceCents({ linkedin_slot: 1, whatsapp_slot: 0 }, 'monthly') - planDiscountCents(legacy, 'monthly')).toBe(3300)
+        expect(planPriceCents({ linkedin_slot: 1, whatsapp_slot: 0 }, 'monthly') - planDiscountCents(legacy, 'monthly')).toBe(1300)
     })
 
     it('promises nothing past a change of interval', () => {

@@ -17,7 +17,7 @@ vi.mock('@/components/chat/ProviderErrorNotice', () => ({
 }))
 vi.mock('next-intl', () => ({ useTranslations: () => (key: string) => key, useLocale: () => 'en' }))
 vi.mock('@/supabase/session/SessionProvider', () => ({ useSession: () => ({ workspace: null }) }))
-vi.mock('@rerun/cloud/billing.client', () => ({ BudgetExhaustedNotice: () => null, usePriceArm: () => null }))
+vi.mock('@rerun/cloud/billing.client', () => ({ BudgetExhaustedNotice: () => null }))
 vi.mock('@/supabase/client', () => ({ createClient: () => ({}) }))
 vi.mock('./useForemanMentionAgents', () => ({ useForemanMentionAgents: () => [] }))
 

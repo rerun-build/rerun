@@ -17,15 +17,11 @@ export {
     ADDON_KEYS,
     BASE_PLAN,
     BASE_PLAN_CREDITS,
-    BASE_PRICE_CENTS,
     BILLING_INTERVALS,
     CREDITS_PER_PACK,
     CREDIT_USD_PER_PACK,
-    DEFAULT_PRICE_ARM,
-    LIST_PRICE_ARM,
     PLAN_CURRENCY,
     PLAN_PRICES_CENTS,
-    PRICE_ARMS,
     TRIAL_ACTIVE_AGENTS,
     TRIAL_CREDITS,
     TRIAL_CREDIT_USD,
@@ -38,7 +34,6 @@ export {
     basePriceCents,
     cardlessTrialLine,
     monthlyTotalCents,
-    parsePriceArm,
     perMonthCents,
     planPriceCents,
     trialChargeLine,
@@ -48,7 +43,6 @@ export {
     type AddonKey,
     type AddonQuantities,
     type BillingInterval,
-    type PriceArm,
 } from '@rerun/contracts'
 
 export const BASE_PLAN_SLUG = 'base'
@@ -191,7 +185,7 @@ export type PlanDiscounts = { interval: BillingInterval; monthlyDiscountCents: n
 
 // What still comes off each invoice once the plan is billed `interval`. A change of add-ons keeps
 // the legacy base price and the subscription's promo. A change of interval moves the base item onto
-// the price of its arm, so nothing is promised past it.
+// the list price, so nothing is promised past it.
 export function planDiscountCents(discounts: PlanDiscounts, interval: BillingInterval): number {
     if (interval !== discounts.interval) return 0
     return discounts.monthlyDiscountCents

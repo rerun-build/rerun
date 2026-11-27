@@ -2,7 +2,7 @@
 // read the same answers. Server-safe: no Stripe client, no React.
 import { RENEWAL_REMINDER_LEAD_MS, TRIAL_ENDING_LEAD_MS } from '@/ee/lib/lifecycle/sequences'
 import { z } from 'zod'
-import { LIST_PRICE_ARM, PLAN_CURRENCY, PRICE_ARMS, basePriceCents, type PriceArm } from './plans'
+import { PLAN_CURRENCY } from './plans'
 
 // Stripe's `cancellation_details.feedback` values, minus `customer_service`: there is no support
 // interaction in the product for it to be about.
@@ -49,21 +49,25 @@ const BASE_OFFER_PRICE_CENTS = 100
 const BASE_OFFER_COUPON_ID = 'rerun_retention_base_1usd'
 const TRIAL_OFFER_COUPON_ID = 'rerun_retention_trial_half'
 
+// The $49 base kept the id the coupon was first minted under, before the price test.
+const HISTORIC_BASE_OFFER_CENTS = 4900
+
 // Fixed ids so the coupon is created once and found again by id, never minted twice. The $1 offer
-// is an amount off, so each arm of the price test has its own: the one sized for $49 would take
-// more than the whole base plan off a $29 one. The list arm keeps the id it had before the test.
-export function retentionCouponId(kind: RetentionOfferKind, arm: PriceArm): string {
+// is an amount off the base the subscription is billed, so each base price has its own coupon, named
+// after its dollars: the one sized for a workspace still on $49 would take more than the whole base
+// plan off a $29 one.
+export function retentionCouponId(kind: RetentionOfferKind, baseCents: number): string {
     if (kind === 'trial_half') return TRIAL_OFFER_COUPON_ID
-    return arm === LIST_PRICE_ARM ? BASE_OFFER_COUPON_ID : `${BASE_OFFER_COUPON_ID}_${arm}`
+    return baseCents === HISTORIC_BASE_OFFER_CENTS ? BASE_OFFER_COUPON_ID : `${BASE_OFFER_COUPON_ID}_${Math.round(baseCents / 100)}`
 }
 
-function baseOfferAmountOff(arm: PriceArm): number {
-    return basePriceCents(arm) - BASE_OFFER_PRICE_CENTS
+function baseOfferAmountOff(baseCents: number): number {
+    return Math.max(0, baseCents - BASE_OFFER_PRICE_CENTS)
 }
 
-export function retentionCouponParams(kind: RetentionOfferKind, arm: PriceArm) {
+export function retentionCouponParams(kind: RetentionOfferKind, baseCents: number) {
     if (kind === 'trial_half') return { percent_off: 50, duration: 'once', name: '50% off your first month' } as const
-    return { amount_off: baseOfferAmountOff(arm), currency: PLAN_CURRENCY, duration: 'once', name: 'Next month for $1' } as const
+    return { amount_off: baseOfferAmountOff(baseCents), currency: PLAN_CURRENCY, duration: 'once', name: 'Next month for $1' } as const
 }
 
 export function cancelFlowPhase(status: string | null | undefined, hasPaymentMethod: boolean): CancelPhase | null {
@@ -97,15 +101,15 @@ export function retentionOfferFor(phase: CancelPhase, subscription: { metadata: 
 }
 
 export function retentionOfferOfCoupon(couponId: string | null | undefined): RetentionOfferKind | null {
-    if (PRICE_ARMS.some(arm => couponId === retentionCouponId('base_1usd', arm))) return 'base_1usd'
+    if (couponId === BASE_OFFER_COUPON_ID || couponId?.startsWith(`${BASE_OFFER_COUPON_ID}_`)) return 'base_1usd'
     if (couponId === TRIAL_OFFER_COUPON_ID) return 'trial_half'
     return null
 }
 
 // What the next invoice comes to under the offer, before tax. The $1 covers the base plan only:
 // add-ons keep their price.
-export function offerPriceCents(kind: RetentionOfferKind, monthlyCents: number, arm: PriceArm): number {
-    if (kind === 'base_1usd') return monthlyCents - baseOfferAmountOff(arm)
+export function offerPriceCents(kind: RetentionOfferKind, monthlyCents: number, baseCents: number): number {
+    if (kind === 'base_1usd') return monthlyCents - baseOfferAmountOff(baseCents)
     return Math.round(monthlyCents / 2)
 }
 

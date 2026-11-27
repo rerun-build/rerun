@@ -15,7 +15,6 @@ function stateWith(intent: ArrivingIntent | null): ForemanState {
         entitled: false,
         trialSpent: false,
         trialNeedsCard: true,
-        priceArm: '49',
         client: 'web',
         workspaceName: 'Retalk',
         workspacePlan: 'none',

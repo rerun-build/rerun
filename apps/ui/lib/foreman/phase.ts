@@ -1,7 +1,6 @@
 import { FOREMAN_PHASES, RERUN_BRAND, isMobileClient, type Brand, type ForemanClient, type ForemanPhase, type TemplatePricing } from '@rerun/contracts'
 
 import type { OnboardingAnswers } from '@/app/actions/onboarding'
-import type { PriceArm } from '@rerun/cloud/billing'
 import { RERUN_CLOUD } from '@rerun/cloud/edition'
 import type { ForemanAgentRow, ForemanSpaceRow } from './board-map'
 import type { KickoffIntent } from './kickoff-marker'
@@ -203,8 +202,6 @@ export type ForemanState = {
     trialSpent: boolean
     // The card arm of the trial test: the trial is still free, but it starts through the card form.
     trialNeedsCard: boolean
-    // The price the workspace is sold the base plan at, which the trial phase quotes.
-    priceArm: PriceArm
     client: ForemanClient
     workspaceName: string
     workspacePlan: string

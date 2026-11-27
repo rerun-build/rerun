@@ -25,7 +25,6 @@ function stateWith(patch: Partial<ForemanState>): ForemanState {
         entitled: true,
         trialSpent: false,
         trialNeedsCard: true,
-        priceArm: '49',
         client: 'web',
         workspaceName: "Nico's workspace",
         workspacePlan: 'base',
@@ -165,7 +164,7 @@ describe('foremanSystemPrompt in the app', () => {
     })
 
     it.skipIf(!BILLING_ENABLED)('still quotes the price on the web', () => {
-        expect(foremanSystemPrompt(stateWith({ phase: 'trial', entitled: false, client: 'web' }))).toMatch(/\$49 a month/)
+        expect(foremanSystemPrompt(stateWith({ phase: 'trial', entitled: false, client: 'web' }))).toMatch(/\$29 a month/)
         expect(foremanSystemPrompt(stateWith({ phase: 'trial', entitled: false, client: 'web' }))).not.toContain('mobile app')
     })
 })

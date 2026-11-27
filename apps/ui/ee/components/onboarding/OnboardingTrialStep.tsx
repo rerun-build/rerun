@@ -17,7 +17,6 @@ import { SubscribePane, type SubscribeSubmit } from '@/ee/components/dialogs/bil
 import { checkoutRouteFor, trialOffer } from '@/ee/lib/billing/checkout-variant'
 import { isSubscriptionEntitled } from '@/ee/lib/billing/entitlement'
 import { BASE_PLAN_SLUG, ZERO_QUANTITIES, planPriceCents, trialEndDate } from '@/ee/lib/billing/plans'
-import { usePriceArm } from '@/ee/lib/billing/usePriceArm'
 import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess'
 import { ArrowLeftIcon, CheckIcon, LockIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
@@ -37,7 +36,6 @@ export function OnboardingTrialStep({ onBack, waitlisted }: { onBack: () => void
     const { workspace, refreshWorkspace } = useSession()
     const { access, keptUntil } = useWorkspaceAccess()
     const parked = useOnboardingStore(s => hasPendingStart(s))
-    const priceArm = usePriceArm()
     const [view, setView] = useState<View>('offer')
     const [refused, setRefused] = useState(false)
     const [started, setStarted] = useState(false)
@@ -60,7 +58,7 @@ export function OnboardingTrialStep({ onBack, waitlisted }: { onBack: () => void
     if (!entitled && current !== kept) setKept(current)
     const variant = entitled ? kept : current
     const trial = variant === 'start_trial'
-    const listCents = planPriceCents(ZERO_QUANTITIES, 'monthly', priceArm)
+    const listCents = planPriceCents(ZERO_QUANTITIES, 'monthly')
     const context: CheckoutContext = {
         billed: <BilledFlow cents={listCents} interval="monthly" />,
         nextInvoice: shortDate(nextInvoiceDate('monthly', openedAt), locale),
@@ -92,7 +90,7 @@ export function OnboardingTrialStep({ onBack, waitlisted }: { onBack: () => void
             {view === 'offer' ? (
                 <div className="flex flex-col gap-5">
                     <TrialTimeline steps={copy.timeline} />
-                    <PlanCard interval="monthly" priceArm={priceArm} freeTrial={trial} compact />
+                    <PlanCard interval="monthly" freeTrial={trial} compact />
                     <PinnedActions>
                         <div className="flex gap-2">
                             <BackButton onClick={onBack} />
@@ -107,7 +105,6 @@ export function OnboardingTrialStep({ onBack, waitlisted }: { onBack: () => void
                     <SubscribePane
                         key={variant}
                         selection={{ quantities: ZERO_QUANTITIES, interval: 'monthly' }}
-                        priceArm={priceArm}
                         copy={copy}
                         onDone={() => {
                             setStarted(true)

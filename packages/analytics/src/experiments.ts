@@ -18,12 +18,9 @@ export const EXPERIMENT_COOKIE_MAX_AGE = 90 * 24 * 60 * 60
 // valide chaque paire contre cette liste, donc la paire `hero7` ou `hero_visual` des visiteurs
 // enrôlés quand ces tests tournaient encore est simplement ignorée.
 //
-// `price1` est le prix du plan de base, en dollars par mois. Ses valeurs sont les `PRICE_ARMS` de
-// `@rerun/contracts`, recopiées ici parce que ce fichier n'importe rien. Les robots et les visiteurs
-// non enrôlés voient `DEFAULT_PRICE_ARM`, pas la première valeur.
-export const EXPERIMENT_VALUES = {
-    price1: ['49', '29'],
-} as const
+// `price1` a tranché le 27 novembre 2026 : tout le monde est à 29 $. Aucun test ne tourne, la liste
+// reste pour le prochain. Un cookie `price1:…` encore posé est ignoré par `parseExperimentCookie`.
+export const EXPERIMENT_VALUES = {} as const satisfies Record<string, readonly string[]>
 
 export type ExperimentKey = keyof typeof EXPERIMENT_VALUES
 
@@ -31,18 +28,13 @@ export type ExperimentValue<K extends ExperimentKey> = (typeof EXPERIMENT_VALUES
 
 export type ExperimentVariants = { [K in ExperimentKey]?: ExperimentValue<K> }
 
-export type PriceVariant = ExperimentValue<'price1'>
-
 // Dérivé plutôt que déclaré : la liste ne peut pas diverger de celle des valeurs. L'ordre est celui
 // de la déclaration ci-dessus, et c'est lui qui fixe l'ordre des paires dans le cookie.
-export const EXPERIMENT_KEYS = Object.keys(EXPERIMENT_VALUES) as readonly ExperimentKey[]
+export const EXPERIMENT_KEYS: readonly ExperimentKey[] = Object.keys(EXPERIMENT_VALUES).filter((key): key is ExperimentKey => key in EXPERIMENT_VALUES)
 
 // Une clé absente se tire à parts égales. Un poids de 0 retire un bras du tirage sans le retirer des
-// valeurs : `price1:49` reste un cookie valide, celui d'un workspace figé à 49 $, mais un visiteur
-// sans workspace qui le porte encore est re-tiré.
-export const EXPERIMENT_WEIGHTS: { [K in ExperimentKey]?: Record<ExperimentValue<K>, number> } = {
-    price1: { '49': 0, '29': 1 },
-}
+// valeurs : le cookie qui le porte reste valide, mais un visiteur qui le porte encore est re-tiré.
+export const EXPERIMENT_WEIGHTS: { [K in ExperimentKey]?: Record<ExperimentValue<K>, number> } = {}
 
 function pick<T>(values: readonly T[]): T {
     return values[Math.floor(Math.random() * values.length)]
@@ -124,6 +116,7 @@ export const STALE_EXPERIMENT_PROPERTIES = [
     'ab_hero_composer',
     'ab_hero_visual',
     'ab_hero_band',
+    'ab_price1',
 ]
 
 export function readExperimentCookie(): ExperimentVariants {

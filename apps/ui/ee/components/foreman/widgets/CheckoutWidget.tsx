@@ -10,7 +10,6 @@ import { startTrialAction } from '@/ee/actions/billing.actions'
 import { Button } from '@/components/ui/button'
 import { isSubscriptionEntitled } from '@/ee/lib/billing/entitlement'
 import { BASE_PLAN_SLUG } from '@/ee/lib/billing/plans'
-import { usePriceArm } from '@/ee/lib/billing/usePriceArm'
 import { trialOffer } from '@/ee/lib/billing/checkout-variant'
 import { CircleCheckIcon, ClockIcon, CreditCardIcon, XCircleIcon } from '@/lib/icons'
 import { useBillingStore } from '@/stores/billing.store'
@@ -102,7 +101,6 @@ export function CheckoutWidget({ output, onDone }: CheckoutWidgetProps) {
     // Copy and route only: startCardlessTrial re-reads the workspace and the arm.
     const offer = trialOffer(workspace)
     const cardless = offer === 'cardless'
-    const priceArm = usePriceArm()
     const arrival = useForemanStore(state => state.arrival)
     const tPrice = useTranslations('templates.price')
     const locale = useLocale()
@@ -166,5 +164,5 @@ export function CheckoutWidget({ output, onDone }: CheckoutWidgetProps) {
 
     // No way to turn it down: nothing can be built without a plan. Closing the card form lands back
     // here with the button still live.
-    return <TrialOfferCard offer={offer} priceArm={priceArm} submitting={submitting || (stage === 'checkout' && billingOpen)} error={trialError} onStart={cardless ? startTrial : openCheckout} subject={arrival?.coworker ?? arrival?.title} thenPay={arrival?.paid ? priceLabel(arrival.paid, tPrice, locale) : undefined} />
+    return <TrialOfferCard offer={offer} submitting={submitting || (stage === 'checkout' && billingOpen)} error={trialError} onStart={cardless ? startTrial : openCheckout} subject={arrival?.coworker ?? arrival?.title} thenPay={arrival?.paid ? priceLabel(arrival.paid, tPrice, locale) : undefined} />
 }

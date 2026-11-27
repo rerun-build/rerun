@@ -11,7 +11,7 @@ import { ThreadBranch } from '@/components/agent/sheet/ThreadBranch'
 import { Conversation, ConversationContent, ConversationScrollButton, type ConversationHandle } from '@/components/ai-elements/conversation'
 import { Message, MessageContent } from '@/components/ai-elements/message'
 import { mentionTokensOf } from '@/components/chat/MentionAutocomplete'
-import { BudgetExhaustedNotice, usePriceArm } from '@rerun/cloud/billing.client'
+import { BudgetExhaustedNotice } from '@rerun/cloud/billing.client'
 import { useWorkspaceManager } from '@/components/brand/useWorkspaceManager'
 import { ChatActivityLoader } from '@/components/chat/ChatActivityLoader'
 import { ChatScreen } from '@/components/chat/ChatScreen'
@@ -122,7 +122,6 @@ export function ForemanChatLayer({ messages, streaming, runHeld = false, guided,
     const foremanName = useForemanName()
     const tHitlCue = useTranslations('chat.hitlCue')
     const { workspace } = useSession()
-    const priceArm = usePriceArm()
     const entitled = isSubscriptionEntitled(workspace?.subscription_status)
     const manager = useWorkspaceManager()
     // `Conversation` possède son conteneur de défilement : on le récupère par son contexte, une
@@ -201,7 +200,7 @@ export function ForemanChatLayer({ messages, streaming, runHeld = false, guided,
                 <MessageContent>
                     {/* Pas de cellule « abonnement » : il n'y a pas de Box derrière le Foreman, donc
                         nulle part où brancher un plan Claude ou ChatGPT. */}
-                    {error.kind === 'budget' ? <BudgetExhaustedNotice preTrial={!entitled} trialing={workspace?.subscription_status === 'trialing'} paused={!!workspace?.rerun_credit_paused_at} lifetime={isLifetimePlan(workspace)} claudePlanOffered={isClaudePlanOffered(workspace)} manager={manager} priceArm={priceArm} /> : <ProviderErrorNotice kind={error.kind} message={error.message} onStopRun={onStop} onRetry={onRetry} />}
+                    {error.kind === 'budget' ? <BudgetExhaustedNotice preTrial={!entitled} trialing={workspace?.subscription_status === 'trialing'} paused={!!workspace?.rerun_credit_paused_at} lifetime={isLifetimePlan(workspace)} claudePlanOffered={isClaudePlanOffered(workspace)} manager={manager} /> : <ProviderErrorNotice kind={error.kind} message={error.message} onStopRun={onStop} onRetry={onRetry} />}
                 </MessageContent>
             </Message>
         )

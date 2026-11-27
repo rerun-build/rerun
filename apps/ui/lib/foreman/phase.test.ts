@@ -18,7 +18,7 @@ const planned: ForemanProfile = { ...profiled, plan: { title: 'Team', items: [{ 
 const intent = { kind: 'template', slug: 'seo-newsroom' } as const
 
 function stateOf(phase: ForemanPhase, patch: Partial<ForemanState> = {}): ForemanState {
-    return { phase, intent: null, answers: {}, foreman: {}, onboardingCompletedAt: null, firstName: '', language: null, entitled: false, trialSpent: false, trialNeedsCard: true, priceArm: '49', client: 'web', workspaceName: 'Acme', workspacePlan: 'none', userEmail: null, spaces: [], agents: [], ...patch }
+    return { phase, intent: null, answers: {}, foreman: {}, onboardingCompletedAt: null, firstName: '', language: null, entitled: false, trialSpent: false, trialNeedsCard: true, client: 'web', workspaceName: 'Acme', workspacePlan: 'none', userEmail: null, spaces: [], agents: [], ...patch }
 }
 
 function beltOf(phase: ActiveForemanPhase, patch: Partial<ForemanState> = {}): readonly string[] {

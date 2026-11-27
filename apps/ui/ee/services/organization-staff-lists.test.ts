@@ -74,7 +74,7 @@ function world(tables: MemoryTables = {}) {
     const member = memberRow(MEMBER, WORKSPACE)
     const db = memoryDatabase(
         {
-            workspaces: [workspaceRow(WORKSPACE, { name: 'Acme', is_sandbox: false, organization_id: null, price_arm: null, subscription_cancel_at: null, trial_started_at: null, trial_ends_at: null, onboarded_at: null, first_paid_at: null })],
+            workspaces: [workspaceRow(WORKSPACE, { name: 'Acme', is_sandbox: false, organization_id: null, subscription_cancel_at: null, trial_started_at: null, trial_ends_at: null, onboarded_at: null, first_paid_at: null })],
             workspace_members: [staff, member],
             users: [user(STAFF), user(MEMBER)],
             workspace_invitations: [],

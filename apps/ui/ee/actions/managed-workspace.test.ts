@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { getServerSession } from '@/supabase/session/getServerSession'
 import { fakeSupabase } from '@/test/supabase-fake'
 
-const MANAGED = { id: 7, name: 'Acme', plan: 'organization', subscription_status: 'active', organization_id: 'org-nordlys', is_sandbox: false, stripe_customer_id: 'cus_left_over', price_arm: null }
+const MANAGED = { id: 7, name: 'Acme', plan: 'organization', subscription_status: 'active', organization_id: 'org-nordlys', is_sandbox: false, stripe_customer_id: 'cus_left_over' }
 const OWN = { ...MANAGED, plan: 'base', organization_id: null }
 
 const mocks = vi.hoisted(() => ({ workspace: null as unknown, stripeTouched: vi.fn(), db: null as unknown }))

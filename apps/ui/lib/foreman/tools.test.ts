@@ -9,7 +9,7 @@ vi.mock('./search-docs', () => ({ searchDocs: vi.fn() }))
 const { foremanActiveTools } = await import('./tools')
 
 function stateWith(patch: Partial<ForemanState>): ForemanState {
-    return { phase: 'discover', intent: null, answers: {}, foreman: {}, onboardingCompletedAt: null, firstName: '', language: null, entitled: false, trialSpent: false, trialNeedsCard: false, priceArm: '49', client: 'web', workspaceName: 'Acme', workspacePlan: 'none', userEmail: null, spaces: [], agents: [], ...patch }
+    return { phase: 'discover', intent: null, answers: {}, foreman: {}, onboardingCompletedAt: null, firstName: '', language: null, entitled: false, trialSpent: false, trialNeedsCard: false, client: 'web', workspaceName: 'Acme', workspacePlan: 'none', userEmail: null, spaces: [], agents: [], ...patch }
 }
 
 describe('foremanActiveTools', () => {

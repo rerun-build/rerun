@@ -4,7 +4,7 @@ import { isAdminEmail } from '@/lib/auth/admin-emails'
 import { Database } from '@/app/api/database.types'
 import { routes } from '@/lib/routes'
 import { resetCrisp } from '@/lib/crisp'
-import { parsePriceArm, PRICE_EXPERIMENT_KEY, PRICE_PROPERTY, isSubscriptionEntitled, TRIAL_CARD_PROPERTY, trialArm } from '@rerun/cloud/billing'
+import { isSubscriptionEntitled, TRIAL_CARD_PROPERTY, trialArm } from '@rerun/cloud/billing'
 import { createClient } from '@/supabase/client'
 import { useBoardStore } from '@/stores/board.store'
 import { useForemanStore } from '@/stores/foreman.store'
@@ -17,9 +17,9 @@ import { PHONE_STATUS_COLUMNS, phoneStatusOf, type PhoneStatus } from '@rerun/cl
 import { awaitSignupStamp } from '@/supabase/session/signup-stamp'
 import { Session } from '@supabase/supabase-js'
 import { track, readAttribution, getCookie, identifyPerson, setSharedCookie, deleteSharedCookie } from '@rerun/analytics/client'
-import { experimentProperties, readExperimentCookie, STALE_EXPERIMENT_PROPERTIES, writeExperimentVariants } from '@rerun/analytics/experiments'
+import { experimentProperties, readExperimentCookie, STALE_EXPERIMENT_PROPERTIES } from '@rerun/analytics/experiments'
 import { SIGNUP_INTENT_COOKIE, type SignupMethod } from '@rerun/analytics'
-import { clearSessionHintCookie, readConsentCookie, reportAffiliateSignup } from '@rerun/contracts'
+import { clearSessionHintCookie, reportAffiliateSignup } from '@rerun/contracts'
 import posthog from 'posthog-js'
 import { useRouter } from 'next/navigation'
 import { createContext, PropsWithChildren, useCallback, useContext, useEffect, useRef, useState } from 'react'
@@ -50,7 +50,6 @@ type Workspace = Pick<
     | 'is_sandbox'
     | 'onboarded_at'
     | 'boxes_archived_at'
-    | 'price_arm'
     | 'locale'
     | 'organization_id'
 >
@@ -268,22 +267,6 @@ export function SessionProvider({ children, initial = null, hostScope = null }: 
         const properties = experimentProperties(readExperimentCookie())
         if (Object.keys(properties).length > 0) posthog.register(properties)
     }, [session?.user?.id])
-
-    // Once there is a workspace, its price is the one the column froze, not the cookie's: a second
-    // device or an invited teammate carries another draw, or none. The cookie is brought back in line
-    // so the landing quotes the same price, and the arm goes on the person as well as on the events:
-    // the billing events are sent by the server, which has no super property to carry it.
-    //
-    // A workspace from before the test has no arm and is left out: nothing is written for it, nor
-    // for a visitor who has since refused the cookie.
-    const priceArm = workspace?.price_arm ? parsePriceArm(workspace.price_arm) : null
-    useEffect(() => {
-        if (!priceArm || readConsentCookie() === 'denied') return
-        const variants = readExperimentCookie()
-        if (variants[PRICE_EXPERIMENT_KEY] !== priceArm) writeExperimentVariants({ ...variants, [PRICE_EXPERIMENT_KEY]: priceArm })
-        posthog.register({ [PRICE_PROPERTY]: priceArm })
-        posthog.setPersonProperties({ [PRICE_PROPERTY]: priceArm })
-    }, [priceArm, session?.user?.id])
 
     // The trial test is drawn from the workspace, so only a workspace still facing the offer is
     // enrolled. The person property, set once, is what splits the server-side events

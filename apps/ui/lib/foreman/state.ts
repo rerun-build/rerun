@@ -4,7 +4,7 @@ import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 import { isPaid, type ForemanClient } from '@rerun/contracts'
 import { resolveEngineWaitlist } from '@/app/api/_services/waitlist.service'
 import { readAgentShare } from '@/lib/agents/share-read'
-import { isSubscriptionEntitled, parsePriceArm, trialArm } from '@rerun/cloud/billing'
+import { isSubscriptionEntitled, trialArm } from '@rerun/cloud/billing'
 import { RERUN_CLOUD } from '@rerun/cloud/edition'
 import { workspaceBrand } from '@/lib/brand/workspace'
 import { accountFirstName } from '@/lib/naming/account-first-name'
@@ -122,7 +122,6 @@ export async function loadForemanState(ctx: WorkspaceContext, acceptLanguage: st
         trialSpent: !!ctx.workspace.trial_ends_at,
         // The app sells nothing, so every trial it starts goes without a card, whatever the test's arm.
         trialNeedsCard: client === 'web' && trialArm(ctx.workspace.id) === 'card',
-        priceArm: parsePriceArm(ctx.workspace.price_arm),
         client,
         workspaceName: ctx.workspace.name ?? 'this workspace',
         workspacePlan: ctx.workspace.plan ?? 'none',

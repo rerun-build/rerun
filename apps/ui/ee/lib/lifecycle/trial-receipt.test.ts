@@ -55,11 +55,10 @@ describe('sendTrialStartedReceipt', () => {
         )
     })
 
-    it('quotes the price of the arm the workspace was drawn into, the default price without one', async () => {
-        await receipt(database({ workspaces: { data: { id: 1, name: 'Acme', is_sandbox: false, price_arm: '49' } } }))
+    it('quotes the list price of the plan', async () => {
         await receipt(database())
 
-        expect(vi.mocked(sendTrialStartedEmail).mock.calls.map(([, props]) => props.monthlyPriceLabel)).toEqual(['$49', '$29'])
+        expect(vi.mocked(sendTrialStartedEmail).mock.calls.map(([, props]) => props.monthlyPriceLabel)).toEqual(['$29'])
     })
 
     it('sends nothing when another webhook already claimed the slot', async () => {

@@ -1,7 +1,5 @@
 'use client'
 
-import { DEFAULT_PRICE_ARM, type PriceArm } from '@rerun/contracts'
-
 import type { WorkspaceManager } from '@/components/brand/useWorkspaceManager'
 import type { SubscriptionProvider } from '@/components/agent/ModelPickerProviders'
 import type { TrialStep } from '@/lib/foreman/next-steps'
@@ -43,7 +41,6 @@ export function BudgetExhaustedNotice(_props: {
     claudePlanOffered?: boolean
     manager?: WorkspaceManager | null
     coworker?: string
-    priceArm?: PriceArm
     onPaid?: () => void
     resuming?: boolean
     onResumeNow?: () => void
@@ -68,7 +65,3 @@ export function TemplatePurchaseWidget(_props: { input: unknown; output?: unknow
 }
 
 export async function startPlan(_source: 'template_cta' | 'agent_share' | 'billing_dialog' | 'ai_providers'): Promise<void> {}
-
-export function usePriceArm(): PriceArm {
-    return DEFAULT_PRICE_ARM
-}

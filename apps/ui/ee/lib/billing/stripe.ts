@@ -1,5 +1,5 @@
 import Stripe from 'stripe'
-import { ADDON_KEYS, BASE_PLAN, BILLING_INTERVALS, LIST_PRICE_ARM, PLAN_CURRENCY, PRICE_ARMS, ZERO_QUANTITIES, type AddonKey, type AddonQuantities, type BillingInterval, type PriceArm } from './plans'
+import { ADDON_KEYS, BILLING_INTERVALS, PLAN_CURRENCY, ZERO_QUANTITIES, basePriceCents, type AddonKey, type AddonQuantities, type BillingInterval } from './plans'
 
 // A deployment that sells nothing has no key. The client still builds, so the routes that import it
 // load (Next evaluates them at build time), and a call it should never make fails on authentication.
@@ -22,20 +22,19 @@ const PRICE_ENV_NAMES: Record<BillingInterval, Record<PlanPriceKey, string>> = {
     },
 }
 
-// The base plan has one price per arm of the price test. The list arm keeps the variables it had
-// before the test, so nothing moves for the subscriptions already on them.
-const BASE_PRICE_ENV_NAMES: Record<PriceArm, Record<BillingInterval, string>> = {
-    '49': { monthly: PRICE_ENV_NAMES.monthly.base, yearly: PRICE_ENV_NAMES.yearly.base },
-    '29': { monthly: 'STRIPE_PRICE_BASE_29', yearly: 'STRIPE_PRICE_BASE_29_YEARLY' },
-}
-
 // Read on every call rather than captured at import, so a test can stub one variable.
 function configuredPriceId(key: PlanPriceKey, interval: BillingInterval): string | undefined {
     return process.env[PRICE_ENV_NAMES[interval][key]] || undefined
 }
 
-function configuredBasePriceId(arm: PriceArm, interval: BillingInterval): string | undefined {
-    return process.env[BASE_PRICE_ENV_NAMES[arm][interval]] || undefined
+// The base prices the plan sold at before the current one, comma-separated: $24 until September
+// 2026, then $49 a month or $468 a year until the price test settled on $29 in November 2026. Nobody
+// new is put on them, but the workspaces subscribed back then keep theirs and still get the plan.
+function legacyBasePriceIds(): string[] {
+    return (process.env.STRIPE_PRICE_BASE_LEGACY ?? '')
+        .split(',')
+        .map(id => id.trim())
+        .filter(Boolean)
 }
 
 function requirePriceId(key: PlanPriceKey, interval: BillingInterval): string {
@@ -44,10 +43,8 @@ function requirePriceId(key: PlanPriceKey, interval: BillingInterval): string {
     return id
 }
 
-export function basePriceId(interval: BillingInterval = 'monthly', arm: PriceArm = LIST_PRICE_ARM): string {
-    const id = configuredBasePriceId(arm, interval)
-    if (!id) throw new Error(`No Stripe price configured for the $${arm} base plan billed ${interval} (set ${BASE_PRICE_ENV_NAMES[arm][interval]})`)
-    return id
+export function basePriceId(interval: BillingInterval = 'monthly'): string {
+    return requirePriceId('base', interval)
 }
 
 export function priceIdForAddon(key: AddonKey, interval: BillingInterval = 'monthly'): string {
@@ -90,40 +87,39 @@ export function isLegacyPlanItemPriceId(priceId?: string | null): boolean {
 
 // The base plan's price. Read straight from the env rather than through basePriceId(): asking
 // "is this the base item?" must not throw when the variable is missing.
-//
-// STRIPE_PRICE_BASE_LEGACY is the $24 price the base plan sold at before $49. Nobody new is put on
-// it, but the workspaces subscribed back then stay on it for good and still get the whole plan.
 export function isBasePriceId(priceId?: string | null): boolean {
     if (!priceId) return false
-    return priceId === process.env.STRIPE_PRICE_BASE_LEGACY || PRICE_ARMS.some(arm => BILLING_INTERVALS.some(interval => configuredBasePriceId(arm, interval) === priceId))
+    return isLegacyBasePriceId(priceId) || BILLING_INTERVALS.some(interval => configuredPriceId('base', interval) === priceId)
+}
+
+export function isLegacyBasePriceId(priceId?: string | null): boolean {
+    return !!priceId && legacyBasePriceIds().includes(priceId)
 }
 
 export function isYearlyBasePriceId(priceId?: string | null): boolean {
-    return !!priceId && PRICE_ARMS.some(arm => configuredBasePriceId(arm, 'yearly') === priceId)
+    return !!priceId && configuredPriceId('base', 'yearly') === priceId
 }
 
-// The arm of the price test a subscription was sold on, read off its base item. Once a workspace
-// subscribes, this is what prices every later change, so a switch of interval or of packs keeps the
-// price it signed up at whatever happens to the test. A legacy base price belongs to no arm and
-// reads as the list price, which legacyBaseDiscountCents then brings back to what it bills.
-export function priceArmOfItems(items: Stripe.SubscriptionItem[]): PriceArm {
-    const priceId = items.find(item => isBasePriceId(item.price?.id))?.price?.id
-    return PRICE_ARMS.find(arm => BILLING_INTERVALS.some(interval => configuredBasePriceId(arm, interval) === priceId)) ?? LIST_PRICE_ARM
-}
-
-// Read off the base item: every item of a subscription bills on the same interval.
+// Read off the base item: every item of a subscription bills on the same interval. A legacy price
+// says its own interval.
 export function intervalOfItems(items: Stripe.SubscriptionItem[]): BillingInterval {
     const base = items.find(item => isBasePriceId(item.price?.id))
     if (isYearlyBasePriceId(base?.price?.id)) return 'yearly'
     return base?.price?.recurring?.interval === 'year' ? 'yearly' : 'monthly'
 }
 
-// What a workspace still on a legacy base price saves every month against the list price, so the
-// figures derived from the plan table can be brought back to what it is actually billed.
+// What a workspace still on a legacy base price saves on every invoice against the list price, so
+// the figures derived from the plan table can be brought back to what it is actually billed. Below
+// zero for a legacy price above the list price: a workspace still on $49 is billed $20 more.
 export function legacyBaseDiscountCents(items: Stripe.SubscriptionItem[]): number {
     const price = items.find(item => isBasePriceId(item.price?.id))?.price
-    if (!price || price.id !== process.env.STRIPE_PRICE_BASE_LEGACY || price.currency !== PLAN_CURRENCY || price.unit_amount == null) return 0
-    return Math.max(0, BASE_PLAN.priceCents - price.unit_amount)
+    if (!price || !isLegacyBasePriceId(price.id) || price.currency !== PLAN_CURRENCY || price.unit_amount == null) return 0
+    return basePriceCents(intervalOfItems(items)) - price.unit_amount
+}
+
+// What the base item alone bills on every invoice, a legacy price included.
+export function baseItemCents(items: Stripe.SubscriptionItem[]): number {
+    return basePriceCents(intervalOfItems(items)) - legacyBaseDiscountCents(items)
 }
 
 // A price belonging to the Rerun plan subscription: the base plan or one of its

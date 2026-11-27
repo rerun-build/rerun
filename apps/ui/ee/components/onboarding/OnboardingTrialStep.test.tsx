@@ -17,7 +17,6 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('@/supabase/session/SessionProvider', () => ({ useSession: () => ({ workspace: mocks.workspace, refreshWorkspace: mocks.refreshWorkspace }) }))
 vi.mock('@/hooks/useWorkspaceAccess', () => ({ useWorkspaceAccess: () => ({ access: 'full', keptUntil: null }) }))
-vi.mock('@/ee/lib/billing/usePriceArm', () => ({ usePriceArm: () => '29' }))
 vi.mock('@rerun/analytics/client', () => ({ track: mocks.track }))
 // The Stripe form itself needs a live session: the stand-in draws only the footer the step hands it.
 vi.mock('@/ee/components/dialogs/billing/SubscribeCheckout', () => ({

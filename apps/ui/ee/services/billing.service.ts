@@ -13,13 +13,10 @@ import {
     PLAN_CURRENCY,
     ZERO_QUANTITIES,
     baseLimitsToColumns,
-    basePriceCents,
     isLifetimePlan,
-    parsePriceArm,
     planPriceCents,
     type AddonQuantities,
     type BillingInterval,
-    type PriceArm,
     type WorkspaceLimitColumns,
 } from '@/ee/lib/billing/plans'
 import { affiliateReferralMetadata } from '@/ee/lib/billing/affiliate'
@@ -54,13 +51,13 @@ import { trialArm } from '@/ee/lib/billing/trial-experiment'
 import { normalizeTaxIdValue, taxIdTypesFor, type TaxIdStatus, type TaxIdType } from '@/ee/lib/billing/tax-id'
 import {
     addonForPriceId,
+    baseItemCents,
     basePriceId,
     intervalOfItems,
     isBasePriceId,
     isLegacyPlanItemPriceId,
     isYearlyBasePriceId,
     legacyBaseDiscountCents,
-    priceArmOfItems,
     priceIdForAddon,
     quantitiesFromItems,
     stripe,
@@ -158,12 +155,10 @@ async function ensureCustomerEmail(customerId: string): Promise<void> {
     await stripe.customers.update(customerId, { email: session.email })
 }
 
-// Everything the plan Checkout session carries but its line items: the free trial when the workspace
-// has never had one, billed today otherwise, and the card collected either way. The limits are only
-// applied to the workspace once the session completes, via the webhook.
-//
-// The line items are the caller's, priced on the arm of the price test returned beside the params.
-async function basePlanCheckoutParams(): Promise<{ params: Omit<Stripe.Checkout.SessionCreateParams, 'line_items'>; priceArm: PriceArm }> {
+// Everything the plan Checkout session carries but its line items, which are the caller's: the free
+// trial when the workspace has never had one, billed today otherwise, and the card collected either
+// way. The limits are only applied to the workspace once the session completes, via the webhook.
+async function basePlanCheckoutParams(): Promise<Omit<Stripe.Checkout.SessionCreateParams, 'line_items'>> {
     // Before the customer: a refused account leaves no orphan behind in Stripe.
     const { session } = await getServerSession()
     if (session && (await isPhoneStepPending(createServiceRoleClient(), session.id))) throw new AppError('phoneRequired')
@@ -185,7 +180,7 @@ async function basePlanCheckoutParams(): Promise<{ params: Omit<Stripe.Checkout.
     // the other way in here, and it must be billed from day one: a redeemed code left `trial_ends_at`
     // null, so without this check it would be handed a trial on top of the plan it already has.
     const supabase = createServiceRoleClient()
-    const { data: workspace } = await selectSingle(supabase, 'workspaces', ['trial_ends_at', 'subscription_status', 'price_arm'] as const, { id: workspaceId })
+    const { data: workspace } = await selectSingle(supabase, 'workspaces', ['trial_ends_at', 'subscription_status'] as const, { id: workspaceId })
     const trialEligible = !workspace?.trial_ends_at && !isSubscriptionEntitled(workspace?.subscription_status)
 
     const referral = await affiliateReferralMetadata()
@@ -219,7 +214,7 @@ async function basePlanCheckoutParams(): Promise<{ params: Omit<Stripe.Checkout.
         customer_update: { address: 'auto', name: 'auto' },
         allow_promotion_codes: true,
     }
-    return { params, priceArm: parsePriceArm(workspace?.price_arm) }
+    return params
 }
 
 // The trial the cardless arm of the trial test starts, without a card and without leaving the app:
@@ -239,7 +234,7 @@ export async function startCardlessTrial(client: ForemanClient = 'web'): Promise
 
     const workspaceId = await requireWorkspaceId()
     const supabase = createServiceRoleClient()
-    const { data: workspace } = await selectSingle(supabase, 'workspaces', ['trial_ends_at', 'subscription_status', 'is_sandbox', 'price_arm', 'organization_id'] as const, { id: workspaceId })
+    const { data: workspace } = await selectSingle(supabase, 'workspaces', ['trial_ends_at', 'subscription_status', 'is_sandbox', 'organization_id'] as const, { id: workspaceId })
     if (!workspace || workspace.is_sandbox) return false
     refuseManagedWorkspace(workspace)
     if (isSubscriptionEntitled(workspace.subscription_status)) return true
@@ -255,7 +250,7 @@ export async function startCardlessTrial(client: ForemanClient = 'web'): Promise
     const subscription = await stripe.subscriptions.create(
         {
             customer: customerId,
-            items: [{ price: basePriceId('monthly', parsePriceArm(workspace.price_arm)), quantity: 1 }],
+            items: [{ price: basePriceId('monthly'), quantity: 1 }],
             // Same trap as the checkout: left out, Stripe mints the subscription in whatever
             // `currency_options` the live price still carries.
             currency: PLAN_CURRENCY,
@@ -291,9 +286,9 @@ function assertValidSelection(selection: PlanSelection): void {
     if (!BILLING_INTERVALS.includes(selection.interval)) throw new AppError('invalidBillingInterval')
 }
 
-function planLineItems({ quantities, interval }: PlanSelection, priceArm: PriceArm): { price: string; quantity: number }[] {
+function planLineItems({ quantities, interval }: PlanSelection): { price: string; quantity: number }[] {
     return [
-        { price: basePriceId(interval, priceArm), quantity: 1 },
+        { price: basePriceId(interval), quantity: 1 },
         ...ADDON_KEYS.filter(key => quantities[key] > 0).map(key => ({ price: priceIdForAddon(key, interval), quantity: quantities[key] })),
     ]
 }
@@ -310,12 +305,12 @@ export type PlanCheckoutSession = { clientSecret: string; sessionId: string; tri
 // (updatePlanCheckoutSession), so the agents slider and the interval toggle need no new session.
 export async function createPlanCheckoutSession(selection: PlanSelection): Promise<PlanCheckoutSession> {
     assertValidSelection(selection)
-    const { params, priceArm } = await basePlanCheckoutParams()
+    const params = await basePlanCheckoutParams()
     const trial = !!params.subscription_data?.trial_period_days
 
     const checkout = await stripe.checkout.sessions.create({
         ...params,
-        line_items: planLineItems(trial ? CARD_TRIAL_SELECTION : selection, priceArm),
+        line_items: planLineItems(trial ? CARD_TRIAL_SELECTION : selection),
         metadata: { ...params.metadata, ...(trial ? { [CARD_TRIAL_METADATA_KEY]: '1' } : {}) },
         // The address is what the tax is computed from, so the dialog always renders the address form.
         billing_address_collection: 'required',
@@ -345,8 +340,7 @@ export async function updatePlanCheckoutSession(sessionId: string, selection: Pl
     if (session.mode !== 'subscription') throw new AppError('checkoutNotPlan')
     if (session.metadata?.[CARD_TRIAL_METADATA_KEY]) throw new AppError('trialPlanLocked')
 
-    const { data: workspace } = await selectSingle(createServiceRoleClient(), 'workspaces', ['price_arm'] as const, { id: Number(session.metadata?.workspace_id) })
-    await stripe.checkout.sessions.update(sessionId, { line_items: planLineItems(selection, parsePriceArm(workspace?.price_arm)) })
+    await stripe.checkout.sessions.update(sessionId, { line_items: planLineItems(selection) })
 }
 
 // The buyer ticked the terms in the dialog: the timestamp lands on the session, where Stripe keeps
@@ -506,8 +500,6 @@ export type SubscriptionState = {
     status: Stripe.Subscription.Status
     quantities: AddonQuantities
     interval: BillingInterval
-    // The arm of the price test the subscription was sold on: what the dialog prices the plan with.
-    priceArm: PriceArm
     // A switch to monthly waiting for the end of the paid year, with the plan it lands on.
     pendingSwitch: { selection: PlanSelection; at: string } | null
     // Flat amount taken off the list price on every invoice of the current interval, for a workspace
@@ -592,7 +584,6 @@ export async function getSubscriptionState(): Promise<SubscriptionState | null> 
         status: subscription.status,
         quantities,
         interval: intervalOfItems(subscription.items.data),
-        priceArm: priceArmOfItems(subscription.items.data),
         pendingSwitch,
         monthlyDiscountCents: permanentDiscountCents(subscription) + legacyBaseDiscountCents(subscription.items.data),
         pendingDowngrade,
@@ -942,7 +933,7 @@ async function requireCancellableSubscription(): Promise<CancellableSubscription
 // What one period of the plan costs this workspace before tax, a grandfathered base price included.
 function planPeriodCents(subscription: Stripe.Subscription): number {
     const { quantities } = quantitiesFromItems(subscription.items.data)
-    return planPriceCents(quantities, intervalOfItems(subscription.items.data), priceArmOfItems(subscription.items.data)) - legacyBaseDiscountCents(subscription.items.data)
+    return planPriceCents(quantities, intervalOfItems(subscription.items.data)) - legacyBaseDiscountCents(subscription.items.data)
 }
 
 // The offers are priced on a month: a yearly plan gets none.
@@ -969,7 +960,7 @@ export async function getCancelFlowState(): Promise<CancelFlowState> {
     const monthlyCents = planPeriodCents(subscription)
     const periodStart = periodStartOf(subscription)
     const kind = retentionOfferOf(cancellable)
-    const priceArm = priceArmOfItems(subscription.items.data)
+    const baseCents = baseItemCents(subscription.items.data)
 
     return {
         now: now.toISOString(),
@@ -981,9 +972,9 @@ export async function getCancelFlowState(): Promise<CancelFlowState> {
         offer: kind
             ? {
                   kind,
-                  priceCents: offerPriceCents(kind, monthlyCents, priceArm),
+                  priceCents: offerPriceCents(kind, monthlyCents, baseCents),
                   fullPriceCents: monthlyCents,
-                  basePriceCents: basePriceCents(priceArm),
+                  basePriceCents: baseCents,
                   billedOn: endsAt.toISOString(),
                   fullPriceFrom: addOneMonth(endsAt).toISOString(),
               }
@@ -1018,20 +1009,20 @@ export async function resumeSubscription(): Promise<void> {
 // Created on first use and found again by its fixed id afterwards. The $1 coupon is limited to the
 // base plan's product, so the add-ons keep their price.
 async function ensureRetentionCoupon(kind: RetentionOfferKind, subscription: Stripe.Subscription): Promise<string> {
-    const priceArm = priceArmOfItems(subscription.items.data)
-    const id = retentionCouponId(kind, priceArm)
+    const baseCents = baseItemCents(subscription.items.data)
+    const id = retentionCouponId(kind, baseCents)
     try {
         return (await stripe.coupons.retrieve(id)).id
     } catch (err) {
         if ((err as { code?: string }).code !== 'resource_missing') throw err
     }
 
-    if (kind === 'trial_half') return (await stripe.coupons.create({ id, ...retentionCouponParams(kind, priceArm) })).id
+    if (kind === 'trial_half') return (await stripe.coupons.create({ id, ...retentionCouponParams(kind, baseCents) })).id
 
     const product = subscription.items.data.find(item => isBasePriceId(item.price?.id))?.price.product
     if (!product) throw new AppError('noPlanSubscription')
     const productId = typeof product === 'string' ? product : product.id
-    return (await stripe.coupons.create({ id, ...retentionCouponParams(kind, priceArm), applies_to: { products: [productId] } })).id
+    return (await stripe.coupons.create({ id, ...retentionCouponParams(kind, baseCents), applies_to: { products: [productId] } })).id
 }
 
 // The offer is checked again here rather than trusted from the dialog: it is once per workspace, and
@@ -1081,13 +1072,12 @@ export async function requestRenewalReminder(): Promise<string> {
 // add-ons appear or go, and a legacy seat, agent pack or credit pack item goes with the old interval, since a
 // subscription bills every item on the same one.
 function replacementItems(subscription: Stripe.Subscription, { quantities, interval }: PlanSelection): PlanItemChange[] {
-    const priceArm = priceArmOfItems(subscription.items.data)
     const changes: PlanItemChange[] = []
     const kept = new Set<string>()
     for (const item of subscription.items.data) {
         const priceId = item.price?.id
         if (isBasePriceId(priceId)) {
-            changes.push({ id: item.id, price: basePriceId(interval, priceArm), quantity: 1 })
+            changes.push({ id: item.id, price: basePriceId(interval), quantity: 1 })
             continue
         }
         const addon = addonForPriceId(priceId)
@@ -1292,7 +1282,7 @@ async function scheduleIntervalSwitch(subscription: Stripe.Subscription, selecti
                 start_date: current.start_date,
                 end_date: current.end_date,
             },
-            { items: planLineItems(selection, priceArmOfItems(subscription.items.data)), duration: { interval: 'month', interval_count: 1 }, proration_behavior: 'none' },
+            { items: planLineItems(selection), duration: { interval: 'month', interval_count: 1 }, proration_behavior: 'none' },
         ],
     })
     return new Date(current.end_date * 1000).toISOString()

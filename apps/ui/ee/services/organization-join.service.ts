@@ -112,7 +112,7 @@ async function insertAccount(supabase: Client, userId: string, workspaceId: numb
 // one, and an account has to have a workspace: one of its own, without credit, that an organization's
 // address never shows. Another request of the same sign-in may have written it first.
 async function openTeamAccount(supabase: Client, user: User, locale: Locale): Promise<boolean> {
-    if (await provisionUser(supabase, user, { phoneStep: false, priceArm: null, locale, ownWorkspace: 'bare' })) return true
+    if (await provisionUser(supabase, user, { phoneStep: false, locale, ownWorkspace: 'bare' })) return true
     const { data } = await selectMaybeSingle(supabase, 'users', ['id'] as const, { id: user.id })
     return !!data
 }

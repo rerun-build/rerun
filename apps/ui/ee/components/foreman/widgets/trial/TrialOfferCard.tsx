@@ -6,7 +6,7 @@ import { Badge } from '@rerun/ui/primitives'
 
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
-import { PLAN_CURRENCY, TRIAL_DAYS, basePriceCents, trialEndDate, type PriceArm } from '@/ee/lib/billing/plans'
+import { PLAN_CURRENCY, TRIAL_DAYS, basePriceCents, trialEndDate } from '@/ee/lib/billing/plans'
 import type { TrialOffer } from '@/ee/lib/billing/checkout-variant'
 import { shortDate } from '@/ee/lib/billing/dates'
 import { CalendarClockIcon, CircleCheckIcon, CreditCardIcon, type LucideIcon } from '@/lib/icons'
@@ -20,7 +20,6 @@ import { TRIAL_ACTIVE_AGENTS, TRIAL_CREDITS, formatAmount } from '@rerun/contrac
 
 type TrialOfferCardProps = {
     offer: TrialOffer
-    priceArm: PriceArm
     submitting: boolean
     error?: string | null
     onStart: () => void
@@ -55,10 +54,10 @@ function TimelineStep({ icon, title, description }: { icon: LucideIcon; title: s
     )
 }
 
-export function TrialOfferCard({ offer, priceArm, submitting, error, onStart, subject, thenPay }: TrialOfferCardProps) {
+export function TrialOfferCard({ offer, submitting, error, onStart, subject, thenPay }: TrialOfferCardProps) {
     const locale = useLocale()
     const t = useTranslations('foreman.trial')
-    const price = formatAmount(basePriceCents(priceArm), PLAN_CURRENCY)
+    const price = formatAmount(basePriceCents(), PLAN_CURRENCY)
     const trial = offer !== 'paid'
     const cardless = offer === 'cardless'
     const chargeOn = trialEndDate()

@@ -16,7 +16,7 @@ import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
 import { BorderBeam } from '@rerun/ui'
 import { ArrowRightIcon, CheckIcon, CoinsIcon, CreditCardIcon, KeyIcon, LinkIcon, PauseIcon, Play, ZapOffIcon } from '@/lib/icons'
 import { usd } from '@/ee/components/dialogs/billing/parts'
-import { BASE_PLAN_CREDITS, DEFAULT_PRICE_ARM, TRIAL_CREDITS, ZERO_QUANTITIES, creditsLabel, planPriceCents, type PriceArm } from '@/ee/lib/billing/plans'
+import { BASE_PLAN_CREDITS, TRIAL_CREDITS, ZERO_QUANTITIES, creditsLabel, planPriceCents } from '@/ee/lib/billing/plans'
 import { NOTICE_PERKS } from '@/ee/lib/billing/pro-perks'
 
 type SubscriptionProvider = 'claude' | 'codex'
@@ -54,7 +54,7 @@ type SubscriptionProvider = 'claude' | 'codex'
 // the receipt. `onResumeNow` is the hand-held way back if that moment drags on.
 export type BudgetNoticeOwnConnection = { label: string; provider: string; onUse: () => void }
 
-type TrialUpgrade = { coworker?: string; priceArm?: PriceArm; onPaid?: () => void; resuming?: boolean; onResumeNow?: () => void }
+type TrialUpgrade = { coworker?: string; onPaid?: () => void; resuming?: boolean; onResumeNow?: () => void }
 
 export function BudgetExhaustedNotice({
     onConnectProvider,
@@ -282,7 +282,7 @@ function LifetimeNotice({ onConnectProvider, ownConnection, claudePlanOffered }:
     )
 }
 
-function TrialUpgradeNotice({ coworker, priceArm = DEFAULT_PRICE_ARM, onPaid, resuming, onResumeNow, onConnectProvider, ownConnection }: TrialUpgrade & { onConnectProvider?: (provider: SubscriptionProvider) => void; ownConnection?: BudgetNoticeOwnConnection }) {
+function TrialUpgradeNotice({ coworker, onPaid, resuming, onResumeNow, onConnectProvider, ownConnection }: TrialUpgrade & { onConnectProvider?: (provider: SubscriptionProvider) => void; ownConnection?: BudgetNoticeOwnConnection }) {
     const t = useTranslations('chat.budget')
     const tPerks = useTranslations('billing.perks.headlines')
     const openBilling = useBillingStore(s => s.openBilling)
@@ -305,7 +305,7 @@ function TrialUpgradeNotice({ coworker, priceArm = DEFAULT_PRICE_ARM, onPaid, re
         )
     }
 
-    const monthly = usd(planPriceCents(ZERO_QUANTITIES, 'monthly', priceArm))
+    const monthly = usd(planPriceCents(ZERO_QUANTITIES, 'monthly'))
     return (
         <div className="relative mb-2 space-y-3 overflow-hidden rounded-lg px-4 pt-3 pb-4">
             <BorderBeam animated pattern="arcs" tone="red" glow width={1} duration={7} />

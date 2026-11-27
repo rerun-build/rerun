@@ -29,20 +29,20 @@ beforeEach(() => {
 
 describe('provisionUser and the phone step', () => {
     it('stamps a row left without its signup, with the phone step and the allowance, once', async () => {
-        expect(await provisionUser(existing(null).client, account, { phoneStep: true, priceArm: null })).toEqual({ signedUp: true })
+        expect(await provisionUser(existing(null).client, account, { phoneStep: true })).toEqual({ signedUp: true })
 
         expect(payloads(service)).toEqual([{ user_id: 'user-1' }])
         expect(grantRerunTopup).toHaveBeenCalledTimes(1)
     })
 
     it('asks nothing of an account that arrives by invite or from the mobile app', async () => {
-        expect(await provisionUser(existing(null).client, account, { phoneStep: false, priceArm: null })).toEqual({ signedUp: true })
+        expect(await provisionUser(existing(null).client, account, { phoneStep: false })).toEqual({ signedUp: true })
 
         expect(payloads(service)).toEqual([])
     })
 
     it('never asks an account that already signed up', async () => {
-        await provisionUser(existing('2026-09-01T00:00:00Z').client, account, { phoneStep: true, priceArm: null })
+        await provisionUser(existing('2026-09-01T00:00:00Z').client, account, { phoneStep: true })
 
         expect(payloads(service)).toEqual([])
     })
@@ -51,7 +51,7 @@ describe('provisionUser and the phone step', () => {
         service = fakeSupabase(table => (table === 'workspaces' ? { data: { id: 7 } } : undefined))
         const request = fakeSupabase()
 
-        expect(await provisionUser(request.client, account, { phoneStep: true, priceArm: null })).toEqual({ signedUp: true })
+        expect(await provisionUser(request.client, account, { phoneStep: true })).toEqual({ signedUp: true })
 
         expect(payloads(service)).toEqual([{ user_id: 'user-1' }])
         expect(service.writes('users').map(write => write.payload)).toEqual([expect.objectContaining({ signed_up_at: expect.any(String) })])
@@ -62,7 +62,7 @@ describe('provisionUser and the phone step', () => {
         service = fakeSupabase(table => (table === 'workspaces' ? { data: { id: 7 } } : undefined))
         const request = fakeSupabase()
 
-        await provisionUser(request.client, account, { phoneStep: false, priceArm: null })
+        await provisionUser(request.client, account, { phoneStep: false })
 
         expect(request.writes('users')).toEqual([])
         expect(service.writes('users').map(write => write.payload)).toEqual([expect.objectContaining({ id: 'user-1', workspace_id: 7 })])
@@ -70,31 +70,11 @@ describe('provisionUser and the phone step', () => {
     })
 })
 
-describe('provisionUser and the price test', () => {
-    const workspaceInserts = () => service.writes('workspaces').filter(write => write.method === 'insert').map(write => write.payload)
-
-    it('freezes the arm drawn for this request on the workspace it creates', async () => {
-        service = fakeSupabase(table => (table === 'workspaces' ? { data: { id: 7 } } : undefined))
-
-        await provisionUser(fakeSupabase().client, account, { phoneStep: true, priceArm: '29' })
-
-        expect(workspaceInserts()).toEqual([expect.objectContaining({ price_arm: '29' })])
-    })
-
-    it('leaves a workspace out of the test when no arm was drawn', async () => {
-        service = fakeSupabase(table => (table === 'workspaces' ? { data: { id: 7 } } : undefined))
-
-        await provisionUser(fakeSupabase().client, account, { phoneStep: false, priceArm: null })
-
-        expect(workspaceInserts()).toEqual([expect.objectContaining({ price_arm: null })])
-    })
-})
-
 describe('provisionUser on an install without the illustration library', () => {
     it('creates the workspace with no icon rather than a link to a missing file', async () => {
         service = fakeSupabase(table => (table === 'workspaces' ? { data: { id: 7 } } : undefined))
 
-        await provisionUser(fakeSupabase().client, account, { phoneStep: false, priceArm: null })
+        await provisionUser(fakeSupabase().client, account, { phoneStep: false })
 
         const inserts = service.writes('workspaces').filter(write => write.method === 'insert').map(write => write.payload)
         expect(inserts).toEqual([expect.objectContaining({ icon_url: null })])
