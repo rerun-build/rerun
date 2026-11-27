@@ -2,6 +2,7 @@
 
 import { useMemberDirectory } from '@/hooks/useMemberProfiles'
 import { type CursorPayload, cursorFromPayload, leavingUserId, placeCursor, type TeamCursor, type TimedCursor } from '@/lib/board/team-cursor'
+import { createChannelRecovery } from '@/supabase/channel-recovery'
 import { createClient } from '@/supabase/client'
 import { useSession } from '@/supabase/session/SessionProvider'
 import { REALTIME_CHANNEL_STATES, type RealtimeChannel } from '@supabase/supabase-js'
@@ -10,7 +11,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 export type { TeamCursor } from '@/lib/board/team-cursor'
 
 const STALE_MS = 5000
-const THROTTLE_MS = 50
+const THROTTLE_MS = 100
 
 export function useTeamCursors(workspaceId: number | undefined) {
     const { session, organizationStaff } = useSession()
@@ -47,8 +48,11 @@ export function useTeamCursors(workspaceId: number | undefined) {
         const cursorsMap = cursorsRef.current
         let disposed = false
         let channel: RealtimeChannel | null = null
-        let attempt = 0
-        let reconnectTimer: ReturnType<typeof setTimeout> | null = null
+        // Un canal fermé par le serveur (token expiré, onglet réveillé) n'est jamais rejoint par
+        // realtime-js : sans remplacement, les curseurs restent morts jusqu'au reload.
+        const recovery = createChannelRecovery(() => {
+            if (!disposed) void setup()
+        })
 
         // Le topic est une room broadcast partagée, donc il ne peut pas être rendu unique. Le
         // client browser étant un singleton, un remontage rapide peut retomber sur le canal
@@ -79,24 +83,11 @@ export function useTeamCursors(workspaceId: number | undefined) {
             created.on('broadcast', { event: 'cursor-leave' }, ({ payload }) => drop(leavingUserId(payload)))
             created.on('presence', { event: 'leave' }, ({ key }) => drop(key))
 
-            let alive = true
-            // Un canal fermé par le serveur (token expiré, onglet réveillé) n'est jamais rejoint par
-            // realtime-js : sans reconnexion, les curseurs restent morts jusqu'au reload.
+            recovery.watch(created)
             created.subscribe(status => {
-                if (!alive || disposed) return
-                if (status === 'SUBSCRIBED') {
-                    attempt = 0
-                    if (visibleRef.current) created.track({ userId })
-                } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
-                    alive = false
-                    const delay = Math.min(1000 * 2 ** attempt, 15000)
-                    attempt++
-                    if (reconnectTimer) clearTimeout(reconnectTimer)
-                    reconnectTimer = setTimeout(() => {
-                        reconnectTimer = null
-                        if (!disposed) void setup()
-                    }, delay)
-                }
+                if (disposed) return
+                if (status === 'SUBSCRIBED' && visibleRef.current) created.track({ userId })
+                recovery.onStatus(created, status)
             })
         }
         void setup()
@@ -115,8 +106,8 @@ export function useTeamCursors(workspaceId: number | undefined) {
 
         return () => {
             disposed = true
+            recovery.dispose()
             clearInterval(prune)
-            if (reconnectTimer) clearTimeout(reconnectTimer)
             cursorsMap.clear()
             setCursors([])
             channelRef.current = null
@@ -128,7 +119,7 @@ export function useTeamCursors(workspaceId: number | undefined) {
         (world: { x: number; y: number } | null) => {
             const channel = channelRef.current
             // Hors d'un canal joint, realtime-js retombe sur un POST HTTP à chaque appel, soit jusqu'à
-            // 20 requêtes par seconde pendant un pan. Un curseur perdu n'a aucune importance.
+            // 10 requêtes par seconde pendant un pan. Un curseur perdu n'a aucune importance.
             if (!visible || !channel || channel.state !== REALTIME_CHANNEL_STATES.joined || !userId) return
 
             if (!world) {

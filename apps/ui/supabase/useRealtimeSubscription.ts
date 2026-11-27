@@ -1,6 +1,7 @@
 'use client'
 
 import type { Database, Tables } from '@/app/api/database.types'
+import { createChannelRecovery } from '@/supabase/channel-recovery'
 import { createClient } from '@/supabase/client'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import { useEffect, useRef } from 'react'
@@ -68,10 +69,13 @@ export function useRealtimeSubscription<T extends TableName>(table: T, options: 
         const filterString = filter ? `${filter.column}=eq.${filter.value}` : undefined
 
         let disposed = false
-        let attempt = 0
-        let reconnectTimer: ReturnType<typeof setTimeout> | null = null
         let resyncTimer: ReturnType<typeof setTimeout> | null = null
         let current: RealtimeChannel | null = null
+        const recovery = createChannelRecovery(async () => {
+            const replaced = current
+            if (replaced) await supabase.removeChannel(replaced)
+            if (!disposed) current = connect()
+        })
 
         const scheduleResync = () => {
             if (!callbacksRef.current.onResync) return
@@ -80,7 +84,6 @@ export function useRealtimeSubscription<T extends TableName>(table: T, options: 
         }
 
         const connect = (): RealtimeChannel => {
-            let alive = true
             // Topic unique par connexion : le client browser est un singleton et `channel(topic)`
             // rend le canal EXISTANT sur collision — un canal encore joint dont les `.on()`
             // throwent ("cannot add callbacks after subscribe"). Le filtrage postgres_changes est
@@ -135,29 +138,11 @@ export function useRealtimeSubscription<T extends TableName>(table: T, options: 
                 )
             }
 
+            recovery.watch(channel)
             channel.subscribe(subStatus => {
-                if (!alive || disposed) return
-                if (subStatus === 'SUBSCRIBED') {
-                    attempt = 0
-                    scheduleResync()
-                } else if (subStatus === 'CHANNEL_ERROR' || subStatus === 'TIMED_OUT' || subStatus === 'CLOSED') {
-                    // Un même canal émet souvent plusieurs statuts d'échec (erreur de join puis
-                    // phx_close) : chacun reprogrammait un connect(), les canaux doublaient à chaque
-                    // cycle jusqu'à des milliers. Le premier statut retire le canal, les suivants sont ignorés.
-                    alive = false
-                    const delay = Math.min(1000 * 2 ** attempt, 15000)
-                    attempt++
-                    if (reconnectTimer) clearTimeout(reconnectTimer)
-                    reconnectTimer = setTimeout(async () => {
-                        reconnectTimer = null
-                        if (disposed) return
-                        // Attendre la fin du teardown avant de reconnecter, sinon le nouveau
-                        // subscribe se fait no-op sur un socket en train de fermer.
-                        await supabase.removeChannel(channel)
-                        if (disposed) return
-                        current = connect()
-                    }, delay)
-                }
+                if (disposed) return
+                if (subStatus === 'SUBSCRIBED') scheduleResync()
+                recovery.onStatus(channel, subStatus)
             })
 
             return channel
@@ -174,7 +159,7 @@ export function useRealtimeSubscription<T extends TableName>(table: T, options: 
 
         return () => {
             disposed = true
-            if (reconnectTimer) clearTimeout(reconnectTimer)
+            recovery.dispose()
             if (resyncTimer) clearTimeout(resyncTimer)
             document.removeEventListener('visibilitychange', onVisible)
             window.removeEventListener('online', onOnline)

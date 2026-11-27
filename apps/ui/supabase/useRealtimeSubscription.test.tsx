@@ -7,13 +7,23 @@ import { useRealtimeSubscription } from './useRealtimeSubscription'
 
 let joined: ((status: string) => void) | null = null
 const channel = {
+    state: 'joining',
     on: () => channel,
     subscribe: (callback: (status: string) => void) => {
         joined = callback
         return channel
     },
 }
-vi.mock('@/supabase/client', () => ({ createClient: () => ({ channel: () => channel, removeChannel: async () => {} }) }))
+const opened = vi.hoisted(() => ({ count: 0 }))
+vi.mock('@/supabase/client', () => ({
+    createClient: () => ({
+        channel: () => {
+            opened.count++
+            return channel
+        },
+        removeChannel: async () => {},
+    }),
+}))
 
 let root: Root | null = null
 let visibility: DocumentVisibilityState = 'visible'
@@ -35,6 +45,8 @@ function showPage(state: DocumentVisibilityState) {
 beforeEach(() => {
     vi.useFakeTimers()
     joined = null
+    opened.count = 0
+    channel.state = 'joining'
     visibility = 'visible'
     vi.spyOn(document, 'visibilityState', 'get').mockImplementation(() => visibility)
 })
@@ -84,5 +96,30 @@ describe('useRealtimeSubscription resync', () => {
         window.dispatchEvent(new Event('online'))
         vi.advanceTimersByTime(500)
         expect(onResync).not.toHaveBeenCalled()
+    })
+})
+
+describe('useRealtimeSubscription recovery', () => {
+    it('leaves a channel that errored to realtime-js instead of opening another one', async () => {
+        await subscribe(() => {})
+        channel.state = 'errored'
+        act(() => joined?.('CHANNEL_ERROR'))
+        vi.advanceTimersByTime(5000)
+        channel.state = 'joined'
+        act(() => joined?.('SUBSCRIBED'))
+        await act(async () => {
+            await vi.advanceTimersByTimeAsync(60_000)
+        })
+        expect(opened.count).toBe(1)
+    })
+
+    it('opens a new channel when the server closed the old one', async () => {
+        await subscribe(() => {})
+        channel.state = 'closed'
+        act(() => joined?.('CLOSED'))
+        await act(async () => {
+            await vi.advanceTimersByTimeAsync(1000)
+        })
+        expect(opened.count).toBe(2)
     })
 })
