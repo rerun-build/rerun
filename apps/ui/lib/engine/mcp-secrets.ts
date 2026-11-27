@@ -1,16 +1,14 @@
-import { isUuid } from '@rerun/contracts'
+import { isUuid, mcpPlaceholderNames, renameMcpPlaceholders } from '@rerun/contracts'
 
 // Credential values never belong in an agent's config.json: they go to the engine key store and
 // the config keeps only a ${VAR} reference, which the engine substitutes at connect time (see the
 // engine's mcp-resolve.ts, which resolves command, args, url, env and headers alike).
 
-const PLACEHOLDER = /\$\{[A-Za-z_][A-Za-z0-9_]*\}/
-
 // A value already carrying a ref points at a stored secret, so it is left whole — including the
 // `Bearer ${VAR}` shape the connector compiler emits. Externalizing that would store the ref
 // itself as a literal, and the engine resolver only substitutes once.
 export function hasRef(value: string): boolean {
-    return PLACEHOLDER.test(value)
+    return mcpPlaceholderNames(value).length > 0
 }
 
 // A stored key name has to be something hasRef matches: a name it cannot match would be
@@ -215,7 +213,7 @@ export function separateKeys<T extends ServerRefs>(server: T, keys: Record<strin
         if (next !== name) renamed[name] = next
         separated[next] = value
     }
-    const swap = (text: string) => text.replace(/\$\{([A-Za-z_][A-Za-z0-9_]*)\}/g, (whole, name: string) => (renamed[name] ? ref(renamed[name]) : whole))
+    const swap = (text: string) => renameMcpPlaceholders(text, name => renamed[name])
     const swapAll = (pairs: Record<string, string>) => Object.fromEntries(Object.entries(pairs).map(([key, value]) => [key, swap(value)]))
     return {
         server: { ...server, args: server.args.map(swap), ...(server.url ? { url: swap(server.url) } : {}), env: swapAll(server.env), headers: swapAll(server.headers) },

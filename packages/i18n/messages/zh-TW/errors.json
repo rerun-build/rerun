@@ -276,6 +276,8 @@
     "inspectCoworkersFailed": "無法檢查同事。",
     "installServiceFailed": "無法安裝服務",
     "serviceKeyRejected": "{name} 拒絕了此金鑰。請確認您從 {name} 複製的是正確的金鑰，然後再試一次。",
+    "serviceCredentialNotJson": "{field} 不是有效的 JSON。請貼上 {name} 提供給你的檔案的完整內容，或直接拖放該檔案。",
+    "serviceNeedsEngineUpdate": "{name} 需要較新版本的工作區機器。它會在下次更新時取得該版本。",
     "shopifyAppNotInstalled": "您的 Shopify App 尚未安裝在 {domain}。請在 Dev Dashboard 中開啟該 App，點選「Install app」並選擇這家商店，然後再試一次。",
     "shopifyCredentialsRejected": "Shopify 無法辨識此 Client ID 和密鑰。請從 Dev Dashboard 中 App 的「Settings」重新複製兩者。",
     "shopifyStoreNotFound": "{domain} 沒有 Shopify 商店回應。請輸入您的 .myshopify.com 網域，例如 my-store.myshopify.com。",

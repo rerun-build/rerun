@@ -99,7 +99,10 @@
         "missingFields": "Bazı zorunlu alanlar hâlâ eksik."
     },
     "fields": {
-        "selectPlaceholder": "Seçin…"
+        "selectPlaceholder": "Seçin…",
+        "chooseFile": "veya dosyayı seçin",
+        "dropFile": "Bu alanı doldurmak için dosyayı bırakın",
+        "fileTooLarge": "Bu dosya bir kimlik bilgisi olamayacak kadar büyük."
     },
     "installed": {
         "title": "{name} kuruldu",

@@ -5,7 +5,7 @@ import type { EngineConnection, EngineMcpServer } from '@/lib/engine/types'
 import type { InputDef, McpServerTemplate, ServiceManifest, ServiceSkill } from './manifest'
 import { deleteConnectedAccount } from '@/lib/composio/client'
 import { type ServiceInstanceTarget, defaultInstanceEnvVar, heldAccounts, instanceEnvVar, instanceServerName, ordinalInstanceLabel } from './instances'
-import { appTarget, composioTarget, getMethod, managedTarget, oauthServer, skillQuotesAccount, variablePattern } from './manifest'
+import { FILE_INPUT_PLACEHOLDER, appTarget, composioTarget, fileInputKeys, getMethod, managedTarget, oauthServer, skillQuotesAccount, variablePattern } from './manifest'
 import { type RegistryEntry, readRegistry, registryFootprint, upsertRegistryEntry } from './registry'
 
 // Substitution context shared by every template string in a compile pass. Non-secret
@@ -35,11 +35,23 @@ function substituteBasic(value: string, ctx: SubstituteContext): string {
     })
 }
 
+// `${file:input.KEY}` keeps the value in its own secret and becomes `${file:VAR}`, which the engine
+// turns into the path of a file holding it. checkFileCredentials already put the value on one line.
+// A field left blank keeps the reference, like a plain secret: a recompile keeps the credential held.
+function substituteFile(value: string, ctx: SubstituteContext): string {
+    return value.replace(FILE_INPUT_PLACEHOLDER, (_, key: string) => {
+        const varName = ctx.varNameFor(key)
+        const credential = ctx.values[key]
+        if (credential) ctx.derivedSecrets[varName] = credential
+        return `\${file:${varName}}`
+    })
+}
+
 // ${agent.id} is resolved here (the engine's ${VAR} resolver can't — it disallows the dot),
 // so a managed proxy server can carry the agent id in a header. ${RERUN_API_KEY} /
 // ${RERUN_HUB_BASE_URL} are left intact for the engine to resolve from its own env.
 function substitute(value: string, ctx: SubstituteContext): string {
-    return substituteBasic(value, ctx).replaceAll('${agent.id}', ctx.engineAgentId).replace(/\$\{input\.([A-Za-z0-9_]+)\}/g, (_, key) => {
+    return substituteFile(substituteBasic(value, ctx), ctx).replaceAll('${agent.id}', ctx.engineAgentId).replace(/\$\{input\.([A-Za-z0-9_]+)\}/g, (_, key) => {
         if (ctx.inputMap.get(key)?.secret) {
             ctx.referencedSecrets.add(key)
             return `\${${ctx.varNameFor(key)}}`
@@ -162,9 +174,11 @@ export function compileServiceParts(manifest: ServiceManifest, values: Record<st
     }
     Object.assign(env, ctx.derivedSecrets)
 
+    // A value written to a file is a credential, even under an input its author left unmarked.
+    const fileKeys = fileInputKeys(method)
     const config: Record<string, string> = {}
     for (const input of method.inputs) {
-        if (!input.secret && values[input.key] !== undefined) config[input.key] = values[input.key]
+        if (!input.secret && !fileKeys.has(input.key) && values[input.key] !== undefined) config[input.key] = values[input.key]
     }
 
     // An OAuth / managed service is only usable once the user signs in — the sign-in writes

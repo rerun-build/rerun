@@ -166,3 +166,62 @@ describe('decompileService', () => {
         expect(vi.mocked(deleteSkill).mock.calls.map(call => call[2])).toEqual(['own'])
     })
 })
+
+const firebase = serviceManifestSchema.parse({
+    slug: 'firebase',
+    name: 'Firebase',
+    category: 'dev',
+    inputs: [{ key: 'FIREBASE_SERVICE_ACCOUNT', label: 'Service account JSON', type: 'password', secret: true, required: true, multiline: true }],
+    mcpServers: [
+        {
+            name: 'firebase',
+            transport: 'stdio',
+            command: 'npx',
+            args: ['-y', 'firebase-tools@latest', 'mcp'],
+            env: { GOOGLE_APPLICATION_CREDENTIALS: '${file:input.FIREBASE_SERVICE_ACCOUNT}' },
+        },
+    ],
+})
+
+const SERVICE_ACCOUNT = '{"type":"service_account","project_id":"demo","private_key":"-----BEGIN PRIVATE KEY-----\\nabc\\n-----END PRIVATE KEY-----\\n"}'
+const FILE_VAR = 'RERUN_SVC_FIREBASE_FIREBASE_SERVICE_ACCOUNT'
+
+describe('compileService with a file: placeholder', () => {
+    beforeEach(() => vi.clearAllMocks())
+
+    it('stores the credential as a secret and hands the engine a file reference to it', async () => {
+        await compileService('agent', firebase, { FIREBASE_SERVICE_ACCOUNT: SERVICE_ACCOUNT })
+
+        expect(updateAgentKeys).toHaveBeenCalledWith({}, 'engine-agent', { set: { [FILE_VAR]: SERVICE_ACCOUNT } })
+        const [server] = vi.mocked(patchMcpServers).mock.calls[0][2].upsert!
+        expect(server.env).toEqual({ GOOGLE_APPLICATION_CREDENTIALS: `\${file:${FILE_VAR}}` })
+        expect(JSON.stringify(vi.mocked(patchMcpServers).mock.calls[0])).not.toContain('service_account')
+    })
+
+    it('keeps the credential out of the registry, even under an input left unmarked, and records its key for uninstall', async () => {
+        const unmarked = serviceManifestSchema.parse({ ...firebase, authMethods: [], inputs: [{ ...firebase.authMethods[0].inputs[0], secret: false }], mcpServers: firebase.authMethods[0].mcpServers })
+        await compileService('agent', unmarked, { FIREBASE_SERVICE_ACCOUNT: SERVICE_ACCOUNT })
+
+        const [, , , entry] = vi.mocked(upsertRegistryEntry).mock.calls[0]
+        expect(entry.config).toEqual({})
+        expect(entry.envKeys).toEqual([FILE_VAR])
+    })
+
+    it('keeps the file reference of an optional credential left blank, so a recompile keeps the one held', async () => {
+        const optional = serviceManifestSchema.parse({ ...firebase, authMethods: [], inputs: [{ ...firebase.authMethods[0].inputs[0], required: false }], mcpServers: firebase.authMethods[0].mcpServers })
+        await compileService('agent', optional, { FIREBASE_SERVICE_ACCOUNT: '' })
+
+        const [server] = vi.mocked(patchMcpServers).mock.calls[0][2].upsert!
+        expect(server.env).toEqual({ GOOGLE_APPLICATION_CREDENTIALS: `\${file:${FILE_VAR}}` })
+        expect(updateAgentKeys).not.toHaveBeenCalled()
+    })
+
+    it('gives an extra account a file of its own', async () => {
+        await compileService('agent', firebase, { FIREBASE_SERVICE_ACCOUNT: SERVICE_ACCOUNT }, undefined, undefined, { key: 'firebase@k3x9ab', instanceId: 'k3x9ab' })
+
+        const [server] = vi.mocked(patchMcpServers).mock.calls[0][2].upsert!
+        const [varName] = Object.keys(vi.mocked(updateAgentKeys).mock.calls[0][2].set!)
+        expect(varName).not.toBe(FILE_VAR)
+        expect(server.env.GOOGLE_APPLICATION_CREDENTIALS).toBe(`\${file:${varName}}`)
+    })
+})

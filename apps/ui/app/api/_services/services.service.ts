@@ -40,6 +40,7 @@ import {
     upsertRegistryEntry,
 } from '@/lib/services/registry'
 import { rerankRelevant } from '@/lib/services/rerank'
+import { checkFileCredentials } from '@/lib/services/file-credentials'
 import { checkShopifyCredentials } from '@/lib/services/shopify-credentials'
 import { sanitizeIlike } from '@/lib/search/ilike'
 import { ALTERNATIVE_THRESHOLD, MAX_OFFERED_ALTERNATIVES } from '@/lib/services/alternatives'
@@ -469,7 +470,8 @@ export async function installService(
         else await markServiceNeedsConfig(agentId, key, method.id, actor, instance ? { instanceId: instance.instanceId, label: instance.label } : undefined)
         return { status: 'needs_config', key, slug: manifest.slug, name: manifest.name, authMethods: toAuthMethodSummaries(manifest), authMethodId: method.id, message: `${manifest.name} needs configuration. A form has been shown to the user — ask them to fill it in.` }
     }
-    const checked = await checkShopifyCredentials(manifest.slug, method.id, values)
+    const engine = async () => vault?.conn ?? (await resolveAgentTarget(agentId, 'manage', actor)).conn
+    const checked = await checkFileCredentials(manifest, method, await checkShopifyCredentials(manifest.slug, method.id, values), engine)
 
     const intoVault = vault
         ? await rethrowConflict(vault.ctx, () => compileIntoVault({ conn: vault.conn, manifest, values: checked, authMethodId: method.id, instance: instance ?? undefined, itemId: vault.itemId, engineAgentId: vault.engineAgentId, createdBy: vault.createdBy }))

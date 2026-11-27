@@ -99,7 +99,10 @@
         "missingFields": "仍有必填字段未填写。"
     },
     "fields": {
-        "selectPlaceholder": "请选择…"
+        "selectPlaceholder": "请选择…",
+        "chooseFile": "或选择文件",
+        "dropFile": "拖放文件以填写此字段",
+        "fileTooLarge": "此文件太大，不可能是凭据。"
     },
     "installed": {
         "title": "{name} 已安装",

@@ -18,7 +18,8 @@ const TOKEN_BASE = 'pointer-events-auto inline cursor-pointer rounded-[3px] -mx-
 const TOKEN_SET = 'bg-emerald-400/10 text-emerald-600 ring-emerald-400/40 hover:bg-emerald-400/20 dark:text-emerald-400'
 const TOKEN_UNSET = 'bg-orange-500/10 text-orange-600 ring-orange-500/40 hover:bg-orange-500/20 dark:text-orange-400'
 
-export function McpVariableToken({ name, vars }: { name: string; vars: AgentVariables }) {
+// `text` is the placeholder exactly as written (`${KEY}` or `${file:KEY}`), so the mirror stays aligned.
+export function McpVariableToken({ name, text, vars }: { name: string; text: string; vars: AgentVariables }) {
     const t = useTranslations('agent.mcpVariableToken')
     const [open, setOpen] = useState(false)
     const [value, setValue] = useState('')
@@ -51,7 +52,7 @@ export function McpVariableToken({ name, vars }: { name: string; vars: AgentVari
             >
                 <PopoverTrigger asChild>
                     <button type="button" aria-label={t('editVariable', { name })} className={`${TOKEN_BASE} ${isDefined ? TOKEN_SET : TOKEN_UNSET}`}>
-                        {`\${${name}}`}
+                        {text}
                     </button>
                 </PopoverTrigger>
                 <PopoverContent align="start" onOpenAutoFocus={e => e.preventDefault()}>

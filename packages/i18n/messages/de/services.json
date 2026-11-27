@@ -99,7 +99,10 @@
         "missingFields": "Einige Pflichtfelder fehlen noch."
     },
     "fields": {
-        "selectPlaceholder": "Auswählen…"
+        "selectPlaceholder": "Auswählen…",
+        "chooseFile": "oder die Datei auswählen",
+        "dropFile": "Datei hier ablegen, um dieses Feld auszufüllen",
+        "fileTooLarge": "Diese Datei ist zu groß für Zugangsdaten."
     },
     "installed": {
         "title": "{name} installiert",

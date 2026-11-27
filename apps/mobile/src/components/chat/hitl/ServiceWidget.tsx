@@ -179,7 +179,7 @@ export function ServiceWidget({ pending, agentId, onAnswer, webUrl }: HitlWidget
                                 <>
                                     <FromVault slug={step.slug} vault={vault} disabled={busy} onLent={() => settle('connected', at)} />
                                     {(methodOf(step)?.inputs ?? []).map(input => (
-                                        <TextField key={input.key} id={input.key} verbatim label={input.label} help={input.help} placeholder={input.placeholder} secret={input.secret || input.type === 'password'} value={stepValues[input.key] ?? ''} onChangeText={text => setValues(current => ({ ...current, [step.slug]: { ...current[step.slug], [input.key]: text } }))} />
+                                        <TextField key={input.key} id={input.key} verbatim label={input.label} help={input.help} placeholder={input.placeholder} secret={!input.multiline && (input.secret || input.type === 'password')} multiline={input.multiline} value={stepValues[input.key] ?? ''} onChangeText={text => setValues(current => ({ ...current, [step.slug]: { ...current[step.slug], [input.key]: text } }))} />
                                     ))}
                                 </>
                             )}

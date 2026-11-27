@@ -224,7 +224,16 @@ export function isPaidApp(manifest: ServiceManifest): boolean {
     return manifest.authMethods.some(method => method.kind === 'app')
 }
 
-const INPUT_REFERENCE = /\$\{(?:basic:)?input\.([A-Za-z0-9_]+)(?::input\.([A-Za-z0-9_]+))?\}/g
+const INPUT_REFERENCE = /\$\{(?:basic:|file:)?input\.([A-Za-z0-9_]+)(?::input\.([A-Za-z0-9_]+))?\}/g
+
+// `${file:input.KEY}`: the server takes the value as a file (a service account JSON), whose path the
+// engine puts in place of the placeholder when it starts the server.
+export const FILE_INPUT_PLACEHOLDER = /\$\{file:input\.([A-Za-z0-9_]+)\}/g
+
+export function fileInputKeys(method: AuthMethod): Set<string> {
+    const values = method.mcpServers.flatMap(server => [server.command ?? '', server.url ?? '', ...server.args, ...Object.values(server.env), ...Object.values(server.headers)])
+    return new Set(values.flatMap(value => [...value.matchAll(FILE_INPUT_PLACEHOLDER)].map(match => match[1])))
+}
 const ACCOUNT_KINDS = new Set<AuthMethod['kind']>(['oauth', 'managed', 'composio', 'app'])
 
 function referencedInputs(text: string): Set<string> {

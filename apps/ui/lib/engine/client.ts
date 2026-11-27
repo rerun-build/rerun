@@ -24,6 +24,7 @@ import {
     ENGINE_CAPABILITY_SCHEDULE_RENAME,
     ENGINE_CAPABILITY_SCRIPT_ROUTINES,
     ENGINE_CAPABILITY_VAULT,
+    ENGINE_CAPABILITY_MCP_FILE_SECRETS,
     ENGINE_CAPABILITY_VAULT_INSTANCE,
     ENGINE_CAPABILITY_VAULT_RENAME,
     ENGINE_CAPABILITY_FOREMAN_VAULT,
@@ -781,6 +782,11 @@ export async function supportsScheduleRename(conn: EngineConnection): Promise<bo
 
 export async function supportsScriptRoutines(conn: EngineConnection): Promise<boolean> {
     return (await engineCapabilities(conn)).has(ENGINE_CAPABILITY_SCRIPT_ROUTINES)
+}
+
+// The box writes a `${file:VAR}` of an MCP server to a file and hands the server its path.
+export async function supportsMcpFileSecrets(conn: EngineConnection): Promise<boolean> {
+    return (await engineCapabilities(conn)).has(ENGINE_CAPABILITY_MCP_FILE_SECRETS)
 }
 
 // The box keeps the workspace's Vault. Without it, every connector stays in its coworker's folder.

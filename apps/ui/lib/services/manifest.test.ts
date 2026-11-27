@@ -1,4 +1,4 @@
-import { composioTarget, defaultMethod, predictInstall, serviceManifestSchema, skillQuotesAccount, takesSeveralAccounts, usesInstances } from '@/lib/services/manifest'
+import { composioTarget, defaultMethod, fileInputKeys, predictInstall, serviceManifestSchema, skillQuotesAccount, takesSeveralAccounts, usesInstances } from '@/lib/services/manifest'
 import { describe, expect, it } from 'vitest'
 
 const linkedinManifest = {
@@ -87,6 +87,12 @@ describe('takesSeveralAccounts', () => {
         })
         expect(takesSeveralAccounts(unipile)).toBe(true)
         expect(skillQuotesAccount(unipile.skills[0], unipile.authMethods[0])).toBe(true)
+    })
+
+    it('reads an input written to a file as one the skill quotes', () => {
+        const method = defaultMethod(serviceManifestSchema.parse({ slug: 'f', name: 'F', inputs: [apiKey], mcpServers: [{ name: 'f', command: 'npx', env: { CREDS: '${file:input.API_KEY}' } }] }))
+        expect(skillQuotesAccount({ name: 's', description: '', body: 'Credentials at ${file:input.API_KEY}' }, method)).toBe(true)
+        expect(fileInputKeys(method)).toEqual(new Set(['API_KEY']))
     })
 
     it('reads a variable by its whole name, never inside a longer one', () => {

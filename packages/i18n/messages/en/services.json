@@ -118,7 +118,10 @@
         "missingFields": "Some required fields are still missing."
     },
     "fields": {
-        "selectPlaceholder": "Select…"
+        "selectPlaceholder": "Select…",
+        "chooseFile": "or choose the file",
+        "dropFile": "Drop the file to fill this field",
+        "fileTooLarge": "This file is too large to be a credential."
     },
     "installed": {
         "title": "{name} installed",

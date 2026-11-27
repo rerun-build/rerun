@@ -114,6 +114,8 @@ describe('parseMcpConfig', () => {
         expect(error(parseMcpConfig('{ "a": { "command": "npx", "args": ["${input:key}"] } }'))).toMatchObject({ code: 'unresolvedRef', field: 'args' })
         expect(error(parseMcpConfig('{ "a": { "url": "https://a.dev/${T:-x}" } }'))).toMatchObject({ code: 'unresolvedRef', field: 'url' })
         expect(servers(parseMcpConfig('{ "a": { "command": "npx", "env": { "T": "${T}" } } }'))[0].env).toEqual({ T: '${T}' })
+        expect(servers(parseMcpConfig('{ "a": { "command": "npx", "env": { "C": "${file:SA}" } } }'))[0].env).toEqual({ C: '${file:SA}' })
+        expect(error(parseMcpConfig('{ "a": { "command": "npx", "env": { "C": "${file:a/b.json}" } } }'))).toMatchObject({ code: 'unresolvedRef', field: 'C' })
     })
 
     it('refuses a value on several lines, not one that ends with a line break', () => {

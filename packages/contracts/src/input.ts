@@ -18,6 +18,9 @@ export const inputDefSchema = z.object({
     secret: z.boolean().default(false),
     options: z.array(inputOptionSchema).optional(),
     placeholder: z.string().optional(),
+    // A value pasted over several lines (a service account JSON), with its file droppable instead.
+    // Apart from `type` so a build of the app that predates it still reads the field, as one line.
+    multiline: z.boolean().optional(),
     // One line under the field, inline markdown only: where to find the value.
     help: z.string().optional(),
     // Markdown numbered steps shown in a collapsible under the field: how to create the value,

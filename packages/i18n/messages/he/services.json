@@ -99,7 +99,10 @@
         "missingFields": "חלק מהשדות הנדרשים עדיין חסרים."
     },
     "fields": {
-        "selectPlaceholder": "לבחור…"
+        "selectPlaceholder": "לבחור…",
+        "chooseFile": "או בחרו את הקובץ",
+        "dropFile": "שחררו את הקובץ כדי למלא שדה זה",
+        "fileTooLarge": "הקובץ הזה גדול מדי מכדי להיות פרטי התחברות."
     },
     "installed": {
         "title": "{name} הותקן",

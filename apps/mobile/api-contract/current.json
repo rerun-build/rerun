@@ -3938,6 +3938,9 @@
                                                                     "label": {
                                                                         "type": "string"
                                                                     },
+                                                                    "multiline": {
+                                                                        "type": "boolean"
+                                                                    },
                                                                     "options": {
                                                                         "items": {
                                                                             "anyOf": [
@@ -4166,6 +4169,9 @@
                                                                 },
                                                                 "label": {
                                                                     "type": "string"
+                                                                },
+                                                                "multiline": {
+                                                                    "type": "boolean"
                                                                 },
                                                                 "options": {
                                                                     "items": {
@@ -4571,6 +4577,9 @@
                                                                         },
                                                                         "label": {
                                                                             "type": "string"
+                                                                        },
+                                                                        "multiline": {
+                                                                            "type": "boolean"
                                                                         },
                                                                         "options": {
                                                                             "items": {

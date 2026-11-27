@@ -276,6 +276,8 @@
     "inspectCoworkersFailed": "Die Coworker konnten nicht untersucht werden.",
     "installServiceFailed": "Dienst konnte nicht installiert werden",
     "serviceKeyRejected": "{name} hat diesen Schlüssel abgelehnt. Prüfe, ob du den richtigen aus {name} kopiert hast, und versuche es erneut.",
+    "serviceCredentialNotJson": "{field} ist kein gültiges JSON. Füge den gesamten Inhalt der Datei ein, die du von {name} erhalten hast, oder lege die Datei selbst ab.",
+    "serviceNeedsEngineUpdate": "{name} benötigt eine neuere Version der Maschine deines Workspace. Sie erhält sie mit dem nächsten Update.",
     "shopifyAppNotInstalled": "Deine Shopify-App ist nicht auf {domain} installiert. Öffne im Dev Dashboard die App, klicke auf Install app, wähle diesen Shop und versuche es dann erneut.",
     "shopifyCredentialsRejected": "Shopify erkennt diese Client ID und dieses Secret nicht. Kopiere beide erneut aus den Settings deiner App im Dev Dashboard.",
     "shopifyStoreNotFound": "Unter {domain} antwortet kein Shopify-Shop. Gib deine .myshopify.com-Domain ein, z. B. my-store.myshopify.com.",

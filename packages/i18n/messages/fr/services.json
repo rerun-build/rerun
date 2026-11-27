@@ -99,7 +99,10 @@
         "missingFields": "Certains champs obligatoires manquent encore."
     },
     "fields": {
-        "selectPlaceholder": "Sélectionner…"
+        "selectPlaceholder": "Sélectionner…",
+        "chooseFile": "ou choisir le fichier",
+        "dropFile": "Déposez le fichier pour remplir ce champ",
+        "fileTooLarge": "Ce fichier est trop volumineux pour être un identifiant."
     },
     "installed": {
         "title": "{name} installé",

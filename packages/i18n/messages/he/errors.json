@@ -276,6 +276,8 @@
     "inspectCoworkersFailed": "בדיקת העמיתים נכשלה.",
     "installServiceFailed": "התקנת השירות נכשלה",
     "serviceKeyRejected": "{name} דחה את המפתח הזה. יש לוודא שהעתקת את המפתח הנכון מ-{name}, ואז לנסות שוב.",
+    "serviceCredentialNotJson": "{field} אינו JSON תקין. הדביקו את כל התוכן של הקובץ ש-{name} נתן לכם, או שחררו את הקובץ עצמו.",
+    "serviceNeedsEngineUpdate": "{name} דורש גרסה חדשה יותר של המכונה של סביבת העבודה שלכם. היא תקבל אותה בעדכון הבא.",
     "shopifyAppNotInstalled": "אפליקציית Shopify שלך לא מותקנת ב-{domain}. ב-Dev Dashboard יש לפתוח את האפליקציה, ללחוץ על Install app ולבחור את החנות הזו, ואז לנסות שוב.",
     "shopifyCredentialsRejected": "Shopify לא מזהה את ה-Client ID והסוד האלה. יש להעתיק את שניהם שוב מ-Settings של האפליקציה ב-Dev Dashboard.",
     "shopifyStoreNotFound": "אף חנות Shopify לא עונה בכתובת {domain}. יש להזין את הדומיין ‎.myshopify.com שלך, למשל my-store.myshopify.com.",

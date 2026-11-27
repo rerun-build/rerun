@@ -122,8 +122,9 @@ function proposeName(source: string | undefined, url: string | undefined, index:
 }
 
 // `${input:token}`, `${env:TOKEN}` and `${TOKEN:-default}` are resolved by the client the config was
-// written for. Rerun only reads `${TOKEN}`, so the rest would be stored as the secret itself.
-const FOREIGN_REF = /\$\{[A-Za-z_][A-Za-z0-9_]*:[^}]*\}/
+// written for. Rerun only reads `${TOKEN}` and `${file:TOKEN}`, so the rest would be stored as the
+// secret itself.
+const FOREIGN_REF = /\$\{(?!file:[A-Za-z_][A-Za-z0-9_]*\})[A-Za-z_][A-Za-z0-9_]*:[^}]*\}/
 
 type ValueProblem = { code: 'unresolvedRef'; field: string; ref: string } | { code: 'multiline'; field: string }
 

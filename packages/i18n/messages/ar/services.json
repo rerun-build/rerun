@@ -99,7 +99,10 @@
         "missingFields": "لا تزال بعض الحقول المطلوبة ناقصة."
     },
     "fields": {
-        "selectPlaceholder": "اختر…"
+        "selectPlaceholder": "اختر…",
+        "chooseFile": "أو اختر الملف",
+        "dropFile": "أفلت الملف لملء هذا الحقل",
+        "fileTooLarge": "هذا الملف أكبر من أن يكون بيانات اعتماد."
     },
     "installed": {
         "title": "تم تثبيت {name}",

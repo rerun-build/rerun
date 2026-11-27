@@ -276,6 +276,8 @@
     "inspectCoworkersFailed": "Coworker'lar incelenemedi.",
     "installServiceFailed": "Servis yüklenemedi",
     "serviceKeyRejected": "{name} bu anahtarı reddetti. {name} üzerinden doğru anahtarı kopyaladığınızı kontrol edip tekrar deneyin.",
+    "serviceCredentialNotJson": "{field} geçerli bir JSON değil. {name} tarafından verilen dosyanın tüm içeriğini yapıştırın veya dosyanın kendisini bırakın.",
+    "serviceNeedsEngineUpdate": "{name}, workspace'inizin makinesinin daha yeni bir sürümünü gerektiriyor. Makine bir sonraki güncellemesiyle bu sürüme geçecek.",
     "shopifyAppNotInstalled": "Shopify uygulamanız {domain} üzerinde yüklü değil. Dev Dashboard içinde uygulamayı açın, Install app seçeneğine tıklayıp bu mağazayı seçin, ardından tekrar deneyin.",
     "shopifyCredentialsRejected": "Shopify bu Client ID ve secret'ı tanımıyor. İkisini de Dev Dashboard'da uygulamanızın Settings bölümünden yeniden kopyalayın.",
     "shopifyStoreNotFound": "{domain} adresinde yanıt veren bir Shopify mağazası yok. .myshopify.com alan adınızı girin, örneğin my-store.myshopify.com.",

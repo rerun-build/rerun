@@ -5,23 +5,21 @@ import { Field } from '@/components/ui/field'
 import { TextareaMirror } from '@/components/ui/textarea-mirror'
 import type { AgentVariables } from '@/hooks/useAgentVariables'
 import { cn } from '@/lib/utils'
+import { MCP_PLACEHOLDER } from '@rerun/contracts'
 import { useId, useMemo, type ClipboardEvent } from 'react'
-
-// Same shape the engine's resolver substitutes at connect time (see engine mcp-resolve.ts).
-const PLACEHOLDER = /\$\{([A-Za-z_][A-Za-z0-9_]*)\}/g
 
 // Typography and box metrics have to be byte-identical between the textarea and the mirror layered
 // on top of it, otherwise the highlights drift away from the characters they mark.
 const METRICS = 'px-2.5 py-2 font-mono text-xs leading-5 whitespace-pre-wrap break-words'
 
-type Segment = { kind: 'text'; text: string } | { kind: 'var'; name: string }
+type Segment = { kind: 'text'; text: string } | { kind: 'var'; name: string; text: string }
 
 function tokenize(value: string): Segment[] {
     const segments: Segment[] = []
     let cursor = 0
-    for (const match of value.matchAll(PLACEHOLDER)) {
+    for (const match of value.matchAll(MCP_PLACEHOLDER)) {
         if (match.index > cursor) segments.push({ kind: 'text', text: value.slice(cursor, match.index) })
-        segments.push({ kind: 'var', name: match[1] })
+        segments.push({ kind: 'var', name: match[2], text: match[0] })
         cursor = match.index + match[0].length
     }
     segments.push({ kind: 'text', text: value.slice(cursor) })
@@ -72,7 +70,7 @@ export function McpVarTextarea({ label, helperText, warning, value, onChange, pl
                                 {segment.kind === 'text' ? segment.text : `\${${segment.name}}`}
                             </span>
                         ) : (
-                            <McpVariableToken key={index} name={segment.name} vars={vars} />
+                            <McpVariableToken key={index} name={segment.name} text={segment.text} vars={vars} />
                         ),
                     )}
                 </TextareaMirror>
