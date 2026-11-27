@@ -7,6 +7,7 @@ vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 
 const { createServiceRoleClient } = await import('@/supabase/serviceRole')
 const { authenticateApiKey, bindImportKey, generateApiKey, hashApiKey } = await import('./api-keys')
+const { forgetStamps } = await import('@/lib/server/stamp-memory')
 
 const LIVE = { keyId: 'k1', workspaceId: 5, createdByUserId: 'u1', scope: 'account', boundAgentId: null }
 
@@ -24,6 +25,7 @@ beforeEach(() => {
         return undefined
     })
     vi.mocked(createServiceRoleClient).mockReset().mockReturnValue(db.client)
+    forgetStamps()
 })
 
 describe('authenticateApiKey', () => {
@@ -66,12 +68,27 @@ describe('authenticateApiKey', () => {
         expect(write.filters.map(call => call.args)).toEqual([['id', 'k1']])
     })
 
+    it('marks a key used again and again only once every five minutes', async () => {
+        await authenticateApiKey(generateApiKey())
+        await authenticateApiKey(generateApiKey())
+        expect(db.writes('api_keys')).toHaveLength(1)
+    })
+
     it('stamps the activity of a sandbox, at most once an hour', async () => {
+        workspaceRow = { subscription_status: 'active', is_sandbox: true, api_access: true }
+        await authenticateApiKey(generateApiKey())
         await authenticateApiKey(generateApiKey())
         await Promise.resolve()
-        const [write] = db.writes('workspaces')
-        expect(write.payload).toEqual({ last_active_at: expect.any(String) })
-        expect(write.filters.map(call => call.args)).toEqual([['id', 5], ['is_sandbox', true], [expect.stringMatching(/^last_active_at\.is\.null,last_active_at\.lt\./)]])
+        const writes = db.writes('workspaces')
+        expect(writes).toHaveLength(1)
+        expect(writes[0].payload).toEqual({ last_active_at: expect.any(String) })
+        expect(writes[0].filters.map(call => call.args)).toEqual([['id', 5], ['is_sandbox', true], [expect.stringMatching(/^last_active_at\.is\.null,last_active_at\.lt\./)]])
+    })
+
+    it('stamps no activity for a workspace that is not a sandbox', async () => {
+        await authenticateApiKey(generateApiKey())
+        await Promise.resolve()
+        expect(db.writes('workspaces')).toEqual([])
     })
 
     it('still authenticates when the last_used_at update fails', async () => {

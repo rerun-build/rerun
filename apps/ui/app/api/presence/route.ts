@@ -1,4 +1,5 @@
 import { clearPresence, touchPresence, touchSandboxActivity } from '@/app/api/_services/presence.service'
+import { shouldStamp } from '@/lib/server/stamp-memory'
 import { getSessionIdentity } from '@/supabase/session/getServerSession'
 
 // A route handler rather than a server action: only fetch(keepalive) can still reach the server
@@ -13,9 +14,13 @@ async function currentUserId(): Promise<string | null> {
     return identity.id
 }
 
+// The presence must stay fresh to the beat, the sandbox activity only to the hour: the database
+// already refuses a second stamp within the hour, so the call itself is spared too.
+const SANDBOX_ACTIVITY_INTERVAL_MS = 60 * 60_000
+
 export async function POST(): Promise<Response> {
     const userId = await currentUserId()
-    if (userId) await Promise.all([touchPresence(userId), touchSandboxActivity(userId)])
+    if (userId) await Promise.all([touchPresence(userId), shouldStamp(`presence-sandbox:${userId}`, SANDBOX_ACTIVITY_INTERVAL_MS) ? touchSandboxActivity(userId) : null])
     return new Response(null, { status: 204 })
 }
 

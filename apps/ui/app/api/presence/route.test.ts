@@ -21,12 +21,14 @@ vi.mock('@/app/api/_services/presence.service', () => ({
 }))
 
 const { DELETE, POST } = await import('./route')
+const { forgetStamps } = await import('@/lib/server/stamp-memory')
 
 const claimsOf = (claims: Record<string, unknown> | null) => ({ data: claims ? { claims } : null, error: null })
 
 describe('/api/presence', () => {
     beforeEach(() => {
         for (const mock of Object.values(mocks)) mock.mockReset()
+        forgetStamps()
     })
 
     it('stamps a signed-in tab from its token, without asking the auth server', async () => {
@@ -58,5 +60,19 @@ describe('/api/presence', () => {
         expect((await POST()).status).toBe(204)
         expect(mocks.touchPresence).not.toHaveBeenCalled()
         expect(mocks.getUser).not.toHaveBeenCalled()
+    })
+
+    it('touches the presence on every beat, the sandbox activity once an hour', async () => {
+        vi.useFakeTimers()
+        mocks.getClaims.mockResolvedValue(claimsOf({ sub: 'u1', is_anonymous: false }))
+        await POST()
+        vi.advanceTimersByTime(30_000)
+        await POST()
+        expect(mocks.touchPresence).toHaveBeenCalledTimes(2)
+        expect(mocks.touchSandboxActivity).toHaveBeenCalledTimes(1)
+        vi.advanceTimersByTime(60 * 60_000)
+        await POST()
+        expect(mocks.touchSandboxActivity).toHaveBeenCalledTimes(2)
+        vi.useRealTimers()
     })
 })

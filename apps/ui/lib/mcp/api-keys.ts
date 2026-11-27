@@ -2,6 +2,7 @@ import 'server-only'
 
 import type { Database } from '@/app/api/database.types'
 import { isWorkspaceApiEntitled } from '@rerun/cloud/billing'
+import { shouldStamp } from '@/lib/server/stamp-memory'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { createHash, randomBytes } from 'node:crypto'
@@ -10,6 +11,7 @@ const KEY_PREFIX = 'rk_'
 const KEY_BYTES = 30
 const DISPLAY_PREFIX_LENGTH = 12
 const ACTIVITY_STAMP_INTERVAL_MS = 60 * 60_000
+const LAST_USED_STAMP_INTERVAL_MS = 5 * 60_000
 
 const API_KEY_AUTH_COLUMNS = ['id', 'workspace_id', 'revoked_at', 'created_by_user_id', 'expires_at', 'scope', 'bound_agent_id'] as const
 
@@ -67,17 +69,20 @@ export async function authenticateApiKey(token: string): Promise<AuthenticatedAp
     const { data: workspace } = await selectMaybeSingle(supabase, 'workspaces', ['subscription_status', 'is_sandbox', 'api_access'] as const, { id: data.workspace_id })
     if (!workspace || !isWorkspaceApiEntitled(workspace)) return null
 
-    // Best-effort freshness marker: never let it fail or slow down the call it authenticates.
-    supabase
-        .from('api_keys')
-        .update<Database['public']['Tables']['api_keys']['Update']>({ last_used_at: new Date().toISOString() })
-        .eq('id', data.id)
-        .then(
-            () => undefined,
-            () => undefined,
-        )
+    // Best-effort freshness marker: never let it fail or slow down the call it authenticates. Every
+    // MCP request authenticates, so it is written once every few minutes rather than on each one.
+    if (shouldStamp(`api-key:${data.id}`, LAST_USED_STAMP_INTERVAL_MS)) {
+        supabase
+            .from('api_keys')
+            .update<Database['public']['Tables']['api_keys']['Update']>({ last_used_at: new Date().toISOString() })
+            .eq('id', data.id)
+            .then(
+                () => undefined,
+                () => undefined,
+            )
+    }
 
-    void stampSandboxActivity(data.workspace_id)
+    if (workspace.is_sandbox && shouldStamp(`sandbox-activity:${data.workspace_id}`, ACTIVITY_STAMP_INTERVAL_MS)) void stampSandboxActivity(data.workspace_id)
 
     return {
         keyId: data.id,
