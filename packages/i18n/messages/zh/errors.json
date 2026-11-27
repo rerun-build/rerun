@@ -13,6 +13,8 @@
     "passkeyNameRequired": "请为此通行密钥命名。",
     "passkeyNameTooLong": "名称请少于 {max} 个字符。",
     "passkeySaveFailed": "无法保存此名称。",
+    "passkeyRefused": "通行密钥没有响应。请重试，或使用其他方式。",
+    "passkeyLimit": "最多可以添加 {max} 个通行密钥。请先移除一个。",
     "signOutSessionFailed": "无法让此会话退出登录。",
     "notMember": "您不是此工作区的成员",
     "userNotMember": "该用户不是此工作区的成员。",

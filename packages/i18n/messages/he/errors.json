@@ -13,6 +13,8 @@
     "passkeyNameRequired": "צריך לתת שם למפתח הגישה הזה.",
     "passkeyNameTooLong": "השם צריך להיות קצר מ-{max} תווים.",
     "passkeySaveFailed": "לא ניתן לשמור את השם הזה.",
+    "passkeyRefused": "מפתח הגישה לא הגיב. כדאי לנסות שוב, או להשתמש בשיטה אחרת.",
+    "passkeyLimit": "אפשר להוסיף עד {max} מפתחות גישה. כדאי להסיר אחד קודם.",
     "signOutSessionFailed": "לא ניתן לנתק את ההתחברות הזו.",
     "notMember": "אינך חבר בסביבת העבודה הזו",
     "userNotMember": "המשתמש הזה אינו חבר בסביבת העבודה.",

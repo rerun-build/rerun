@@ -72,6 +72,8 @@
     "passkeyNameRequired": "Give this passkey a name.",
     "passkeyNameTooLong": "Keep the name under {max} characters.",
     "passkeySaveFailed": "Could not save this name.",
+    "passkeyRefused": "The passkey did not answer. Try again, or use another method.",
+    "passkeyLimit": "You can add up to {max} passkeys. Remove one first.",
     "signOutSessionFailed": "Could not sign this session out.",
     "notMember": "You are not a member of this workspace",
     "userNotMember": "This user is not a member of the workspace.",

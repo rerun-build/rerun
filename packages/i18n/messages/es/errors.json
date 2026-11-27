@@ -13,6 +13,8 @@
     "passkeyNameRequired": "Ponle un nombre a esta llave de acceso.",
     "passkeyNameTooLong": "El nombre debe tener menos de {max} caracteres.",
     "passkeySaveFailed": "No se pudo guardar este nombre.",
+    "passkeyRefused": "La llave de acceso no respondió. Inténtalo de nuevo o usa otro método.",
+    "passkeyLimit": "Puedes añadir hasta {max} llaves de acceso. Quita una primero.",
     "signOutSessionFailed": "No se pudo cerrar esta sesión.",
     "notMember": "No eres miembro de este workspace",
     "userNotMember": "Esta persona no es miembro del workspace.",

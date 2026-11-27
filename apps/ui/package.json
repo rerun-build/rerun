@@ -41,6 +41,8 @@
     "@rerun/emails": "workspace:*",
     "@rerun/i18n": "workspace:*",
     "@rerun/ui": "workspace:*",
+    "@simplewebauthn/browser": "^14.0.0",
+    "@simplewebauthn/server": "^14.1.0",
     "@streamdown/cjk": "^1.0.3",
     "@streamdown/code": "^1.1.1",
     "@streamdown/math": "^1.0.2",

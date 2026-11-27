@@ -2,7 +2,7 @@ import { getBrand } from '@/lib/brand/server'
 import { isWhiteLabel } from '@rerun/contracts'
 import { LazyShowcase } from '@/components/onboarding/panels/LazyPanels'
 import { internalPath } from '@/lib/auth/internal-path'
-import { ownFactors, passkeyName } from '@/lib/auth/two-step/factors'
+import { methodCount, ownMethods } from '@/lib/auth/two-step/factors'
 import { TWO_STEP_LAST_COOKIE } from '@/lib/auth/two-step/gate'
 import { readTwoStep, writeTwoStep, writeTwoStepFlag } from '@/lib/auth/two-step/store'
 import { routes } from '@/lib/routes'
@@ -25,10 +25,10 @@ export default async function TwoStepPage({ searchParams }: { searchParams: Prom
 
     const { user } = signingIn
     const record = await readTwoStep(user.id)
-    const factors = ownFactors(user, record)
-    // The flag outlived the methods (removed by support from the auth dashboard): two-step is off, the
-    // hub's recovery factor with it, or the auth server would still ask a second step of every client.
-    if (!factors.length) {
+    const methods = ownMethods(user, record)
+    // The flag outlived the methods (removed by support): two-step is off, the hub's recovery factor
+    // with it, or the auth server would still ask a second step of every client.
+    if (!methodCount(methods)) {
         const admin = createServiceRoleClient().auth.admin.mfa
         for (const factor of user.factors ?? []) await admin.deleteFactor({ userId: user.id, id: factor.id })
         await writeTwoStep(user.id, null)
@@ -36,15 +36,11 @@ export default async function TwoStepPage({ searchParams }: { searchParams: Prom
         return <FullLoad to={next} />
     }
 
-    const app = factors.find(factor => factor.factor_type === 'totp')
+    const { app } = methods
     // A passkey opens the account on the hub's own address only, never on an organization's.
-    const passkeysHere = !isWhiteLabel(await getBrand())
-    const passkeys = factors
-        .filter(factor => passkeysHere && factor.factor_type === 'webauthn')
-        .sort((a, b) => (b.last_challenged_at ?? b.created_at).localeCompare(a.last_challenged_at ?? a.created_at))
-        .map(factor => ({ id: factor.id, name: passkeyName(factor, record) }))
+    const hasPasskeys = methods.passkeys.length > 0 && !isWhiteLabel(await getBrand())
     const last = (await cookies()).get(TWO_STEP_LAST_COOKIE)?.value
-    const first = passkeys.length && (last === 'passkey' || !app) ? 'passkey' : app ? 'app' : 'backup'
+    const first = hasPasskeys && (last === 'passkey' || !app) ? 'passkey' : app ? 'app' : 'backup'
 
-    return <TwoStepChallenge next={next} userId={user.id} appFactorId={app?.id ?? null} passkeys={passkeys} first={first} hasBackupCodes={!!record.codes?.length} panel={<LazyShowcase />} />
+    return <TwoStepChallenge next={next} appFactorId={app?.id ?? null} hasPasskeys={hasPasskeys} first={first} hasBackupCodes={!!record.codes?.length} panel={<LazyShowcase />} />
 }

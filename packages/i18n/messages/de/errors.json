@@ -13,6 +13,8 @@
     "passkeyNameRequired": "Gib diesem Passkey einen Namen.",
     "passkeyNameTooLong": "Der Name darf höchstens {max} Zeichen lang sein.",
     "passkeySaveFailed": "Dieser Name konnte nicht gespeichert werden.",
+    "passkeyRefused": "Der Passkey hat nicht geantwortet. Versuch es erneut oder nutze eine andere Methode.",
+    "passkeyLimit": "Du kannst bis zu {max} Passkeys hinzufügen. Entferne zuerst einen.",
     "signOutSessionFailed": "Diese Sitzung konnte nicht abgemeldet werden.",
     "notMember": "Du bist kein Mitglied dieses Workspace",
     "userNotMember": "Diese Person ist kein Mitglied des Workspace.",

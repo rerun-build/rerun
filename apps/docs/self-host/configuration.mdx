@@ -121,7 +121,7 @@ Sign-in codes go out through Supabase unless you set up that hook. See [Set up S
 | `PASSKEY_IOS_APP_IDS` | Optional | empty | The iPhone apps allowed to use this install's passkeys for [two-step verification](/account-security), as `TEAMID.bundle.id`, comma separated. Served at `/.well-known/apple-app-site-association`. Empty: the file answers 404, and the app offers the authenticator code and backup codes only. |
 | `PASSKEY_ANDROID_APPS` | Optional | empty | The same for Android, as `package:SHA-256 fingerprint of the signing certificate`, comma separated. Served at `/.well-known/assetlinks.json`. |
 
-[Two-step verification](/account-security) needs multi-factor authentication on in your Supabase project: the authenticator app (TOTP) and WebAuthn, both enroll and verify. Passkeys also need its WebAuthn relying party: the domain of your install as RP ID, and its URL as origin (`[auth.webauthn]` of `supabase/config.toml`, which sets them for a local stack). A passkey then works on that address only.
+[Two-step verification](/account-security) needs the authenticator app (TOTP) of multi-factor authentication on in your Supabase project, both enroll and verify. Passkeys need nothing more: Rerun checks them itself, for the domain of `NEXT_PUBLIC_APP_URL`. A passkey then works on that address only, so changing the address of your install leaves the passkeys added before it unusable: sign in with the authenticator app or a backup code and add them again.
 
 ## Optional services
 

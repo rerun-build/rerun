@@ -13,6 +13,8 @@
     "passkeyNameRequired": "Bu geçiş anahtarına bir ad verin.",
     "passkeyNameTooLong": "Ad en fazla {max} karakter olabilir.",
     "passkeySaveFailed": "Bu ad kaydedilemedi.",
+    "passkeyRefused": "Geçiş anahtarı yanıt vermedi. Tekrar deneyin ya da başka bir yöntem kullanın.",
+    "passkeyLimit": "En fazla {max} geçiş anahtarı ekleyebilirsiniz. Önce birini kaldırın.",
     "signOutSessionFailed": "Bu oturum kapatılamadı.",
     "notMember": "Bu çalışma alanının üyesi değilsiniz",
     "userNotMember": "Bu kullanıcı çalışma alanının üyesi değil.",

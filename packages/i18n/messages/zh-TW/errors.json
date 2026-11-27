@@ -13,6 +13,8 @@
     "passkeyNameRequired": "請為這個密碼金鑰命名。",
     "passkeyNameTooLong": "名稱請勿超過 {max} 個字元。",
     "passkeySaveFailed": "無法儲存這個名稱。",
+    "passkeyRefused": "密碼金鑰沒有回應。請再試一次，或改用其他方式。",
+    "passkeyLimit": "最多可以新增 {max} 個密碼金鑰。請先移除一個。",
     "signOutSessionFailed": "無法登出這個工作階段。",
     "notMember": "您不是此工作區的成員",
     "userNotMember": "此使用者不是工作區的成員。",

@@ -1,6 +1,7 @@
 'use client'
 
 import {
+    finishPasskeySetupAction,
     finishTwoStepSetupAction,
     getSecurityAction,
     newBackupCodesAction,
@@ -8,6 +9,7 @@ import {
     renamePasskeyAction,
     signOutOtherSessionsAction,
     signOutSessionAction,
+    startPasskeySetupAction,
     type SecurityPasskey,
     type SecurityState,
 } from '@/app/api/_actions/two-step.actions'
@@ -18,11 +20,10 @@ import { useBrand } from '@/components/brand/BrandProvider'
 import { PanelSteps } from '@/components/ui/panel-steps'
 import { useErrorText } from '@/hooks/useErrorText'
 import { desktopShell } from '@/lib/desktop-shell/client'
-import { randomUuid } from '@/lib/random-uuid'
 import { createClient } from '@/supabase/client'
 import { useSession } from '@/supabase/session/SessionProvider'
 import { isWhiteLabel } from '@rerun/contracts'
-import type { MFAVerifyWebauthnParams } from '@supabase/supabase-js'
+import { startRegistration } from '@simplewebauthn/browser'
 import { useTranslations } from 'next-intl'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -31,7 +32,7 @@ type Step =
     | { kind: 'list' }
     | { kind: 'app'; factorId: string; qrCode: string; secret: string }
     | { kind: 'codes'; codes: string[] }
-    | { kind: 'name'; factorId: string; name: string; renaming: boolean; codes: string[] | null }
+    | { kind: 'name'; passkeyId: string; name: string; renaming: boolean; codes: string[] | null }
 
 type PasskeyNameKey = 'mac' | 'iphone' | 'ipad' | 'windows' | 'android' | 'chromebook' | 'passkey'
 
@@ -46,35 +47,12 @@ function passkeyNameKey(userAgent: string): PasskeyNameKey {
     return 'passkey'
 }
 
-// A name Supabase keeps unique per account; the one the person reads is the hub's.
-function factorName(): string {
-    return `passkey-${randomUuid().slice(0, 8)}`
-}
-
-// Supabase's `webauthn.register` always asks the browser for a security key (cross-platform, and an
-// undefined override is skipped), which keeps Touch ID, Face ID and Windows Hello out of its window.
-// So the ceremony is run here, on Supabase's own challenge, with any authenticator welcome.
-async function createPasskey(friendlyName: string): Promise<string> {
-    const mfa = createClient().auth.mfa
-    const { data: factor, error: enrollError } = await mfa.webauthn.enroll({ friendlyName })
-    if (enrollError || !factor) throw enrollError ?? new Error('enroll')
-    const webauthn = { rpId: window.location.hostname, rpOrigins: [window.location.origin] }
-    const { data: challenge, error: challengeError } = await mfa.challenge({ factorId: factor.id, webauthn })
-    if (challengeError || !challenge || challenge.type !== 'webauthn' || challenge.webauthn.type !== 'create') throw challengeError ?? new Error('challenge')
-    const publicKey = challenge.webauthn.credential_options.publicKey
-    const credential = await navigator.credentials.create({ publicKey: { ...publicKey, authenticatorSelection: { residentKey: 'preferred', userVerification: 'preferred' } } as PublicKeyCredentialCreationOptions })
-    if (!credential) throw new Error('cancelled')
-    const { error: verifyError } = await mfa.verify({ factorId: factor.id, challengeId: challenge.id, webauthn: { ...webauthn, type: 'create', credential_response: credential as MFAVerifyWebauthnParams<'create'>['webauthn']['credential_response'] } })
-    if (verifyError) throw verifyError
-    return factor.id
-}
-
 // A setup left half way keeps an unverified factor, which counts against the account's ten.
-async function dropUnfinished(type: 'totp' | 'webauthn') {
+async function dropUnfinishedApp() {
     const mfa = createClient().auth.mfa
     const { data: factors } = await mfa.listFactors()
     for (const factor of factors?.all ?? []) {
-        if (factor.factor_type === type && factor.status === 'unverified') await mfa.unenroll({ factorId: factor.id })
+        if (factor.factor_type === 'totp' && factor.status === 'unverified') await mfa.unenroll({ factorId: factor.id })
     }
 }
 
@@ -123,7 +101,7 @@ export function SecurityTab() {
             .then(available => setNoPlatformPasskey(!available))
             .catch(() => setNoPlatformPasskey(true))
     }, [])
-    // The auth server ties every passkey to the hub's own address: an organization's address has none.
+    // The hub ties every passkey to its own address: an organization's address has none.
     const addPasskeyUnavailable = isWhiteLabel(brand) ? t('passkeys.notHere') : noPlatformPasskey ? t('passkeys.addInBrowser') : undefined
 
     const backToList = async () => {
@@ -141,7 +119,7 @@ export function SecurityTab() {
         setBusy('app')
         try {
             const mfa = createClient().auth.mfa
-            await dropUnfinished('totp')
+            await dropUnfinishedApp()
             const { data, error } = await mfa.enroll({ factorType: 'totp', friendlyName: t('app.title'), issuer: brand.name })
             if (error || !data) throw error ?? new Error()
             setStep({ kind: 'app', factorId: data.id, qrCode: data.totp.qr_code, secret: data.totp.secret })
@@ -171,12 +149,15 @@ export function SecurityTab() {
     const addPasskey = async () => {
         setBusy('passkey')
         try {
-            await dropUnfinished('webauthn')
-            const factorId = await createPasskey(factorName())
+            const started = await startPasskeySetupAction()
+            if (refused(started) || !started.ok) return
+            const response = await startRegistration({ optionsJSON: started.options })
             const name = t(`passkeyNames.${passkeyNameKey(navigator.userAgent)}`)
-            const result = await finishTwoStepSetupAction({ factorId, passkeyName: name })
+            const result = await finishPasskeySetupAction({ response, name })
             if (refused(result) || !result.ok) return
-            setStep({ kind: 'name', factorId, name, renaming: false, codes: result.codes })
+            // The first method raised this session on the server: the browser takes the new tokens.
+            if (result.codes) await createClient().auth.refreshSession()
+            setStep({ kind: 'name', passkeyId: result.passkeyId, name, renaming: false, codes: result.codes })
         } catch (error) {
             console.warn('[two-step] passkey not added', error)
             toast.error(t('passkeys.failed'))
@@ -187,7 +168,7 @@ export function SecurityTab() {
 
     const savePasskeyName = async (name: string) => {
         if (step.kind !== 'name') return
-        if (refused(await renamePasskeyAction({ factorId: step.factorId, name }))) return
+        if (refused(await renamePasskeyAction({ passkeyId: step.passkeyId, name }))) return
         if (step.codes) setStep({ kind: 'codes', codes: step.codes })
         else await backToList()
     }
@@ -197,12 +178,12 @@ export function SecurityTab() {
         else await backToList()
     }
 
-    const renamePasskey = (passkey: SecurityPasskey) => setStep({ kind: 'name', factorId: passkey.id, name: passkey.name, renaming: true, codes: null })
+    const renamePasskey = (passkey: SecurityPasskey) => setStep({ kind: 'name', passkeyId: passkey.id, name: passkey.name, renaming: true, codes: null })
 
-    const removeMethod = async (factorId: string) => {
-        setBusy(factorId)
+    const removeMethod = async (methodId: string) => {
+        setBusy(methodId)
         try {
-            if (refused(await removeTwoStepMethodAction({ factorId }))) return
+            if (refused(await removeTwoStepMethodAction({ methodId }))) return
             await createClient().auth.refreshSession()
             await load()
         } finally {
@@ -276,7 +257,7 @@ export function SecurityTab() {
 
     if (step.kind === 'name') {
         return (
-            <PanelSteps stepKey={`name-${step.factorId}`} depth={1}>
+            <PanelSteps stepKey={`name-${step.passkeyId}`} depth={1}>
                 <PasskeyNameStep initialName={step.name} renaming={step.renaming} onSave={savePasskeyName} onBack={() => void leavePasskeyName()} />
             </PanelSteps>
         )
@@ -291,7 +272,7 @@ export function SecurityTab() {
                 onSetUpApp={() => void setUpApp()}
                 onAddPasskey={() => void addPasskey()}
                 onRenamePasskey={renamePasskey}
-                onRemoveMethod={factorId => void removeMethod(factorId)}
+                onRemoveMethod={methodId => void removeMethod(methodId)}
                 onNewCodes={() => void newCodes()}
                 onSignOutSession={sessionId => void signOutSession(sessionId)}
                 onSignOutOthers={() => void signOutOthers()}
