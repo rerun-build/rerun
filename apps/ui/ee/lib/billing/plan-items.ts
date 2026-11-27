@@ -60,3 +60,9 @@ export function machineColumns(items: Stripe.SubscriptionItem[], existing: { mac
     if (!held || !existing) return derived
     return { machine_size: largerMachineSize(parseMachineSize(existing.machine_size), derived.machine_size), storage_packs: Math.max(existing.storage_packs, derived.storage_packs) }
 }
+
+// Whether `target` asks for nothing more than what the workspace holds until its renewal: the period
+// already paid for it, so taking it back is billed to nobody.
+export function withinHeldMachine(target: { machineSize: MachineSize; storagePacks: number }, held: { machine_size: string; storage_packs: number }): boolean {
+    return compareMachineSizes(target.machineSize, parseMachineSize(held.machine_size)) <= 0 && target.storagePacks <= held.storage_packs
+}

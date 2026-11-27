@@ -91,7 +91,6 @@
         "plan.credit.dueBeforeTax": "Label of a summary row: the amount due today, tax added on the Stripe page.",
         "lifetime.slots.freeThen": "{price} is a monthly price like \"$9/mo\".",
         "lifetime.slots.oneOnCheckout": "Tooltip of a disabled plus button: the first app slot is paid alone on a Stripe page.",
-        "tiles.home.machine.comingSoon": "Shown in large type on the Machine tile of the billing home, in place of a figure: bigger machines are not sold yet.",
         "tiles.home.machine.title": "Tile title: the workspace's machine, the server its coworkers run on.",
         "tiles.home.apps.slots": "{count} is the number of paid slots of an app, {amount} what they cost each billing period, like \"1 · $9\".",
         "tiles.home.notice.trialTitle": "Banner during a free trial: {amount} is the first charge, {date} the day it is taken.",

@@ -52,7 +52,7 @@ import { BOX_DELETION_GRACE_MS } from '@/ee/lib/billing/grace'
 import { isTemplateSubscription, stripeTimestampIso, subscriptionPeriodEndIso } from '@/ee/lib/billing/marketplace'
 import { invoiceItemsOf, type InvoiceItems } from '@/ee/lib/billing/invoice-items'
 import { isLifetimeAddonsSubscription } from '@/ee/lib/billing/lifetime-addons'
-import { machineColumns, planItemChanges, type PlanItemChange } from '@/ee/lib/billing/plan-items'
+import { machineColumns, planItemChanges, withinHeldMachine, type PlanItemChange } from '@/ee/lib/billing/plan-items'
 import { isSameSubscription, shouldAdoptSubscription } from '@/ee/lib/billing/ownership'
 import { hasPeriodAdvanced, rerunPeriodUpdate } from '@/ee/lib/billing/period'
 import { trialArm } from '@/ee/lib/billing/trial-experiment'
@@ -835,7 +835,7 @@ async function backToHeldMachine(workspaceId: number, subscription: Stripe.Subsc
     if (increases.length === 0) return false
     const { data: held } = await selectMaybeSingle(createServiceRoleClient(), 'workspaces', ['machine_size', 'storage_packs'] as const, { id: workspaceId })
     if (!held) return false
-    return compareMachineSizes(target.machineSize, parseMachineSize(held.machine_size)) <= 0 && target.quantities.storage_pack <= held.storage_packs
+    return withinHeldMachine({ machineSize: target.machineSize, storagePacks: target.quantities.storage_pack }, held)
 }
 
 // A trial runs on the included machine: a size or storage is bought once the plan is paid, from the

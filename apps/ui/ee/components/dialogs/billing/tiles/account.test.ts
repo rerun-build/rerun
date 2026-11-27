@@ -65,7 +65,15 @@ describe('planBillCents', () => {
 
 describe('yearlySavingsCents', () => {
     it('is twelve months of the base plan less a year of it', () => {
-        expect(yearlySavingsCents()).toBe(7200)
+        expect(yearlySavingsCents({ interval: 'monthly', monthlyDiscountCents: 0 })).toBe(7200)
+    })
+
+    it('counts what a workspace still on $49 really pays each month', () => {
+        expect(yearlySavingsCents({ interval: 'monthly', monthlyDiscountCents: -2000 })).toBe(31200)
+    })
+
+    it('promises nothing to a workspace a year would cost more', () => {
+        expect(yearlySavingsCents({ interval: 'monthly', monthlyDiscountCents: 1000 })).toBe(0)
     })
 })
 

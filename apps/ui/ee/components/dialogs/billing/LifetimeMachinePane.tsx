@@ -4,7 +4,7 @@ import { useLocale, useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 import { runLifetimeMachineChange } from '@/ee/lib/billing/plan-payment'
-import { MACHINE_SIZES, MAX_STORAGE_PACKS, PLAN_PRICES_CENTS, compareMachineSizes, machineDiskGib, machinePriceCents, type MachineSize } from '@/ee/lib/billing/plans'
+import { INCLUDED_MACHINE_SIZE, MACHINE_SIZES, MAX_STORAGE_PACKS, PLAN_PRICES_CENTS, compareMachineSizes, machineDiskGib, machinePriceCents, type MachineSize } from '@/ee/lib/billing/plans'
 import type { LifetimeBillingState } from '@/ee/services/lifetime-addons.service'
 import { useErrorText } from '@/hooks/useErrorText'
 
@@ -27,8 +27,10 @@ export function LifetimeMachinePane({ state, onBack, onApplied }: { state: Lifet
     const locale = useLocale()
     const errorText = useErrorText()
     const held = state.heldMachine
-    const [size, setSize] = useState<MachineSize>(state.machineSize)
-    const [packs, setPacks] = useState(state.quantities.storage_pack)
+    // A subscription set to end still carries what was given back: from its renewal it pays for nothing.
+    const paid: LifetimeBillingState['heldMachine'] = state.cancelAtPeriodEnd ? { machineSize: INCLUDED_MACHINE_SIZE, storagePacks: 0 } : { machineSize: state.machineSize, storagePacks: state.quantities.storage_pack }
+    const [size, setSize] = useState<MachineSize>(paid.machineSize)
+    const [packs, setPacks] = useState(paid.storagePacks)
     const [accepted, setAccepted] = useState(false)
     const [submitting, setSubmitting] = useState(false)
     const [error, setError] = useState<string | null>(null)
@@ -38,8 +40,10 @@ export function LifetimeMachinePane({ state, onBack, onApplied }: { state: Lifet
     const machine = state.machine
     const usedGb = Math.ceil(machine?.usedDiskGib ?? 0)
     const unavailable = Object.fromEntries(MACHINE_SIZES.filter(each => tooFullFor(machine, each, packs)).map(each => [each, t('tooFull', { used: usedGb, size: machineDiskGib(each, packs) })]))
-    const changed = size !== state.machineSize || packs !== state.quantities.storage_pack
+    const changed = size !== paid.machineSize || packs !== paid.storagePacks
     const heldDisk = machineDiskGib(held.machineSize, held.storagePacks)
+    const paidDisk = machineDiskGib(paid.machineSize, paid.storagePacks)
+    const pending = compareMachineSizes(paid.machineSize, held.machineSize) < 0 || paidDisk < heldDisk
     const targetDisk = machineDiskGib(size, packs)
     const sizeChange = compareMachineSizes(size, held.machineSize)
     const grows = sizeChange > 0 || targetDisk > heldDisk
@@ -111,6 +115,7 @@ export function LifetimeMachinePane({ state, onBack, onApplied }: { state: Lifet
         <div className="@container flex flex-1 flex-col gap-5">
             <RightTitle onBack={onBack}>{t('lifetimeTitle')}</RightTitle>
             {lockedReason && <Note>{lockedReason}</Note>}
+            {pending && <Note>{t('notes.pending', { size: tSize(paid.machineSize), disk: paidDisk, date: renewal })}</Note>}
             <MachineSizeCards current={held.machineSize} selected={size} interval="monthly" onSelect={setSize} unavailable={unavailable} disabledReason={lockedReason} />
             <StorageRow
                 packs={packs}

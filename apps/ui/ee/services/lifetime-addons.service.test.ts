@@ -57,6 +57,7 @@ beforeEach(() => {
     m.findWorkspaceId.mockResolvedValue(WORKSPACE_ID)
     m.ensureStripeCustomer.mockResolvedValue({ workspaceId: WORKSPACE_ID, customerId: 'cus_1' })
     m.readMachine.mockResolvedValue(null)
+    vi.mocked(stripe.subscriptions.list).mockResolvedValue({ data: [] } as never)
     vi.spyOn(console, 'warn').mockImplementation(() => {})
 })
 
@@ -372,6 +373,58 @@ describe('the machine of a lifetime workspace', () => {
         expect(vi.mocked(stripe.subscriptions.update).mock.calls).toEqual([
             ['sub_addons', { items: [{ id: 'si_li', deleted: true }], cancel_at_period_end: false, proration_behavior: 'none', metadata: { machine_change_after_payment: '' } }],
         ])
+    })
+
+    it('takes back a size the workspace still holds until its renewal without billing it again', async () => {
+        useDb({ ...LIFETIME, machine_size: 'large', storage_packs: 1 })
+        vi.mocked(stripe.subscriptions.retrieve).mockResolvedValue(withMachine() as never)
+
+        await changeLifetimeMachine({ machineSize: 'large', storagePacks: 1 }, 'req-1')
+        await changeLifetimeMachine({ machineSize: 'medium', storagePacks: 0 }, 'req-2')
+
+        expect(m.updateWithPayment).not.toHaveBeenCalled()
+        expect(vi.mocked(stripe.subscriptions.update).mock.calls).toEqual([
+            ['sub_addons', { items: [{ price: 'price_storage_pack', quantity: 1 }, { price: 'price_machine_large', quantity: 1 }], proration_behavior: 'none' }],
+            ['sub_addons', { items: [{ price: 'price_machine_medium', quantity: 1 }], proration_behavior: 'none' }],
+        ])
+    })
+
+    it('bills whatever goes beyond what the workspace holds', async () => {
+        useDb({ ...LIFETIME, machine_size: 'medium', storage_packs: 0 })
+        vi.mocked(stripe.subscriptions.retrieve).mockResolvedValue(withMachine() as never)
+        m.updateWithPayment.mockResolvedValue(null)
+
+        await changeLifetimeMachine({ machineSize: 'medium', storagePacks: 1 }, 'req-1')
+
+        expect(m.updateWithPayment).toHaveBeenCalledWith('sub_addons', expect.objectContaining({ proration_behavior: 'always_invoice' }))
+    })
+
+    it('runs a subscription set to end on when a held size goes back on it, its slots still given back', async () => {
+        useDb({ ...LIFETIME, machine_size: 'medium', storage_packs: 0 })
+        vi.mocked(stripe.subscriptions.retrieve).mockResolvedValue(subscription({ cancel_at_period_end: true, items: { data: [{ id: 'si_li', price: { id: 'price_linkedin_slot' }, quantity: 1, current_period_end: PERIOD_END }] } as never }) as never)
+
+        await changeLifetimeMachine({ machineSize: 'medium', storagePacks: 0 }, 'req-1')
+
+        expect(m.updateWithPayment).not.toHaveBeenCalled()
+        expect(vi.mocked(stripe.subscriptions.update).mock.calls).toEqual([
+            ['sub_addons', { items: [{ price: 'price_machine_medium', quantity: 1 }, { id: 'si_li', deleted: true }], proration_behavior: 'none', cancel_at_period_end: false }],
+        ])
+    })
+
+    it('puts the size on a subscription already paid whose webhook has not landed, rather than selling a second one', async () => {
+        const row = { ...LIFETIME, stripe_addons_subscription_id: null as string | null }
+        useDb(row)
+        vi.mocked(stripe.subscriptions.list).mockImplementation((async () => {
+            row.stripe_addons_subscription_id = 'sub_addons'
+            return { data: [withMachine()] }
+        }) as never)
+        vi.mocked(stripe.subscriptions.retrieve).mockResolvedValue(withMachine() as never)
+        m.updateWithPayment.mockResolvedValue(null)
+
+        await expect(changeLifetimeMachine({ machineSize: 'medium', storagePacks: 0 }, 'req-1')).resolves.toEqual({ checkoutUrl: null, paymentClientSecret: null })
+
+        expect(stripe.checkout.sessions.create).not.toHaveBeenCalled()
+        expect(m.updateWithPayment).toHaveBeenCalledWith('sub_addons', { items: [{ price: 'price_machine_medium', quantity: 1 }], proration_behavior: 'always_invoice' })
     })
 
     it('keeps a size given back off a subscription that runs on for a slot', async () => {

@@ -16,7 +16,7 @@ import { slotItem } from '@/lib/apps/stripe-slots'
 import { PAID_APP_PARAM, SLOTS_CHECKOUT_PARAM, type AppSlug } from '@/lib/apps/types'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
-import { machineColumns, planItemChanges } from '@/ee/lib/billing/plan-items'
+import { machineColumns, planItemChanges, withinHeldMachine } from '@/ee/lib/billing/plan-items'
 import { applyMachineSize, readMachine } from '@rerun/cloud/engines'
 import { assertMachineFits, businessDetailsOf, ensureStripeCustomer, findWorkspaceId, PLAN_PAYMENT_METHOD_TYPES, readNextInvoice, updateWithPayment, type BusinessDetails } from './billing.service'
 
@@ -206,11 +206,14 @@ export type LifetimeMachineChange = { checkoutUrl: string | null; paymentClientS
 
 // Only the full lifetime plan buys a size, by the month, like its app slots: an AppSumo workspace and
 // an organization's have no subscription to carry it.
-async function requireLifetimeMachineBuyer(): Promise<{ workspaceId: number; addonsSubscriptionId: string | null }> {
+type LifetimeMachineBuyer = { workspaceId: number; held: { machine_size: string; storage_packs: number }; subscription: Stripe.Subscription | null }
+
+async function requireLifetimeMachineBuyer(): Promise<LifetimeMachineBuyer> {
     const workspaceId = await requireWorkspaceId()
-    const { data: workspace } = await selectMaybeSingle(createServiceRoleClient(), 'workspaces', ['plan', 'organization_id', 'stripe_addons_subscription_id'] as const, { id: workspaceId })
+    const { data: workspace } = await selectMaybeSingle(createServiceRoleClient(), 'workspaces', ['plan', 'organization_id', 'stripe_addons_subscription_id', 'machine_size', 'storage_packs'] as const, { id: workspaceId })
     if (workspace?.plan !== LIFETIME_PLAN_SLUG || !arePaidAppsOffered(workspace)) throw new AppError('machineNotOffered')
-    return { workspaceId, addonsSubscriptionId: workspace.stripe_addons_subscription_id }
+    const current = workspace.stripe_addons_subscription_id ? await stripe.subscriptions.retrieve(workspace.stripe_addons_subscription_id) : null
+    return { workspaceId, held: workspace, subscription: current && isSubscriptionEntitled(current.status) ? current : null }
 }
 
 function assertValidLifetimeMachine(selection: LifetimeMachineSelection): void {
@@ -230,13 +233,14 @@ function machineLineItems({ machineSize, storagePacks }: LifetimeMachineSelectio
 // through Checkout, with no free trial: the trial comes with the first app slot only.
 export async function changeLifetimeMachine(selection: LifetimeMachineSelection, requestId: string): Promise<LifetimeMachineChange> {
     assertValidLifetimeMachine(selection)
-    const { workspaceId, addonsSubscriptionId } = await requireLifetimeMachineBuyer()
-    const current = addonsSubscriptionId ? await stripe.subscriptions.retrieve(addonsSubscriptionId) : null
-    const subscription = current && isSubscriptionEntitled(current.status) ? current : null
+    let buyer = await requireLifetimeMachineBuyer()
+    const lineItems = machineLineItems(selection)
+    // A Checkout already paid whose webhook has not landed holds the subscription this size goes on.
+    if (!buyer.subscription && lineItems.length > 0 && (await adoptPendingLifetimeAddonsSubscription())) buyer = await requireLifetimeMachineBuyer()
+    const { workspaceId, held, subscription } = buyer
     await assertMachineFits(workspaceId, selection, subscription?.items.data ?? [])
 
     if (!subscription) {
-        const lineItems = machineLineItems(selection)
         if (lineItems.length === 0) return { checkoutUrl: null, paymentClientSecret: null }
         return { checkoutUrl: await createLifetimeMachineCheckout(lineItems, requestId), paymentClientSecret: null }
     }
@@ -251,6 +255,13 @@ export async function changeLifetimeMachine(selection: LifetimeMachineSelection,
     const kept = subscription.items.data.filter(item => !decreases.some(change => change.id === item.id && change.deleted)).length + increases.filter(change => !change.id).length
     if (kept === 0) {
         if (!subscription.cancel_at_period_end) await stripe.subscriptions.update(subscription.id, { cancel_at_period_end: true })
+        return { checkoutUrl: null, paymentClientSecret: null }
+    }
+
+    // What the workspace still holds until the renewal is already paid for: it goes back on the
+    // subscription with the rest of the change, billed to nobody.
+    if (increases.length > 0 && withinHeldMachine(selection, held)) {
+        await stripe.subscriptions.update(subscription.id, { items: [...increases, ...decreases], proration_behavior: 'none', ...(target.givenBack ? { cancel_at_period_end: false } : {}) })
         return { checkoutUrl: null, paymentClientSecret: null }
     }
 

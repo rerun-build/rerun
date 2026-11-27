@@ -10,7 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { cancelPendingSwitchAction } from '@/ee/actions/billing.actions'
 import { runPlanChange } from '@/ee/lib/billing/plan-payment'
-import { INCLUDED_MACHINE_SIZE, PLAN_PRICES_CENTS, ZERO_QUANTITIES, type BillingInterval } from '@/ee/lib/billing/plans'
+import { INCLUDED_MACHINE_SIZE, PLAN_PRICES_CENTS, ZERO_QUANTITIES, machinePriceCents, type BillingInterval } from '@/ee/lib/billing/plans'
 import { useErrorText } from '@/hooks/useErrorText'
 import { appInfo } from '@/lib/apps/catalog'
 import { APP_ADDON_KEYS, APP_SLUGS } from '@/lib/apps/types'
@@ -35,6 +35,8 @@ function inAYear(locale: string): string {
 // unused part of the month taken off; a switch back to monthly waits for the end of the paid year.
 export function PlanPanel({ state, data, onDone }: PanelProps) {
     const t = useTranslations('billing.tiles.plan')
+    const tInvoice = useTranslations('billing.tiles.invoice')
+    const tSize = useTranslations('billing.machine.sizes')
     const locale = useLocale()
     const errorText = useErrorText()
     const upgrade = useBillingStore(s => s.upgrade)
@@ -83,6 +85,12 @@ export function PlanPanel({ state, data, onDone }: PanelProps) {
         if (!count) return []
         return [{ label: t('appLine', { app: appInfo(slug).name, count }), value: <UsdFlow cents={count * PLAN_PRICES_CENTS[interval][APP_ADDON_KEYS[slug]]} /> }]
     })
+    const packs = state.quantities.storage_pack
+    const machineRows: SummaryRow[] = [
+        ...(state.machineSize === INCLUDED_MACHINE_SIZE ? [] : [{ label: tInvoice('machine', { size: tSize(state.machineSize) }), value: <UsdFlow cents={machinePriceCents(state.machineSize, interval)} /> }]),
+        ...(packs > 0 ? [{ label: tInvoice('storage', { count: packs }), value: <UsdFlow cents={packs * PLAN_PRICES_CENTS[interval].storage_pack} /> }] : []),
+    ]
+    const yearlySaving = yearlySavingsCents(state)
     const dueToday = quote === 'loading' ? <Skeleton className="inline-block h-4 w-14" /> : <UsdFlow cents={quote?.dueTodayCents ?? planBillCents(state, state.quantities, interval)} />
 
     return (
@@ -106,6 +114,7 @@ export function PlanPanel({ state, data, onDone }: PanelProps) {
                     <SummaryRows
                         rows={[
                             { label: interval === 'yearly' ? t('proYearly') : t('proMonthly'), value: <UsdFlow cents={baseCents} /> },
+                            ...machineRows,
                             ...appRows,
                             ...(!trial && quote && quote !== 'loading' && quote.unusedCreditCents > 0 ? [{ label: t('unusedMonth'), value: `-${usd(quote.unusedCreditCents)}`, muted: true }] : []),
                             { label: t('dueToday'), value: dueToday, strong: true },
@@ -154,7 +163,7 @@ export function PlanPanel({ state, data, onDone }: PanelProps) {
                             {error && <p className="text-sm text-destructive">{error}</p>}
                         </div>
                     )}
-                    {!lockedReason && !state.pendingSwitch && state.interval === 'monthly' && <Note>{t('yearlySaves', { amount: usd(yearlySavingsCents()) })}</Note>}
+                    {!lockedReason && !state.pendingSwitch && state.interval === 'monthly' && yearlySaving > 0 && <Note>{t('yearlySaves', { amount: usd(yearlySaving) })}</Note>}
                 </>
             )}
         </Panel>

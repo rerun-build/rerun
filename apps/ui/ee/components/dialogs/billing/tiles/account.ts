@@ -1,6 +1,6 @@
 import { MICROS_PER_CREDIT } from '@rerun/contracts'
 
-import { basePriceCents, planDiscountCents, planPriceCents, type AddonQuantities, type BillingInterval } from '@/ee/lib/billing/plans'
+import { INCLUDED_MACHINE_SIZE, ZERO_QUANTITIES, planDiscountCents, planPriceCents, type AddonQuantities, type BillingInterval } from '@/ee/lib/billing/plans'
 import type { SubscriptionState } from '@/ee/services/billing.service'
 
 // The state the billing home opens on, the first that applies: what needs the user goes before what
@@ -36,9 +36,11 @@ export function planBillCents(state: Pick<SubscriptionState, 'interval' | 'month
     return Math.max(0, planPriceCents(quantities, interval, state.machineSize) - planDiscountCents(state, interval))
 }
 
-// What a year billed yearly saves on twelve months of the base plan.
-export function yearlySavingsCents(): number {
-    return basePriceCents('monthly') * 12 - basePriceCents('yearly')
+// What a year billed yearly saves on twelve months of the base plan as this workspace is billed it: a
+// legacy monthly price moves to the list price with the switch.
+export function yearlySavingsCents(state: Pick<SubscriptionState, 'interval' | 'monthlyDiscountCents'>): number {
+    const base: Pick<SubscriptionState, 'interval' | 'monthlyDiscountCents' | 'machineSize'> = { ...state, machineSize: INCLUDED_MACHINE_SIZE }
+    return Math.max(0, planBillCents(base, ZERO_QUANTITIES, 'monthly') * 12 - planBillCents(base, ZERO_QUANTITIES, 'yearly'))
 }
 
 const DAY_MS = 86_400_000
