@@ -1,14 +1,12 @@
 'use client'
 
-import { ScrollFade } from '@rerun/ui/primitives'
 import { useLocale, useTranslations } from 'next-intl'
-import { useLayoutEffect, useRef, useState, type ComponentType, type ReactNode } from 'react'
+import { useState } from 'react'
 
 import { BrandLogo } from '@/components/brand/BrandLogo'
 import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
 import { PanelDialogContent } from '@/components/dialogs/PanelDialogContent'
 import { useEnabledPaidApps } from '@/components/layout/FeatureFlagsProvider'
-import { PanelSteps } from '@/components/ui/panel-steps'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { SubscriptionState } from '@/ee/services/billing.service'
 import { APP_SLUGS } from '@/lib/apps/types'
@@ -29,12 +27,11 @@ import { Home } from './Home'
 import { BusinessPanel, CardPanel, InvoicesPanel, PaymentPanel, ReferralPanel } from './PaymentPanels'
 import { MachinePanel } from './MachinePanel'
 import { PlanPanel } from './PlanPanel'
+import { TilesFrame, type TilesHeader } from './TilesFrame'
 import { billingDate } from './bits'
 import type { PanelProps, Success, TilesData, View } from './views'
 
-type Glyph = ComponentType<{ className?: string }>
-
-type Header = { icon: Glyph | ReactNode; title: string; description: string; backLabel?: string }
+type Header = TilesHeader
 
 // A page reached from another page goes back to it rather than to the home.
 const PARENT: Partial<Record<View, View>> = { usage: 'credits', card: 'payment', business: 'payment', cancelFlow: 'cancel' }
@@ -45,7 +42,7 @@ function depthOf(view: View, cancelDepth: number): number {
     return PARENT[view] ? 2 : 1
 }
 
-function usePageHeader(view: Exclude<View, 'home' | 'cancelFlow'>, state: SubscriptionState): Header {
+export function usePageHeader(view: Exclude<View, 'home' | 'cancelFlow'>, state: Pick<SubscriptionState, 'status' | 'card'>): Header {
     const t = useTranslations('billing.tiles.pages')
     const trial = state.status === 'trialing'
     const billing = t('billing')
@@ -99,7 +96,6 @@ export function BillingTilesDialog({ state, initialView = 'home', onChanged }: {
     const [success, setSuccess] = useState<Success | null>(null)
     const [cancelHeader, setCancelHeader] = useState<CancelFlowHeader | null>(null)
     const [reloads, setReloads] = useState(0)
-    const scrollRef = useRef<HTMLDivElement>(null)
     const [openedAt] = useState(() => Date.now())
     const trialEndsAt = state.status === 'trialing' ? (workspace?.trial_ends_at ?? null) : null
 
@@ -149,10 +145,6 @@ export function BillingTilesDialog({ state, initialView = 'home', onChanged }: {
                   : { ...pageHeader, icon: <Skeleton className="size-10 rounded-lg" />, key: 'cancel:loading', onBack: () => go('cancel') }
               : { ...pageHeader, key: stepKey, onBack: back }
 
-    useLayoutEffect(() => {
-        scrollRef.current?.scrollTo({ top: 0 })
-    }, [stepKey, cancelHeader?.key])
-
     const props: PanelProps = { state, data, go, onBack: back, onDone: done }
     const body = success ? (
         <SuccessPanel
@@ -194,16 +186,9 @@ export function BillingTilesDialog({ state, initialView = 'home', onChanged }: {
     )
 
     return (
-        <PanelDialogContent className="sm:h-[min(46rem,90dvh)] sm:max-w-2xl">
-            <DialogHeaderBar icon={header.icon} title={header.title} description={header.description} onBack={header.onBack} backLabel={header.backLabel} page={{ key: header.key, depth }} />
-            <ScrollFade scrollRef={scrollRef} className="@container min-h-0 flex-1">
-                <div className="flex min-h-full flex-col p-4">
-                    <PanelSteps stepKey={stepKey} depth={depth}>
-                        {body}
-                    </PanelSteps>
-                </div>
-            </ScrollFade>
-        </PanelDialogContent>
+        <TilesFrame header={header} stepKey={stepKey} depth={depth} scrollKey={cancelHeader?.key}>
+            {body}
+        </TilesFrame>
     )
 }
 

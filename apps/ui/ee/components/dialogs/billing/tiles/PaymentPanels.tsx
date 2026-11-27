@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
-import type { InvoiceSummary } from '@/ee/services/billing.service'
+import type { InvoiceSummary, SubscriptionState } from '@/ee/services/billing.service'
 import { appInfo } from '@/lib/apps/catalog'
 import { DownloadIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
@@ -18,7 +18,7 @@ import { invoiceStatusLabel } from '../InvoicesPane'
 import { SummaryRows, usd } from '../parts'
 import { FriendList, ReferralLinkField } from '../referrals/ReferralsPane'
 import { billingDate, CardLine, Explain, Panel, TILE_FRAME } from './bits'
-import type { PanelProps } from './views'
+import type { PanelProps, TilesData } from './views'
 
 export function PaymentPanel({ state, go }: PanelProps) {
     const t = useTranslations('billing.tiles.payment')
@@ -83,7 +83,7 @@ export function CardPanel({ state, onDone }: PanelProps) {
     )
 }
 
-export function BusinessPanel({ state, onDone }: PanelProps) {
+export function BusinessPanel({ state, onDone }: { state: Pick<SubscriptionState, 'business'>; onDone: PanelProps['onDone'] }) {
     const t = useTranslations('billing.tiles.payment')
     return (
         <Panel>
@@ -177,7 +177,7 @@ export function InvoiceRows({ invoices, limit, download }: { invoices: InvoiceSu
     )
 }
 
-export function InvoicesPanel({ state, data }: PanelProps) {
+export function InvoicesPanel({ state, data }: { state: Pick<SubscriptionState, 'status'>; data: Pick<TilesData, 'invoices'> }) {
     const t = useTranslations('billing.tiles.invoices')
     if (data.invoices && data.invoices.length === 0) return <Explain>{state.status === 'trialing' ? t('emptyTrial') : t('empty')}</Explain>
     return (

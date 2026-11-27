@@ -1,6 +1,6 @@
 'use client'
 
-import { creditsFromMicros } from '@rerun/contracts'
+import { creditsFromMicros, type MachineReading } from '@rerun/contracts'
 import { formatNumber } from '@rerun/i18n/format'
 import { Badge } from '@rerun/ui/primitives'
 import { useLocale, useTranslations } from 'next-intl'
@@ -16,7 +16,8 @@ import { Progress } from '@/components/ui/progress'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { resumeSubscriptionAction } from '@/ee/actions/billing.actions'
-import { MACHINE_SPECS, PLAN_PRICES_CENTS, machineDiskGib } from '@/ee/lib/billing/plans'
+import { MACHINE_SPECS, PLAN_PRICES_CENTS, machineDiskGib, type MachineSize } from '@/ee/lib/billing/plans'
+import type { SubscriptionState } from '@/ee/services/billing.service'
 import { useErrorText } from '@/hooks/useErrorText'
 import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess'
 import { appInfo } from '@/lib/apps/catalog'
@@ -31,13 +32,13 @@ import { LOW_CREDITS, planBadge, planBillCents, tilesAccountState } from './acco
 import { billingDate, CardBrand, cardBrandName, cardExpiry, TILE_FRAME } from './bits'
 import { creditsLeftOf, creditsPercent } from './CreditsPanels'
 import { InvoiceRows } from './PaymentPanels'
-import type { PanelProps } from './views'
+import type { PanelProps, TilesData } from './views'
 
 type Glyph = ComponentType<{ className?: string }>
 
 const HISTORY_ROWS = 4
 
-function Tile({ icon, title, children, actions }: { icon: Glyph; title: string; children: ReactNode; actions?: ReactNode }) {
+export function Tile({ icon, title, children, actions }: { icon: Glyph; title: string; children: ReactNode; actions?: ReactNode }) {
     return (
         <section className={cn('flex min-w-0 flex-col gap-3 p-4', TILE_FRAME)}>
             <div className="flex items-center gap-2.5 text-base text-muted-foreground">
@@ -50,20 +51,30 @@ function Tile({ icon, title, children, actions }: { icon: Glyph; title: string; 
     )
 }
 
-// The size the workspace runs on this period, how full its disk is, and the way to another size. A
-// trial keeps the included one: Pro comes first.
-function MachineTile({ state, go }: Pick<PanelProps, 'state' | 'go'>) {
+// The size the workspace runs on this period, how full its disk is, and the way to another size.
+// `pending` is the smaller size it goes to at its renewal, `action` a second button beside the first.
+export function MachineTile({
+    held,
+    machine,
+    pending,
+    lockedReason,
+    onChange,
+    action,
+}: {
+    held: SubscriptionState['heldMachine']
+    machine: MachineReading | null
+    pending: { size: MachineSize; date: string } | null
+    lockedReason?: string
+    onChange: () => void
+    action?: ReactNode
+}) {
     const t = useTranslations('billing.tiles.home.machine')
     const tSize = useTranslations('billing.machine.sizes')
     const locale = useLocale()
-    const trial = state.status === 'trialing'
-    const { machineSize, storagePacks } = state.heldMachine
+    const { machineSize, storagePacks } = held
     const spec = MACHINE_SPECS[machineSize]
     const diskGib = machineDiskGib(machineSize, storagePacks)
-    const used = state.machine?.usedDiskGib ?? null
-    const lockedReason = trial ? t('trialReason') : state.status === 'past_due' ? t('locked.pastDue') : state.cancelAtPeriodEnd ? t('locked.canceling') : undefined
-    const pending = state.pendingDowngrade.machine_size ?? null
-    const date = state.periodEnd ? billingDate(state.periodEnd, locale) : ''
+    const used = machine?.usedDiskGib ?? null
 
     return (
         <Tile
@@ -72,15 +83,11 @@ function MachineTile({ state, go }: Pick<PanelProps, 'state' | 'go'>) {
             actions={
                 <>
                     <TooltipDisabledReason reason={lockedReason} className="flex flex-1">
-                        <Button size="sm" variant="outline" className="flex-1" disabled={!!lockedReason} onClick={() => go('machine')}>
+                        <Button size="sm" variant="outline" className="flex-1" disabled={!!lockedReason} onClick={onChange}>
                             {t('change')}
                         </Button>
                     </TooltipDisabledReason>
-                    {trial && (
-                        <Button size="sm" onClick={() => go('plan')}>
-                            {t('startPro')}
-                        </Button>
-                    )}
+                    {action}
                 </>
             }
         >
@@ -88,7 +95,7 @@ function MachineTile({ state, go }: Pick<PanelProps, 'state' | 'go'>) {
                 <p className="text-3xl font-semibold tracking-tight">{tSize(machineSize)}</p>
                 {pending && (
                     <Badge size="sm" tone="yellow">
-                        {t('from', { size: tSize(pending), date })}
+                        {t('from', { size: tSize(pending.size), date: pending.date })}
                     </Badge>
                 )}
             </div>
@@ -99,6 +106,30 @@ function MachineTile({ state, go }: Pick<PanelProps, 'state' | 'go'>) {
                     : t('specsUsed', { used: formatNumber(Math.ceil(used), locale), disk: diskGib, memory: spec.memoryGib, vcpus: spec.vcpus })}
             </p>
         </Tile>
+    )
+}
+
+// A trial keeps the included machine: Pro comes first.
+function PlanMachineTile({ state, go }: Pick<PanelProps, 'state' | 'go'>) {
+    const t = useTranslations('billing.tiles.home.machine')
+    const locale = useLocale()
+    const trial = state.status === 'trialing'
+    const pending = state.pendingDowngrade.machine_size
+    return (
+        <MachineTile
+            held={state.heldMachine}
+            machine={state.machine}
+            pending={pending ? { size: pending, date: state.periodEnd ? billingDate(state.periodEnd, locale) : '' } : null}
+            lockedReason={trial ? t('trialReason') : state.status === 'past_due' ? t('locked.pastDue') : state.cancelAtPeriodEnd ? t('locked.canceling') : undefined}
+            onChange={() => go('machine')}
+            action={
+                trial && (
+                    <Button size="sm" onClick={() => go('plan')}>
+                        {t('startPro')}
+                    </Button>
+                )
+            }
+        />
     )
 }
 
@@ -216,8 +247,10 @@ function PlanCard({ state, data, go }: Pick<PanelProps, 'state' | 'data' | 'go'>
     )
 }
 
-function CreditsTile({ state, data, go }: Pick<PanelProps, 'state' | 'data' | 'go'>) {
+// A workspace with no monthly credit (a lifetime deal) only holds what it bought.
+export function CreditsTile({ state, data, go }: { state: Pick<SubscriptionState, 'status' | 'cancelAtPeriodEnd'>; data: Pick<TilesData, 'credit'>; go: (view: 'credits' | 'usage') => void }) {
     const t = useTranslations('billing.tiles.home.credits')
+    const tCredits = useTranslations('billing.tiles.credits')
     const locale = useLocale()
     const { workspace } = useSession()
     const credit = data.credit
@@ -227,7 +260,8 @@ function CreditsTile({ state, data, go }: Pick<PanelProps, 'state' | 'data' | 'g
     const balance = credit.balance
     const monthCredits = creditsFromMicros(balance?.monthLeftMicros ?? 0)
     const packCredits = creditsFromMicros(balance?.topupLeftMicros ?? 0)
-    const monthTotal = formatNumber(creditsFromMicros(workspace?.rerun_budget_micros ?? 0), locale)
+    const monthlyMicros = workspace?.rerun_budget_micros ?? 0
+    const monthTotal = formatNumber(creditsFromMicros(monthlyMicros), locale)
 
     return (
         <Tile
@@ -257,7 +291,9 @@ function CreditsTile({ state, data, go }: Pick<PanelProps, 'state' | 'data' | 'g
             <p className="text-xs text-muted-foreground tabular-nums">
                 {trial
                     ? t('trialLine')
-                    : packCredits > 0
+                    : monthlyMicros === 0
+                      ? tCredits('fromPacks')
+                      : packCredits > 0
                       ? t('monthAndPacks', { month: formatNumber(monthCredits, locale), total: monthTotal, packs: formatNumber(packCredits, locale) })
                       : t('month', { month: formatNumber(monthCredits, locale), total: monthTotal })}
             </p>
@@ -265,7 +301,7 @@ function CreditsTile({ state, data, go }: Pick<PanelProps, 'state' | 'data' | 'g
     )
 }
 
-function AppsTile({ state, data, go }: Pick<PanelProps, 'state' | 'data' | 'go'>) {
+export function AppsTile({ state, data, go }: { state: Pick<SubscriptionState, 'status' | 'quantities' | 'interval'>; data: Pick<TilesData, 'apps'>; go: (view: 'apps') => void }) {
     const t = useTranslations('billing.tiles.home.apps')
     const trial = state.status === 'trialing'
     return (
@@ -334,7 +370,7 @@ export function Home({ state, data, go, onDone }: Pick<PanelProps, 'state' | 'da
 
             <div className="grid gap-3 @lg:grid-cols-2">
                 <CreditsTile state={state} data={data} go={go} />
-                <MachineTile state={state} go={go} />
+                <PlanMachineTile state={state} go={go} />
                 {data.apps.length > 0 && <AppsTile state={state} data={data} go={go} />}
                 <PaymentTile state={state} go={go} />
             </div>

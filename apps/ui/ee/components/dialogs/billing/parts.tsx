@@ -19,7 +19,7 @@ import { Input } from '@/components/ui/input'
 import { Progress } from '@/components/ui/progress'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { BASE_PLAN_CREDITS, PLAN_CURRENCY, TRIAL_ACTIVE_AGENTS, TRIAL_CREDITS, TRIAL_DAYS, ZERO_QUANTITIES, perMonthCents, planPriceCents, yearlyDiscountPercent, type BillingInterval } from '@/ee/lib/billing/plans'
-import { ArrowLeft, BrainIcon, CheckIcon, ChevronDownIcon, CoinsIcon, CpuIcon, CreditCardIcon, KeyIcon, Loader2Icon, Package, Repeat, TicketIcon, TriangleAlertIcon, UserPlus, XIcon, ZapIcon, type LucideIcon } from '@/lib/icons'
+import { ArrowLeft, BrainIcon, CheckIcon, ChevronDownIcon, CoinsIcon, CpuIcon, CreditCardIcon, KeyIcon, Loader2Icon, Package, Repeat, TriangleAlertIcon, UserPlus, XIcon, ZapIcon, type LucideIcon } from '@/lib/icons'
 import { TESTIMONIALS, testimonialCopy } from '@rerun/cloud/testimonials'
 import { useTimedRotation } from '@/hooks/useTimedRotation'
 import { landingUrl } from '@/lib/site'
@@ -227,30 +227,6 @@ export function PlanCard({ interval, discountCents = 0, freeTrial = false, compa
                 </div>
             </div>
             <FeatureGrid variant={freeTrial ? 'trial' : 'pro'} compact={compact} />
-        </div>
-    )
-}
-
-// The lifetime twin of PlanCard: the same card, paid once instead of priced per month.
-export function LifetimeDealCard() {
-    const t = useTranslations('billing.parts.lifetime')
-    return (
-        <div className="relative flex flex-col gap-5 rounded-2xl bg-background/60 p-5 ring-1 ring-border sm:p-6">
-            <BorderBeam />
-            <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
-                <div className="flex min-w-0 items-center gap-4">
-                    <Icon size="lg" icon={TicketIcon} />
-                    <div className="min-w-0">
-                        <p className="text-lg font-medium">{t('title')}</p>
-                        <p className="text-sm text-muted-foreground">{t('line')}</p>
-                    </div>
-                </div>
-                <div className="ms-auto min-w-0 text-end">
-                    <p className="text-2xl font-semibold tracking-tight sm:text-3xl">{t('paidOnce')}</p>
-                    <p className="text-sm text-muted-foreground">{t('forGood')}</p>
-                </div>
-            </div>
-            <FeatureGrid variant="lifetime" />
         </div>
     )
 }

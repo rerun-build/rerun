@@ -26,10 +26,10 @@ import { useSession } from '@/supabase/session/SessionProvider'
 import { BillingDialogShell } from './billing/BillingDialogShell'
 import { CheckoutDialog } from './billing/CheckoutDialog'
 import { CreditPane, type CreditPurchased } from './billing/CreditPane'
-import { LifetimeDialog } from './billing/LifetimeDialog'
 import { ManagedCreditDialog } from './billing/ManagedCreditDialog'
 import { SuccessPanel } from './billing/parts'
 import { BillingTilesDialog, BillingTilesSkeleton } from './billing/tiles/BillingTilesDialog'
+import { LifetimeTilesDialog } from './billing/tiles/LifetimeTilesDialog'
 import type { View } from './billing/tiles/views'
 import { CancelSubscriptionDialog } from './cancel-subscription/CancelSubscriptionDialog'
 
@@ -58,8 +58,9 @@ export function BillingDialog() {
     useCreditCheckoutReturn()
 
     const entitled = isSubscriptionEntitled(workspace?.subscription_status)
-    // A trial waits for its card to know whether it lands on the tiles or on the checkout.
-    const tilesCertain = entitled && workspace?.subscription_status !== 'trialing' && !isLifetimePlan(workspace)
+    // A trial waits for its card to know whether it lands on the tiles or on the checkout. A lifetime
+    // deal always opens its tiles.
+    const tilesCertain = isLifetimePlan(workspace) || (entitled && workspace?.subscription_status !== 'trialing')
 
     // `offer` is forced once the server refused a trial the browser thought was still there.
     const resolve = useCallback(
@@ -144,10 +145,9 @@ export function BillingDialog() {
             ) : resolved.kind === 'loading' ? (
                 tilesCertain ? <BillingTilesSkeleton /> : <LoadingShell />
             ) : resolved.kind === 'lifetime' && lifetimeState ? (
-                <LifetimeDialog
+                <LifetimeTilesDialog
                     state={lifetimeState}
                     highlightAddon={highlightAddon}
-                    onClose={close}
                     onChanged={async () => {
                         await loadLifetimeState()
                     }}

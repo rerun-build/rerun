@@ -7,6 +7,7 @@ import { useState } from 'react'
 import { Progress } from '@/components/ui/progress'
 import { Skeleton } from '@/components/ui/skeleton'
 import { runCreditPurchase } from '@/ee/lib/billing/plan-payment'
+import type { SubscriptionState } from '@/ee/services/billing.service'
 import { useErrorText } from '@/hooks/useErrorText'
 import { cn } from '@/lib/utils'
 import { useSession } from '@/supabase/session/SessionProvider'
@@ -18,7 +19,7 @@ import type { CreditUsageState } from '../credit-usage/useCreditUsage'
 import { CountFlow, PayFooter, SummaryRows, TermsConsent, UsdFlow, usd } from '../parts'
 import { LOW_CREDITS } from './account'
 import { billingDate, cardBrandName, CardLine, Explain, Note, Panel, Stepper, TILE_FRAME } from './bits'
-import type { PanelProps } from './views'
+import type { PanelProps, TilesData } from './views'
 
 export function creditsLeftOf(credit: CreditUsageState): { left: number; whole: number } {
     return { left: creditsFromMicros(credit.balance?.leftMicros ?? 0), whole: creditsFromMicros(credit.balance?.wholeMicros ?? 0) }
@@ -28,14 +29,25 @@ export function creditsPercent({ left, whole }: { left: number; whole: number })
     return whole > 0 ? (left / whole) * 100 : 0
 }
 
-function lockedReasonOf(state: PanelProps['state'], t: ReturnType<typeof useTranslations<'billing.tiles.credits'>>): string | undefined {
+function lockedReasonOf(state: Pick<SubscriptionState, 'status' | 'cancelAtPeriodEnd'>, t: ReturnType<typeof useTranslations<'billing.tiles.credits'>>): string | undefined {
     if (state.status === 'past_due') return t('locked.pastDue')
     if (state.cancelAtPeriodEnd) return t('locked.canceling')
     return undefined
 }
 
 // The balance, the packs that top it up, the switch that stops all spending, and the way to usage.
-export function CreditsPanel({ state, data, go, onDone }: PanelProps) {
+// A workspace with no monthly credit (a lifetime deal) only holds what it bought.
+export function CreditsPanel({
+    state,
+    data,
+    go,
+    onDone,
+}: {
+    state: Pick<SubscriptionState, 'status' | 'cancelAtPeriodEnd' | 'card'>
+    data: Pick<TilesData, 'credit'>
+    go: (view: 'plan' | 'usage') => void
+    onDone: PanelProps['onDone']
+}) {
     const t = useTranslations('billing.tiles.credits')
     const locale = useLocale()
     const errorText = useErrorText()
@@ -53,6 +65,7 @@ export function CreditsPanel({ state, data, go, onDone }: PanelProps) {
     const lockedReason = lockedReasonOf(state, t)
     const listCents = packs * CREDIT_PACK_PRICE_CENTS
     const card = quote?.card ?? state.card
+    const monthlyMicros = workspace?.rerun_budget_micros ?? 0
 
     if (state.status === 'trialing') {
         return (
@@ -97,10 +110,14 @@ export function CreditsPanel({ state, data, go, onDone }: PanelProps) {
             </div>
             <SummaryRows
                 rows={[
-                    {
-                        label: credit.resetsOn ? t('thisMonthResets', { date: billingDate(credit.resetsOn, locale) }) : t('thisMonth'),
-                        value: t('monthOf', { left: formatCredits(balance?.monthLeftMicros ?? 0, locale), total: formatCredits(workspace?.rerun_budget_micros ?? 0, locale) }),
-                    },
+                    ...(monthlyMicros > 0
+                        ? [
+                              {
+                                  label: credit.resetsOn ? t('thisMonthResets', { date: billingDate(credit.resetsOn, locale) }) : t('thisMonth'),
+                                  value: t('monthOf', { left: formatCredits(balance?.monthLeftMicros ?? 0, locale), total: formatCredits(monthlyMicros, locale) }),
+                              },
+                          ]
+                        : []),
                     { label: t('fromPacks'), value: formatCredits(balance?.topupLeftMicros ?? 0, locale) },
                 ]}
             />
@@ -141,7 +158,7 @@ const TOP_COWORKERS = 5
 
 // What the period spent so far: each day, the split between the models and paid data, and who spent it.
 // Every figure covers the same days, so the split adds up to the total above it.
-export function UsagePanel({ data }: PanelProps) {
+export function UsagePanel({ data }: { data: Pick<TilesData, 'credit'> }) {
     const t = useTranslations('billing.tiles.usage')
     const tUsage = useTranslations('billing.usage')
     const locale = useLocale()

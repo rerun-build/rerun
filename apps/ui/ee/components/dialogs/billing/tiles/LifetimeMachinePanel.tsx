@@ -8,34 +8,39 @@ import { INCLUDED_MACHINE_SIZE, MACHINE_SIZES, MAX_STORAGE_PACKS, PLAN_PRICES_CE
 import type { LifetimeBillingState } from '@/ee/services/lifetime-addons.service'
 import { useErrorText } from '@/hooks/useErrorText'
 
-import { shortDate } from './checkout-copy'
-import { MachineSizeCards, StorageRow } from './machine/MachinePicker'
-import { PayFooter, RightTitle, SummaryRows, TermsConsent, usd } from './parts'
-import { minPacksFor, tooFullFor } from './tiles/MachinePanel'
-import { Note } from './tiles/bits'
+import { MachineSizeCards, StorageRow } from '../machine/MachinePicker'
+import { PayFooter, SummaryRows, TermsConsent, usd } from '../parts'
+import { billingDate, Note, Panel } from './bits'
+import { minPacksFor, tooFullFor } from './MachinePanel'
+import type { Success } from './views'
 
 function monthlyCents(size: MachineSize, packs: number): number {
     return machinePriceCents(size, 'monthly') + packs * PLAN_PRICES_CENTS.monthly.storage_pack
 }
 
+// What the add-ons subscription pays for from its next renewal. Set to end, it still carries what was
+// given back, and pays for nothing.
+export function lifetimePaidMachine(state: Pick<LifetimeBillingState, 'cancelAtPeriodEnd' | 'machineSize' | 'quantities'>): LifetimeBillingState['heldMachine'] {
+    return state.cancelAtPeriodEnd ? { machineSize: INCLUDED_MACHINE_SIZE, storagePacks: 0 } : { machineSize: state.machineSize, storagePacks: state.quantities.storage_pack }
+}
+
 // The machine of a full lifetime workspace, billed by the month on the subscription of its app slots:
 // the first purchase through Stripe's Checkout, a larger size billed today for the rest of the month,
 // a smaller one at the renewal, when the workspace moves to a fresh machine of that size.
-export function LifetimeMachinePane({ state, onBack, onApplied }: { state: LifetimeBillingState; onBack: () => void; onApplied: (success: { title: string; body: string }) => void }) {
+export function LifetimeMachinePanel({ state, onDone }: { state: LifetimeBillingState; onDone: (success: Success) => void | Promise<void> }) {
     const t = useTranslations('billing.machine')
     const tSize = useTranslations('billing.machine.sizes')
     const locale = useLocale()
     const errorText = useErrorText()
     const held = state.heldMachine
-    // A subscription set to end still carries what was given back: from its renewal it pays for nothing.
-    const paid: LifetimeBillingState['heldMachine'] = state.cancelAtPeriodEnd ? { machineSize: INCLUDED_MACHINE_SIZE, storagePacks: 0 } : { machineSize: state.machineSize, storagePacks: state.quantities.storage_pack }
+    const paid = lifetimePaidMachine(state)
     const [size, setSize] = useState<MachineSize>(paid.machineSize)
     const [packs, setPacks] = useState(paid.storagePacks)
     const [accepted, setAccepted] = useState(false)
     const [submitting, setSubmitting] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
-    const renewal = state.periodEnd ? shortDate(state.periodEnd, locale) : t('yourRenewal')
+    const renewal = state.periodEnd ? billingDate(state.periodEnd, locale) : t('yourRenewal')
     const lockedReason = state.trialing ? t('lifetimeTrialReason') : undefined
     const machine = state.machine
     const usedGb = Math.ceil(machine?.usedDiskGib ?? 0)
@@ -65,7 +70,7 @@ export function LifetimeMachinePane({ state, onBack, onApplied }: { state: Lifet
         // Stripe's Checkout has the page from here.
         if (result.checkoutUrl) return
         setSubmitting(false)
-        onApplied(success)
+        void onDone(success)
     }
 
     const footer = (() => {
@@ -112,8 +117,7 @@ export function LifetimeMachinePane({ state, onBack, onApplied }: { state: Lifet
     })()
 
     return (
-        <div className="@container flex flex-1 flex-col gap-5">
-            <RightTitle onBack={onBack}>{t('lifetimeTitle')}</RightTitle>
+        <Panel>
             {lockedReason && <Note>{lockedReason}</Note>}
             {pending && <Note>{t('notes.pending', { size: tSize(paid.machineSize), disk: paidDisk, date: renewal })}</Note>}
             <MachineSizeCards current={held.machineSize} selected={size} interval="monthly" onSelect={setSize} unavailable={unavailable} disabledReason={lockedReason} />
@@ -126,6 +130,6 @@ export function LifetimeMachinePane({ state, onBack, onApplied }: { state: Lifet
                 disabledReason={lockedReason}
             />
             {footer ?? (machine?.usedDiskGib != null && <Note>{t('notes.diskUsed', { used: usedGb, total: machine.diskGib })}</Note>)}
-        </div>
+        </Panel>
     )
 }
