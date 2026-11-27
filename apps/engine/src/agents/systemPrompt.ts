@@ -266,8 +266,19 @@ const unattendedRunNote = (origin: string) =>
 const CLI_BRIDGE_NOTE =
     'Rerun tools are exposed to you through the MCP server named rerun, so their visible names use the mcp__rerun__ prefix. For example, mcp__rerun__ask_user is the ask_user tool described in these instructions. Call the prefixed tool whenever an instruction names its unprefixed form, and never claim that a Rerun tool is unavailable merely because only its prefixed name is visible.'
 
+// The Claude CLI gets the history as one text, each earlier call a line of the turn that made it
+// (RER-404): left unexplained, the model writes its next call the same way instead of making it.
+const CLAUDE_HISTORY_NOTE =
+    'Your earlier turns in this conversation list the tools you called as lines like [Tool call: name({...})], after your message and without their results. The system writes those lines after the fact: writing one yourself runs nothing and shows raw text to the user. To use a tool, call it.'
+
 const cliBridgeNote = (provider: Provider, web: boolean) =>
-    web ? `${CLI_BRIDGE_NOTE} web_search is the one exception: it names your own built-in ${provider === 'claude' ? 'WebSearch' : 'web_search'} tool, not a Rerun one.` : CLI_BRIDGE_NOTE
+    [
+        CLI_BRIDGE_NOTE,
+        web ? `web_search is the one exception: it names your own built-in ${provider === 'claude' ? 'WebSearch' : 'web_search'} tool, not a Rerun one.` : '',
+        provider === 'claude' ? CLAUDE_HISTORY_NOTE : '',
+    ]
+        .filter(Boolean)
+        .join(' ')
 
 type TurnClosers = { cards: readonly HitlToolName[]; skillPropose: boolean }
 

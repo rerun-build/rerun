@@ -1,17 +1,25 @@
 import { describe, expect, it } from 'vitest'
-import { CardTagSplitter, createCardTagGuard, cutsCardTag } from './card-tag-stream.js'
+import { CardTagSplitter, createCardTagGuard, firstTextCut } from './card-tag-stream.js'
 
 // The end of the SEO optimizer message of 28 October: the questions asked in prose, then the card
 // written as an empty tag instead of the call.
 const MESSAGE = "Le classement nominatif reste possible si tu le veux, mais c'est ta décision de fondateur, pas la mienne.\n\nDeux précisions avant de lancer la chaîne : ChatSEO n'est pas connecté."
 const EMPTY_TAG = '<ask_user>\n</ask_user>'
 
-function split(deltas: string[], id = 't'): { text: string[]; cuts: string[] } {
+// The Support coworker's message of 27 November (RER-404), shortened: the skill proposal written as
+// a [Tool call: ...] line, the way the Claude CLI shows its earlier calls, then the rest of the reply.
+const BEFORE_CALL = 'Compris, je le fais en règle permanente et je te propose de la garder dans le skill de validation des réponses support. À toi de l\'accepter ou non dans la ligne ci-dessous.'
+const CALL_LINE = '[Tool call: mcp__rerun__skill_propose({"mode":"edit","slug":"validation-des-reponses-support","title":"Toujours rédiger les drafts de réponse","instruction":"Rédige toujours un brouillon (f(x) compris)."})]'
+const AFTER_CALL = 'Voici comment je l\'appliquerai :\n- **Email :** brouillon créé dans Resend, tu relis et tu envoies.'
+const WRITTEN_CALL = `${BEFORE_CALL}\n${CALL_LINE}\n\n${AFTER_CALL}`
+
+function split(deltas: string[], id = 't'): { text: string[]; cuts: string[]; calls: string[] } {
     const cuts: string[] = []
-    const splitter = new CardTagSplitter(tag => cuts.push(tag))
+    const calls: string[] = []
+    const splitter = new CardTagSplitter(cut => (cut.kind === 'tag' ? cuts : calls).push(cut.name))
     const text = deltas.flatMap(delta => splitter.delta(id, delta))
     text.push(...splitter.end(id))
-    return { text, cuts }
+    return { text, cuts, calls }
 }
 
 describe('CardTagSplitter', () => {
@@ -79,17 +87,98 @@ describe('CardTagSplitter', () => {
     })
 })
 
-describe('cutsCardTag', () => {
+describe('CardTagSplitter on a tool call written as text', () => {
+    it('cuts the [Tool call: ...] line and lets the rest of the reply through', () => {
+        const { text, calls } = split([WRITTEN_CALL])
+        expect(text.join('')).toBe(`${BEFORE_CALL}\n\n${AFTER_CALL}`)
+        expect(calls).toEqual(['skill_propose'])
+    })
+
+    it('finds the call split across deltas, the marker included', () => {
+        const deltas = [`${BEFORE_CALL}\n[To`, 'ol ca', 'll: mcp__rerun__skill_', 'propose({"mode":"ed', 'it"})]\n\n', AFTER_CALL]
+        const { text, calls } = split(deltas)
+        expect(text.join('')).toBe(`${BEFORE_CALL}\n\n${AFTER_CALL}`)
+        expect(calls).toEqual(['skill_propose'])
+    })
+
+    it('cuts a call that closes the message, and the line break before it', () => {
+        const { text, calls } = split([`${BEFORE_CALL}\n`, '[Tool call: ask_user({"questions":[]})]'])
+        expect(text.join('')).toBe(BEFORE_CALL)
+        expect(calls).toEqual(['ask_user'])
+    })
+
+    it('cuts every line of a call whose input runs over several lines', () => {
+        const { text, calls } = split([`${BEFORE_CALL}\n[Tool call: mcp__rerun__request_approval({\n  "approvals": [\n    {"action": "Send"}\n  ]\n})]\n${AFTER_CALL}`])
+        expect(text.join('')).toBe(`${BEFORE_CALL}\n${AFTER_CALL}`)
+        expect(calls).toEqual(['request_approval'])
+    })
+
+    it('keeps the words written after the call on its line', () => {
+        const { text, calls } = split([`${BEFORE_CALL}\n${CALL_LINE} Je te laisse valider.\n\n${AFTER_CALL}`])
+        expect(text.join('')).toBe(`${BEFORE_CALL}\nJe te laisse valider.\n\n${AFTER_CALL}`)
+        expect(calls).toEqual(['skill_propose'])
+    })
+
+    it('keeps the words after the call when they come in the same deltas as it', () => {
+        const deltas = [`${BEFORE_CALL}\n[Tool call: mcp__rerun__skill_`, 'propose({"mode":"edit"})] Je te', ' laisse valider.\n\n', AFTER_CALL]
+        expect(split(deltas).text.join('')).toBe(`${BEFORE_CALL}\nJe te laisse valider.\n\n${AFTER_CALL}`)
+    })
+
+    it('cuts the period left after a call and lets the next paragraphs through', () => {
+        const { text, calls } = split([`${BEFORE_CALL}\n${CALL_LINE}.\n\n${AFTER_CALL}`])
+        expect(text.join('')).toBe(`${BEFORE_CALL}\n\n${AFTER_CALL}`)
+        expect(calls).toEqual(['skill_propose'])
+    })
+
+    it('cuts a call written without an input', () => {
+        const { text, calls } = split([`${BEFORE_CALL}\n[Tool call: mcp__rerun__skill_propose]\n\n${AFTER_CALL}`])
+        expect(text.join('')).toBe(`${BEFORE_CALL}\n\n${AFTER_CALL}`)
+        expect(calls).toEqual(['skill_propose'])
+    })
+
+    it('ends a call that never closes on the first blank line', () => {
+        const { text, calls } = split([`${BEFORE_CALL}\n[Tool call: mcp__rerun__skill_propose({\n  "mode": "edit"\n\n${AFTER_CALL}`])
+        expect(text.join('')).toBe(`${BEFORE_CALL}\n\n${AFTER_CALL}`)
+        expect(calls).toEqual(['skill_propose'])
+    })
+
+    it('keeps the words after the closing line of a call over several lines, and a )] quoted in its input', () => {
+        const { text } = split([`${BEFORE_CALL}\n[Tool call: x({\n  "note": "voir (annexe [2])]",\n  "b": 1\n})] Voilà.\n${AFTER_CALL}`])
+        expect(text.join('')).toBe(`${BEFORE_CALL}\nVoilà.\n${AFTER_CALL}`)
+    })
+
+    it('keeps a call quoted in a sentence or inside a code fence', () => {
+        const inline = 'A line like `[Tool call: ask_user({})]` in a message runs nothing.'
+        const fenced = 'The history shows:\n```\n[Tool call: ask_user({})]\n```\nDone.'
+        expect(split([inline])).toEqual({ text: [inline], cuts: [], calls: [] })
+        expect(split([fenced]).text.join('')).toBe(fenced)
+        expect(split([fenced]).calls).toEqual([])
+    })
+
+    it('releases a line that only looked like it could open a call', () => {
+        const { text, calls } = split(['[', 'The docs](https://docs.rerun.build) are up to date.'])
+        expect(text.join('')).toBe('[The docs](https://docs.rerun.build) are up to date.')
+        expect(calls).toEqual([])
+    })
+})
+
+describe('firstTextCut', () => {
     it('spots a card tag, bridged or not, and nothing else', () => {
-        expect(cutsCardTag(`${MESSAGE}\n\n${EMPTY_TAG}`)).toBe(true)
-        expect(cutsCardTag('<mcp__rerun__request_approval>')).toBe(true)
-        expect(cutsCardTag('Call ask_user now. <b>bold</b>')).toBe(false)
-        expect(cutsCardTag('')).toBe(false)
+        expect(firstTextCut(`${MESSAGE}\n\n${EMPTY_TAG}`)).toEqual({ kind: 'tag', name: 'ask_user' })
+        expect(firstTextCut('<mcp__rerun__request_approval>')).toEqual({ kind: 'tag', name: 'request_approval' })
+        expect(firstTextCut('Call ask_user now. <b>bold</b>')).toBeNull()
+        expect(firstTextCut('')).toBeNull()
+    })
+
+    it('spots a tool call written as text', () => {
+        expect(firstTextCut(WRITTEN_CALL)).toEqual({ kind: 'call', name: 'skill_propose' })
+        expect(firstTextCut('[Tool call: mcp__rerun__skill_propose]')).toEqual({ kind: 'call', name: 'skill_propose' })
     })
 
     it('sees no card in a tag quoted as inline code or inside a code fence, like the stream', () => {
-        expect(cutsCardTag('Never write `<ask_user>` in a message.')).toBe(false)
-        expect(cutsCardTag('The format looks like this:\n```xml\n<ask_user>\n</ask_user>\n```\nDone.')).toBe(false)
+        expect(firstTextCut('Never write `<ask_user>` in a message.')).toBeNull()
+        expect(firstTextCut('The format looks like this:\n```xml\n<ask_user>\n</ask_user>\n```\nDone.')).toBeNull()
+        expect(firstTextCut('Never write `[Tool call: ask_user({})]` in a message.')).toBeNull()
     })
 })
 
@@ -143,6 +232,15 @@ describe('createCardTagGuard', () => {
             }),
         } as never)
         expect(wrapped.content).toEqual([{ type: 'text', text: MESSAGE }])
+    })
+
+    it('cuts a tool call written as text out of a stream', async () => {
+        const seen = await run([{ type: 'text-start', id: 't' }, { type: 'text-delta', id: 't', delta: WRITTEN_CALL }, { type: 'text-end', id: 't' }, { type: 'finish' }])
+        const text = seen
+            .filter(part => part.type === 'text-delta')
+            .map(part => part.delta)
+            .join('')
+        expect(text).toBe(`${BEFORE_CALL}\n\n${AFTER_CALL}`)
     })
 
     it('returns a one-shot answer without a card tag as it was', async () => {

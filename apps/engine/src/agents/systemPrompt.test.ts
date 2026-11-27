@@ -362,6 +362,11 @@ describe('buildSystemPrompt provider notes', () => {
         expect(prompt).toContain('mcp__rerun__ask_user')
     })
 
+    it('tells Claude that the [Tool call: ...] lines of its history are a record, never a way to call a tool', async () => {
+        expect(await buildSystemPrompt(agent, { source: 'chat' }, 'claude')).toContain('lines like [Tool call: name({...})]')
+        expect(await buildSystemPrompt(agent, { source: 'chat' }, 'codex')).not.toContain('[Tool call:')
+    })
+
     it.each(['rerun', 'openai', 'anthropic', 'google', 'openrouter'] as const)('leaves the %s prompt without the bridge note', async provider => {
         const prompt = await buildSystemPrompt(agent, { source: 'chat' }, provider)
         expect(prompt).not.toContain('<bridged_tools>')
