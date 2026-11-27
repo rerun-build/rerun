@@ -5,7 +5,7 @@ import { formatDuration } from '@rerun/i18n/format'
 import { BorderBeam } from '@rerun/ui'
 import { Badge, Icon, type BadgeTone } from '@rerun/ui/primitives'
 import { useLocale, useTranslations } from 'next-intl'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 
 import { computerJobAction, stopComputerJobAction } from '@/app/api/_actions/remote-computers.actions'
@@ -13,10 +13,14 @@ import { ComputerHandle } from '@/components/computers/ComputerBits'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useErrorText } from '@/hooks/useErrorText'
+import { useVisibleInterval } from '@/hooks/useVisibleInterval'
 import { SquareIcon, TerminalIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 
 const POLL_MS = 5_000
+// Offline, the job runs on over there and its end wakes the coworker: nothing to watch closely, and a
+// chat full of cards of a computer switched off for the night must not read it every five seconds.
+const OFFLINE_POLL_MS = 60_000
 
 type CardState = RemoteJobState | 'offline' | 'gone'
 
@@ -43,23 +47,20 @@ export function ComputerJobCard({ computer, jobId, command, label }: { computer:
     const [view, setView] = useState<JobView | null>(null)
     const [stopping, setStopping] = useState(false)
 
+    const [readFailed, setReadFailed] = useState(false)
+
     const read = useCallback(async () => {
-        const res = await computerJobAction(computer, jobId)
+        const res = await computerJobAction(computer, jobId).catch(() => null)
         // A read that failed is tried again at the next tick: the job is still running over there.
-        if (!res.ok) return
+        if (!res?.ok) return setReadFailed(true)
+        setReadFailed(false)
         if (res.gone) return setView(current => ({ job: current?.job ?? null, output: current?.output ?? '', offline: false, gone: true }))
         setView(res.logs ? { job: res.logs.job, output: res.logs.output, offline: false } : current => ({ job: current?.job ?? null, output: current?.output ?? '', offline: true }))
     }, [computer, jobId])
 
     const running = !view?.gone && (!view?.job || view.job.state === 'running')
-    useEffect(() => {
-        void read()
-        if (!running) return
-        const timer = setInterval(() => {
-            if (document.visibilityState === 'visible') void read()
-        }, POLL_MS)
-        return () => clearInterval(timer)
-    }, [read, running])
+    const poll = useCallback(() => (running ? read() : undefined), [read, running])
+    useVisibleInterval(poll, view?.offline || readFailed ? OFFLINE_POLL_MS : POLL_MS)
 
     const stop = async () => {
         setStopping(true)
