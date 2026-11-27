@@ -6,6 +6,18 @@ import { geminiCompatibleSchema, googleToolSchemaMiddleware } from './google-too
 // Buffer's `create_post`, as its MCP server describes `thumbnailUrl`.
 const BUFFER_THUMBNAIL = { anyOf: [{ type: 'string', format: 'uri' }, { type: 'string', const: '' }] }
 
+// `signature` of send_email, reply_to_email and continue_email_thread, as mcp-mail-server@2.1.2 lists it.
+const MAIL_SIGNATURE = {
+    description: 'Optional signature appended after the new body. Provide text, html, or both.',
+    anyOf: [{ required: ['text'] }, { required: ['html'] }],
+    type: 'object',
+    properties: {
+        text: { description: 'Plain-text signature', type: 'string', minLength: 1, maxLength: 10000000 },
+        html: { description: 'Trusted HTML signature', type: 'string', minLength: 1, maxLength: 10000000 },
+    },
+    additionalProperties: false,
+}
+
 describe('geminiCompatibleSchema', () => {
     it('drops an empty-string const, deep in a union', () => {
         const schema = { type: 'object', properties: { assets: { type: 'array', items: { type: 'object', properties: { thumbnailUrl: BUFFER_THUMBNAIL } } } } }
@@ -30,6 +42,22 @@ describe('geminiCompatibleSchema', () => {
         const schema = { type: 'object', properties: { enum: { type: 'string' }, const: { type: 'boolean' } }, required: ['enum'] }
         expect(geminiCompatibleSchema(schema)).toEqual(schema)
     })
+
+    it('turns a nested union of required-only branches into a sentence, the mail signature', () => {
+        const { anyOf: _anyOf, ...signature } = MAIL_SIGNATURE
+        expect(geminiCompatibleSchema({ type: 'object', properties: { signature: MAIL_SIGNATURE } })).toEqual({
+            type: 'object',
+            properties: { signature: { ...signature, description: `${MAIL_SIGNATURE.description}\n\nProvide at least one of: text, html.` } },
+        })
+    })
+
+    it('says exactly one for a oneOf, and writes the description when there was none', () => {
+        const schema = { type: 'object', properties: { target: { type: 'object', properties: { channel: { type: 'string' }, user: { type: 'string' } }, oneOf: [{ required: ['channel'] }, { required: ['user'] }] } } }
+        expect(geminiCompatibleSchema(schema)).toEqual({
+            type: 'object',
+            properties: { target: { type: 'object', properties: { channel: { type: 'string' }, user: { type: 'string' } }, description: 'Provide exactly one of: channel, user.' } },
+        })
+    })
 })
 
 describe('googleToolSchemaMiddleware', () => {
@@ -45,5 +73,14 @@ describe('googleToolSchemaMiddleware', () => {
         expect(transformed.tools?.[0]).toMatchObject({ inputSchema: { properties: { thumbnailUrl: { anyOf: [{ format: 'uri' }, { type: 'string' }] } } } })
         expect(transformed.tools?.[1]).toBe(params.tools[1])
         expect(params.tools[0].inputSchema.properties.thumbnailUrl).toBe(BUFFER_THUMBNAIL)
+    })
+
+    it('sends the mail tools to Google without the signature union it refuses', async () => {
+        const inputSchema = { type: 'object' as const, properties: { to: { type: 'string' }, signature: MAIL_SIGNATURE }, required: ['to'] }
+        const params = { prompt: [], tools: [{ type: 'function' as const, name: 'email_send_email', inputSchema }] }
+        const transformed = await googleToolSchemaMiddleware.transformParams!({ type: 'stream', params, model: {} as never })
+        expect(JSON.stringify(transformed.tools)).not.toContain('anyOf')
+        expect(transformed.tools?.[0]).toMatchObject({ inputSchema: { required: ['to'], properties: { signature: { type: 'object', properties: { text: { type: 'string' }, html: { type: 'string' } } } } } })
+        expect(MAIL_SIGNATURE.anyOf).toEqual([{ required: ['text'] }, { required: ['html'] }])
     })
 })

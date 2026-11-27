@@ -10,7 +10,7 @@ const requiredOf = (branch: JsonObject): string[] => (Array.isArray(branch.requi
 // these" (`oneOf: [{ required: ['a'] }, { required: ['b'] }]`).
 const onlyRequires = (branch: JsonObject): boolean => Object.keys(branch).every(key => key === 'required') && requiredOf(branch).length > 0
 
-function constraintNote(kind: (typeof ROOT_COMBINATORS)[number], branches: JsonObject[]): string | null {
+export function constraintNote(kind: (typeof ROOT_COMBINATORS)[number], branches: JsonObject[]): string | null {
     if (kind === 'allOf' || branches.length === 0 || !branches.every(onlyRequires)) return null
     const names = [...new Set(branches.flatMap(requiredOf))].join(', ')
     return kind === 'oneOf' ? `Provide exactly one of: ${names}.` : `Provide at least one of: ${names}.`
