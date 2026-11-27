@@ -108,7 +108,8 @@
             "deal": "Plan de por vida",
             "paidOnce": "Pagado una vez",
             "apps": "Apps",
-            "aiProviders": "Proveedores de IA"
+            "aiProviders": "Proveedores de IA",
+            "machine": "Máquina"
         },
         "slots": {
             "oneOnCheckout": "Un slot en el primer pago, añade más justo después",
@@ -927,6 +928,10 @@
                 "title": "Uso de créditos",
                 "description": "Lo que gastaron tus coworkers, y en qué."
             },
+            "machine": {
+                "title": "Máquina",
+                "description": "Una sola máquina para el workspace, compartida por todos los coworkers."
+            },
             "apps": {
                 "title": "Apps de pago",
                 "description": "Una plaza por cada cuenta que usan tus coworkers."
@@ -1013,8 +1018,17 @@
             },
             "machine": {
                 "title": "Máquina",
-                "comingSoon": "Próximamente",
-                "description": "Máquinas más grandes para workspaces con mucha actividad."
+                "change": "Cambiar tamaño",
+                "startPro": "Empezar Pro ahora",
+                "trialReason": "Los tamaños de máquina vienen con Pro. Empieza Pro ahora para elegir uno.",
+                "locked": {
+                    "pastDue": "Primero paga la factura rechazada.",
+                    "canceling": "Reanuda Pro para cambiar la máquina."
+                },
+                "from": "{size} desde el {date}",
+                "diskLabel": "Disco usado",
+                "specs": "{disk} GB de disco · {memory} GB de memoria · {vcpus} vCPU",
+                "specsUsed": "Disco {used} de {disk} GB · {memory} GB de memoria · {vcpus} vCPU"
             },
             "apps": {
                 "title": "Apps de pago",
@@ -1222,6 +1236,73 @@
             "small": "Pequeña",
             "medium": "Mediana",
             "large": "Grande"
-        }
+        },
+        "current": "Actual",
+        "included": "Incluida",
+        "extraMonthly": "+{amount} / mes",
+        "extraYearly": "+{amount} / mes, facturado al año",
+        "specs": {
+            "disk": "{gb} GB de almacenamiento",
+            "memory": "{gb} GB de memoria",
+            "vcpus": "{count} vCPU",
+            "backups": "{days, plural, =0 {Sin copias de seguridad} one {# día de copias de seguridad} other {# días de copias de seguridad}}"
+        },
+        "storage": {
+            "title": "Almacenamiento extra",
+            "line": "+{gb} GB por {amount} al mes cada uno",
+            "less": "Un pack de almacenamiento menos",
+            "more": "Un pack de almacenamiento más",
+            "max": "{count} packs como máximo."
+        },
+        "trialReason": "Los tamaños de máquina vienen con Pro. Empieza Pro ahora para elegir uno.",
+        "lifetimeTrialReason": "Tu prueba de apps sigue en curso. Elige un tamaño de máquina cuando termine.",
+        "startPro": "Empezar Pro ahora",
+        "locked": {
+            "pastDue": "Primero paga la factura rechazada.",
+            "canceling": "Reanuda Pro para cambiar la máquina."
+        },
+        "yourRenewal": "tu renovación",
+        "tooFull": "Tu máquina contiene {used} GB, demasiado para {size} GB.",
+        "acceptTerms": "Primero acepta las condiciones",
+        "nothingToday": "Nada que pagar hoy.",
+        "rows": {
+            "storage": "Almacenamiento",
+            "memory": "Memoria",
+            "processor": "Procesador",
+            "change": "{from} → {to} {unit}",
+            "dueToday": "A pagar hoy",
+            "until": "Hasta el {date}",
+            "from": "Desde el {date}",
+            "machine": "{size}, {disk} GB",
+            "monthly": "Cada mes",
+            "perMonth": "{amount} al mes"
+        },
+        "notes": {
+            "restart": "Tu máquina se reinicia una vez, en menos de un minuto, en cuanto ningún coworker esté en marcha. Los archivos, los coworkers y los chats se quedan como están.",
+            "diskLive": "El disco crece sin moverse. No se reinicia nada.",
+            "partLater": "Lo que devuelves sigue disponible hasta el {date}.",
+            "move": "El {date} tu workspace pasa a una máquina nueva de ese tamaño: unos minutos sin conexión, y todo se va con él.",
+            "pending": "Tu máquina pasa al tamaño {size} con {disk} GB el {date}. Elige el tamaño que tienes hoy para mantenerlo.",
+            "resizing": "Tu máquina se está redimensionando. Estará lista en unos minutos.",
+            "diskUsed": "Disco: {used} de {total} GB usados. Una máquina más grande da más espacio para archivos y más coworkers a la vez.",
+            "lifetimeCheckout": "Se factura cada mes con tus plazas de apps, desde hoy.",
+            "lifetimeProrated": "Se factura hoy por el resto del mes y luego cada mes con tus plazas de apps."
+        },
+        "cta": {
+            "upgrade": "Ampliar · pagar <amount></amount>",
+            "upgradePlain": "Ampliar",
+            "keep": "Mantener la máquina {size}",
+            "switchOn": "Cambiar el {date}",
+            "subscribe": "Suscribirme · {amount} al mes"
+        },
+        "success": {
+            "upTitle": "Máquina {size} en camino",
+            "upBody": "Tu máquina crece en los próximos minutos.",
+            "keptTitle": "Máquina {size} conservada",
+            "keptBody": "Nada cambia en tu factura.",
+            "downTitle": "Máquina {size} desde el {date}",
+            "downBody": "Conservas la máquina más grande hasta entonces."
+        },
+        "lifetimeTitle": "Máquina"
     }
 }

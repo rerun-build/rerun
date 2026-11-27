@@ -16,7 +16,7 @@ import { Progress } from '@/components/ui/progress'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { resumeSubscriptionAction } from '@/ee/actions/billing.actions'
-import { PLAN_PRICES_CENTS } from '@/ee/lib/billing/plans'
+import { MACHINE_SPECS, PLAN_PRICES_CENTS, machineDiskGib } from '@/ee/lib/billing/plans'
 import { useErrorText } from '@/hooks/useErrorText'
 import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess'
 import { appInfo } from '@/lib/apps/catalog'
@@ -50,14 +50,54 @@ function Tile({ icon, title, children, actions }: { icon: Glyph; title: string; 
     )
 }
 
-// Bigger machines are not sold yet: the tile keeps its place and says so, with nothing to click.
-function MachineTile() {
+// The size the workspace runs on this period, how full its disk is, and the way to another size. A
+// trial keeps the included one: Pro comes first.
+function MachineTile({ state, go }: Pick<PanelProps, 'state' | 'go'>) {
     const t = useTranslations('billing.tiles.home.machine')
+    const tSize = useTranslations('billing.machine.sizes')
+    const locale = useLocale()
+    const trial = state.status === 'trialing'
+    const { machineSize, storagePacks } = state.heldMachine
+    const spec = MACHINE_SPECS[machineSize]
+    const diskGib = machineDiskGib(machineSize, storagePacks)
+    const used = state.machine?.usedDiskGib ?? null
+    const lockedReason = trial ? t('trialReason') : state.status === 'past_due' ? t('locked.pastDue') : state.cancelAtPeriodEnd ? t('locked.canceling') : undefined
+    const pending = state.pendingDowngrade.machine_size ?? null
+    const date = state.periodEnd ? billingDate(state.periodEnd, locale) : ''
+
     return (
-        <Tile icon={ServerIcon} title={t('title')}>
-            <p className="text-3xl font-semibold tracking-tight text-muted-foreground/70">{t('comingSoon')}</p>
-            <div className="h-1.5 w-full rounded-full bg-muted" />
-            <p className="text-xs text-muted-foreground">{t('description')}</p>
+        <Tile
+            icon={ServerIcon}
+            title={t('title')}
+            actions={
+                <>
+                    <TooltipDisabledReason reason={lockedReason} className="flex flex-1">
+                        <Button size="sm" variant="outline" className="flex-1" disabled={!!lockedReason} onClick={() => go('machine')}>
+                            {t('change')}
+                        </Button>
+                    </TooltipDisabledReason>
+                    {trial && (
+                        <Button size="sm" onClick={() => go('plan')}>
+                            {t('startPro')}
+                        </Button>
+                    )}
+                </>
+            }
+        >
+            <div className="flex flex-wrap items-center gap-2">
+                <p className="text-3xl font-semibold tracking-tight">{tSize(machineSize)}</p>
+                {pending && (
+                    <Badge size="sm" tone="yellow">
+                        {t('from', { size: tSize(pending), date })}
+                    </Badge>
+                )}
+            </div>
+            <Progress value={used === null ? 0 : Math.min(100, (used / diskGib) * 100)} size="sm" tone={used !== null && used / diskGib > 0.9 ? 'destructive' : 'brand'} label={t('diskLabel')} />
+            <p className="text-xs text-muted-foreground tabular-nums">
+                {used === null
+                    ? t('specs', { disk: diskGib, memory: spec.memoryGib, vcpus: spec.vcpus })
+                    : t('specsUsed', { used: formatNumber(Math.ceil(used), locale), disk: diskGib, memory: spec.memoryGib, vcpus: spec.vcpus })}
+            </p>
         </Tile>
     )
 }
@@ -294,7 +334,7 @@ export function Home({ state, data, go, onDone }: Pick<PanelProps, 'state' | 'da
 
             <div className="grid gap-3 @lg:grid-cols-2">
                 <CreditsTile state={state} data={data} go={go} />
-                <MachineTile />
+                <MachineTile state={state} go={go} />
                 {data.apps.length > 0 && <AppsTile state={state} data={data} go={go} />}
                 <PaymentTile state={state} go={go} />
             </div>

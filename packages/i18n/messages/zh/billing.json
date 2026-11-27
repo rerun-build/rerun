@@ -108,7 +108,8 @@
             "deal": "终身方案",
             "paidOnce": "一次性付款",
             "apps": "应用",
-            "aiProviders": "AI 提供商"
+            "aiProviders": "AI 提供商",
+            "machine": "机器"
         },
         "slots": {
             "oneOnCheckout": "首次付款含一个席位，之后可立即添加更多",
@@ -927,6 +928,10 @@
                 "title": "积分用量",
                 "description": "您的同事花了多少，花在了哪里。"
             },
+            "machine": {
+                "title": "机器",
+                "description": "工作区专属一台机器，所有同事共用。"
+            },
             "apps": {
                 "title": "付费应用",
                 "description": "您的同事使用的每个账号占一个席位。"
@@ -1013,8 +1018,17 @@
             },
             "machine": {
                 "title": "机器",
-                "comingSoon": "即将推出",
-                "description": "为繁忙的工作区提供更大的机器。"
+                "change": "更改规格",
+                "startPro": "立即开始 Pro",
+                "trialReason": "机器规格随 Pro 提供。立即开始 Pro 即可选择。",
+                "locked": {
+                    "pastDue": "请先支付被拒绝的款项。",
+                    "canceling": "恢复 Pro 后即可更改机器。"
+                },
+                "from": "{date} 起改为{size}",
+                "diskLabel": "已用磁盘",
+                "specs": "磁盘 {disk} GB · 内存 {memory} GB · {vcpus} vCPU",
+                "specsUsed": "磁盘 {used} / {disk} GB · 内存 {memory} GB · {vcpus} vCPU"
             },
             "apps": {
                 "title": "付费应用",
@@ -1222,6 +1236,73 @@
             "small": "小型",
             "medium": "中型",
             "large": "大型"
-        }
+        },
+        "current": "当前",
+        "included": "已包含",
+        "extraMonthly": "+{amount} / 月",
+        "extraYearly": "+{amount} / 月，按年计费",
+        "specs": {
+            "disk": "{gb} GB 存储空间",
+            "memory": "{gb} GB 内存",
+            "vcpus": "{count} vCPU",
+            "backups": "{days, plural, =0 {无备份} other {备份保留 # 天}}"
+        },
+        "storage": {
+            "title": "额外存储",
+            "line": "+{gb} GB，每个 {amount}/月",
+            "less": "减少一个存储包",
+            "more": "增加一个存储包",
+            "max": "最多 {count} 个存储包。"
+        },
+        "trialReason": "机器规格随 Pro 提供。立即开始 Pro 即可选择。",
+        "lifetimeTrialReason": "您的应用试用仍在进行中。结束后再选择机器规格。",
+        "startPro": "立即开始 Pro",
+        "locked": {
+            "pastDue": "请先支付被拒绝的款项。",
+            "canceling": "恢复 Pro 后即可更改机器。"
+        },
+        "yourRenewal": "您的续订日",
+        "tooFull": "您的机器已占用 {used} GB，超出 {size} GB。",
+        "acceptTerms": "请先接受条款",
+        "nothingToday": "今天无需付款。",
+        "rows": {
+            "storage": "存储",
+            "memory": "内存",
+            "processor": "处理器",
+            "change": "{from} → {to} {unit}",
+            "dueToday": "今日应付",
+            "until": "至 {date}",
+            "from": "{date} 起",
+            "machine": "{size}，{disk} GB",
+            "monthly": "每月",
+            "perMonth": "每月 {amount}"
+        },
+        "notes": {
+            "restart": "没有同事在运行时，您的机器会重启一次，不到一分钟。文件、同事和对话都保持不变。",
+            "diskLive": "磁盘直接扩容，无需重启。",
+            "partLater": "您减少的部分保留至 {date}。",
+            "move": "{date} 您的工作区将迁移到该规格的新机器：离线几分钟，所有内容都会一起迁移。",
+            "pending": "您的机器将于 {date} 改为{size}，{disk} GB。选择当前规格即可保留。",
+            "resizing": "正在调整您的机器规格，几分钟后即可就绪。",
+            "diskUsed": "磁盘已用 {used} / {total} GB。更大的机器可容纳更多文件，并同时运行更多同事。",
+            "lifetimeCheckout": "从今天起，每月与应用席位一起计费。",
+            "lifetimeProrated": "今天按本月剩余时间计费，之后每月与应用席位一起计费。"
+        },
+        "cta": {
+            "upgrade": "升级 · 支付 <amount></amount>",
+            "upgradePlain": "升级",
+            "keep": "保留{size}",
+            "switchOn": "{date} 切换",
+            "subscribe": "订阅 · 每月 {amount}"
+        },
+        "success": {
+            "upTitle": "{size}机器即将就绪",
+            "upBody": "您的机器将在几分钟内完成扩容。",
+            "keptTitle": "已保留{size}机器",
+            "keptBody": "您的账单不会有任何变化。",
+            "downTitle": "{date} 起改为{size}机器",
+            "downBody": "在此之前，您仍可使用更大的机器。"
+        },
+        "lifetimeTitle": "机器"
     }
 }

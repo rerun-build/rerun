@@ -108,7 +108,8 @@
             "deal": "終身方案",
             "paidOnce": "一次付清",
             "apps": "應用程式",
-            "aiProviders": "AI 供應商"
+            "aiProviders": "AI 供應商",
+            "machine": "機器"
         },
         "slots": {
             "oneOnCheckout": "首次付款時一個名額，之後可立即新增更多",
@@ -927,6 +928,10 @@
                 "title": "點數用量",
                 "description": "您的同事花了多少，又花在哪裡。"
             },
+            "machine": {
+                "title": "機器",
+                "description": "工作區專屬一台機器，所有同事共用。"
+            },
             "apps": {
                 "title": "付費應用程式",
                 "description": "您的同事使用的每個帳號各佔一個名額。"
@@ -1013,8 +1018,17 @@
             },
             "machine": {
                 "title": "機器",
-                "comingSoon": "即將推出",
-                "description": "為忙碌的工作區提供更大的機器。"
+                "change": "變更規格",
+                "startPro": "立即開始 Pro",
+                "trialReason": "機器規格隨 Pro 提供。立即開始 Pro 即可選擇。",
+                "locked": {
+                    "pastDue": "請先支付遭拒的款項。",
+                    "canceling": "恢復 Pro 後即可變更機器。"
+                },
+                "from": "{date} 起改為{size}",
+                "diskLabel": "已用磁碟",
+                "specs": "磁碟 {disk} GB · 記憶體 {memory} GB · {vcpus} vCPU",
+                "specsUsed": "磁碟 {used} / {disk} GB · 記憶體 {memory} GB · {vcpus} vCPU"
             },
             "apps": {
                 "title": "付費應用程式",
@@ -1222,6 +1236,73 @@
             "small": "小型",
             "medium": "中型",
             "large": "大型"
-        }
+        },
+        "current": "目前",
+        "included": "已包含",
+        "extraMonthly": "+{amount} / 月",
+        "extraYearly": "+{amount} / 月，年繳",
+        "specs": {
+            "disk": "{gb} GB 儲存空間",
+            "memory": "{gb} GB 記憶體",
+            "vcpus": "{count} vCPU",
+            "backups": "{days, plural, =0 {無備份} other {備份保留 # 天}}"
+        },
+        "storage": {
+            "title": "額外儲存空間",
+            "line": "+{gb} GB，每個 {amount}/月",
+            "less": "減少一個儲存包",
+            "more": "增加一個儲存包",
+            "max": "最多 {count} 個儲存包。"
+        },
+        "trialReason": "機器規格隨 Pro 提供。立即開始 Pro 即可選擇。",
+        "lifetimeTrialReason": "您的應用程式試用仍在進行中。結束後再選擇機器規格。",
+        "startPro": "立即開始 Pro",
+        "locked": {
+            "pastDue": "請先支付遭拒的款項。",
+            "canceling": "恢復 Pro 後即可變更機器。"
+        },
+        "yourRenewal": "您的續訂日",
+        "tooFull": "您的機器已使用 {used} GB，超過 {size} GB。",
+        "acceptTerms": "請先接受條款",
+        "nothingToday": "今天無須付款。",
+        "rows": {
+            "storage": "儲存空間",
+            "memory": "記憶體",
+            "processor": "處理器",
+            "change": "{from} → {to} {unit}",
+            "dueToday": "今日應付",
+            "until": "至 {date}",
+            "from": "{date} 起",
+            "machine": "{size}，{disk} GB",
+            "monthly": "每月",
+            "perMonth": "每月 {amount}"
+        },
+        "notes": {
+            "restart": "沒有同事在執行時，您的機器會重新啟動一次，不到一分鐘。檔案、同事和對話都維持原樣。",
+            "diskLive": "磁碟直接擴充，不需重新啟動。",
+            "partLater": "您減少的部分會保留到 {date}。",
+            "move": "{date} 您的工作區會搬到該規格的新機器：離線幾分鐘，所有內容都會一起搬過去。",
+            "pending": "您的機器將於 {date} 改為{size}，{disk} GB。選擇目前的規格即可維持。",
+            "resizing": "正在調整您的機器規格，幾分鐘後就會就緒。",
+            "diskUsed": "磁碟已使用 {used} / {total} GB。更大的機器能放更多檔案，並同時執行更多同事。",
+            "lifetimeCheckout": "從今天起，每月與應用程式名額一起計費。",
+            "lifetimeProrated": "今天按本月剩餘時間計費，之後每月與應用程式名額一起計費。"
+        },
+        "cta": {
+            "upgrade": "升級 · 支付 <amount></amount>",
+            "upgradePlain": "升級",
+            "keep": "維持{size}",
+            "switchOn": "{date} 切換",
+            "subscribe": "訂閱 · 每月 {amount}"
+        },
+        "success": {
+            "upTitle": "{size}機器即將就緒",
+            "upBody": "您的機器會在幾分鐘內完成擴充。",
+            "keptTitle": "已維持{size}機器",
+            "keptBody": "您的帳單不會有任何變動。",
+            "downTitle": "{date} 起改為{size}機器",
+            "downBody": "在此之前，您仍可使用較大的機器。"
+        },
+        "lifetimeTitle": "機器"
     }
 }

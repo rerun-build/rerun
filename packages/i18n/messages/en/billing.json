@@ -104,7 +104,14 @@
         "tiles.apps.addedLine": "A change of slots: {app} is the app's name, like LinkedIn Pro.",
         "tiles.pages.card.description": "Under the title of the page where a card is added or replaced.",
         "tiles.invoice.machine": "A machine size on an invoice. {size} is the name of the size: Small, Medium or Large.",
-        "machine.sizes.small": "Name of the smallest machine size a workspace runs on, included in the plan."
+        "machine.sizes.small": "Name of the smallest machine size a workspace runs on, included in the plan.",
+        "machine.extraMonthly": "What a machine size adds to the plan each month. {amount} is a dollar amount.",
+        "machine.specs.backups": "Backups the size advertises. {days} is 0 (none), 7 or 30.",
+        "machine.rows.change": "A resource before and after the change, like \"20 → 60 GB\". {unit} is GB or vCPU, never translated.",
+        "machine.rows.machine": "A machine size and its disk, like \"Medium, 60 GB\".",
+        "machine.cta.upgrade": "The <amount> tag is replaced by the dollar amount charged today.",
+        "machine.notes.move": "A smaller machine cannot shrink in place: the workspace is copied onto a fresh one at the renewal.",
+        "tiles.home.machine.specsUsed": "{used} and {disk} are gigabytes of disk, {memory} gigabytes of memory, {vcpus} processor cores."
     },
     "credits": "{count, plural, one {# credit} other {# credits}}",
     "plan": {
@@ -215,7 +222,8 @@
             "deal": "Lifetime deal",
             "paidOnce": "Paid once",
             "apps": "Apps",
-            "aiProviders": "AI providers"
+            "aiProviders": "AI providers",
+            "machine": "Machine"
         },
         "slots": {
             "oneOnCheckout": "One slot on the first payment, add more right after",
@@ -1034,6 +1042,10 @@
                 "title": "Credit usage",
                 "description": "What your coworkers spent, and on what."
             },
+            "machine": {
+                "title": "Machine",
+                "description": "One machine for the workspace, shared by every coworker."
+            },
             "apps": {
                 "title": "Paid apps",
                 "description": "One slot per account your coworkers use."
@@ -1120,8 +1132,17 @@
             },
             "machine": {
                 "title": "Machine",
-                "comingSoon": "Coming soon",
-                "description": "Bigger machines for busy workspaces."
+                "change": "Change size",
+                "startPro": "Start Pro now",
+                "trialReason": "Machine sizes come with Pro. Start Pro now to pick one.",
+                "locked": {
+                    "pastDue": "Pay the declined invoice first.",
+                    "canceling": "Resume Pro to change the machine."
+                },
+                "from": "{size} from {date}",
+                "diskLabel": "Disk used",
+                "specs": "{disk} GB disk · {memory} GB memory · {vcpus} vCPU",
+                "specsUsed": "Disk {used} of {disk} GB · {memory} GB memory · {vcpus} vCPU"
             },
             "apps": {
                 "title": "Paid apps",
@@ -1329,6 +1350,73 @@
             "small": "Small",
             "medium": "Medium",
             "large": "Large"
-        }
+        },
+        "current": "Current",
+        "included": "Included",
+        "extraMonthly": "+{amount} / month",
+        "extraYearly": "+{amount} / month, billed yearly",
+        "specs": {
+            "disk": "{gb} GB storage",
+            "memory": "{gb} GB memory",
+            "vcpus": "{count} vCPU",
+            "backups": "{days, plural, =0 {No backups} one {# day of backups} other {# days of backups}}"
+        },
+        "storage": {
+            "title": "Extra storage",
+            "line": "+{gb} GB for {amount} a month each",
+            "less": "One storage pack fewer",
+            "more": "One more storage pack",
+            "max": "{count} packs at most."
+        },
+        "trialReason": "Machine sizes come with Pro. Start Pro now to pick one.",
+        "lifetimeTrialReason": "Your app trial is still running. Pick a machine size once it ends.",
+        "startPro": "Start Pro now",
+        "locked": {
+            "pastDue": "Pay the declined invoice first.",
+            "canceling": "Resume Pro to change the machine."
+        },
+        "yourRenewal": "your renewal",
+        "tooFull": "Your machine holds {used} GB, too much for {size} GB.",
+        "acceptTerms": "Accept the terms first",
+        "nothingToday": "Nothing to pay today.",
+        "rows": {
+            "storage": "Storage",
+            "memory": "Memory",
+            "processor": "Processor",
+            "change": "{from} → {to} {unit}",
+            "dueToday": "Due today",
+            "until": "Until {date}",
+            "from": "From {date}",
+            "machine": "{size}, {disk} GB",
+            "monthly": "Every month",
+            "perMonth": "{amount} a month"
+        },
+        "notes": {
+            "restart": "Your machine restarts once, under a minute, as soon as no coworker is running. Files, coworkers and chats stay as they are.",
+            "diskLive": "The disk grows in place. Nothing restarts.",
+            "partLater": "What you give back stays until {date}.",
+            "move": "On {date} your workspace moves to a fresh machine of that size: a few minutes offline, and everything comes with it.",
+            "pending": "Your machine goes to {size} with {disk} GB on {date}. Pick the size you have today to keep it.",
+            "resizing": "Your machine is being resized. It is ready in a few minutes.",
+            "diskUsed": "Disk {used} of {total} GB used. A larger machine gives more room for files and more coworkers at once.",
+            "lifetimeCheckout": "Billed every month with your app slots, from today.",
+            "lifetimeProrated": "Billed today for the rest of the month, then every month with your app slots."
+        },
+        "cta": {
+            "upgrade": "Upgrade · pay <amount></amount>",
+            "upgradePlain": "Upgrade",
+            "keep": "Keep {size}",
+            "switchOn": "Switch on {date}",
+            "subscribe": "Subscribe · {amount} a month"
+        },
+        "success": {
+            "upTitle": "{size} machine on its way",
+            "upBody": "Your machine grows in the next few minutes.",
+            "keptTitle": "{size} machine kept",
+            "keptBody": "Nothing changes on your bill.",
+            "downTitle": "{size} machine from {date}",
+            "downBody": "You keep the larger machine until then."
+        },
+        "lifetimeTitle": "Machine"
     }
 }

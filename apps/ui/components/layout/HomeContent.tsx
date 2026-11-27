@@ -36,6 +36,8 @@ import { useUnseenRunsSync } from '@/hooks/useUnseenRunsSync'
 import { useAccountStore } from '@/stores/account.store'
 import { useAppBootStore } from '@/stores/app-boot.store'
 import { useBillingStore } from '@/stores/billing.store'
+import { settleLifetimeMachineCheckoutAction } from '@/ee/actions/billing.actions'
+import { MACHINE_CHECKOUT_PARAM } from '@/ee/lib/billing/lifetime-addons'
 import { useBoardStore } from '@/stores/board.store'
 import { useCreatorStore } from '@/stores/creator.store'
 import { useSession } from '@/supabase/session/SessionProvider'
@@ -142,10 +144,15 @@ export function HomeContent({ initialSpaces = [], initialWorkspaceId = null }: {
     }, [searchParams, loading])
 
     // Every end-of-access email links here: open billing straight away, once the account is known.
+    // Back from the Checkout of a lifetime workspace's first machine size, the size is settled first,
+    // without waiting for the webhook, and billing opens on it.
     useEffect(() => {
         if (searchParams.get('billing') !== '1' || loading || !workspace) return
-        if (!isManagedWorkspace(workspace)) useBillingStore.getState().openBilling(undefined, 'email_link')
-        clearSearchParams('billing')
+        const machineSession = searchParams.get(MACHINE_CHECKOUT_PARAM)
+        clearSearchParams('billing', MACHINE_CHECKOUT_PARAM)
+        if (isManagedWorkspace(workspace)) return
+        if (!machineSession) return useBillingStore.getState().openBilling(undefined, 'email_link')
+        void settleLifetimeMachineCheckoutAction(machineSession).finally(() => useBillingStore.getState().openBilling('machine', 'machine_checkout'))
     }, [searchParams, loading, workspace])
 
     // The email about an AI account that stopped links here: its sign-in opens straight away.

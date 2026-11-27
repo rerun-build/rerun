@@ -1,6 +1,8 @@
-import { abandonCreditInvoiceAction, buyCreditAction, changePlanAction, settleCreditInvoiceAction } from '@/ee/actions/billing.actions'
+import { abandonCreditInvoiceAction, buyCreditAction, changeLifetimeMachineAction, changePlanAction, settleCreditInvoiceAction } from '@/ee/actions/billing.actions'
 import type { PlanSelection } from '@/ee/services/billing.service'
+import type { LifetimeMachineSelection } from '@/ee/services/lifetime-addons.service'
 import { stripeBrowser } from '@/ee/lib/billing/stripe-client'
+import { randomUuid } from '@/lib/random-uuid'
 
 const NOT_CONFIRMED = "Your bank didn't confirm the payment. Nothing was charged, try again."
 
@@ -24,6 +26,26 @@ export async function runPlanChange(selection: PlanSelection): ReturnType<typeof
         return result
     } catch (err) {
         // Stripe's own refusal is already in the reader's language; ours goes by its code.
+        const message = err instanceof Error ? err.message : NOT_CONFIRMED
+        return message === NOT_CONFIRMED ? { ok: false, error: NOT_CONFIRMED, code: 'bankNotConfirmed' } : { ok: false, error: message }
+    }
+}
+
+// The machine of a lifetime workspace as its dialog changes it: on the subscription of its app slots,
+// confirmed with the bank when it asks, or handed to Stripe's Checkout for a first purchase, which
+// leaves the page.
+export async function runLifetimeMachineChange(selection: LifetimeMachineSelection): ReturnType<typeof changeLifetimeMachineAction> {
+    const result = await changeLifetimeMachineAction(selection, randomUuid())
+    if (!result.ok) return result
+    if (result.checkoutUrl) {
+        window.location.assign(result.checkoutUrl)
+        return result
+    }
+    if (!result.paymentClientSecret) return result
+    try {
+        await confirmPlanPayment(result.paymentClientSecret)
+        return result
+    } catch (err) {
         const message = err instanceof Error ? err.message : NOT_CONFIRMED
         return message === NOT_CONFIRMED ? { ok: false, error: NOT_CONFIRMED, code: 'bankNotConfirmed' } : { ok: false, error: message }
     }

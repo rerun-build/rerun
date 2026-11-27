@@ -12,7 +12,7 @@ import { PanelSteps } from '@/components/ui/panel-steps'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { SubscriptionState } from '@/ee/services/billing.service'
 import { APP_SLUGS } from '@/lib/apps/types'
-import { BarChart3, Building2, CoinsIcon, CreditCardIcon, FileTextIcon, Grid2x2Icon, TriangleAlertIcon, UserPlus } from '@/lib/icons'
+import { BarChart3, Building2, CoinsIcon, CreditCardIcon, FileTextIcon, Grid2x2Icon, ServerIcon, TriangleAlertIcon, UserPlus } from '@/lib/icons'
 import { useSession } from '@/supabase/session/SessionProvider'
 
 import type { CancelFlowHeader } from '../../cancel-subscription/CancelFlow'
@@ -27,6 +27,7 @@ import { CancelFlowPanel, CancelPanel } from './CancelPanels'
 import { CreditsPanel, UsagePanel } from './CreditsPanels'
 import { Home } from './Home'
 import { BusinessPanel, CardPanel, InvoicesPanel, PaymentPanel, ReferralPanel } from './PaymentPanels'
+import { MachinePanel } from './MachinePanel'
 import { PlanPanel } from './PlanPanel'
 import { billingDate } from './bits'
 import type { PanelProps, Success, TilesData, View } from './views'
@@ -55,6 +56,8 @@ function usePageHeader(view: Exclude<View, 'home' | 'cancelFlow'>, state: Subscr
             return { icon: CoinsIcon, title: t('credits.title'), description: trial ? t('credits.trialDescription') : t('credits.description'), backLabel: billing }
         case 'usage':
             return { icon: BarChart3, title: t('usage.title'), description: t('usage.description'), backLabel: t('credits.title') }
+        case 'machine':
+            return { icon: ServerIcon, title: t('machine.title'), description: t('machine.description'), backLabel: billing }
         case 'apps':
             return { icon: Grid2x2Icon, title: t('apps.title'), description: t('apps.description'), backLabel: billing }
         case 'payment':
@@ -88,8 +91,7 @@ function useHomeHeader(state: SubscriptionState, trialDaysLeft: number | null): 
 }
 
 // The billing of a workspace with a plan to manage: a home of tiles, and a page for each thing it
-// changes, sliding in under the one header, which goes back. The Machine tile is a placeholder:
-// machine sizes are not sold yet.
+// changes, sliding in under the one header, which goes back.
 export function BillingTilesDialog({ state, initialView = 'home', onChanged }: { state: SubscriptionState; initialView?: View; onChanged: () => Promise<void> }) {
     const t = useTranslations('billing')
     const { workspace, refreshWorkspace } = useSession()
@@ -169,6 +171,8 @@ export function BillingTilesDialog({ state, initialView = 'home', onChanged }: {
         <CreditsPanel {...props} />
     ) : view === 'usage' ? (
         <UsagePanel {...props} />
+    ) : view === 'machine' ? (
+        <MachinePanel {...props} />
     ) : view === 'apps' ? (
         <AppsPanel {...props} />
     ) : view === 'payment' ? (

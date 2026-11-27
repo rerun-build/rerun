@@ -7,9 +7,9 @@ import { useState } from 'react'
 import type { LifetimeBillingState } from '@/ee/services/lifetime-addons.service'
 import { useEnabledPaidApps } from '@/components/layout/FeatureFlagsProvider'
 import { PanelSteps } from '@/components/ui/panel-steps'
-import { arePaidAppsOffered } from '@/ee/lib/billing/plans'
+import { arePaidAppsOffered, LIFETIME_PLAN_SLUG } from '@/ee/lib/billing/plans'
 import { APP_SLUGS, type AppSlug } from '@/lib/apps/types'
-import { ChevronRightIcon, KeyIcon } from '@/lib/icons'
+import { ChevronRightIcon, KeyIcon, ServerIcon } from '@/lib/icons'
 import type { BillingHighlight } from '@/stores/billing.store'
 import { usePaidAppsStore } from '@/stores/paid-apps.store'
 import { useSession } from '@/supabase/session/SessionProvider'
@@ -23,11 +23,12 @@ import { UsagePane } from './credit-usage/UsagePane'
 import { useCreditUsage } from './credit-usage/useCreditUsage'
 import { CreditPane } from './CreditPane'
 import { InvoicesPane } from './InvoicesPane'
+import { LifetimeMachinePane } from './LifetimeMachinePane'
 import { LifetimeSlotsPane } from './LifetimeSlotsPane'
 import { CreditUsageRow, InvoicesRow, OverviewLinkRow } from './OverviewRows'
 import { Headline, LifetimeDealCard, RightTitle, SuccessPanel, SummaryRows, usd } from './parts'
 
-type Drill = 'overview' | 'invoices' | 'credit' | 'usage' | 'business'
+type Drill = 'overview' | 'invoices' | 'credit' | 'usage' | 'business' | 'machine'
 type Success = { title: string; body: string }
 
 // The plan dialog of a workspace that paid once: the same frame as Pro, the lifetime deal in place of
@@ -58,7 +59,9 @@ export function LifetimeDialog({
     const slotsStates = appSlots ?? fetchedSlots
     const openApp = usePaidAppsStore(s => s.openApp)
     const [slots, setSlots] = useState<AppSlots>(currentSlots)
-    const [drill, setDrill] = useState<Drill>(highlightAddon === 'credit_pack' ? 'credit' : 'overview')
+    // Sizes are sold to the full lifetime plan, on the subscription of its app slots.
+    const machineOffered = workspace?.plan === LIFETIME_PLAN_SLUG && arePaidAppsOffered(workspace)
+    const [drill, setDrill] = useState<Drill>(highlightAddon === 'credit_pack' ? 'credit' : machineOffered && (highlightAddon === 'machine' || highlightAddon === 'storage_pack') ? 'machine' : 'overview')
     const [success, setSuccess] = useState<Success | null>(null)
     // A lifetime deal comes with no monthly credit: what it holds is bought, and never resets.
     const credit = { ...useCreditUsage(), resetsOn: null }
@@ -129,6 +132,8 @@ export function LifetimeDialog({
                 <CreditPane onBack={() => setDrill('overview')} onDone={next => void done(next)} />
             ) : drill === 'usage' ? (
                 <UsagePane credit={credit} onBack={() => setDrill('overview')} />
+            ) : drill === 'machine' ? (
+                <LifetimeMachinePane state={state} onBack={() => setDrill('overview')} onApplied={next => void done(next)} />
             ) : drill === 'business' ? (
                 <BusinessDetailsPane business={state.business} onBack={() => setDrill('overview')} onSaved={onChanged} />
             ) : (
@@ -138,6 +143,7 @@ export function LifetimeDialog({
                     onInvoices={() => setDrill('invoices')}
                     onUsage={() => setDrill('usage')}
                     onBusiness={() => setDrill('business')}
+                    onMachine={machineOffered ? () => setDrill('machine') : undefined}
                     onConnectAi={onConnectAi}
                 />
             )}
@@ -153,6 +159,7 @@ function LifetimeOverviewPane({
     onInvoices,
     onUsage,
     onBusiness,
+    onMachine,
     onConnectAi,
 }: {
     state: LifetimeBillingState
@@ -160,10 +167,12 @@ function LifetimeOverviewPane({
     onInvoices: () => void
     onUsage: () => void
     onBusiness: () => void
+    onMachine?: () => void
     onConnectAi: () => void
 }) {
     const locale = useLocale()
     const t = useTranslations('billing')
+    const tSize = useTranslations('billing.machine.sizes')
 
     const appsRow = state.nextInvoice
         ? [{ label: t('plan.nextInvoice'), value: `${shortDate(state.nextInvoice.at, locale)} · ${usd(state.nextInvoice.amountCents)}` }]
@@ -181,6 +190,19 @@ function LifetimeOverviewPane({
                     {state.hasCustomer && <InvoicesRow onOpen={onInvoices} />}
                     {state.hasCustomer && <BusinessDetailsRow business={state.business} onOpen={onBusiness} />}
                     <CreditUsageRow leftMicros={creditLeftMicros} onOpen={onUsage} />
+                    {onMachine && (
+                        <OverviewLinkRow
+                            icon={ServerIcon}
+                            label={t('lifetime.overview.machine')}
+                            value={
+                                <>
+                                    {tSize(state.heldMachine.machineSize)}
+                                    <ChevronRightIcon className="size-4" />
+                                </>
+                            }
+                            onOpen={onMachine}
+                        />
+                    )}
                     <OverviewLinkRow icon={KeyIcon} label={t('lifetime.overview.aiProviders')} value={<ChevronRightIcon className="size-4" />} onOpen={onConnectAi} />
                 </div>
             </div>

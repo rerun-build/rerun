@@ -108,7 +108,8 @@
             "deal": "Ömür boyu anlaşma",
             "paidOnce": "Bir kez ödendi",
             "apps": "Uygulamalar",
-            "aiProviders": "Yapay zeka sağlayıcıları"
+            "aiProviders": "Yapay zeka sağlayıcıları",
+            "machine": "Makine"
         },
         "slots": {
             "oneOnCheckout": "İlk ödemede bir yer, hemen ardından daha fazlasını ekleyin",
@@ -927,6 +928,10 @@
                 "title": "Kredi kullanımı",
                 "description": "Coworker'larınızın neye ne kadar harcadığı."
             },
+            "machine": {
+                "title": "Makine",
+                "description": "Çalışma alanı için, tüm coworker'ların paylaştığı tek bir makine."
+            },
             "apps": {
                 "title": "Ücretli uygulamalar",
                 "description": "Coworker'larınızın kullandığı her hesap için bir yer."
@@ -1013,8 +1018,17 @@
             },
             "machine": {
                 "title": "Makine",
-                "comingSoon": "Çok yakında",
-                "description": "Yoğun çalışma alanları için daha büyük makineler."
+                "change": "Boyutu değiştir",
+                "startPro": "Pro'yu şimdi başlat",
+                "trialReason": "Makine boyutları Pro ile gelir. Birini seçmek için Pro'yu şimdi başlatın.",
+                "locked": {
+                    "pastDue": "Önce reddedilen faturayı ödeyin.",
+                    "canceling": "Makineyi değiştirmek için Pro'yu sürdürün."
+                },
+                "from": "{date} tarihinden itibaren {size}",
+                "diskLabel": "Kullanılan disk",
+                "specs": "{disk} GB disk · {memory} GB bellek · {vcpus} vCPU",
+                "specsUsed": "Disk {used} / {disk} GB · {memory} GB bellek · {vcpus} vCPU"
             },
             "apps": {
                 "title": "Ücretli uygulamalar",
@@ -1222,6 +1236,73 @@
             "small": "Küçük",
             "medium": "Orta",
             "large": "Büyük"
-        }
+        },
+        "current": "Mevcut",
+        "included": "Dahil",
+        "extraMonthly": "+{amount} / ay",
+        "extraYearly": "+{amount} / ay, yıllık faturalandırılır",
+        "specs": {
+            "disk": "{gb} GB depolama",
+            "memory": "{gb} GB bellek",
+            "vcpus": "{count} vCPU",
+            "backups": "{days, plural, =0 {Yedek yok} one {# günlük yedek} other {# günlük yedek}}"
+        },
+        "storage": {
+            "title": "Ek depolama",
+            "line": "Her biri ayda {amount} karşılığında +{gb} GB",
+            "less": "Bir depolama paketi eksilt",
+            "more": "Bir depolama paketi ekle",
+            "max": "En fazla {count} paket."
+        },
+        "trialReason": "Makine boyutları Pro ile gelir. Birini seçmek için Pro'yu şimdi başlatın.",
+        "lifetimeTrialReason": "Uygulama denemeniz hâlâ sürüyor. Bittiğinde bir makine boyutu seçin.",
+        "startPro": "Pro'yu şimdi başlat",
+        "locked": {
+            "pastDue": "Önce reddedilen faturayı ödeyin.",
+            "canceling": "Makineyi değiştirmek için Pro'yu sürdürün."
+        },
+        "yourRenewal": "yenileme",
+        "tooFull": "Makinenizde {used} GB veri var, {size} GB için fazla.",
+        "acceptTerms": "Önce koşulları kabul edin",
+        "nothingToday": "Bugün ödenecek bir şey yok.",
+        "rows": {
+            "storage": "Depolama",
+            "memory": "Bellek",
+            "processor": "İşlemci",
+            "change": "{from} → {to} {unit}",
+            "dueToday": "Bugün ödenecek",
+            "until": "{date} tarihine kadar",
+            "from": "{date} tarihinden itibaren",
+            "machine": "{size}, {disk} GB",
+            "monthly": "Her ay",
+            "perMonth": "Ayda {amount}"
+        },
+        "notes": {
+            "restart": "Hiçbir coworker çalışmadığı anda makineniz bir kez, bir dakikadan kısa sürede yeniden başlar. Dosyalar, coworker'lar ve sohbetler olduğu gibi kalır.",
+            "diskLive": "Disk yerinde büyür. Hiçbir şey yeniden başlamaz.",
+            "partLater": "Bıraktığınız kısım {date} tarihine kadar sizde kalır.",
+            "move": "{date} tarihinde çalışma alanınız bu boyutta yeni bir makineye taşınır: birkaç dakika çevrimdışı kalır ve her şey onunla birlikte gelir.",
+            "pending": "Makineniz {date} tarihinde {disk} GB ile {size} boyutuna geçer. Korumak için bugünkü boyutu seçin.",
+            "resizing": "Makinenizin boyutu değiştiriliyor. Birkaç dakika içinde hazır olur.",
+            "diskUsed": "Disk: {used} / {total} GB kullanılıyor. Daha büyük bir makine, dosyalar için daha fazla yer ve aynı anda daha fazla coworker sağlar.",
+            "lifetimeCheckout": "Bugünden itibaren uygulama yerlerinizle birlikte her ay faturalandırılır.",
+            "lifetimeProrated": "Bugün ayın geri kalanı için, ardından uygulama yerlerinizle birlikte her ay faturalandırılır."
+        },
+        "cta": {
+            "upgrade": "Yükselt · <amount></amount> öde",
+            "upgradePlain": "Yükselt",
+            "keep": "{size} boyutunu koru",
+            "switchOn": "{date} tarihinde geç",
+            "subscribe": "Abone ol · ayda {amount}"
+        },
+        "success": {
+            "upTitle": "{size} makine yolda",
+            "upBody": "Makineniz önümüzdeki birkaç dakika içinde büyür.",
+            "keptTitle": "{size} makine korundu",
+            "keptBody": "Faturanızda hiçbir şey değişmez.",
+            "downTitle": "{date} tarihinden itibaren {size} makine",
+            "downBody": "O zamana kadar daha büyük makine sizde kalır."
+        },
+        "lifetimeTitle": "Makine"
     }
 }

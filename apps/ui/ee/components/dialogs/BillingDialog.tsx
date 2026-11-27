@@ -39,7 +39,7 @@ import { CancelSubscriptionDialog } from './cancel-subscription/CancelSubscripti
 type Resolved = { kind: 'loading' } | { kind: 'checkout'; route: CheckoutRoute } | { kind: 'plan' } | { kind: 'lifetime' } | { kind: 'credit' } | { kind: 'error' }
 
 // Opened from a button about credit or referrals, the dialog starts on that page.
-const HIGHLIGHT_VIEW: Partial<Record<BillingHighlight, View>> = { credit_pack: 'credits', referrals: 'referral' }
+const HIGHLIGHT_VIEW: Partial<Record<BillingHighlight, View>> = { credit_pack: 'credits', referrals: 'referral', machine: 'machine', storage_pack: 'machine' }
 
 // Every openBilling() lands here. Two dialogs: the checkout, which sells a plan, and the billing
 // tiles, which manage one that is paid or on a card trial. Rerun credit is sold to every workspace:

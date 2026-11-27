@@ -11,7 +11,7 @@ export type BillingUpgrade = { coworker?: string; onPaid?: () => void }
 
 // `credit_pack` opens the purchase of Rerun credit, bought once outside the plan. `referrals` opens
 // the plan dialog on Refer a friend.
-export type BillingHighlight = AddonKey | 'credit_pack' | 'referrals'
+export type BillingHighlight = AddonKey | 'credit_pack' | 'referrals' | 'machine'
 
 type BillingState = {
     open: boolean

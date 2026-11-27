@@ -542,6 +542,9 @@ export type SubscriptionState = {
     // a resize is under way. null where machines are not sold in sizes.
     machineSize: MachineSize
     machine: MachineReading | null
+    // What the workspace runs on this period: a smaller size or fewer packs bought back land at the
+    // renewal, until then it keeps these.
+    heldMachine: { machineSize: MachineSize; storagePacks: number }
     // A switch to monthly waiting for the end of the paid year, with the plan it lands on.
     pendingSwitch: { selection: FullPlanSelection; at: string } | null
     // Flat amount taken off the list price on every invoice of the current interval, for a workspace
@@ -632,6 +635,7 @@ export async function getSubscriptionState(): Promise<SubscriptionState | null> 
         interval: intervalOfItems(subscription.items.data),
         machineSize,
         machine,
+        heldMachine: { machineSize: largerMachineSize(parseMachineSize(workspace.machine_size), machineSize), storagePacks: Math.max(workspace.storage_packs, quantities.storage_pack) },
         pendingSwitch,
         monthlyDiscountCents: permanentDiscountCents(subscription) + legacyBaseDiscountCents(subscription.items.data),
         pendingDowngrade,
@@ -819,6 +823,19 @@ export async function assertMachineFits(workspaceId: number, target: { machineSi
     const machine = await readMachine(workspaceId)
     if (!machine || diskGib >= machine.diskGib || fitsOnDisk(machine.usedDiskGib, diskGib)) return
     throw new AppError('machineDataTooBig', { used: Math.ceil(machine.usedDiskGib ?? 0), size: diskGib })
+}
+
+// A smaller size or fewer packs keep running until the renewal: taking back what this period already
+// paid for, and nothing more, is billed to nobody. Read off the workspace, where the webhook holds them.
+async function backToHeldMachine(workspaceId: number, subscription: Stripe.Subscription, target: FullPlanSelection): Promise<boolean> {
+    if (subscription.status !== 'active' || target.interval !== intervalOfItems(subscription.items.data)) return false
+    const { quantities: current } = quantitiesFromItems(subscription.items.data)
+    if (ADDON_KEYS.some(key => key !== 'storage_pack' && target.quantities[key] > current[key])) return false
+    const { increases } = planItemChanges(subscription, target)
+    if (increases.length === 0) return false
+    const { data: held } = await selectMaybeSingle(createServiceRoleClient(), 'workspaces', ['machine_size', 'storage_packs'] as const, { id: workspaceId })
+    if (!held) return false
+    return compareMachineSizes(target.machineSize, parseMachineSize(held.machine_size)) <= 0 && target.quantities.storage_pack <= held.storage_packs
 }
 
 // A trial runs on the included machine: a size or storage is bought once the plan is paid, from the
@@ -1214,6 +1231,12 @@ export async function changePlan(requested: PlanSelection): Promise<PlanChangeRe
     await assertSlotRemovalLeavesConnections(workspaceId, loaded, selection.quantities)
     await assertMachineFits(workspaceId, { machineSize: selection.machineSize, storagePacks: selection.quantities.storage_pack }, loaded.items.data)
     const subscription = await releasePendingSwitch(loaded)
+
+    if (await backToHeldMachine(workspaceId, subscription, selection)) {
+        const { increases, decreases } = planItemChanges(subscription, selection)
+        await stripe.subscriptions.update(subscription.id, { items: [...increases, ...decreases], proration_behavior: 'none' })
+        return { trialEnded: false, switchAt: null, paymentClientSecret: null }
+    }
     const kind = planChangeKind(subscription.status, intervalOfItems(subscription.items.data), selection.interval)
 
     if (kind === 'end_trial') {
@@ -1383,6 +1406,7 @@ export async function previewPlanChange(requested: PlanSelection): Promise<PlanQ
     assertValidSelection(selection)
     assertMachineOutsideTrial(subscription, selection)
     await assertMachineFits(workspaceId, { machineSize: selection.machineSize, storagePacks: selection.quantities.storage_pack }, subscription.items.data)
+    if (await backToHeldMachine(workspaceId, subscription, selection)) return null
     const kind = planChangeKind(subscription.status, intervalOfItems(subscription.items.data), selection.interval)
 
     if (kind === 'end_trial' || kind === 'switch_now') {

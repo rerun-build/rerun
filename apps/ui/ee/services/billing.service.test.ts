@@ -888,7 +888,7 @@ describe('extendTrial', () => {
 })
 
 describe('getSubscriptionState', () => {
-    const row = { stripe_subscription_id: 'sub_1', subscription_status: 'active', current_period_end: '2030-01-01T00:00:00+00:00', max_agents: 5, max_seats: 3, rerun_budget_micros: 5 * MICROS_PER_USD }
+    const row = { stripe_subscription_id: 'sub_1', subscription_status: 'active', current_period_end: '2030-01-01T00:00:00+00:00', max_agents: 5, max_seats: 3, rerun_budget_micros: 5 * MICROS_PER_USD, machine_size: 'small', storage_packs: 0 }
 
     it('is null for a workspace without a subscription or without the base plan', async () => {
         useDb({ row: { ...row, stripe_subscription_id: null } })
@@ -921,6 +921,7 @@ describe('getSubscriptionState', () => {
             interval: 'monthly',
             machineSize: 'small',
             machine: null,
+            heldMachine: { machineSize: 'small', storagePacks: 0 },
             pendingSwitch: null,
             monthlyDiscountCents: 300 + 500,
             pendingDowngrade: { rerun_budget_micros: 5 * MICROS_PER_USD },
@@ -1925,5 +1926,30 @@ describe('the machine size and the storage packs', () => {
             ])
             expect(trial).toEqual([{ price: 'price_base', quantity: 1 }])
         })
+    })
+})
+
+describe('taking back a size this period already paid for', () => {
+    const subscription = sub({ default_payment_method: 'pm_1', items: [{ price: 'price_base', quantity: 1, id: 'si_base' }, { price: 'price_machine_medium', quantity: 1, id: 'si_machine' }] })
+    const LARGE = { quantities: { linkedin_slot: 0, whatsapp_slot: 0, storage_pack: 0 }, interval: 'monthly', machineSize: 'large' } as const
+
+    beforeEach(() => {
+        vi.mocked(stripe.subscriptions.retrieve).mockResolvedValue(subscription as never)
+        vi.mocked(stripe.customers.retrieve).mockResolvedValue({ invoice_settings: { default_payment_method: null } } as never)
+    })
+
+    it('bills nothing to go back to the size the workspace still holds until the renewal', async () => {
+        useDb({ row: { stripe_subscription_id: 'sub_1', subscription_status: 'active', machine_size: 'large', storage_packs: 0 } })
+
+        await expect(changePlan(LARGE)).resolves.toEqual({ trialEnded: false, switchAt: null, paymentClientSecret: null })
+        await expect(previewPlanChange(LARGE)).resolves.toBeNull()
+        expect(vi.mocked(stripe.subscriptions.update).mock.calls).toEqual([['sub_1', { items: [{ id: 'si_machine', price: 'price_machine_large', quantity: 1 }], proration_behavior: 'none' }]])
+    })
+
+    it('bills a size past the one it holds as any other increase', async () => {
+        useDb({ row: { stripe_subscription_id: 'sub_1', subscription_status: 'active', machine_size: 'medium', storage_packs: 0 } })
+
+        await changePlan(LARGE)
+        expect(vi.mocked(stripe.subscriptions.update).mock.calls[0]![1]).toMatchObject({ proration_behavior: 'always_invoice', payment_behavior: 'pending_if_incomplete' })
     })
 })

@@ -6,7 +6,7 @@ import type { AppSlotsState } from '../AppsSection'
 import type { CreditUsageState } from '../credit-usage/useCreditUsage'
 import type { SummaryRow } from '../parts'
 
-export type View = 'home' | 'plan' | 'credits' | 'usage' | 'apps' | 'payment' | 'card' | 'business' | 'invoices' | 'referral' | 'cancel' | 'cancelFlow'
+export type View = 'home' | 'plan' | 'credits' | 'usage' | 'machine' | 'apps' | 'payment' | 'card' | 'business' | 'invoices' | 'referral' | 'cancel' | 'cancelFlow'
 
 export type Success = { title: string; body: string; rows?: SummaryRow[] }
 
