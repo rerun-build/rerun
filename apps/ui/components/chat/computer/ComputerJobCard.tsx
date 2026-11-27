@@ -5,7 +5,7 @@ import { formatDuration } from '@rerun/i18n/format'
 import { BorderBeam } from '@rerun/ui'
 import { Badge, Icon, type BadgeTone } from '@rerun/ui/primitives'
 import { useLocale, useTranslations } from 'next-intl'
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { computerJobAction, stopComputerJobAction } from '@/app/api/_actions/remote-computers.actions'
@@ -49,7 +49,10 @@ export function ComputerJobCard({ computer, jobId, command, label }: { computer:
 
     const [readFailed, setReadFailed] = useState(false)
 
+    const lastReadAt = useRef(0)
+
     const read = useCallback(async () => {
+        lastReadAt.current = Date.now()
         const res = await computerJobAction(computer, jobId).catch(() => null)
         // A read that failed is tried again at the next tick: the job is still running over there.
         if (!res?.ok) return setReadFailed(true)
@@ -59,8 +62,14 @@ export function ComputerJobCard({ computer, jobId, command, label }: { computer:
     }, [computer, jobId])
 
     const running = !view?.gone && (!view?.job || view.job.state === 'running')
-    const poll = useCallback(() => (running ? read() : undefined), [read, running])
-    useVisibleInterval(poll, view?.offline || readFailed ? OFFLINE_POLL_MS : POLL_MS)
+    const every = view?.offline || readFailed ? OFFLINE_POLL_MS : POLL_MS
+    const poll = useCallback(() => {
+        // One steady tick, with those that come too early skipped: changing the interval itself would
+        // read again at once on each change. Half a tick of slack for one that lands a moment early.
+        if (!running || Date.now() - lastReadAt.current < every - POLL_MS / 2) return
+        return read()
+    }, [read, running, every])
+    useVisibleInterval(poll, POLL_MS)
 
     const stop = async () => {
         setStopping(true)

@@ -61,23 +61,27 @@ describe('ComputerJobCard', () => {
     it('reads once a minute while the computer is offline, and every five seconds once it is back', async () => {
         answer = offline
         await wait(5 * SECOND)
-        const wentOffline = reads()
-        await wait(5 * 60 * SECOND)
-        expect(reads() - wentOffline).toBeLessThanOrEqual(6)
+        expect(reads()).toBe(2)
+        await wait(59 * SECOND)
+        expect(reads()).toBe(2)
+        await wait(1 * SECOND)
+        expect(reads()).toBe(3)
 
         answer = running
         await wait(60 * SECOND)
-        const back = reads()
+        expect(reads()).toBe(4)
         await wait(30 * SECOND)
-        expect(reads() - back).toBeGreaterThanOrEqual(6)
+        expect(reads()).toBe(10)
     })
 
     it('slows down the same way when the read fails', async () => {
         answer = failed
         await wait(5 * SECOND)
-        const firstFailure = reads()
-        await wait(5 * 60 * SECOND)
-        expect(reads() - firstFailure).toBeLessThanOrEqual(6)
+        expect(reads()).toBe(2)
+        await wait(59 * SECOND)
+        expect(reads()).toBe(2)
+        await wait(1 * SECOND)
+        expect(reads()).toBe(3)
     })
 
     it('stops reading once the job has ended', async () => {
