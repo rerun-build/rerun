@@ -131,6 +131,21 @@
         "title": "Her seferinde bir parça büyüyün.",
         "lede": "Yeni bir paket değil. İhtiyacınız olduğunda daha fazlasını alın.",
         "items": {
+            "machine_medium": {
+                "title": "Orta makine",
+                "unit": "{vcpus} vCPU, {memory} GB bellek, {disk} GB disk",
+                "caption": "Coworker'ları diski dolduran veya çok sayıda tarayıcı açan çalışma alanları için. Dahil olan Küçük makinenin yerine geçer."
+            },
+            "machine_large": {
+                "title": "Büyük makine",
+                "unit": "{vcpus} vCPU, {memory} GB bellek, {disk} GB disk",
+                "caption": "Aynı anda çok sayıda Coworker, video ve veri işleri için."
+            },
+            "storage_pack": {
+                "title": "Ek depolama",
+                "unit": "Paket başına +{gb} GB, en fazla {max} paket",
+                "caption": "Her makine boyutunda daha fazla disk, planla birlikte faturalandırılır."
+            },
             "credit_pack": {
                 "title": "Rerun kredisi",
                 "unit": "+{credits, plural, one {# kredi} other {# kredi}}, süresi dolmaz",
@@ -173,7 +188,7 @@
             },
             "addons": {
                 "question": "Eklentiler nasıl çalışır?",
-                "answer": "Ayrı bir plan değiller. Rerun kredisi bir kez ödenir ve süresi dolmaz: ihtiyaç duyduğunuzda daha fazlasını alın."
+                "answer": "Ayrı bir plan değiller. Daha büyük bir makine ve ek depolama her ay planla birlikte faturalandırılır. Rerun kredisi bir kez ödenir ve süresi dolmaz: ihtiyaç duyduğunuzda daha fazlasını alın."
             },
             "removeAddon": {
                 "question": "Bir eklentiyi kaldırdığımda ne olur?",

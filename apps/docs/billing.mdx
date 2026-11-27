@@ -1,6 +1,6 @@
 ---
 title: "Plans and billing"
-description: "One plan, Pro, with unlimited coworkers, its paid apps, credit packs and the free trial."
+description: "One plan, Pro, with unlimited coworkers, its machine sizes, paid apps, credit packs and the free trial."
 ---
 
 Rerun Cloud sells a single plan, **Pro**, with unlimited coworkers. There are no tiers to compare and no feature held back for a higher one.
@@ -14,7 +14,7 @@ Rerun Cloud sells a single plan, **Pro**, with unlimited coworkers. There are no
 <Card title="Pro" icon="box">
   **Billed per month or per year**, at the price the plan dialog shows when you start it. 5 day free trial.
 
-  Includes **unlimited coworkers**, **unlimited seats**, **your own private machine** and **500 Rerun credits every month**.
+  Includes **unlimited coworkers**, **unlimited seats**, **your own private machine** (Small: 2 vCPU, 8 GB of memory, 20 GB of disk) and **500 Rerun credits every month**.
 </Card>
 
 Also included:
@@ -25,6 +25,25 @@ Also included:
 - **The coworker and template library.** A template with a price of its own is billed apart from your plan.
 - **The [Rerun API](/api/introduction).**
 - **As many Boxes as you want.** They group your coworkers by team, client or project, and they cost nothing.
+
+## Machine sizes
+
+Every workspace runs on one machine, shared by all its coworkers: their files, their browsers and their runs. Pro comes with a Small machine. A workspace whose coworkers fill the disk, open many browsers or run many tasks at once can take a larger one.
+
+| Size | Processor | Memory | Disk | Billed monthly | Billed yearly |
+| --- | --- | --- | --- | --- | --- |
+| **Small** | 2 vCPU | 8 GB | 20 GB | Included | Included |
+| **Medium** | 4 vCPU | 16 GB | 60 GB | +\$20/mo | +\$192/yr (\$16/mo) |
+| **Large** | 8 vCPU | 32 GB | 150 GB | +\$70/mo | +\$672/yr (\$56/mo) |
+
+On top of any size, **extra storage** adds 50 GB for \$10 a month (\$120 a year), up to 10 packs.
+
+Open **Billing**, then **Change size** on the **Machine** tile, to pick a size and the storage. The tile shows the size you run on and how full its disk is. Only an admin can change it.
+
+- **A larger size or more storage** is billed today for what is left of the current period. The machine grows within a few minutes: the disk in place, the memory with one restart of under a minute, as soon as no coworker is running. Files, coworkers and chats stay as they are.
+- **A smaller size or less storage** costs nothing today and lands at the next renewal: the workspace keeps what it paid for until then, then moves to a fresh machine of the new size, a few minutes offline. Picking the size you still have before the renewal keeps it, at no charge.
+- **A smaller disk is refused** while what the machine holds would fill more than 80% of it: free some space, or keep more storage.
+- **During the trial** the machine stays Small. Start Pro to pick another size.
 
 ## Paid apps
 
@@ -98,13 +117,13 @@ Open the workspace pill in the top left corner, then **Billing**. Only an admin 
 **Billing** opens on your plan, with its price and its next renewal, and a banner when something needs you: a declined payment, credits running low, a plan that ends, or the date your trial turns into Pro. Under it, four tiles:
 
 - **Rerun credits**: what is left, **Add credits** and **See usage**.
-- **Machine**: bigger machines for busy workspaces are coming soon. Nothing to change there yet.
+- **Machine**: the size you run on, how full its disk is, and **Change size**.
 - **Paid apps**: your LinkedIn Pro and WhatsApp Pro slots, and **Manage slots**.
 - **Payment**: the card you are charged on and the business name on your invoices, and **Update**.
 
 Then the last invoices (**All invoices** lists them all, ready to download), **Refer a friend** and **Cancel plan**. Each button opens its page in the same window, and the arrow in its header brings you back.
 
-From there you change your app slots, buy credits, switch between monthly and yearly (**Manage plan**), replace your card, add your business details (VAT number or tax ID) for the invoices, and cancel.
+From there you change your machine size and your app slots, buy credits, switch between monthly and yearly (**Manage plan**), replace your card, add your business details (VAT number or tax ID) for the invoices, and cancel.
 
 - **Monthly to yearly** starts the year today, and the unused part of the month is credited.
 - **Yearly to monthly** waits for the end of the paid year.

@@ -131,6 +131,21 @@
         "title": "Wachse Stück für Stück.",
         "lede": "Kein weiterer Tarif. Nimm mehr, wenn du es brauchst.",
         "items": {
+            "machine_medium": {
+                "title": "Mittlere Maschine",
+                "unit": "{vcpus} vCPU, {memory} GB Arbeitsspeicher, {disk} GB Festplatte",
+                "caption": "Für einen Workspace, dessen Coworker die Festplatte füllen oder viele Browser öffnen. Ersetzt die inklusive kleine Maschine."
+            },
+            "machine_large": {
+                "title": "Große Maschine",
+                "unit": "{vcpus} vCPU, {memory} GB Arbeitsspeicher, {disk} GB Festplatte",
+                "caption": "Für viele Coworker gleichzeitig, Video und Datenarbeit."
+            },
+            "storage_pack": {
+                "title": "Zusätzlicher Speicherplatz",
+                "unit": "+{gb} GB pro Paket, bis zu {max} Pakete",
+                "caption": "Mehr Speicherplatz für jede Maschinengröße, mit dem Tarif abgerechnet."
+            },
             "credit_pack": {
                 "title": "Rerun-Guthaben",
                 "unit": "+{credits, plural, one {# Credit} other {# Credits}}, verfallen nie",
@@ -173,7 +188,7 @@
             },
             "addons": {
                 "question": "Wie funktionieren Add-ons?",
-                "answer": "Sie sind kein weiterer Tarif. Rerun-Guthaben wird einmal bezahlt und verfällt nie: Kauf mehr, wann immer du es brauchst."
+                "answer": "Sie sind kein weiterer Tarif. Eine größere Maschine und zusätzlicher Speicherplatz werden jeden Monat mit dem Tarif abgerechnet. Rerun-Guthaben wird einmal bezahlt und verfällt nie: Kauf mehr, wann immer du es brauchst."
             },
             "removeAddon": {
                 "question": "Was passiert, wenn ich ein Add-on entferne?",

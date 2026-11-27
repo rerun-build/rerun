@@ -131,6 +131,21 @@
         "title": "Grandissez pièce par pièce.",
         "lede": "Pas une formule de plus. Prenez-en plus quand il le faut.",
         "items": {
+            "machine_medium": {
+                "title": "Machine moyenne",
+                "unit": "{vcpus} vCPU, {memory} Go de mémoire, {disk} Go de disque",
+                "caption": "Pour un workspace dont les Coworkers remplissent le disque ou ouvrent beaucoup de navigateurs. Remplace la petite machine incluse."
+            },
+            "machine_large": {
+                "title": "Grande machine",
+                "unit": "{vcpus} vCPU, {memory} Go de mémoire, {disk} Go de disque",
+                "caption": "Pour beaucoup de Coworkers à la fois, la vidéo et le traitement de données."
+            },
+            "storage_pack": {
+                "title": "Stockage supplémentaire",
+                "unit": "+{gb} Go par pack, jusqu’à {max} packs",
+                "caption": "Plus de disque sur toutes les tailles de machine, facturé avec l’offre."
+            },
             "credit_pack": {
                 "title": "Crédits Rerun",
                 "unit": "+{credits, plural, one {# crédit} other {# crédits}}, sans expiration",
@@ -173,7 +188,7 @@
             },
             "addons": {
                 "question": "Comment fonctionnent les options ?",
-                "answer": "Ce n’est pas une autre offre. Les crédits Rerun se paient une fois et n’expirent jamais : achetez-en quand il vous en faut."
+                "answer": "Ce n’est pas une autre offre. Une machine plus grande et du stockage supplémentaire sont facturés chaque mois avec l’offre. Les crédits Rerun se paient une fois et n’expirent jamais : achetez-en quand il vous en faut."
             },
             "removeAddon": {
                 "question": "Que se passe-t-il si je retire une option ?",

@@ -131,6 +131,21 @@
         "title": "一次加一點，逐步擴充。",
         "lede": "不是另一個方案等級。需要時再多拿一些。",
         "items": {
+            "machine_medium": {
+                "title": "中型機器",
+                "unit": "{vcpus} vCPU，{memory} GB 記憶體，{disk} GB 磁碟",
+                "caption": "適合同事會塞滿磁碟或開啟大量瀏覽器的工作區。取代方案內含的小型機器。"
+            },
+            "machine_large": {
+                "title": "大型機器",
+                "unit": "{vcpus} vCPU，{memory} GB 記憶體，{disk} GB 磁碟",
+                "caption": "適合多位同事同時作業，以及影片與資料處理。"
+            },
+            "storage_pack": {
+                "title": "額外儲存空間",
+                "unit": "每個儲存包 +{gb} GB，最多 {max} 個",
+                "caption": "任何規格的機器都能加大磁碟，隨方案計費。"
+            },
             "credit_pack": {
                 "title": "Rerun 點數",
                 "unit": "+{credits, plural, other {# 點}}，永不過期",
@@ -173,7 +188,7 @@
             },
             "addons": {
                 "question": "加購項目怎麼運作？",
-                "answer": "它們不是另一個方案。Rerun 點數一次付清、永不過期：需要時隨時多買一些。"
+                "answer": "它們不是另一個方案。更大的機器與額外儲存空間每月隨方案計費。Rerun 點數一次付清、永不過期：需要時隨時多買一些。"
             },
             "removeAddon": {
                 "question": "移除加購項目後會怎樣？",

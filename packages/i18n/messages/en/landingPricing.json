@@ -10,7 +10,8 @@
         "plan.trialNote": "The argument \"free\" is a zero price in the plan currency, e.g. \"$0\".",
         "faq.items.trial.answer": "The argument \"free\" is a zero price in the plan currency, e.g. \"$0\".",
         "comparison.versus": "Link to the page comparing Rerun with a competitor, e.g. \"Rerun vs Zapier\".",
-        "price.once": "Suffix right after a price paid a single time, e.g. \"$10 once\"."
+        "price.once": "Suffix right after a price paid a single time, e.g. \"$10 once\".",
+        "addons.items.machine_medium.unit": "{vcpus}, {memory} and {disk} are numbers: processor cores, gigabytes of memory, gigabytes of disk."
     },
     "seo": {
         "title": "Pricing",
@@ -144,6 +145,21 @@
         "title": "Grow one piece at a time.",
         "lede": "Not another tier. Take more when you need it.",
         "items": {
+            "machine_medium": {
+                "title": "Medium machine",
+                "unit": "{vcpus} vCPU, {memory} GB memory, {disk} GB disk",
+                "caption": "For a workspace whose coworkers fill the disk or open many browsers. Instead of the included Small."
+            },
+            "machine_large": {
+                "title": "Large machine",
+                "unit": "{vcpus} vCPU, {memory} GB memory, {disk} GB disk",
+                "caption": "For many coworkers at once, video and data work."
+            },
+            "storage_pack": {
+                "title": "Extra storage",
+                "unit": "+{gb} GB per pack, up to {max} packs",
+                "caption": "More disk on any machine size, billed with the plan."
+            },
             "credit_pack": {
                 "title": "Rerun credits",
                 "unit": "+{credits, plural, one {# credit} other {# credits}}, never expire",
@@ -186,7 +202,7 @@
             },
             "addons": {
                 "question": "How do add-ons work?",
-                "answer": "They are not another plan. Rerun credits are paid once and never expire: buy more whenever you need them."
+                "answer": "They are not another plan. A larger machine and extra storage are billed every month with the plan. Rerun credits are paid once and never expire: buy more whenever you need them."
             },
             "removeAddon": {
                 "question": "What happens when I remove an add-on?",

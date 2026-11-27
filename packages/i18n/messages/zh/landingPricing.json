@@ -131,6 +131,21 @@
         "title": "按需逐步扩展。",
         "lede": "不是另一个套餐等级，需要时再加。",
         "items": {
+            "machine_medium": {
+                "title": "中型机器",
+                "unit": "{vcpus} vCPU，{memory} GB 内存，{disk} GB 磁盘",
+                "caption": "适合同事会占满磁盘或打开大量浏览器的工作区。替代套餐包含的小型机器。"
+            },
+            "machine_large": {
+                "title": "大型机器",
+                "unit": "{vcpus} vCPU，{memory} GB 内存，{disk} GB 磁盘",
+                "caption": "适合多位同事同时工作，以及视频和数据处理。"
+            },
+            "storage_pack": {
+                "title": "额外存储",
+                "unit": "每个存储包 +{gb} GB，最多 {max} 个",
+                "caption": "任意规格的机器均可增加磁盘，随套餐计费。"
+            },
             "credit_pack": {
                 "title": "Rerun 积分",
                 "unit": "+{credits, plural, other {# 积分}}，永不过期",
@@ -173,7 +188,7 @@
             },
             "addons": {
                 "question": "附加项如何运作？",
-                "answer": "它们不是另一个套餐。Rerun 积分一次性付费且永不过期：需要时随时购买。"
+                "answer": "它们不是另一个套餐。更大的机器和额外存储每月随套餐计费。Rerun 积分一次性付费且永不过期：需要时随时购买。"
             },
             "removeAddon": {
                 "question": "移除附加项后会怎样？",

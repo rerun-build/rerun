@@ -131,6 +131,21 @@
         "title": "Cresça uma peça de cada vez.",
         "lede": "Não é outro nível. Pegue mais quando precisar.",
         "items": {
+            "machine_medium": {
+                "title": "Máquina média",
+                "unit": "{vcpus} vCPU, {memory} GB de memória, {disk} GB de disco",
+                "caption": "Para um workspace cujos Coworkers enchem o disco ou abrem muitos navegadores. Substitui a máquina pequena incluída."
+            },
+            "machine_large": {
+                "title": "Máquina grande",
+                "unit": "{vcpus} vCPU, {memory} GB de memória, {disk} GB de disco",
+                "caption": "Para muitos Coworkers ao mesmo tempo, vídeo e trabalho com dados."
+            },
+            "storage_pack": {
+                "title": "Armazenamento extra",
+                "unit": "+{gb} GB por pacote, até {max} pacotes",
+                "caption": "Mais disco em qualquer tamanho de máquina, cobrado com o plano."
+            },
             "credit_pack": {
                 "title": "Créditos Rerun",
                 "unit": "+{credits, plural, one {# crédito} other {# créditos}}, sem expiração",
@@ -173,7 +188,7 @@
             },
             "addons": {
                 "question": "Como funcionam os complementos?",
-                "answer": "Não são outro plano. Os créditos Rerun são pagos uma vez e nunca expiram: compre mais quando precisar."
+                "answer": "Não são outro plano. Uma máquina maior e o armazenamento extra são cobrados todo mês com o plano. Os créditos Rerun são pagos uma vez e nunca expiram: compre mais quando precisar."
             },
             "removeAddon": {
                 "question": "O que acontece quando removo um complemento?",
