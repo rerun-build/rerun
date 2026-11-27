@@ -14,6 +14,7 @@ import { ChatScreen } from '@/components/chat/ChatScreen'
 import { BudgetExhaustedNotice } from '@rerun/cloud/billing.client'
 import { useWorkspaceManager } from '@/components/brand/useWorkspaceManager'
 import { ProviderErrorNotice } from '@/components/chat/ProviderErrorNotice'
+import type { SubscriptionProvider } from '@/lib/engine/subscription-providers'
 import { ComposerSubscriptionCta } from '@/components/chat/ComposerSubscriptionCta'
 import { InstallGate } from '@/components/chat/InstallGate'
 import { QuestionForm } from '@/components/chat/QuestionForm'
@@ -794,7 +795,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
         return { label: ownConnection.name, provider: ownConnection.provider, onUse }
     }, [ownConnection, boxDefault, tConnections, selectModel, clearError])
     const connectProvider = useCallback(
-        (provider: 'claude' | 'codex') => {
+        (provider: SubscriptionProvider) => {
             track('connection_cta_clicked', { source: `budget_notice_${provider}` })
             addAiProvider(provider)
         },
