@@ -179,7 +179,7 @@
     "pricing": {
         "title": "Ein Preis pro Kunden-Workspace.",
         "lead": "Je mehr Kunden du darauf betreust, desto weniger kostet jeder einzelne. Wähle deine Anzahl und buche ein kurzes Gespräch zum Start.",
-        "costAnswer": "Ein Preis pro Kunden-Workspace und Monat, der mit jedem weiteren Kunden sinkt, ab {min} Workspaces: {tiers}. Jeder Workspace wird zum Preis der Stufe abgerechnet, die du erreichst.",
+        "costAnswer": "Ein Preis pro Kunden-Workspace und Monat, der mit jedem weiteren Kunden sinkt, ab {min} Workspaces: {tiers}. Jeder Preis gilt für die Workspaces seiner Stufe.",
         "tier": "{price} ab {count}",
         "card": {
             "title": "White Label",
@@ -187,7 +187,7 @@
             "workspaces": "Kunden-Workspaces",
             "valueText": "{count, plural, one {# Kunden-Workspace} other {# Kunden-Workspaces}}",
             "valueTextAtLeast": "{count, plural, one {Ab # Kunden-Workspace} other {Ab # Kunden-Workspaces}}",
-            "perWorkspace": "Pro Kunden-Workspace",
+            "perWorkspace": "Durchschnitt pro Kunden-Workspace",
             "save": "{percent} sparen",
             "perMonth": "/Monat",
             "total": "<total></total> im Monat für {count, plural, one {# Workspace} other {# Workspaces}}",

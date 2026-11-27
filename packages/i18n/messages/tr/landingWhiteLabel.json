@@ -179,7 +179,7 @@
     "pricing": {
         "title": "Müşteri çalışma alanı başına fiyat.",
         "lead": "Ne kadar çok müşteri yönetirseniz her biri o kadar az tutar. Sayınızı seçin, ardından başlamak için kısa bir görüşme ayarlayın.",
-        "costAnswer": "Müşteri ekledikçe düşen, müşteri çalışma alanı başına aylık bir fiyat; en az {min} çalışma alanı: {tiers}. Her çalışma alanı, ulaştığınız kademenin fiyatından faturalandırılır.",
+        "costAnswer": "Müşteri ekledikçe düşen, müşteri çalışma alanı başına aylık bir fiyat; en az {min} çalışma alanı: {tiers}. Her fiyat, kendi kademesindeki çalışma alanlarına uygulanır.",
         "tier": "{price} ({count} ve üzeri)",
         "card": {
             "title": "Beyaz etiket",
@@ -187,7 +187,7 @@
             "workspaces": "Müşteri çalışma alanları",
             "valueText": "{count, plural, one {# müşteri çalışma alanı} other {# müşteri çalışma alanı}}",
             "valueTextAtLeast": "{count, plural, one {#+ müşteri çalışma alanı} other {#+ müşteri çalışma alanı}}",
-            "perWorkspace": "Müşteri çalışma alanı başına",
+            "perWorkspace": "Müşteri çalışma alanı başına ortalama",
             "save": "{percent} tasarruf",
             "perMonth": "/ay",
             "total": "{count, plural, one {# çalışma alanı} other {# çalışma alanı}} için ayda <total></total>",

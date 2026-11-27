@@ -179,7 +179,7 @@
     "pricing": {
         "title": "依客戶工作區計價。",
         "lead": "您經營的客戶越多，每位客戶的費用越低。選好數量，再預約一通簡短通話即可開始。",
-        "costAnswer": "每個客戶工作區每月的價格會隨客戶增加而降低，{min} 個工作區起：{tiers}。每個工作區都依您達到的級距計價。",
+        "costAnswer": "每個客戶工作區每月的價格會隨客戶增加而降低，{min} 個工作區起：{tiers}。每個價格僅適用於其級距內的工作區。",
         "tier": "{count} 個起 {price}",
         "card": {
             "title": "白牌方案",
@@ -187,7 +187,7 @@
             "workspaces": "客戶工作區",
             "valueText": "{count, plural, other {# 個客戶工作區}}",
             "valueTextAtLeast": "{count, plural, other {# 個以上客戶工作區}}",
-            "perWorkspace": "每個客戶工作區",
+            "perWorkspace": "每個客戶工作區平均",
             "save": "節省 {percent}",
             "perMonth": "/月",
             "total": "每月 <total></total>，共 {count, plural, other {# 個工作區}}",

@@ -179,7 +179,7 @@
     "pricing": {
         "title": "按客户工作区计价。",
         "lead": "您管理的客户越多，每个客户的成本越低。选好数量，再预约一次简短通话即可开始。",
-        "costAnswer": "按客户工作区和月份计价，客户越多单价越低，{min} 个工作区起：{tiers}。每个工作区都按您达到的档位价格计费。",
+        "costAnswer": "按客户工作区和月份计价，客户越多单价越低，{min} 个工作区起：{tiers}。每个价格仅适用于其档位内的工作区。",
         "tier": "{count} 个起 {price}",
         "card": {
             "title": "白标",
@@ -187,7 +187,7 @@
             "workspaces": "客户工作区",
             "valueText": "{count, plural, other {# 个客户工作区}}",
             "valueTextAtLeast": "{count, plural, other {# 个及以上客户工作区}}",
-            "perWorkspace": "每个客户工作区",
+            "perWorkspace": "每个客户工作区平均",
             "save": "节省 {percent}",
             "perMonth": "/月",
             "total": "<total></total>/月，共 {count, plural, other {# 个工作区}}",
