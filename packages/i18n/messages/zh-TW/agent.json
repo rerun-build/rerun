@@ -916,6 +916,12 @@
             "dialogTitle": "編輯系統提示詞",
             "placeholder": "你是..."
         },
+        "instructions": {
+            "label": "你的指示",
+            "helper": "在你與它的每一次對話中都會讀取，且只用於你的對話。最多 {max, number} 個字元。",
+            "dialogTitle": "編輯你的指示",
+            "placeholder": "別叫我的名字。直接說重點。"
+        },
         "verbosity": {
             "label": "詳細程度",
             "helper": "影響回覆的長度，而不是它做多少工作。",

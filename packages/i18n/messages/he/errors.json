@@ -573,6 +573,8 @@
     "mcpNoSignInHere": "ל-{name} אין התחברות שאפשר לפתוח מכאן.",
     "foremanNameInvalid": "יש להשתמש ב-1 עד {max} אותיות, ספרות, רווחים, נקודות, גרשים או מקפים.",
     "saveForemanNameFailed": "לא ניתן היה לשמור את השם.",
+    "foremanInstructionsTooLong": "ההנחיות שלך צריכות להיות קצרות מ-{max, number} תווים.",
+    "saveForemanInstructionsFailed": "לא ניתן היה לשמור את ההנחיות שלך.",
     "saveCheckinsFailed": "לא ניתן היה לשמור את הגדרות העדכונים התקופתיים.",
     "runCheckinFailed": "לא ניתן היה להתחיל עדכון תקופתי.",
     "organizationOwnerOnly": "רק בעלים יכול לעשות זאת.",

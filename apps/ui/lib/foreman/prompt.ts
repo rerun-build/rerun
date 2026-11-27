@@ -186,7 +186,8 @@ function greetingBlock(state: ForemanState): string {
     const asked = owesWebsite(state)
     return [
         `This turn was opened by the app, not by them: the message \`${KICKOFF_MARKER}\` means they have just finished signing up and see you for the first time. Speak first, in four short lines at most, no heading:`,
-        `- greet them${state.firstName ? ` as ${state.firstName}` : ''};`,
+        // The engine reads their own instructions into its prompt, and they may say otherwise.
+        `- greet them${state.firstName ? ` as ${state.firstName}, unless their own instructions to you say otherwise` : ''};`,
         ...(asked
             ? ['- say in one sentence that you would like to read the website of their company, to know what it does before you hire anyone;', ASK_FOR_THE_WEBSITE]
             : [

@@ -573,6 +573,8 @@
     "mcpNoSignInHere": "{name} 没有可从这里打开的登录。",
     "foremanNameInvalid": "请使用 1 到 {max} 个字母、数字、空格、点、撇号或连字符。",
     "saveForemanNameFailed": "无法保存名称。",
+    "foremanInstructionsTooLong": "你的指示不能超过 {max, number} 个字符。",
+    "saveForemanInstructionsFailed": "无法保存你的指示。",
     "saveCheckinsFailed": "无法保存签到设置。",
     "runCheckinFailed": "无法开始签到。",
     "organizationOwnerOnly": "只有所有者可以执行此操作。",

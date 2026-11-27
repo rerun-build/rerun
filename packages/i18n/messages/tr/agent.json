@@ -916,6 +916,12 @@
             "dialogTitle": "Sistem prompt'unu düzenle",
             "placeholder": "Sen..."
         },
+        "instructions": {
+            "label": "Talimatların",
+            "helper": "Onunla yaptığın her konuşmada okunur, yalnızca seninkilerde. En fazla {max, number} karakter.",
+            "dialogTitle": "Talimatlarını düzenle",
+            "placeholder": "Bana adımla hitap etme. Sadede gel."
+        },
         "verbosity": {
             "label": "Ayrıntı düzeyi",
             "helper": "Yanıtlarının ne kadar uzun olduğu, ne kadar iş yaptığı değil.",

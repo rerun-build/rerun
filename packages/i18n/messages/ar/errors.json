@@ -573,6 +573,8 @@
     "mcpNoSignInHere": "لا يوجد لـ {name} تسجيل دخول يمكن فتحه من هنا.",
     "foremanNameInvalid": "استخدم من 1 إلى {max} من الحروف أو الأرقام أو المسافات أو النقاط أو الفواصل العليا أو الشرطات.",
     "saveForemanNameFailed": "تعذّر حفظ الاسم.",
+    "foremanInstructionsTooLong": "يجب أن تكون تعليماتك أقل من {max, number} حرف.",
+    "saveForemanInstructionsFailed": "تعذّر حفظ تعليماتك.",
     "saveCheckinsFailed": "تعذّر حفظ إعدادات المتابعة الدورية.",
     "runCheckinFailed": "تعذّر بدء متابعة دورية.",
     "organizationOwnerOnly": "يمكن للمالك فقط تنفيذ هذا الإجراء.",

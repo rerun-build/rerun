@@ -573,6 +573,8 @@
     "mcpNoSignInHere": "{name} hat keine Anmeldung, die sich von hier öffnen lässt.",
     "foremanNameInvalid": "Verwende 1 bis {max} Buchstaben, Ziffern, Leerzeichen, Punkte, Apostrophe oder Bindestriche.",
     "saveForemanNameFailed": "Der Name konnte nicht gespeichert werden.",
+    "foremanInstructionsTooLong": "Deine Anweisungen dürfen höchstens {max, number} Zeichen lang sein.",
+    "saveForemanInstructionsFailed": "Deine Anweisungen konnten nicht gespeichert werden.",
     "saveCheckinsFailed": "Die Check-in-Einstellungen konnten nicht gespeichert werden.",
     "runCheckinFailed": "Der Check-in konnte nicht gestartet werden.",
     "organizationOwnerOnly": "Das kann nur ein Inhaber tun.",

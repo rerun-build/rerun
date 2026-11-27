@@ -573,6 +573,8 @@
     "mcpNoSignInHere": "{name} için buradan açılacak bir giriş yok.",
     "foremanNameInvalid": "1 ile {max} arasında harf, rakam, boşluk, nokta, kesme işareti veya kısa çizgi kullanın.",
     "saveForemanNameFailed": "Ad kaydedilemedi.",
+    "foremanInstructionsTooLong": "Talimatların {max, number} karakterden kısa olmalı.",
+    "saveForemanInstructionsFailed": "Talimatların kaydedilemedi.",
     "saveCheckinsFailed": "Check-in ayarları kaydedilemedi.",
     "runCheckinFailed": "Check-in başlatılamadı.",
     "organizationOwnerOnly": "Bunu yalnızca bir sahip yapabilir.",
