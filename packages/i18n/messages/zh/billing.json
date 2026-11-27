@@ -1038,7 +1038,9 @@
             },
             "payment": {
                 "title": "付款",
-                "update": "更新"
+                "update": "更新",
+                "add": "添加银行卡",
+                "noCard": "尚未添加银行卡"
             },
             "history": "历史记录",
             "allInvoices": "全部发票",

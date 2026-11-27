@@ -1151,7 +1151,9 @@
             },
             "payment": {
                 "title": "Payment",
-                "update": "Update"
+                "update": "Update",
+                "add": "Add card",
+                "noCard": "No card yet"
             },
             "history": "History",
             "allInvoices": "All invoices",

@@ -1038,7 +1038,9 @@
             },
             "payment": {
                 "title": "Zahlung",
-                "update": "Ändern"
+                "update": "Ändern",
+                "add": "Karte hinzufügen",
+                "noCard": "Noch keine Karte"
             },
             "history": "Verlauf",
             "allInvoices": "Alle Rechnungen",

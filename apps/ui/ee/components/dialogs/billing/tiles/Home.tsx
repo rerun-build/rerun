@@ -23,7 +23,7 @@ import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess'
 import { appInfo } from '@/lib/apps/catalog'
 import { APP_ADDON_KEYS } from '@/lib/apps/types'
 import { ARCHIVE_RETENTION_DAYS } from '@/lib/archive/retention'
-import { CoinsIcon, CreditCardIcon, Grid2x2Icon, ServerIcon, TriangleAlertIcon } from '@/lib/icons'
+import { CoinsIcon, CreditCardIcon, Grid2x2Icon, PlusIcon, ServerIcon, TriangleAlertIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { useSession } from '@/supabase/session/SessionProvider'
 
@@ -328,6 +328,40 @@ export function AppsTile({ state, data, go }: { state: Pick<SubscriptionState, '
     )
 }
 
+function MaskedDigits({ groups, className }: { groups: number; className?: string }) {
+    return (
+        <span className={cn('flex gap-1.5', className)}>
+            {Array.from({ length: groups }, (_, group) => (
+                <span key={group} className="flex gap-[3px]">
+                    {Array.from({ length: 4 }, (_, dot) => (
+                        <span key={dot} className="size-[3px] rounded-full bg-current" />
+                    ))}
+                </span>
+            ))}
+        </span>
+    )
+}
+
+function EmptyCard({ label, onClick }: { label: string; onClick: () => void }) {
+    return (
+        <button type="button" aria-label={label} onClick={onClick} className="group relative flex h-32 items-center justify-center overflow-hidden rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <span className="absolute h-[4.5rem] w-28 -translate-x-7 translate-y-1 -rotate-[10deg] rounded-lg bg-muted ring-1 ring-border transition-transform duration-300 group-hover:-translate-x-9 group-hover:-rotate-[13deg]">
+                <span className="absolute inset-x-0 top-3 h-2.5 bg-foreground/[0.06]" />
+            </span>
+            <span className="relative flex h-[4.5rem] w-28 translate-x-4 rotate-[5deg] flex-col justify-between rounded-lg bg-background p-2.5 shadow-md ring-1 ring-border transition-transform duration-300 group-hover:translate-x-5 group-hover:rotate-[7deg]">
+                <span className="flex items-center justify-between">
+                    <span className="h-3 w-4 rounded-[3px] bg-muted-foreground/25" />
+                    <CreditCardIcon className="size-3 text-muted-foreground/60" />
+                </span>
+                <MaskedDigits groups={4} className="text-muted-foreground/50" />
+            </span>
+            <span className="absolute top-1/2 left-1/2 flex size-6 translate-x-[3.25rem] translate-y-4 items-center justify-center rounded-full bg-brand text-brand-ink shadow-md ring-4 ring-background">
+                <PlusIcon className="size-3.5" />
+            </span>
+        </button>
+    )
+}
+
 function PaymentTile({ state, go }: Pick<PanelProps, 'state' | 'go'>) {
     const t = useTranslations('billing.tiles')
     const { card, business } = state
@@ -337,21 +371,21 @@ function PaymentTile({ state, go }: Pick<PanelProps, 'state' | 'go'>) {
             title={t('home.payment.title')}
             actions={
                 <Button size="sm" variant="outline" className="flex-1" onClick={() => go('payment')}>
-                    {t('home.payment.update')}
+                    {card ? t('home.payment.update') : t('home.payment.add')}
                 </Button>
             }
         >
-            <div className="flex items-center gap-3">
-                <CardBrand brand={card?.brand ?? null} />
-                {card ? (
+            {card ? (
+                <div className="flex items-center gap-3">
+                    <CardBrand brand={card.brand} />
                     <div className="min-w-0">
                         <p className="truncate text-base font-medium">{t('card.number', { network: cardBrandName(card.brand), last4: card.last4 })}</p>
                         <p className="text-xs text-muted-foreground">{t('card.expires', { date: cardExpiry(card) })}</p>
                     </div>
-                ) : (
-                    <p className="text-sm text-muted-foreground">{t('card.none')}</p>
-                )}
-            </div>
+                </div>
+            ) : (
+                <EmptyCard label={t('home.payment.noCard')} onClick={() => go('payment')} />
+            )}
             {business.name && <p className="truncate text-xs text-muted-foreground">{business.name}</p>}
         </Tile>
     )

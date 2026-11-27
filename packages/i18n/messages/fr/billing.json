@@ -1038,7 +1038,9 @@
             },
             "payment": {
                 "title": "Paiement",
-                "update": "Mettre à jour"
+                "update": "Mettre à jour",
+                "add": "Ajouter une carte",
+                "noCard": "Aucune carte"
             },
             "history": "Historique",
             "allInvoices": "Toutes les factures",

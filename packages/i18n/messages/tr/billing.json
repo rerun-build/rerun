@@ -1038,7 +1038,9 @@
             },
             "payment": {
                 "title": "Ödeme",
-                "update": "Güncelle"
+                "update": "Güncelle",
+                "add": "Kart ekle",
+                "noCard": "Henüz kart yok"
             },
             "history": "Geçmiş",
             "allInvoices": "Tüm faturalar",
