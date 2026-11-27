@@ -1,7 +1,7 @@
 'use client'
 
 import { useLocale, useTranslations } from 'next-intl'
-import { useEffect, useState, type ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 
 import { AMOUNT_LOCALE, amountFormat, formatAmount } from '@rerun/contracts'
 import { BorderBeam } from '@rerun/ui'
@@ -21,6 +21,7 @@ import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { BASE_PLAN_CREDITS, DEFAULT_PRICE_ARM, PLAN_CURRENCY, TRIAL_ACTIVE_AGENTS, TRIAL_CREDITS, TRIAL_DAYS, ZERO_QUANTITIES, perMonthCents, planPriceCents, yearlyDiscountPercent, type BillingInterval, type PriceArm } from '@/ee/lib/billing/plans'
 import { ArrowLeft, BrainIcon, CheckIcon, CoinsIcon, CpuIcon, CreditCardIcon, KeyIcon, Loader2Icon, Package, Repeat, TicketIcon, TriangleAlertIcon, UserPlus, XIcon, ZapIcon, type LucideIcon } from '@/lib/icons'
 import { TESTIMONIALS, testimonialCopy } from '@rerun/cloud/testimonials'
+import { useTimedRotation } from '@/hooks/useTimedRotation'
 import { landingUrl } from '@/lib/site'
 import { cn } from '@/lib/utils'
 
@@ -241,24 +242,7 @@ export function TestimonialStrip() {
 function TestimonialRotation() {
     const t = useTranslations('billing.parts')
     const locale = useLocale()
-    const [index, setIndex] = useState(0)
-    const [elapsed, setElapsed] = useState(0)
-
-    useEffect(() => {
-        const startedAt = performance.now()
-        const timer = setInterval(() => {
-            const percent = ((performance.now() - startedAt) / ROTATE_MS) * 100
-            if (percent < 100) return setElapsed(percent)
-            setElapsed(0)
-            setIndex(current => (current + 1) % TESTIMONIALS.length)
-        }, 100)
-        return () => clearInterval(timer)
-    }, [index])
-
-    const show = (next: number) => {
-        setElapsed(0)
-        setIndex(next)
-    }
+    const { index, elapsed, show } = useTimedRotation(TESTIMONIALS.length, ROTATE_MS)
 
     const testimonial = TESTIMONIALS[index]
     const copy = testimonialCopy(testimonial, locale)
