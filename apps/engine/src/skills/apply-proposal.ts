@@ -1,3 +1,4 @@
+import { generateText, NoObjectGeneratedError } from 'ai'
 import { z } from 'zod'
 import { connectorSkillReadOnlyError } from '@rerun/contracts'
 import { modelFor } from '../agents/providers.js'
@@ -45,17 +46,26 @@ async function draft(agent: LoadedAgent, row: SkillProposalRow, abortSignal: Abo
     const editing = row.mode === 'edit' && row.slug ? await readSkill(agent.id, row.slug) : null
     const others = editing ? [] : await listUsableSkillSummaries(agent.id).catch(() => [])
 
-    const output = await generateStructured({
-        model: modelFor(agent, undefined, undefined, undefined, { sessionId: `${agent.id}:skill-proposal` }),
-        schema: draftSchema,
-        prompt: applyProposalPrompt({ title: row.title, instructions, current: editing, others }),
-        abortSignal,
-    })
+    const model = modelFor(agent, undefined, undefined, undefined, { sessionId: `${agent.id}:skill-proposal` })
+    const prompt = applyProposalPrompt({ title: row.title, instructions, current: editing, others })
 
     // An edit keeps the folder it was read from: writeSkill would re-slugify from the name and
     // fork a second skill the moment the two ever drifted apart.
-    const slug = editing ? editing.slug : slugify(output.name || row.title)
-    return { ...output, name: editing ? editing.name : output.name, slug }
+    const named = (output: { name: string; description: string; body: string }) => {
+        const slug = editing ? editing.slug : slugify(output.name || row.title)
+        return { ...output, name: editing ? editing.name : output.name, slug }
+    }
+
+    try {
+        return named(await generateStructured({ model, schema: draftSchema, prompt, abortSignal }))
+    } catch (err) {
+        // A provider without native structured output cannot wrap a long Markdown body in JSON, so
+        // the body is asked as plain text and the name and description come from what is known.
+        if (!NoObjectGeneratedError.isInstance(err)) throw err
+        const body = (await generateText({ model, prompt, abortSignal })).text.trim()
+        if (!body) throw err
+        return named({ name: row.title, description: editing?.description ?? row.summary, body })
+    }
 }
 
 // The accept click comes with no model of its own, so the job writes on the pair the proposing
