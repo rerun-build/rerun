@@ -5,7 +5,9 @@
         "lead": "Verkauf <keep>KI-<chip>Coworker</chip></keep>",
         "tail": "Unter deiner Marke.",
         "first": "Eine sofort startklare KI-App für deine Kunden, mit deiner URL, deinen Farben und deinem Logo.",
-        "second": "Verwalte alle Kunden an einem Ort, im Web und mobil."
+        "second": "Verwalte alle Kunden an einem Ort, im Web und mobil.",
+        "sound": "Mit Ton ansehen",
+        "mute": "Ton aus"
     },
     "partner": "Partner werden",
     "perks": {

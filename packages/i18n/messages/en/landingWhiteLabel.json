@@ -24,7 +24,9 @@
         "pricing.card.included.brand": "<b></b> is shown in bold.",
         "pricing.card.included.mobile": "<b></b> is shown in bold.",
         "pricing.card.included.library": "<b></b> is shown in bold.",
-        "pricing.card.included.clients": "<b></b> is shown in bold."
+        "pricing.card.included.clients": "<b></b> is shown in bold.",
+        "hero.sound": "Pill over the muted hero video; a click anywhere on the video turns the sound on.",
+        "hero.mute": "Same pill once the sound is on; a click anywhere on the video turns it off."
     },
     "metaTitle": "White Label AI Coworkers for Agencies",
     "metaDescription": "Sell AI Coworkers under your own brand: your URL, your colors and your logo. Build them once, run every client from one place.",
@@ -32,7 +34,9 @@
         "lead": "Sell <keep>AI <chip>Coworkers</chip></keep>",
         "tail": "Under your own brand.",
         "first": "A plug-and-play AI app for your clients, with your URL, colors and logo.",
-        "second": "Manage every client from one place, on the web and on mobile."
+        "second": "Manage every client from one place, on the web and on mobile.",
+        "sound": "Watch with sound",
+        "mute": "Mute"
     },
     "partner": "Become a partner",
     "perks": {

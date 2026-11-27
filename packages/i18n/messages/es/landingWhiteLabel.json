@@ -5,7 +5,9 @@
         "lead": "Vende <keep><chip>Coworkers</chip> de IA</keep>",
         "tail": "Con tu propia marca.",
         "first": "Una app de IA lista para usar para tus clientes, con tu URL, tus colores y tu logo.",
-        "second": "Gestiona a todos tus clientes desde un solo lugar, en la web y en el móvil."
+        "second": "Gestiona a todos tus clientes desde un solo lugar, en la web y en el móvil.",
+        "sound": "Ver con sonido",
+        "mute": "Silenciar"
     },
     "partner": "Hazte partner",
     "perks": {

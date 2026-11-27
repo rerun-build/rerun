@@ -5,7 +5,9 @@
         "lead": "<keep>AI <chip>Coworker'lar</chip></keep> satın",
         "tail": "Kendi markanızla.",
         "first": "Müşterileriniz için tak çalıştır bir AI uygulaması: sizin URL'niz, renkleriniz ve logonuzla.",
-        "second": "Tüm müşterilerinizi web'de ve mobilde tek yerden yönetin."
+        "second": "Tüm müşterilerinizi web'de ve mobilde tek yerden yönetin.",
+        "sound": "Sesli izle",
+        "mute": "Sesi kapat"
     },
     "partner": "İş ortağı olun",
     "perks": {
