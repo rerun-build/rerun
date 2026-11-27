@@ -44,8 +44,7 @@ type SubscriptionProvider = 'claude' | 'codex'
 //
 // `lifetime` is a workspace on a lifetime plan (a lifetime code): it has no Rerun credit by design
 // and nothing is sold to it, so its only way out is its own AI, an API key first. The Claude plan is
-// offered only when `claudePlanOffered`: the restricted lifetime plan leaves it out, AppSumo refuses
-// to list it.
+// offered only when `claudePlanOffered`: the restricted lifetime plan, set by support, leaves it out.
 //
 // `manager` is the organization that runs the workspace: it hands the credit out, so it is the one to
 // ask for more, and the workspace's own AI is the other way out.
