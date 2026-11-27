@@ -916,12 +916,6 @@
             "dialogTitle": "Editar el prompt de sistema",
             "placeholder": "Eres..."
         },
-        "instructions": {
-            "label": "Tus instrucciones",
-            "helper": "Se leen en cada una de tus conversaciones con él, y solo en las tuyas. Hasta {max, number} caracteres.",
-            "dialogTitle": "Editar tus instrucciones",
-            "placeholder": "No me llames por mi nombre. Ve al grano."
-        },
         "verbosity": {
             "label": "Nivel de detalle",
             "helper": "Lo largas que son sus respuestas, no cuánto trabajo hace.",

@@ -101,25 +101,6 @@ export type ForemanCheckins = z.infer<typeof foremanCheckinsSchema>
 // POST /agents/foreman/checkins/run: the check-in it started, or the one already under way.
 export const checkinStartedSchema = z.object({ runId: z.string(), sessionId: z.string() })
 
-// What one member asked the Chief of Staff to keep doing in every one of their conversations (how to
-// address them, how to work with them). The engine keeps it beside the member, reads it into the
-// prompt of each of their turns, and answers it on GET/PUT /agents/foreman/members/:id/instructions.
-export const FOREMAN_INSTRUCTIONS_MAX = 2000
-export const foremanInstructionsSchema = z.object({ instructions: z.string().nullable() })
-
-// `null` is no instructions at all: an empty text clears them.
-export function parseForemanInstructions(raw: unknown): { ok: true; instructions: string | null } | { ok: false; reason: 'tooLong' | 'notText' } {
-    if (raw === null || raw === undefined) return { ok: true, instructions: null }
-    if (typeof raw !== 'string') return { ok: false, reason: 'notText' }
-    const text = raw
-        .normalize('NFC')
-        .replace(/\r\n?/g, '\n')
-        .replace(/\n{3,}/g, '\n\n')
-        .trim()
-    if (text.length > FOREMAN_INSTRUCTIONS_MAX) return { ok: false, reason: 'tooLong' }
-    return { ok: true, instructions: text || null }
-}
-
 // Which foreman the workspace talks to: the onboarding's on the hub, the everyday one on the engine, or
 // none at all for a workspace past its onboarding with no machine.
 export const foremanSurfaceSchema = z.enum(['onboarding', 'engine', 'none'])

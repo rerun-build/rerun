@@ -31,10 +31,6 @@ export const runsUnattended = (trigger: RunTrigger): boolean => trigger.source =
 // clients write to the organization.
 export const offersTeamRequests = (trigger: RunTrigger): boolean => trigger.source === 'chat' && trigger.teamRequests === true && trigger.calledBy === undefined && !boxBrand().whiteLabel
 
-// The member a turn of the Chief of Staff reads and writes the instructions of: the person who wrote it,
-// never a coworker that called it, nor a message the Chief of Staff relayed for someone.
-export const instructingMemberId = (author: MessageAuthor | undefined, called: boolean): string | undefined => (!called && author && !author.via ? author.id : undefined)
-
 // A check-in only reads and suggests: its tools, its CLI sandbox and its end all follow from this.
 export const runsReadOnly = (trigger: RunTrigger): boolean => trigger.source === 'checkin'
 

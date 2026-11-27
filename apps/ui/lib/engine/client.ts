@@ -16,8 +16,6 @@ import {
     ENGINE_CAPABILITY_FOREMAN_AGENT,
     ENGINE_CAPABILITY_FOREMAN_COWORKER,
     ENGINE_CAPABILITY_FOREMAN_FILES,
-    ENGINE_CAPABILITY_FOREMAN_INSTRUCTIONS,
-    foremanInstructionsSchema,
     ENGINE_CAPABILITY_MESSAGE_EDIT,
     FOREMAN_AGENT_ID,
     checkinStartedSchema,
@@ -818,19 +816,6 @@ export async function supportsForemanCheckins(conn: EngineConnection): Promise<b
 
 export async function getForemanCheckins(conn: EngineConnection): Promise<ForemanCheckins> {
     return request(conn, `/agents/${FOREMAN_AGENT_ID}/checkins`, { method: 'GET' }, d => foremanCheckinsSchema.parse(d))
-}
-
-// Each member's own instructions to the Chief of Staff, kept by the engine beside the member.
-export async function supportsForemanInstructions(conn: EngineConnection): Promise<boolean> {
-    return (await engineCapabilities(conn)).has(ENGINE_CAPABILITY_FOREMAN_INSTRUCTIONS)
-}
-
-export async function getForemanInstructions(conn: EngineConnection, memberId: string): Promise<string | null> {
-    return request(conn, `/agents/${FOREMAN_AGENT_ID}/members/${encodeURIComponent(memberId)}/instructions`, { method: 'GET' }, d => foremanInstructionsSchema.parse(d).instructions)
-}
-
-export async function putForemanInstructions(conn: EngineConnection, memberId: string, instructions: string | null): Promise<string | null> {
-    return request(conn, `/agents/${FOREMAN_AGENT_ID}/members/${encodeURIComponent(memberId)}/instructions`, { method: 'PUT', body: JSON.stringify({ instructions }) }, d => foremanInstructionsSchema.parse(d).instructions)
 }
 
 export async function runForemanCheckin(conn: EngineConnection): Promise<{ runId: string; sessionId: string }> {

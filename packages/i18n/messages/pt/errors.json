@@ -573,8 +573,6 @@
     "mcpNoSignInHere": "{name} não tem login para abrir daqui.",
     "foremanNameInvalid": "Use de 1 a {max} letras, números, espaços, pontos, apóstrofos ou hifens.",
     "saveForemanNameFailed": "Não foi possível salvar o nome.",
-    "foremanInstructionsTooLong": "Suas instruções devem ter menos de {max, number} caracteres.",
-    "saveForemanInstructionsFailed": "Não foi possível salvar suas instruções.",
     "saveCheckinsFailed": "Não foi possível salvar as configurações dos check-ins.",
     "runCheckinFailed": "Não foi possível iniciar um check-in.",
     "organizationOwnerOnly": "Só um proprietário pode fazer isso.",

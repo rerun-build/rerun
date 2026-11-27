@@ -30,8 +30,6 @@
         "agentPanelServices.uninstallLabeledConfirm": "{label} is the name the user gave to this account of the app (e.g. Work).",
         "agentPanelSettings.soul.label": "The soul is the coworker's system prompt, its core instructions.",
         "agentPanelSettings.appearance": "Section title: how the coworker's character looks (its colour, eyes and mouth).",
-        "agentPanelSettings.instructions.label": "Field in the settings of the Chief of Staff, the workspace's AI assistant: what this person asks it to keep doing in every conversation, such as how to address them.",
-        "agentPanelSettings.instructions.helper": "{max} is a number of characters. Only the person who writes them is concerned, not the other members of the workspace.",
         "coworkerLook.shuffle": "Button that dresses the coworker's character in a random look.",
         "coworkerLook.reset": "Button that gives the coworker's character back the look it was born with.",
         "coworkerLook.eyesOptions": "Accessible names of the eye shapes a coworker's character can wear, read by a screen reader and shown on hover.",
@@ -1013,12 +1011,6 @@
             "label": "Soul (system prompt)",
             "dialogTitle": "Edit the system prompt",
             "placeholder": "You are..."
-        },
-        "instructions": {
-            "label": "Your instructions",
-            "helper": "Read in every one of your conversations with it, and only yours. Up to {max, number} characters.",
-            "dialogTitle": "Edit your instructions",
-            "placeholder": "Don't call me by my first name. Get to the point."
         },
         "verbosity": {
             "label": "Verbosity",

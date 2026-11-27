@@ -199,9 +199,3 @@ describe('foremanEngineInstructions and the getting-started checklist', () => {
         expect(foremanEngineInstructions(stateWith({}))).not.toContain('getting started')
     })
 })
-
-describe('the greeting and the instructions the engine keeps', () => {
-    it('greets them by their first name unless their own instructions say otherwise', () => {
-        expect(foremanEngineInstructions(stateWith({}), { greeting: true })).toContain('- greet them as Nico, unless their own instructions to you say otherwise;')
-    })
-})

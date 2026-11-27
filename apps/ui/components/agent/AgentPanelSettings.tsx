@@ -18,9 +18,8 @@ import { MarkdownTextarea } from '@/components/ui/markdown-textarea'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
 import { useBoxManageReason } from '@/hooks/useBoxManageReason'
-import { FOREMAN_INSTRUCTIONS_MAX, VERBOSITY_LEVELS, agentKindPolicy } from '@rerun/contracts'
+import { VERBOSITY_LEVELS, agentKindPolicy } from '@rerun/contracts'
 import { renameForemanAction } from '@/app/api/_actions/foreman-name.actions'
-import { readForemanInstructionsAction, saveForemanInstructionsAction } from '@/app/api/_actions/foreman-instructions.actions'
 import { useForemanStore } from '@/stores/foreman.store'
 import type { IsoAgent } from '@/lib/board/types'
 import type { EngineVerbosity } from '@/lib/engine/types'
@@ -35,7 +34,7 @@ type AgentPanelSettingsProps = {
     agent: IsoAgent
 }
 
-type ConfigValues = { soul: string; verbosity: EngineVerbosity; instructions: string }
+type ConfigValues = { soul: string; verbosity: EngineVerbosity }
 
 // Le bouton de sauvegarde vit dans le footer sticky, hors du <form> : il le vise par son id.
 const SETTINGS_FORM_ID = 'agent-settings-form'
@@ -51,22 +50,15 @@ export function AgentPanelSettings({ agent }: AgentPanelSettingsProps) {
     const canManage = useCanManageAgent(agent.id)
     const manageReason = canManage ? undefined : boxManageReason
     const policy = agentKindPolicy(agent.kind ?? 'coworker')
-    // The Chief of Staff's soul is the engine's; each member writes their own instructions to it instead.
-    const isForeman = agent.kind === 'foreman'
     const [name, setName] = useState(agent.name)
     const [loading, setLoading] = useState(true)
     const [saved, setSaved] = useState(false)
     const [error, setError] = useState<string | null>(null)
-    const [instructionsUnreadable, setInstructionsUnreadable] = useState(false)
-    // Off on a box that predates them.
-    const [ownInstructions, setOwnInstructions] = useState(isForeman)
 
-    const form = useForm<ConfigValues>({ defaultValues: { soul: '', verbosity: 'normal', instructions: '' } })
+    const form = useForm<ConfigValues>({ defaultValues: { soul: '', verbosity: 'normal' } })
     const {
-        formState: { isSubmitting, dirtyFields },
+        formState: { isSubmitting },
     } = form
-    // A member who cannot manage it saves their own instructions and nothing else.
-    const canSave = canManage || (ownInstructions && !instructionsUnreadable && Boolean(dirtyFields.instructions))
 
     useEffect(() => {
         setName(agent.name)
@@ -92,16 +84,16 @@ export function AgentPanelSettings({ agent }: AgentPanelSettingsProps) {
 
     useEffect(() => {
         setLoading(true)
-        Promise.all([getAgentDetailAction(agent.id), isForeman ? readForemanInstructionsAction() : null])
-            .then(([detail, instructions]) => {
-                const instructionsRead = !isForeman || Boolean(instructions?.ok)
-                setInstructionsUnreadable(!instructionsRead)
-                setOwnInstructions(isForeman && !(instructions?.ok && !instructions.supported))
-                if (!detail || !instructionsRead) setError(t('unreachable'))
+        getAgentDetailAction(agent.id)
+            .then(detail => {
+                if (!detail) {
+                    setError(t('unreachable'))
+                    return
+                }
+                const c = detail.config
                 form.reset({
-                    soul: detail?.soul ?? '',
-                    verbosity: detail?.config.verbosity ?? 'normal',
-                    instructions: instructions?.ok ? (instructions.instructions ?? '') : '',
+                    soul: detail.soul,
+                    verbosity: c.verbosity,
                 })
             })
             .catch(() => setError(t('unreachable')))
@@ -109,28 +101,17 @@ export function AgentPanelSettings({ agent }: AgentPanelSettingsProps) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [agent.id])
 
-    const handleSave = form.handleSubmit(async ({ soul, verbosity, instructions }) => {
+    const handleSave = form.handleSubmit(async ({ soul, verbosity }) => {
         setError(null)
-        // Only once they were edited: a field left as loaded must never overwrite what the chat saved since.
-        if (ownInstructions && instructions !== form.formState.defaultValues?.instructions) {
-            const savedInstructions = await saveForemanInstructionsAction(instructions)
-            if (!savedInstructions.ok) {
-                setError(errorText(savedInstructions, t('saveFailed')))
-                return
-            }
-            form.resetField('instructions', { defaultValue: savedInstructions.instructions ?? '' })
+        // Note: provider/model are intentionally omitted here — they are owned by the
+        // in-chat ModelSelector. Including them would overwrite the user's selection.
+        const result = await updateAgentConfigAction(agent.id, policy.soulEditable ? { soul, verbosity } : { verbosity })
+        if (result.success) {
+            setSaved(true)
+            setTimeout(() => setSaved(false), 2000)
+        } else {
+            setError(errorText(result, t('saveFailed')))
         }
-        if (canManage) {
-            // Note: provider/model are intentionally omitted here — they are owned by the
-            // in-chat ModelSelector. Including them would overwrite the user's selection.
-            const result = await updateAgentConfigAction(agent.id, policy.soulEditable ? { soul, verbosity } : { verbosity })
-            if (!result.success) {
-                setError(errorText(result, t('saveFailed')))
-                return
-            }
-        }
-        setSaved(true)
-        setTimeout(() => setSaved(false), 2000)
     })
 
     if (loading) {
@@ -195,20 +176,6 @@ export function AgentPanelSettings({ agent }: AgentPanelSettingsProps) {
                             />
                         )}
 
-                        {ownInstructions && (
-                            <FormField
-                                control={form.control}
-                                name="instructions"
-                                render={({ field }) => (
-                                    <FormItem className="space-y-1">
-                                        <FormControl>
-                                            <MarkdownTextarea label={t('instructions.label')} optional helperText={t('instructions.helper', { max: FOREMAN_INSTRUCTIONS_MAX })} dialogTitle={t('instructions.dialogTitle')} className="text-xs min-h-32" placeholder={t('instructions.placeholder')} maxLength={FOREMAN_INSTRUCTIONS_MAX} {...field} disabled={instructionsUnreadable} />
-                                        </FormControl>
-                                    </FormItem>
-                                )}
-                            />
-                        )}
-
                         <FormField
                             control={form.control}
                             name="verbosity"
@@ -246,8 +213,8 @@ export function AgentPanelSettings({ agent }: AgentPanelSettingsProps) {
                         </DeleteAgentDialog>
                     </TooltipDisabledReason>
                 )}
-                <TooltipDisabledReason reason={ownInstructions ? undefined : manageReason} className="flex-1">
-                    <Button type="submit" form={SETTINGS_FORM_ID} size="sm" className="flex-1" loading={isSubmitting} disabled={!canSave && !saved}>
+                <TooltipDisabledReason reason={manageReason} className="flex-1">
+                    <Button type="submit" form={SETTINGS_FORM_ID} size="sm" className="flex-1" loading={isSubmitting} disabled={!canManage}>
                         {saved ? (
                             <>
                                 <CheckIcon className="size-3.5 me-1.5 text-emerald-500" /> {t('saved')}

@@ -573,8 +573,6 @@
     "mcpNoSignInHere": "{name} n'a aucune connexion à ouvrir depuis ici.",
     "foremanNameInvalid": "Utilisez 1 à {max} lettres, chiffres, espaces, points, apostrophes ou tirets.",
     "saveForemanNameFailed": "Impossible d'enregistrer le nom.",
-    "foremanInstructionsTooLong": "Vos instructions doivent faire moins de {max, number} caractères.",
-    "saveForemanInstructionsFailed": "Impossible d'enregistrer vos instructions.",
     "saveCheckinsFailed": "Impossible d'enregistrer les réglages des check-ins.",
     "runCheckinFailed": "Impossible de lancer un check-in.",
     "organizationOwnerOnly": "Seul un propriétaire peut faire cela.",

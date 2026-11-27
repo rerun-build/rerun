@@ -916,12 +916,6 @@
             "dialogTitle": "System-Prompt bearbeiten",
             "placeholder": "Du bist..."
         },
-        "instructions": {
-            "label": "Deine Anweisungen",
-            "helper": "Wird in jedem deiner Gespräche mit ihm gelesen, und nur in deinen. Bis zu {max, number} Zeichen.",
-            "dialogTitle": "Deine Anweisungen bearbeiten",
-            "placeholder": "Nenn mich nicht beim Vornamen. Komm direkt zur Sache."
-        },
         "verbosity": {
             "label": "Ausführlichkeit",
             "helper": "Wie lang seine Antworten sind, nicht wie viel Arbeit er leistet.",

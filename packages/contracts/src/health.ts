@@ -39,10 +39,6 @@ export const ENGINE_CAPABILITY_FOREMAN_COWORKER = 'foreman.coworker'
 // `/agents/foreman/checkins`. A hub shows their settings only to a box that says so.
 export const ENGINE_CAPABILITY_FOREMAN_CHECKINS = 'foreman.checkins'
 
-// Each member's instructions to the Chief of Staff live on the engine, on
-// `/agents/foreman/members/:id/instructions`. A hub shows their field only to a box that says so.
-export const ENGINE_CAPABILITY_FOREMAN_INSTRUCTIONS = 'foreman.instructions'
-
 // The box has a window manager and a VNC server, so its screen can be watched and driven.
 export const ENGINE_CAPABILITY_DESKTOP = 'desktop'
 

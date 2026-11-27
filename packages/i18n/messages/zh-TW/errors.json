@@ -573,8 +573,6 @@
     "mcpNoSignInHere": "{name} 沒有可從這裡開啟的登入。",
     "foremanNameInvalid": "請使用 1 到 {max} 個字母、數字、空格、句點、撇號或連字號。",
     "saveForemanNameFailed": "無法儲存名稱。",
-    "foremanInstructionsTooLong": "你的指示不能超過 {max, number} 個字元。",
-    "saveForemanInstructionsFailed": "無法儲存你的指示。",
     "saveCheckinsFailed": "無法儲存定期回報設定。",
     "runCheckinFailed": "無法開始定期回報。",
     "organizationOwnerOnly": "只有擁有者可以執行此操作。",

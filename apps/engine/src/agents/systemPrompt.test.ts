@@ -315,13 +315,8 @@ describe('current time', () => {
 
     it('names the user in the turn block so what goes out under their name is signed with it', () => {
         expect(userBlock('Yassine')).toMatch(/^<user>\nYassine: the person you are talking to/)
-        expect(userBlock('Yassine')).toContain('Sign with it what goes out under their name')
+        expect(userBlock('Yassine')).toContain('sign with it what goes out under their name')
         expect(userBlock(undefined)).toBe('')
-    })
-
-    it('lets the way they asked to be addressed win over the name of their account', () => {
-        expect(userBlock('Yassine')).toContain('unless they told you how they want to be addressed: what they asked wins')
-        expect(userBlock('Yassine')).not.toContain('Call them by it')
     })
 
     it('says when the Chief of Staff answered for the user, and only then', () => {
@@ -622,56 +617,5 @@ describe('paid data section', () => {
 
     it('calls it paid data to the user', async () => {
         expect(await paidDataSection()).toContain('never paid_data, a capability id or a catalog')
-    })
-})
-
-const { saveMemberInstructions, touchMember } = await import('../db/repos/members.js')
-
-describe('the instructions of the member on the Chief of Staff', () => {
-    const foreman = { ...agent, id: 'foreman', config: agentConfigSchema.parse({ name: 'foreman', kind: 'foreman', provider: 'rerun', tools: { memory: false, db: false, schedule: false } }) }
-
-    it('reads the instructions of the person writing, saying they win over the first name and the <user> block', async () => {
-        await saveMemberInstructions('u-ana', "Don't call me by my first name.")
-        const prompt = await buildSystemPrompt(foreman, { source: 'chat', author: { id: 'u-ana', name: 'Ana' } })
-        expect(prompt).toContain('<member_instructions>')
-        expect(prompt).toContain(`"""\nDon't call me by my first name.\n"""`)
-        expect(prompt).toContain('over the <user> block at the end of their messages')
-        expect(prompt).toContain('call save_instructions in that same turn')
-    })
-
-    it("never reads one member's instructions to another", async () => {
-        await saveMemberInstructions('u-ana', "Don't call me by my first name.")
-        const prompt = await buildSystemPrompt(foreman, { source: 'chat', author: { id: 'u-bo', name: 'Bo' } })
-        expect(prompt).not.toContain("Don't call me by my first name.")
-        expect(prompt).toContain('They have saved none yet.')
-    })
-
-    it('has no such section with nobody behind the turn, for a coworker that called it, a relayed message, or a coworker', async () => {
-        await saveMemberInstructions('u-ana', "Don't call me by my first name.")
-        for (const prompt of [
-            await buildSystemPrompt(foreman, { source: 'chat' }),
-            await buildSystemPrompt(foreman, { source: 'chat', author: { id: 'u-ana' }, calledBy: { id: 'sales', name: 'Sales', waiting: true } }),
-            await buildSystemPrompt(foreman, { source: 'chat', author: { id: 'u-ana', via: 'foreman' } }),
-            await buildSystemPrompt(agent, { source: 'chat', author: { id: 'u-ana' } }),
-        ]) {
-            expect(prompt).not.toContain('<member_instructions>')
-        }
-    })
-})
-
-describe('the instructions of the members in a check-in', () => {
-    const foreman = { ...agent, id: 'foreman', config: agentConfigSchema.parse({ name: 'foreman', kind: 'foreman', provider: 'rerun', tools: { memory: false, db: false, schedule: false } }) }
-    const checkin = { source: 'checkin', slug: 'checkin', name: 'Check-in', reason: 'manual' } as const
-
-    it('reads the instructions of every member who wrote some, under their name, never to be told to another', async () => {
-        await touchMember({ id: 'u-cy', name: 'Cy' })
-        await touchMember({ id: 'u-di', name: 'Di' })
-        await saveMemberInstructions('u-cy', 'Call me Mr. Cy.')
-        const prompt = await buildSystemPrompt(foreman, checkin)
-        expect(prompt).toContain('<member_instructions>')
-        expect(prompt).toContain(`Cy (id u-cy):\n"""\nCall me Mr. Cy.\n"""`)
-        expect(prompt).toContain("Never quote or mention one member's instructions to another.")
-        expect(prompt).not.toContain('Di (id u-di):')
-        expect(prompt).not.toContain('save_instructions')
     })
 })

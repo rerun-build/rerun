@@ -916,12 +916,6 @@
             "dialogTitle": "编辑系统提示词",
             "placeholder": "你是..."
         },
-        "instructions": {
-            "label": "你的指示",
-            "helper": "在你与它的每一次对话中都会读取，且只用于你的对话。最多 {max, number} 个字符。",
-            "dialogTitle": "编辑你的指示",
-            "placeholder": "别叫我的名字。直接说重点。"
-        },
         "verbosity": {
             "label": "详细程度",
             "helper": "决定回复的长短，而不是工作量。",
