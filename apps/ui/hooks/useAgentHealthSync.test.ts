@@ -64,12 +64,12 @@ describe('useAgentHealthSync', () => {
         expect(polls()).toBe(1 + 18)
     })
 
-    it('slows down to once a minute after five minutes without a gesture', async () => {
+    it('slows down to once every five minutes after five minutes without a gesture', async () => {
         await wait(5 * MINUTE)
         const atIdle = polls()
         expect(atIdle).toBe(30)
         await wait(10 * MINUTE)
-        expect(polls() - atIdle).toBe(10)
+        expect(polls() - atIdle).toBe(2)
     })
 
     it('reads at once on the first gesture, then every ten seconds again', async () => {
@@ -96,8 +96,8 @@ describe('useAgentHealthSync', () => {
         expect(polls()).toBe(hidden + 1)
     })
 
-    it('over twelve minutes, an idle tab reads 37 times instead of 73', async () => {
+    it('over twelve minutes, an idle tab reads 31 times instead of 73', async () => {
         await wait(12 * MINUTE)
-        expect(polls()).toBe(37)
+        expect(polls()).toBe(31)
     })
 })
