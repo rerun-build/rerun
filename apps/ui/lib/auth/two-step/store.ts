@@ -5,8 +5,11 @@ import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { readTwoStepRecord, type TwoStepRecord } from './record'
 
+// A read that failed is never an account without methods: what decides on an empty record (the second
+// step turned off, a record written over) would undo the account's two-step on a passing error.
 export async function readTwoStep(userId: string): Promise<TwoStepRecord> {
-    const { data } = await selectMaybeSingle(createServiceRoleClient(), 'users', ['two_step'] as const, { id: userId })
+    const { data, error } = await selectMaybeSingle(createServiceRoleClient(), 'users', ['two_step'] as const, { id: userId })
+    if (error) throw new Error(error.message)
     return readTwoStepRecord(data?.two_step)
 }
 

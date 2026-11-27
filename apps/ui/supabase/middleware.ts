@@ -6,6 +6,7 @@ import { REFERRAL_COOKIE, REFERRAL_PATH } from '@/ee/lib/billing/referral'
 import { drawPriceArm } from '@rerun/cloud/billing'
 import { joinOrganization, reachesBeyondOrganization } from '@rerun/cloud/organizations.server'
 import { internalPath } from '@/lib/auth/internal-path'
+import { callerUserAgent } from '@/lib/auth/two-step/devices'
 import { asksSecondStep, awaitsSecondStep, hasTwoStep, sessionLevel, tokenHasTwoStep, TWO_STEP_PATH } from '@/lib/auth/two-step/gate'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { requestHost, requestProtocol } from '@/lib/request-host'
@@ -201,6 +202,9 @@ export async function updateSession(request: NextRequest, site: HostSite = { kin
     })
 
     const supabase = createServerClient<Database>(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!, {
+        // The auth server files a session under the user agent of whoever refreshed it last, and an
+        // expired token is refreshed here: without the caller's, "Where you're signed in" lists the server.
+        global: { headers: callerUserAgent(request.headers) },
         cookies: {
             getAll() {
                 return request.cookies.getAll()

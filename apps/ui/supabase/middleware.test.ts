@@ -9,6 +9,7 @@ const SET_OPTIONS = { path: '/', sameSite: 'lax' as const, httpOnly: false, maxA
 
 const mocks = vi.hoisted(() => ({
     setAll: null as ((cookies: CookieToSet[]) => void) | null,
+    clientHeaders: null as Record<string, string> | null,
     getUser: vi.fn(),
     signOut: vi.fn(),
     level: vi.fn(),
@@ -26,8 +27,9 @@ const getClaims = vi.fn(async () => {
 })
 
 vi.mock('@supabase/ssr', () => ({
-    createServerClient: (_url: string, _key: string, options: { cookies: { setAll: (cookies: CookieToSet[]) => void } }) => {
+    createServerClient: (_url: string, _key: string, options: { global?: { headers?: Record<string, string> }; cookies: { setAll: (cookies: CookieToSet[]) => void } }) => {
         mocks.setAll = options.cookies.setAll
+        mocks.clientHeaders = options.global?.headers ?? null
         return {
             auth: {
                 getUser: mocks.getUser,
@@ -88,6 +90,15 @@ describe('updateSession', () => {
             expect(getClaims).toHaveBeenCalledTimes(1)
             expect(mocks.getUser).toHaveBeenCalledTimes(1)
             expect(mocks.selectMaybeSingle).not.toHaveBeenCalled()
+        })
+
+        it('speaks to the auth server as the caller, so a token it refreshes stays filed under their browser', async () => {
+            mocks.getUser.mockResolvedValue({ data: { user: { id: 'user-1', is_anonymous: false } } })
+            const browser = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15'
+
+            await updateSession(new NextRequest('https://app.rerun.build/board', { headers: { ...DOCUMENT, 'user-agent': browser, cookie: 'rerun-provisioned=user-1.1' } }))
+
+            expect(mocks.clientHeaders).toEqual({ 'user-agent': browser })
         })
     })
 

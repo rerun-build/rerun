@@ -12,9 +12,9 @@ import { readTwoStep } from './store'
 export async function raiseLikeTheBrowser(session: SupabaseClient<Database>, userId: string): Promise<boolean> {
     const { data } = await session.auth.getUser()
     if (!data.user || !asksSecondStep(data.user)) return true
-    const { recovery } = await readTwoStep(userId)
-    if (!recovery) return false
     try {
+        const { recovery } = await readTwoStep(userId)
+        if (!recovery) return false
         await elevateSession(session, recovery)
         return true
     } catch (err) {

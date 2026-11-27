@@ -25,9 +25,13 @@ const twoStepRecordSchema = z.object({
 export type TwoStepRecord = z.infer<typeof twoStepRecordSchema>
 export type StoredPasskey = z.infer<typeof storedPasskeySchema>
 
+// Nothing stored is an account without two-step. A record that no longer reads is not: it throws
+// rather than pass for one.
 export function readTwoStepRecord(raw: unknown): TwoStepRecord {
-    const parsed = twoStepRecordSchema.safeParse(raw ?? {})
-    return parsed.success ? parsed.data : {}
+    if (raw === null || raw === undefined) return {}
+    const parsed = twoStepRecordSchema.safeParse(raw)
+    if (!parsed.success) throw new Error('The stored two-step record cannot be read.')
+    return parsed.data
 }
 
 export const PASSKEY_NAME_MAX = 60

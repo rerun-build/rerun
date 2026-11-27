@@ -7,6 +7,10 @@
 -- same policy (apps/ui/lib/auth/two-step/rls.test.ts checks it). The security definer functions, which
 -- these policies do not reach, carry the same condition: 20261126120200_two_step_required_functions.sql.
 
+-- Each policy locks its table until this file is through. Behind a long query it gives up within
+-- seconds, to be run again, rather than hold every table before it away from the app.
+set lock_timeout = '5s';
+
 create policy two_step_required on public.agent_shares as restrictive for all to authenticated
     using (coalesce((select auth.jwt()) -> 'app_metadata' ->> 'two_step', 'false') <> 'true' or (select auth.jwt()) ->> 'aal' = 'aal2')
     with check (coalesce((select auth.jwt()) -> 'app_metadata' ->> 'two_step', 'false') <> 'true' or (select auth.jwt()) ->> 'aal' = 'aal2');

@@ -60,7 +60,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [sessionRead, setSessionRead] = useState(false)
     const [rawSession, setRawSession] = useState<Session | null>(null)
     // Whether the person last checked still owes their second step. Kept per person, not per token: a
-    // refreshed token is checked again behind the screen, which stays as it was meanwhile.
+    // refreshed token is checked again behind the screen, which stays as it was meanwhile. Forgotten
+    // at sign-out: the same person signing in again starts a session that has to be checked first.
     const [level, setLevel] = useState<{ userId: string; owes: boolean } | null>(null)
     const levelKnown = !rawSession || level?.userId === rawSession.user.id
     const owes = !!rawSession && levelKnown && !!level?.owes
@@ -89,6 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const { data: listener } = supabase.auth.onAuthStateChange((_event, next) => {
             setRawSession(next)
             if (!next) {
+                setLevel(null)
                 setMe(null)
                 picked.current = null
                 clearLocalCache()
@@ -180,6 +182,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const signOut = useCallback(async () => {
         const caller = session && me ? { accessToken: session.access_token, workspaceId: me.workspace.id } : null
         setRawSession(null)
+        setLevel(null)
         setMe(null)
         picked.current = null
         clearLocalCache()

@@ -1,10 +1,12 @@
 import 'server-only'
 
 import type { Database } from '@/app/api/database.types'
+import { AppError } from '@/lib/i18n/action-error'
 import { claimAttempt } from '@/lib/rate-limit/attempts'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { spendBackupCode } from './backup-codes'
 import { elevateSession } from './recovery'
+import { opensSecret } from './seal'
 import { readTwoStep, writeTwoStep } from './store'
 
 // A person gets ten tries every fifteen minutes at the second steps the hub checks: backup codes and
@@ -19,12 +21,14 @@ export function claimSecondStepTry(userId: string): Promise<boolean> {
 export type BackupSignIn = { ok: true; accessToken: string; refreshToken: string } | { ok: false; reason: 'wrong_code' | 'too_many' }
 
 // The second step with a backup code: counted, spent once, then the session the client holds is
-// raised to aal2 by the hub's recovery factor.
+// raised to aal2 by the hub's recovery factor. A code is spent only when that factor's secret still
+// opens: one the hub could not raise the session with stays good.
 export async function signInWithBackupCode(client: SupabaseClient<Database>, userId: string, code: string): Promise<BackupSignIn> {
     if (!(await claimSecondStepTry(userId))) return { ok: false, reason: 'too_many' }
     const record = await readTwoStep(userId)
     const spent = spendBackupCode(record, code)
     if (!spent || !record.recovery) return { ok: false, reason: 'wrong_code' }
+    if (!opensSecret(record.recovery.sealedSecret)) throw new AppError('generic')
     await writeTwoStep(userId, spent)
     return { ok: true, ...(await elevateSession(client, record.recovery)) }
 }

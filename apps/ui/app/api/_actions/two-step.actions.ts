@@ -13,7 +13,7 @@ import { getBrand } from '@/lib/brand/server'
 import { isWhiteLabel, TWO_STEP_RECOVERY_FACTOR_NAME } from '@rerun/contracts'
 import { PASSKEY_MAX, PASSKEY_NAME_MAX, type StoredPasskey, type TwoStepRecord } from '@/lib/auth/two-step/record'
 import { enrollRecoveryFactor } from '@/lib/auth/two-step/recovery'
-import { openSecret } from '@/lib/auth/two-step/seal'
+import { opensSecret } from '@/lib/auth/two-step/seal'
 import { readTwoStep, writeTwoStep, writeTwoStepFlag } from '@/lib/auth/two-step/store'
 import { failure, failureOf, type ActionFailure } from '@/lib/i18n/action-error'
 import { createClient } from '@/supabase/server'
@@ -91,18 +91,29 @@ function securityOf(account: User, record: TwoStepRecord, sessions: SecuritySess
 }
 
 // `codes` when this load finished a setup that was cut short (its method confirmed, then no flag, no
-// recovery factor or no codes): shown once, like at the end of a setup.
+// recovery factor or no codes): shown once, like at the end of a setup. A recovery factor whose secret
+// no longer opens (sealed under a key this server lost) is made again here, the backup codes kept.
 export async function getSecurityAction(): Promise<ActionResult<{ security: SecurityState; codes: string[] | null }>> {
     try {
         const account = await requireAccount()
         const record = await readTwoStep(account.id)
+        let current = record
         let codes: string[] | null = null
         const unfinished = !hasTwoStep(account.app_metadata) || !record.recovery || !record.codes?.length
-        if (unfinished && methodCount(ownMethods(account, record))) {
+        const sealedAway = !!record.recovery && !opensSecret(record.recovery.sealedSecret)
+        if ((unfinished || sealedAway) && methodCount(ownMethods(account, record))) {
             const client = await createClient()
-            if ((await sessionLevel(client)) === 'aal2') codes = await turnOnTwoStep(client, account, record)
+            if ((await sessionLevel(client)) === 'aal2') {
+                if (unfinished) {
+                    codes = await turnOnTwoStep(client, account, record)
+                    current = await readTwoStep(account.id)
+                } else {
+                    current = { ...record, recovery: await ensureRecovery(client, account, record) }
+                    await writeTwoStep(account.id, current)
+                }
+            }
         }
-        const [current, sessions] = await Promise.all([codes ? readTwoStep(account.id) : record, readSessions(account.id)])
+        const sessions = await readSessions(account.id)
         return { ok: true, security: securityOf(account, current, sessions), codes }
     } catch (err) {
         return failureOf(err, 'twoStepLoadFailed')
@@ -110,16 +121,10 @@ export async function getSecurityAction(): Promise<ActionResult<{ security: Secu
 }
 
 // The recovery factor the hub signs in with, kept as long as its secret still opens. A secret sealed
-// under a former service key is replaced, along with any factor left under that name.
+// under a key this server no longer has is replaced, along with any factor left under that name.
 async function ensureRecovery(client: Awaited<ReturnType<typeof createClient>>, account: User, record: TwoStepRecord): Promise<NonNullable<TwoStepRecord['recovery']>> {
-    if (record.recovery) {
-        try {
-            openSecret(record.recovery.sealedSecret)
-            if ((account.factors ?? []).some(factor => factor.id === record.recovery!.factorId && factor.status === 'verified')) return record.recovery
-        } catch {
-            // Sealed under another key: made again below.
-        }
-    }
+    const kept = record.recovery
+    if (kept && opensSecret(kept.sealedSecret) && (account.factors ?? []).some(factor => factor.id === kept.factorId && factor.status === 'verified')) return kept
     for (const factor of account.factors ?? []) {
         if (factor.friendly_name === TWO_STEP_RECOVERY_FACTOR_NAME) await client.auth.mfa.unenroll({ factorId: factor.id })
     }

@@ -153,6 +153,35 @@ describe('the second step of a sign-in', () => {
         expect(auth.secondStep).toBeNull()
         expect(auth.session).toBe(raised)
     })
+
+    it('checks the same person again after a sign-out, before letting their new session in', async () => {
+        const seen: { signedIn: boolean; secondStep: boolean }[] = []
+        rendered = await render(
+            <AuthProvider>
+                <Probe
+                    onAuth={value => {
+                        auth = value
+                        seen.push({ signedIn: Boolean(value.session), secondStep: Boolean(value.secondStep) })
+                    }}
+                />
+            </AuthProvider>
+        )
+        await act(async () => {})
+        expect(auth.session).toBe(mockSession)
+        await act(async () => {
+            await auth.signOut()
+        })
+        mockBootstrap.mockClear()
+
+        mockOwesSecondStep = true
+        const before = seen.length
+        await act(async () => {
+            mockAuthListener('SIGNED_IN', mockSession)
+        })
+        expect(seen.slice(before).some(state => state.signedIn)).toBe(false)
+        expect(auth.secondStep).toBe(mockSession)
+        expect(mockBootstrap).not.toHaveBeenCalled()
+    })
 })
 
 describe('the active workspace', () => {

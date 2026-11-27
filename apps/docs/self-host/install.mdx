@@ -191,7 +191,7 @@ Every other variable is optional: see [Configuration](/self-host/configuration).
 node scripts/self-host-check.mjs
 ```
 
-It generates the secrets left empty (`RERUN_ENGINE_API_KEY`, `FOREMAN_HUB_TOKEN_SECRET`, `BOARD_IMAGE_SECRET`, `MOBILE_OAUTH_TICKET_SECRET` and `UNSUBSCRIBE_SECRET`), checks the required values, then asks Supabase whether the schema is in place and `SUPABASE_SECRET_KEY` is the secret key. It stops with a plain message on anything only you can fix, warns when `OPENROUTER_API_KEY` is empty, and prints the exact command to start.
+It generates the secrets left empty (`RERUN_ENGINE_API_KEY`, `FOREMAN_HUB_TOKEN_SECRET`, `BOARD_IMAGE_SECRET`, `MOBILE_OAUTH_TICKET_SECRET`, `UNSUBSCRIBE_SECRET` and `TWO_STEP_SEAL_KEY`), checks the required values, then asks Supabase whether the schema is in place and `SUPABASE_SECRET_KEY` is the secret key. It stops with a plain message on anything only you can fix, warns when `OPENROUTER_API_KEY` is empty, and prints the exact command to start.
 
 Without it, `RERUN_ENGINE_API_KEY` stays empty and `docker compose` refuses every command, `up`, `down` and `logs` included: `RERUN_ENGINE_API_KEY is empty, run node scripts/self-host-check.mjs first`. An engine without a key would answer anyone who reaches its port.
 
