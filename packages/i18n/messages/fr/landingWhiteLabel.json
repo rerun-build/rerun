@@ -173,5 +173,31 @@
                 "answer": "Chaque workspace tourne sur l’IA que vous choisissez pour lui : l’abonnement ChatGPT ou Claude du client, vos clés d’API, ou les crédits Rerun inclus."
             }
         }
+    },
+    "pricing": {
+        "title": "Un tarif par workspace client.",
+        "lead": "Plus vous y faites tourner de clients, moins chacun coûte. Choisissez votre nombre, puis réservez un court appel pour démarrer.",
+        "costAnswer": "Un prix par workspace client et par mois, dégressif à mesure que vous ajoutez des clients, à partir de {min} workspaces : {tiers}. Chaque workspace est facturé au prix du palier atteint.",
+        "tier": "{price} dès {count}",
+        "card": {
+            "title": "Marque blanche",
+            "line": "Rerun sous votre marque, un workspace pour chacun de vos clients.",
+            "workspaces": "Workspaces clients",
+            "valueText": "{count, plural, one {# workspace client} many {# workspaces clients} other {# workspaces clients}}",
+            "valueTextAtLeast": "{count, plural, one {#+ workspace client} many {#+ workspaces clients} other {#+ workspaces clients}}",
+            "perWorkspace": "Par workspace client",
+            "save": "Économisez {percent}",
+            "perMonth": "/mois",
+            "total": "<total></total> par mois pour {count, plural, one {# workspace} many {# workspaces} other {# workspaces}}",
+            "totalAtLeast": "<total></total> par mois pour {count, plural, one {# workspace} many {# workspaces} other {# workspaces}}, puis {price} par workspace en plus",
+            "start": "Démarrer",
+            "included": {
+                "label": "Ce que vous obtenez",
+                "brand": "<b>Votre URL, vos couleurs et votre logo</b> : vos clients ne voient jamais Rerun",
+                "mobile": "Une <b>app mobile à votre nom</b>",
+                "library": "<b>Une bibliothèque de Coworkers</b>, déployée chez n’importe quel client",
+                "clients": "<b>Tous vos clients</b> gérés depuis un seul endroit"
+            }
+        }
     }
 }

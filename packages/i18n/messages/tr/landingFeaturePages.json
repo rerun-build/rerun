@@ -1,0 +1,1391 @@
+{
+    "hub": {
+        "crumb": "Özellikler",
+        "title": "Bir Coworker'ın işi yapmak için ihtiyaç duyduğu her şey.",
+        "lede": "Bellek, skill'ler, uygulamalar ve kendine ait bir bilgisayar. Her Coworker'ın sunduğu her şey ve kontrolü nasıl elinizde tuttuğunuz burada.",
+        "metaTitle": "Özellikler: bir yapay zeka Coworker'ının sunduğu her şey",
+        "metaDescription": "Bellek, skill'ler, uygulamalar ve kendi bilgisayarı: Chief of Staff'tan güvenliğe, bir Rerun Coworker'ının tüm özellikleri ve kontrolü nasıl korursunuz.",
+        "all": {
+            "title": "Tüm özellikler",
+            "lead": "{count, plural, one {# özellik} other {# özellik}}, dört grupta: Coworker'larınız kim, nasıl çalışırlar, onları nereden takip edersiniz ve kontrolü nasıl korursunuz."
+        },
+        "included": {
+            "title": "Pro'ya dahil",
+            "lines": {
+                "1": "Sınırsız Coworker",
+                "2": "Sınırsız kullanıcı",
+                "3": "Bulutta size özel bir makine",
+                "4": "Ayda {monthlyCredits} Rerun kredisi",
+                "5": "{connectors}+ uygulama",
+                "6": "Kendi yapay zekanız, ek ücret olmadan"
+            },
+            "extras": "LinkedIn Pro ve WhatsApp Pro ücretli uygulamalardır; ek krediler {packCredits} kredilik paketlerle {packPrice} fiyatına alınır.",
+            "cta": "Planları görün"
+        },
+        "faq": {
+            "1": {
+                "question": "Bu özelliklerin hepsi tek bir planda mı?",
+                "answer": "Evet. Pro, bu sayfadaki tüm özellikleri sınırsız Coworker, sınırsız kullanıcı ve ayda {monthlyCredits} Rerun kredisiyle sunar. Yalnızca LinkedIn Pro, WhatsApp Pro, ek krediler ve kendi fiyatı olan şablonlar ayrıca faturalandırılır."
+            },
+            "2": {
+                "question": "Ödemeden önce deneyebilir miyim?",
+                "answer": "Evet. {trialDays} günlük deneme tüm özellikleri açar; aynı anda {trialAgents} Coworker çalışır ve kullanıcı sayısında sınır yoktur."
+            },
+            "3": {
+                "question": "Her özelliği tek tek kurmam gerekiyor mu?",
+                "answer": "Hayır. Chief of Staff, anlattıklarınızdan yola çıkarak Coworker'larınızı uygulamaları, skill'leri ve rutinleriyle birlikte kurar. Hesaplarınızı, bir Coworker istediğinde bağlarsınız."
+            },
+            "4": {
+                "question": "Rerun'u kendi sunucularımda çalıştırabilir miyim?",
+                "answer": "Evet. Rerun, AGPL-3.0 lisanslı açık kaynaktır ve Docker ile kendi sunucunuzda çalışır. Kendi barındırdığınız kurulumda Coworker'lar, bellek, skill'ler, rutinler ve uygulamalar vardır; yalnızca barındırılan bir hizmetin sunabildikleri yoktur: dahil krediler, LinkedIn Pro, WhatsApp Pro ve ücretli veriler."
+            }
+        }
+    },
+    "page": {
+        "more": {
+            "title": "Diğer özellikler",
+            "all": "Tüm özellikler"
+        },
+        "howItWorks": "Nasıl çalışır",
+        "worksWith": {
+            "title": "Birlikte çalıştıkları",
+            "leadWithApps": "İçinde çalıştığı uygulamalar ve birlikte kullanıldığı özellikler.",
+            "lead": "Birlikte kullanıldığı özellikler."
+        },
+        "templates": {
+            "lead": "Kütüphaneden hazır Coworker'lar, bir dakikada kurulur.",
+            "cta": "Kütüphaneye göz atın"
+        }
+    },
+    "items": {
+        "coworkers": {
+            "crumb": "Coworker'lar",
+            "title": "İş akışı değil, bir yapay zeka Coworker'ı işe alın.",
+            "lede": "Ona tek cümleyle bir iş verin. Kendi belleği, skill'leri, uygulamaları ve bilgisayarı olur; kendi programıyla çalışır ve ne yaptığını size anlatır.",
+            "metaTitle": "Yapay zeka Coworker'ları: bir işi üstlenen ajanlar",
+            "metaDescription": "Rerun Coworker'ı tek bir iş için alınan bir yapay zeka ajanıdır: kendi belleği, skill'leri, uygulamaları ve bulut bilgisayarı vardır. Programla çalışır.",
+            "caption": "Kendi ekranında çalışan, sonra az önce ne yaptığını anlatan bir Coworker.",
+            "plate": {
+                "name": "Satış Temsilcisi",
+                "job": "Her sabah yeni müşteri adayları bulur"
+            },
+            "steps": {
+                "1": {
+                    "title": "İşi anlatın",
+                    "body": "Chief of Staff'ınıza neye ihtiyacınız olduğunu tek cümleyle söyleyin ya da şablon kütüphanesinden hazır bir Coworker kurun.",
+                    "ui": {
+                        "2": "Bana yeni bir coworker oluştur",
+                        "3": "Şablonlar"
+                    }
+                },
+                "2": {
+                    "title": "Kendini kurar",
+                    "body": "Soul'unu, skill'lerini ve programını yazar, ardından giriş yapmanız gereken her uygulama için bir kart gösterir.",
+                    "ui": {
+                        "2": "Giriş yap"
+                    }
+                },
+                "3": {
+                    "title": "Çalışır ve rapor verir",
+                    "body": "Her çalıştırma, ne yaptığını anlatan bir konu bırakır. Size ihtiyaç duyduğunda durup sorar ve her düzeltmeyi hatırlar.",
+                    "ui": {
+                        "1": "Konular",
+                        "2": "Otomasyonlar",
+                        "3": "Sizi bekliyor"
+                    }
+                }
+            },
+            "abilitiesTitle": "Her Coworker'ın sahip olduğu şeyler.",
+            "abilities": {
+                "memory": {
+                    "title": "Kendi belleği",
+                    "line": "Kalıcı bilgileri not eder ve sonra hatırlar. Bir kez düzeltin, düzeltmeyi unutmaz."
+                },
+                "skills": {
+                    "title": "Kendi skill'leri",
+                    "line": "Yalnızca bir görev eşleştiğinde açtığı yazılı prosedürler; böylece öğrendikçe prompt'u kısa kalır."
+                },
+                "computer": {
+                    "title": "Kendi bilgisayarı",
+                    "line": "Bulutta tarayıcı, dosyalar ve terminal içeren bir ekran. Canlı izleyin ya da kontrolü alın."
+                },
+                "routines": {
+                    "title": "Kendi rutinleri",
+                    "line": "Sade sözlerle bir program (örneğin hafta içi her gün saat 8'de) ya da başka bir hizmetin çağırdığı bir webhook."
+                }
+            },
+            "templatesTitle": "Bugün işe alabileceğiniz Coworker'lar.",
+            "faq": {
+                "1": {
+                    "question": "Yapay zeka Coworker'ı nedir?",
+                    "answer": "Çizdiğiniz bir iş akışı yerine tek bir iş için işe aldığınız bir ajan. Bir adı, neden sorumlu olduğunu söyleyen bir soul'u, kendi belleği, skill'leri, dosyaları ve veritabanı, ihtiyaç duyduğu uygulamalar ve rutinleri vardır. O işi her çalıştırmada yeniden yapar ve her adımı kaydeder."
+                },
+                "2": {
+                    "question": "Prompt ya da kod yazmam gerekiyor mu?",
+                    "answer": "Hayır. İşi sade sözlerle anlatın, Coworker kendi soul'unu, skill'lerini ve programını yazar. Kurduğu her şey kartında okunabilir ve düzenlenebilir kalır: Ayarlar, Skill'ler, Rutinler ve Uygulamalar."
+                },
+                "3": {
+                    "question": "Kaç Coworker'ım olabilir?",
+                    "answer": "İhtiyacınız kadar: Pro'da sınır yok. {trialDays} günlük deneme aynı anda {trialAgents} Coworker çalıştırır; diğerleri kurulur ve Pro başlayana kadar kapalı bekler."
+                },
+                "4": {
+                    "question": "Kurulduktan sonra bir Coworker'ı değiştirebilir miyim?",
+                    "answer": "Evet. Soul'unu Ayarlar'da düzenleyin, ihtiyacı olmayan bir yeteneği kapatın, modelini sohbet başına değiştirin ya da kendi talimatlarını yeniden yazmasını isteyin. Değişiklikler bir sonraki çalıştırmada geçerli olur."
+                },
+                "5": {
+                    "question": "İyi çalışan bir Coworker'ı kopyalayabilir miyim?",
+                    "answer": "Evet. Çoğalt, onu skill'leri, anıları, dosyaları, uygulamaları ve rutinleriyle aynı çalışma alanına kopyalar. Paylaş, çalışma alanı dışındaki biri için bir bağlantı oluşturur: anahtarlar, bağlı hesaplar ve sohbet geçmişi asla onunla gitmez."
+                }
+            },
+            "docsLabel": "Coworker nedir, okuyun"
+        },
+        "chief-of-staff": {
+            "crumb": "Chief of Staff",
+            "title": "Yapay zeka ekibinizi yöneten bir Chief of Staff.",
+            "lede": "Ne istediğinizi söyleyin, işi doğru Coworker'a aktarır ya da yenisini kurar. Kendiliğinden durumu kontrol eder, nasıl yapacağını söylediğinizde gelen kutunuzu yanıtlar ve ona verdiğiniz adı alır.",
+            "metaTitle": "Chief of Staff: yapay zeka ekibinizin yöneticisi",
+            "metaDescription": "Rerun Chief of Staff yapay zeka ekibinizi kurar, işi doğru Coworker'a verir, her gün kontrol eder, sorularını sizin adınıza yazılı ya da sesli yanıtlar.",
+            "caption": "Space'i basılı tutun, ne istediğinizi söyleyin: Chief of Staff işi ilgili Coworker'a aktarır.",
+            "plate": {
+                "name": "İçerik Yazarı",
+                "job": "Pazartesi gönderilerinin taslağını hazırlar"
+            },
+            "steps": {
+                "1": {
+                    "title": "Ona işinizi anlatın",
+                    "body": "İlk kurulumda web sitenizi okur, Brain'i doldurur ve işletme türünüze uygun bir başlangıç ekibi önerir.",
+                    "ui": {
+                        "1": "acme.com",
+                        "2": "Devam et"
+                    }
+                },
+                "2": {
+                    "title": "Sade sözlerle isteyin",
+                    "body": "Küresine tıklayın, ⌘K'ya basın ya da Space'i basılı tutun. Bir Coworker kurar, görevi doğru olana gönderir ve çalıştırmayı takip eder.",
+                    "ui": {
+                        "3": "Dün gece ne çalıştı?"
+                    }
+                },
+                "3": {
+                    "title": "Durumu kendisi kontrol etsin",
+                    "body": "Çalışma alanınıza kendiliğinden bakar. Vaktinizi hak eden bir şey olduğunda, tek bir sonraki adımla bir konu açar.",
+                    "ui": {
+                        "1": "Kendi kendine check-in yapsın",
+                        "2": "Genel",
+                        "3": "Sizi bekliyor"
+                    }
+                }
+            },
+            "abilitiesTitle": "Sizin için yaptıkları.",
+            "abilities": {
+                "team": {
+                    "title": "Ekibinizi kurar",
+                    "line": "Her Coworker'ın soul'unu, skill'lerini ve programını yazar, onu bir Box'a yerleştirir ve kütüphaneden şablon kurar."
+                },
+                "voice": {
+                    "title": "Space'i basılı tutun ve konuşun",
+                    "line": "Panoda Space'i basılı tutun, ne istediğinizi söyleyin ve bırakın. Masaüstü uygulamasında Hızlı soru ile her uygulamadan ona ulaşırsınız."
+                },
+                "inbox": {
+                    "title": "Gelen kutunuzu yanıtlar",
+                    "line": "Ne diyeceğini ona söyleyin; Coworker'larınızın sorularını, onay isteklerini ve skill önerilerini sizin adınıza yanıtlar."
+                },
+                "check-ins": {
+                    "title": "Günlük check-in'ler",
+                    "line": "Çalıştırmaları, Brain'i ve paylaşılan verileri okur, hiçbir şeyi değiştirmez ve yalnızca değecek bir şey olduğunda yazar."
+                }
+            },
+            "templatesTitle": "Ona yönetecek bir ekip verin.",
+            "faq": {
+                "1": {
+                    "question": "Chief of Staff nedir?",
+                    "answer": "Her çalışma alanıyla gelen asistan. Her Coworker'ı, her birinin ne yaptığını ve ne üzerinde çalıştığını bilir. Yenilerini kurar, onlara işi aktarır, başarısız bir çalıştırmayı açıklar, Brain'i sizinle birlikte günceller ve Rerun hakkındaki soruları dokümanlardan yanıtlar."
+                },
+                "2": {
+                    "question": "Coworker yöneticisiyle aynı şey mi?",
+                    "answer": "Evet. Coworker yöneticisinin adı artık Chief of Staff ve daha fazlasını yapıyor: ilk ekibinizi kurar, kendiliğinden check-in yapar ve gelen kutunuzu yanıtlar. Aynı sayfa, panonun bir köşesinde aynı yer."
+                },
+                "3": {
+                    "question": "Ona bir ad verebilir miyim?",
+                    "answer": "Evet. Bir sohbetin başında bir ad almayı önerir, bir yönetici de adı kartından değiştirebilir. Ad çalışma alanına aittir: her üye onu listede, sohbette ve kısayollarda görür. Chief of Staff adına dönmek için alanı boşaltın."
+                },
+                "4": {
+                    "question": "Bir check-in sırasında ne olur?",
+                    "answer": "Günde bir kez, çalışma saatlerinizde Coworker'larınızı, çalıştırmalarını, Brain'i ve paylaşılan verileri okur. Hiçbir şeyi değiştirmez. Size gereken bir şey varsa, gördüklerini ve önerdiği tek adımı içeren bir konu açar ve telefonunuza gönderir."
+                },
+                "5": {
+                    "question": "Benim yerime bir şeyleri onaylar mı?",
+                    "answer": "Yalnızca yanıtlamasını söylediğiniz şeyleri. Bir harcamayı onaylamadan önce sohbetinde sizden onay ister; sizin adınıza asla anahtar yazmaz, bir uygulamada oturum açmaz ya da bir tarayıcıyı devralmaz: bunlar sizde kalır."
+                }
+            },
+            "docsLabel": "Chief of Staff dokümanlarını okuyun"
+        },
+        "coworkers-work-together": {
+            "crumb": "Birlikte çalışma",
+            "title": "Coworker'larınız işi birbirine devreder.",
+            "lede": "Biri müşteri adaylarını bulur, sonraki onlara yazar, üçüncüsü onları CRM'inize kaydeder. Birbirlerini tanıtıcılarıyla çağırır, aynı tablolar, dosyalar ve Brain üzerinden çalışırlar.",
+            "metaTitle": "İşi birbirine devreden yapay zeka Coworker'ları",
+            "metaDescription": "Rerun Coworker'ları birbirini @tanıtıcıyla çağırır, bulduklarını aktarır, tek veritabanı, tek klasör ve tek Brain paylaşır. Zinciri tek yerden okursunuz.",
+            "caption": "Aynı işi sırayla birbirine aktaran üç Coworker, tek bir panoda.",
+            "plate": {
+                "name": "Aday Avcısı",
+                "job": "Satış Temsilcisi için aday bulur"
+            },
+            "steps": {
+                "1": {
+                    "title": "Her birine kendi payını verin",
+                    "body": "Her adım için bir Coworker işe alın ya da bir ekip şablonu kurun. Her soul neden sorumlu olduğunu ve işi kime devrettiğini söyler.",
+                    "ui": {
+                        "1": "Şablonlar",
+                        "2": "Ücretsiz kullan"
+                    }
+                },
+                "2": {
+                    "title": "Birbirlerini çağırırlar",
+                    "body": "Bir Coworker, bulduklarıyla birlikte sonrakine @tanıtıcısıyla mesaj atar. Çağrılan, kimin çağırdığını bilir.",
+                    "ui": {
+                        "2": "@sales_rep"
+                    }
+                },
+                "3": {
+                    "title": "Zinciri okuyun",
+                    "body": "Her devir, ulaştığı Coworker'da Tümü altında listelenen bir konu açar; ne istendiği ve ne geldiği oradadır.",
+                    "ui": {
+                        "1": "Konular",
+                        "2": "Tümü"
+                    }
+                }
+            },
+            "abilitiesTitle": "Tek ekip, tek tablo seti.",
+            "abilities": {
+                "handles": {
+                    "title": "@tanıtıcıyla çağırır",
+                    "line": "Bir Coworker'ı anmak için @ yazın. Adını değiştirin, diğerlerinin soul, skill ve rutinlerindeki her @tanıtıcı da güncellenir."
+                },
+                "shared-db": {
+                    "title": "Tek ortak veritabanı",
+                    "line": "Çalışma alanındaki her Coworker, hangi Box'ta olursa olsun aynı tabloları ve klasörü okur ve yazar."
+                },
+                "brain": {
+                    "title": "Tek Brain",
+                    "line": "Şirketiniz hakkında aynı sayfaları okurlar, böylece hiçbir şeyi iki kez anlatmanız gerekmez."
+                },
+                "team": {
+                    "title": "Birbirlerini görürler",
+                    "line": "Bir Coworker, diğerlerinin durumunu, rutinlerini ve son çalıştırmalarını hiçbirini değiştirmeden okuyabilir."
+                }
+            },
+            "templatesTitle": "İşi birkaç Coworker'ın paylaştığı ekipler.",
+            "faq": {
+                "1": {
+                    "question": "Bir Coworker işi diğerine nasıl devreder?",
+                    "answer": "Diğerine, sizin yapacağınız gibi @tanıtıcısıyla mesaj atar ve bulduklarını aktarır. Diğeri kendi konusunda çalışır ve yanıt verir. Bir işin bitişiyle uyanan Coworker oradan devam eder."
+                },
+                "2": {
+                    "question": "Zinciri kendim mi kurmalıyım?",
+                    "answer": "Hayır. Her soul'a neden sorumlu olduğunu ve sırada kimin olduğunu yazın ya da ekibi kurmasını Chief of Staff'tan isteyin. Kimin neyle ilgilendiğini bilir ve işi doğru olana aktarır."
+                },
+                "3": {
+                    "question": "Paylaştıklarını nerede tutarlar?",
+                    "answer": "Brain altındaki ortak veritabanında ve ortak klasörde; ikisi de çalışma alanındaki her Coworker için ortaktır. Her birinin ayrıca başka hiçbir Coworker'ın okuyamadığı özel bir veritabanı ve klasörü vardır."
+                },
+                "4": {
+                    "question": "Bir Coworker büyük bir görevi bölebilir mi?",
+                    "answer": "Evet. Görev devretme açıkken, bağımsız alt görevleri kendi klasöründe ve kendi dosyalarıyla çalışan geçici alt coworker'lara verir ve getirdiklerini bir araya toplar."
+                },
+                "5": {
+                    "question": "Bu çoklu ajanlı bir iş akışı oluşturucu mu?",
+                    "answer": "Aynı sorunu bir tuval olmadan çözer. Bakımı yapılacak düğüm yok: işler için Coworker işe alırsınız ve iş, bir ekipte olduğu gibi aralarında dolaşır."
+                }
+            },
+            "docsLabel": "Coworker'ların veri paylaşımını okuyun"
+        },
+        "second-brain": {
+            "crumb": "İkinci beyin",
+            "title": "İşletmeniz için ikinci bir beyin.",
+            "lede": "Ne sattığınız, kime, hangi fiyata ve hangi üslupla; her Coworker'ın çalışmadan önce okuduğu sayfalara bir kez yazılır. Web sitenizden doldurulur, sizinle güncel tutulur.",
+            "metaTitle": "Yapay zeka Coworker'larınızın okuduğu ikinci beyin",
+            "metaDescription": "Rerun Brain teklifinizi, pazarınızı ve üslubunuzu her Coworker'ın okuduğu sayfalarda tutar. Dosya ve .zip aktarın, önerileri inceleyin, eski sürüme dönün.",
+            "caption": "Şirket sayfanızda açık Brain ve bekleyen bir Coworker önerisi.",
+            "plate": {
+                "name": "Metin Yazarı",
+                "job": "Sizin üslubunuzla yazar"
+            },
+            "steps": {
+                "1": {
+                    "title": "Web sitenizden doldurun",
+                    "body": "Sitenizi girin ve Web sitemden doldur'a tıklayın. Şirket, teklif, pazar ve üslup sayfaları kaynaklarıyla birlikte dakikalar içinde hazır olur.",
+                    "ui": {
+                        "1": "Brain",
+                        "2": "acme.com",
+                        "3": "Web sitemden doldur"
+                    }
+                },
+                "2": {
+                    "title": "Elinizdekileri içe aktarın",
+                    "body": "Dosyaları, bir .zip'i ya da bütün bir klasörü bırakın. Bir .zip klasörleriyle birlikte açılır, seçtiğiniz Box ve etiketler altında dosyalanır.",
+                    "ui": {
+                        "1": "İçe aktar",
+                        "2": "Klasör seç",
+                        "3": "12 dosyayı içe aktar"
+                    }
+                },
+                "3": {
+                    "title": "Önerdiklerini inceleyin",
+                    "body": "Bir Coworker yeni bir bilgi bulduğunda bunu önerir. İncele'ye tıklayın, öncesini ve sonrasını okuyun, ardından Kabul et ya da Kapat.",
+                    "ui": {
+                        "1": "İncele",
+                        "2": "Kabul et",
+                        "3": "Kapat"
+                    }
+                }
+            },
+            "abilitiesTitle": "Bir kez yazılır, her Coworker okur.",
+            "abilities": {
+                "pages": {
+                    "title": "Yerinde düzenlediğiniz sayfalar",
+                    "line": "Bloklar için /, başka bir sayfaya bağlantı için [[ yazın. Siz yazarken kaydeder ve her üye düzenleyebilir."
+                },
+                "import": {
+                    "title": ".zip dosyaları ve klasörler",
+                    "line": "İçe aktarma, bir klasörün ya da .zip'in ağaç yapısını korur ve Mac'in eklediği dosyaları dışarıda bırakır."
+                },
+                "history": {
+                    "title": "Her sürüm saklanır",
+                    "line": "Sürüm geçmişi kimin neyi değiştirdiğini gösterir: bir kişi, bir Coworker ya da web sitesi içe aktarması. Her sürümü geri yükleyin."
+                },
+                "boxes": {
+                    "title": "Box'a göre dosyalanır",
+                    "line": "Her ekibin sayfaları kendi Coworker'ları için önce gelir. Dosyalama hiçbir şeyi gizlemez: herkes yine her şeyi okuyabilir."
+                }
+            },
+            "templatesTitle": "Sizin gibi konuşması gereken Coworker'lar.",
+            "faq": {
+                "1": {
+                    "question": "Brain'e neler girer?",
+                    "answer": "Yeni bir çalışana anlatacaklarınız: ne sattığınız ve hangi fiyata, kimin aldığı, ekibiniz, üslubunuz, araçlarınız ve öncelikleriniz; ayrıca müşteriler, rakipler, ürünler ve kararlar için sayfalar. Ortak klasörü ve ortak veritabanını da barındırır."
+                },
+                "2": {
+                    "question": "Elimdeki belgeleri içe aktarabilir miyim?",
+                    "answer": "Evet. Dosyaları, bir .zip arşivini ya da bir klasörü Dosyalar bölümüne veya bir Box'a bırakın. Bir .zip, kendi klasörleri korunarak adını taşıyan bir klasöre açılır. İçe aktar'a tıklamadan önce listeyi görür, bir dosyayı çıkarabilirsiniz."
+                },
+                "3": {
+                    "question": "Bir Coworker bir sayfayı kendi başına değiştirebilir mi?",
+                    "answer": "Hayır. Kendi bulduğu bir bilgi, Kabul et ya da Kapat diyeceğiniz bir öneriye dönüşür ve kapatılan bir değişiklik bir daha önerilmez. Sohbette ona söylediğiniz bir bilgi ise Geri al seçeneğiyle hemen yazılır."
+                },
+                "4": {
+                    "question": "Bir sayfanın üzerine yazılırsa ne olur?",
+                    "answer": "Her değişiklik saklanır. Sayfanın Daha fazla menüsünden Sürüm geçmişi'ni açın, bir sürüm seçin ve Bu sürümü geri yükle'ye tıklayın. Geçerli sürüm geçmişte kalır."
+                },
+                "5": {
+                    "question": "Brain bir Coworker'ın belleğinden nasıl ayrılır?",
+                    "answer": "Brain, tüm çalışma alanının şirket hakkında bildikleridir. Bir Coworker'ın belleği kendi işiyle ilgili bilgileri tutar ve hiçbir şey kullanmadığında silinip gider. Bir kişinin Brain'e yazdığı ya da onayladığı şey belleğe üstün gelir."
+                }
+            },
+            "docsLabel": "Brain dokümanlarını okuyun"
+        },
+        "computer-use": {
+            "crumb": "Bilgisayar kullanımı",
+            "title": "Her Coworker kendi ekranında çalışır.",
+            "lede": "Bir uygulamanın API'si yoksa Coworker'ınız onu kendi bulut bilgisayarındaki gerçek bir tarayıcıda açar ve tıklayarak ilerler. Canlı izleyin, istediğiniz an kontrolü alın.",
+            "metaTitle": "Bilgisayar kullanımı: kendi ekranı olan yapay zeka ajanı",
+            "metaDescription": "Her Rerun Coworker'ının tarayıcı ve terminal içeren bir bulut bilgisayarı vardır. API'si olmayan sitelerde tıklar, modelin asla görmediği şifreleri yazar.",
+            "caption": "Coworker'ın kendi ekranında, hesabınızda oturum açmış gerçek bir tarayıcı.",
+            "plate": {
+                "name": "İhale Avcısı",
+                "job": "Her gün ihale portallarını tarar"
+            },
+            "steps": {
+                "1": {
+                    "title": "Tarayıcısını açar",
+                    "body": "Bir görev API'si olmayan bir site gerektirdiğinde tarayıcısını açar; bir insan gibi tıklar, yazar ve kaydırır."
+                },
+                "2": {
+                    "title": "İzlersiniz ya da devralırsınız",
+                    "body": "Kartındaki küçük resim ekranını canlı gösterir. Masaüstünü açmak için tıklayın, kullanmak için Kontrolü al'a basın.",
+                    "ui": {
+                        "1": "Bilgisayarı",
+                        "2": "Masaüstü: İhale Avcısı",
+                        "3": "Kontrolü al"
+                    }
+                },
+                "3": {
+                    "title": "Zor kısımları size bırakır",
+                    "body": "Bir oturum açma ya da captcha için size sorar: Tarayıcıyı aç, adımı yapın, Bitti'ye tıklayın. Oradan devam eder.",
+                    "ui": {
+                        "1": "Tarayıcıyı aç",
+                        "2": "Bitti"
+                    }
+                }
+            },
+            "abilitiesTitle": "Bulutta kendine ait bir bilgisayar.",
+            "abilities": {
+                "desktop": {
+                    "title": "Tam bir masaüstü",
+                    "line": "Çalışma alanınızın makinesinde, kendine ait bir ekranda tarayıcı, dosya yöneticisi ve terminal."
+                },
+                "take-control": {
+                    "title": "Kontrolü alın",
+                    "line": "İstediğiniz an ekranını kendiniz kullanın. Coworker sonrasında orada ne yaptığınızı görür."
+                },
+                "secrets": {
+                    "title": "Görünmeden yazılan şifreler",
+                    "line": "Saklanan bir gizli bilgiyi değişken adıyla yazar: değer sayfaya gider, asla modele gitmez."
+                },
+                "session": {
+                    "title": "Bir kez oturum açılır",
+                    "line": "Oturum açtığınız her şey o Coworker'ın tarayıcısında kalır, sonraki çalıştırmalarına hazır."
+                }
+            },
+            "templatesTitle": "API'nin gitmediği yere giden Coworker'lar.",
+            "faq": {
+                "1": {
+                    "question": "Bilgisayar kullanımı nedir?",
+                    "answer": "Bir Coworker kendi ekranını görür ve kullanır: tarayıcısında, dosyalarında ve terminalinde tıklar, yazar ve kaydırır. API'si olmayan bir portalı bu şekilde kullanır; formları doldurur ve sonuçları bir insan gibi okur."
+                },
+                "2": {
+                    "question": "Ne yaptığını izleyebilir miyim?",
+                    "answer": "Evet. Kartındaki küçük resim, çalışırken ekranı canlı gösterir. Masaüstünü bir pencerede açmak için tıklayın ya da kendiniz kullanmak için Kontrolü al'a basın, sonra devam etmesine izin verin."
+                },
+                "3": {
+                    "question": "Hesaplarıma nasıl oturum açar?",
+                    "answer": "Ekranda sizden bir sıra ister: Tarayıcıyı aç, tarayıcısını sizin için açar; oturum açar ya da captcha'yı çözersiniz, ardından Bitti'ye tıklarsınız. Oturum açtığınız her şey o Coworker'ın tarayıcısında kalır."
+                },
+                "4": {
+                    "question": "Yapay zeka yazdığı şifreleri görür mü?",
+                    "answer": "Hayır. Bir gizli bilgi, çalışma alanınızın makinesinde bir değişken adı altında saklanır. Coworker onu bu adla sayfaya yazar; değer asla sohbete girmez ve modele ulaşmaz."
+                },
+                "5": {
+                    "question": "Coworker'larım tek bir bilgisayarı mı paylaşır?",
+                    "answer": "Çalışma alanının makinesini paylaşırlar; her birinin kendi ekranı, kendi oturumlarıyla kendi tarayıcısı, kendi klasörü ve kendi veritabanı vardır."
+                }
+            },
+            "docsLabel": "Bilgisayarı hakkında okuyun"
+        },
+        "your-computer": {
+            "crumb": "Bilgisayarınız",
+            "title": "Kendi bilgisayarınızı Coworker'larınıza ödünç verin.",
+            "lede": "Mac'inizi ya da PC'nizi masaüstü uygulamasından bağlayın. Sohbette # ile adını verin; Coworker'larınız orada sizin onayınızla komut çalıştırır, dosya okur ve uzun işler başlatır.",
+            "metaTitle": "Kendi bilgisayarınızı yapay zeka Coworker'larınıza bağlayın",
+            "metaDescription": "Mac, Windows ya da Linux bilgisayarınızı Rerun'a bağlayın. Sohbette # ile adını verin, Coworker'larınız onayınızla orada komut ve uzun işler çalıştırsın.",
+            "caption": "2. günün ham çekimlerini #studio-pc üzerinde kodlayın: komut İzin ver'i bekliyor.",
+            "plate": {
+                "name": "Video Editörü",
+                "job": "Ham çekimleri Mac'inizde kurgular"
+            },
+            "steps": {
+                "1": {
+                    "title": "Masaüstü uygulamasından bağlayın",
+                    "body": "Masaüstü uygulamasını kurun, hesabınızı ve ardından Masaüstü uygulaması'nı açın. Bu bilgisayar altında Bağla'ya tıklayın ve bir ad verin.",
+                    "ui": {
+                        "1": "Hesap",
+                        "2": "Masaüstü uygulaması",
+                        "3": "Bu bilgisayar",
+                        "4": "Bağla"
+                    }
+                },
+                "2": {
+                    "title": "# ile adını verin",
+                    "body": "Mesaj kutusuna # yazın ve bilgisayarı seçin: #studio-pc mesajınıza eklenir, böylece Coworker makineyi bilir.",
+                    "ui": {
+                        "2": "#studio-pc"
+                    }
+                },
+                "3": {
+                    "title": "Komutu onaylayın",
+                    "body": "Kart, komutu ve klasörünü gösterir. Bir kez İzin ver'e, programa Her zaman izin ver'e ya da Reddet'e tıklayın.",
+                    "ui": {
+                        "1": "İzin ver",
+                        "2": "ffmpeg için her zaman izin ver",
+                        "3": "Reddet"
+                    }
+                }
+            },
+            "abilitiesTitle": "Kendi makinenizde bir çift el.",
+            "abilities": {
+                "jobs": {
+                    "title": "Uzun işler",
+                    "line": "Render'lar, eğitimler ve büyük indirmeler iş olarak çalışır, aynı anda en fazla {remoteMaxJobs} tane. Coworker sonuçla birlikte uyanır."
+                },
+                "files": {
+                    "title": "Dosyalarınız yerinde kalır",
+                    "line": "Yalnızca ihtiyacı olanı, dosya neredeyse orada okur ve çalışma klasörünüzün dışında önce sorar."
+                },
+                "approvals": {
+                    "title": "Üç onay modu",
+                    "line": "Sor, sonra hatırla (varsayılan), Her seferinde sor ya da Tam erişim. Asla sudo yok, asla disk silme yok."
+                },
+                "pause": {
+                    "title": "Tek tıkla duraklatın",
+                    "line": "Uygulamadaki ya da tepsi simgesindeki Duraklat, orada çalışan her şeyi durdurur ve siz devam ettirene kadar yeni işi reddeder."
+                }
+            },
+            "templatesTitle": "Makinenize ihtiyaç duyan Coworker'lar.",
+            "faq": {
+                "1": {
+                    "question": "Neden kendi bilgisayarımı bağlayayım?",
+                    "answer": "Makinenizde yapılması gereken işler için: video kurgusu, GPU'nuz, yerel modeller, taşınamayacak kadar büyük dosyalar. Coworker bulutta kalır; bilgisayarınız yalnızca masaüstü uygulaması açıkken ve yalnızca istenen şeyi çalıştırır."
+                },
+                "2": {
+                    "question": "Bir Coworker sormadan neleri çalıştırabilir?",
+                    "answer": "Varsayılan modda yalnızca Her zaman izin ver'e tıkladığınız programları. Her yeni program sorar, çalışma klasörünüzün dışındaki bir yol da sorar; gizli bilgilerin bulunduğu yerler ise Tam erişimde bile her zaman sorar."
+                },
+                "3": {
+                    "question": "Hangi bilgisayarları bağlayabilirim?",
+                    "answer": "Masaüstü uygulamasını çalıştıran her bilgisayar: macOS 13 veya üzeri bir Mac, Windows 10 veya üzeri bir PC (beta) ya da Linux x64 bir makine."
+                },
+                "4": {
+                    "question": "Dizüstü bilgisayarım uyku moduna geçerse ne olur?",
+                    "answer": "Çalışan bir iş bilgisayarı uyanık tutar, ancak kapağı kapatmak onu yine uyutur: iş, bilgisayar uyandığında devam eder. Uygulamanın penceresini kapatmak işleri çalışır tutar; uygulamadan çıkmak ise size sorduktan sonra onları durdurur."
+                },
+                "5": {
+                    "question": "Ekip arkadaşlarım bilgisayarımı kullanabilir mi?",
+                    "answer": "Çalışma alanındaki herkes bağlı bir bilgisayarı kendi Coworker'ları aracılığıyla kullanabilir ve her yeni program yine onay ister. Bir yönetici ya da bilgisayarı bağlayan kişi ayarlarını değiştirir veya onu kaldırır; bu her şeyi anında durdurur."
+                }
+            },
+            "docsLabel": "Bilgisayarlar dokümanlarını okuyun"
+        },
+        "tools": {
+            "crumb": "Araçlar",
+            "title": "{connectors}+ araca bağlı.",
+            "lede": "Gmail, Slack, Stripe, HubSpot, Notion, Shopify, LinkedIn'iniz, WhatsApp'ınız ve gösterdiğiniz her MCP sunucusu. Bir kez oturum açın, seçtiğiniz her Coworker kullanabilsin.",
+            "metaTitle": "{connectors}+ araç ve entegrasyon, plana dahil",
+            "metaDescription": "Coworker'larınız Gmail, Slack, Stripe, HubSpot, Shopify ve {connectors}+ araca, her MCP sunucusuna ve API'ye erişir. Bir kez oturum açın, ek ücret yok.",
+            "caption": "Bir Coworker'ın açabildiği uygulamalar ve ötesinde eriştiği {connectors}+ araç.",
+            "plate": {
+                "name": "Destek Temsilcisi",
+                "job": "Gmail ve Shopify üzerinden yanıtlar"
+            },
+            "steps": {
+                "1": {
+                    "title": "Uygulamayı seçin",
+                    "body": "Coworker'ın Uygulamalar ekranını açın ve kitaplıkta arayın ya da hizmetin adını sohbette söyleyin yeter.",
+                    "ui": {
+                        "1": "Uygulamalar",
+                        "2": "Kitaplık",
+                        "3": "Uygulama ara…"
+                    }
+                },
+                "2": {
+                    "title": "Bir kez oturum açın",
+                    "body": "Oturum açın ya da maskeli bir forma bir anahtar yapıştırın. Hesap Vault'a gider, diğer Coworker'larınız için hazır olur.",
+                    "ui": {
+                        "2": "Bağla",
+                        "3": "Vault"
+                    }
+                },
+                "3": {
+                    "title": "Bir sonraki çalıştırmada kullanır",
+                    "body": "Uygulama, araçlarını ve onları nasıl kullanacağına dair bir skill getirir. Büyük bir araç seti yalnızca bir görev ihtiyaç duyduğunda yüklenir.",
+                    "ui": {
+                        "1": "Kurulu",
+                        "2": "Skill'ler"
+                    }
+                }
+            },
+            "abilitiesTitle": "Araçlarınız, bir kez bağlanır.",
+            "abilities": {
+                "library": {
+                    "title": "Bir uygulama kitaplığı",
+                    "line": "E-posta, takvim, CRM, ödeme, mağaza, depolama ve reklam için hazır uygulamalar; her birinin kendi skill'i var."
+                },
+                "mcp": {
+                    "title": "Her MCP sunucusu",
+                    "line": "Bir sunucuyu HTTP, SSE ya da yerel bir komutla, başlıkları ve değişkenleriyle kaydedin. Araçları diğerlerine eklenir."
+                },
+                "linkedin-whatsapp": {
+                    "title": "LinkedIn ve WhatsApp Pro",
+                    "line": "LinkedIn'inizden müşteri arayın, WhatsApp numaranızdan yanıtlayın. Gelen bir yanıt Coworker'ı uyandırır. Hesap başına aylık {linkedinPrice}."
+                },
+                "included": {
+                    "title": "Plana dahil",
+                    "line": "Kitaplıktaki diğer tüm uygulamalar, uygulama başına birden çok hesap; uygulama başına da çalıştırma başına da ücret yok."
+                }
+            },
+            "templatesTitle": "Uygulamalarınızda yaşayan Coworker'lar.",
+            "faq": {
+                "1": {
+                    "question": "{connectors}+ araç arasında hangileri var?",
+                    "answer": "Kitaplık, bir işletmenin dayandığı uygulamaları barındırır: Gmail ve Outlook, takvimler, Slack, HubSpot gibi CRM'ler, Stripe, Shopify, Notion, depolama alanları ve reklam platformları. Geri kalanına barındırılan MCP sunucularıyla ulaşılır."
+                },
+                "2": {
+                    "question": "Aracım kitaplıkta yoksa ne olur?",
+                    "answer": "MCP sunucusunu MCP sekmesinden kendiniz kaydedin ya da kitaplığın altındaki Uygulama iste'ye tıklayın. Hiç API'si yoksa Coworker onu kendi ekranında açar ve tıklayarak kullanır."
+                },
+                "3": {
+                    "question": "Bağlı uygulamalar ek ücretli mi?",
+                    "answer": "Hayır. Kitaplıktaki her uygulama plana dahildir; kendiniz bağladığınız her MCP sunucusu ya da API de öyle. Yalnızca LinkedIn Pro ve WhatsApp Pro, bağlı hesap başına ayrıca satılır."
+                },
+                "4": {
+                    "question": "LinkedIn Pro ve WhatsApp Pro ne kadar?",
+                    "answer": "Bağlı her hesap bir yer kaplar: LinkedIn Pro için aylık {linkedinPrice}, WhatsApp Pro için aylık {whatsappPrice}; onu kullanan Coworker sayısı ne olursa olsun planınızla aynı faturada. Deneme süresince, uygulama başına bir yer Pro başlayana kadar ücretsizdir."
+                },
+                "5": {
+                    "question": "LinkedIn hesabım risk altında mı?",
+                    "answer": "Her hesabın önerilen günlük bir davet ve profil görüntüleme temposu vardır. Bu aşıldığında Coworker yine istediğinizi yapar ve sizi bir kez uyarır. LinkedIn hesabın yavaşlamasını isterse, Coworker'lar onu bir gün kullanmaz."
+                },
+                "6": {
+                    "question": "Bir Coworker, uygulaması olmayan bir API'yi çağırabilir mi?",
+                    "answer": "Evet. Anahtarı maskeli bir formla ister, ardından API'yi kendi makinesinden çağırır ve anahtarı $'{VARIABLE_NAME}' olarak adlandırır. Değer çalışma anında çözülür ve asla modele ulaşmaz."
+                },
+                "7": {
+                    "question": "Her Coworker her uygulamayı alır mı?",
+                    "answer": "Yalnızca seçtiklerinizi. Bir uygulama Vault'ta durur: onu ihtiyaç duyan Coworker'lar için ya da Tüm coworker'lar için açın. Bir Coworker'dan kurulan uygulama yalnızca o Coworker için açılır."
+                }
+            },
+            "docsLabel": "Uygulama dokümanlarını okuyun"
+        },
+        "lead-data": {
+            "crumb": "Aday ve SEO verileri",
+            "title": "İstediğiniz an e-postalar, telefon numaraları ve sıralamalar.",
+            "lede": "Coworker'ınız potansiyel müşterileri iş e-postaları ve telefon numaralarıyla bulur, arama hacimlerini ve backlink'leri kontrol eder, maliyeti onayladığınızda Rerun kredilerinizden öder.",
+            "metaTitle": "Yapay zeka ajanları için aday zenginleştirme ve SEO verisi",
+            "metaDescription": "Rerun Coworker'ları, onayınızla kredilerinizden iş e-postası, telefon, arama hacmi ve backlink satın alır. Ya da Apollo veya Prospeo'yu bağlayın.",
+            "caption": "Kredi cinsinden Tahmini toplam, ardından Bir kez onayla, Her zaman izin ver ya da Şimdi değil.",
+            "plate": {
+                "name": "Aday Araştırmacısı",
+                "job": "Aranacak karar vericileri bulur"
+            },
+            "steps": {
+                "1": {
+                    "title": "Veriyi isteyin",
+                    "body": "Coworker'a kime ulaşmak istediğinizi söyleyin: bir rol, bir sektör, bir şehir. Ya da bir rakibin sıralandığı anahtar kelimeleri isteyin.",
+                    "ui": {
+                        "1": "@lead_researcher",
+                        "2": "Lyon'daki diş hekimleri"
+                    }
+                },
+                "2": {
+                    "title": "Maliyeti onaylayın",
+                    "body": "Satın almadan önce kredi cinsinden Tahmini toplamı ve kalan kredinizi gösterir. Bir kez onaylayın ya da Her zaman izin verin.",
+                    "ui": {
+                        "1": "Bir kez onayla",
+                        "2": "Her zaman izin ver",
+                        "3": "Şimdi değil"
+                    }
+                },
+                "3": {
+                    "title": "Satırları alın",
+                    "body": "Satın aldıklarını veritabanında tutar ve sohbette bir tablo olarak gösterir, bir sonraki Coworker için hazır.",
+                    "ui": {
+                        "1": "Veritabanı"
+                    }
+                }
+            },
+            "abilitiesTitle": "Canlı veri, çağrı başına ödeme.",
+            "abilities": {
+                "leads": {
+                    "title": "İletişim bilgileriyle adaylar",
+                    "line": "İş e-postaları, telefon numaraları ve şirket verileriyle potansiyel müşteriler."
+                },
+                "seo": {
+                    "title": "SEO verileri",
+                    "line": "Arama hacimleri, anahtar kelime fikirleri, backlink'ler, Google sonuçları ve yerel işletmeler."
+                },
+                "social": {
+                    "title": "Herkese açık sosyal veriler",
+                    "line": "LinkedIn, TikTok, Instagram, X, YouTube, Facebook ve Reddit'teki herkese açık profiller ve gönderiler."
+                },
+                "own-accounts": {
+                    "title": "Ya da kendi hesaplarınız",
+                    "line": "Kitaplıktan Apollo, Prospeo ya da Clay'i bağlayın, Coworker oradaki kendi planınızla çalışsın."
+                }
+            },
+            "templatesTitle": "Taze veriyle çalışan Coworker'lar.",
+            "faq": {
+                "1": {
+                    "question": "Ücretli veriler nasıl faturalandırılır?",
+                    "answer": "Her çağrı Rerun kredilerinizden ödenir. Pro her ay {monthlyCredits} kredi içerir; {packCredits} kredilik bir paket {packPrice} tutar, süresi dolmaz ve ayın kredileri bittiğinde kullanılır."
+                },
+                "2": {
+                    "question": "Bir Coworker sormadan kredi harcar mı?",
+                    "answer": "Varsayılan olarak hayır. Tahmini maliyeti gösterir ve onayınızı bekler. Her zaman izin ver ya da Yetenekler'deki Sormadan harca, siz yokken zamanlanmış çalıştırmaların veri satın almasına izin verir. İstediğiniz an yeniden kapatın."
+                },
+                "3": {
+                    "question": "Kendi Apollo, Clay ya da Prospeo hesabımı kullanabilir miyim?",
+                    "answer": "Evet. Apollo, Prospeo ve Clay kitaplıktaki uygulamalardır: hesabınızı bir kez bağlayın, Coworker o sağlayıcıdaki planınızla, Rerun kredisi harcamadan onun üzerinden çalışır."
+                },
+                "4": {
+                    "question": "LinkedIn profillerini okumak kredi harcar mı?",
+                    "answer": "LinkedIn Pro ile hayır: Coworker LinkedIn'i önce sizin hesabınızla, kredi harcamadan okur. LinkedIn verisini yalnızca hesabınızın okuyamadıkları için ya da hesap günlük temposunu aştığında satın alır ve nedenini söyler."
+                },
+                "5": {
+                    "question": "Kendi barındırdığım kurulumda ücretli veri var mı?",
+                    "answer": "Hayır. Kendi barındırdığınız Rerun veri satmaz. Apollo ya da Semrush gibi sağlayıcıları orada kendi API anahtarlarınızla uygulama veya MCP sunucusu olarak ekleyin."
+                }
+            },
+            "docsLabel": "Ücretli veri dokümanlarını okuyun"
+        },
+        "desktop-app": {
+            "crumb": "Masaüstü uygulaması",
+            "title": "Coworker'larınız bir kısayol uzağınızda.",
+            "lede": "macOS, Windows ve Linux için Rerun. Chief of Staff'ınıza sormak için herhangi bir uygulamada ⌘⇧Space'e basın, Coworker'larınızı ekranın kenarındaki bir dock'ta tutun.",
+            "metaTitle": "Mac, Windows ve Linux için masaüstü uygulaması",
+            "metaDescription": "Rerun masaüstü uygulaması her uygulamadan ⌘⇧Space ile Hızlı soru'yu açar, soruları sesle alır ve Coworker'larınızı ekranın kenarındaki bir dock'ta tutar.",
+            "caption": "Başka bir uygulamanın üzerinde Hızlı soru ve ekranın kenarında Coworker dock'u.",
+            "plate": {
+                "name": "Gelen Kutusu Asistanı",
+                "job": "Her sabah e-postalarınızı ayıklar"
+            },
+            "steps": {
+                "1": {
+                    "title": "İndirin ve oturum açın",
+                    "body": "Rerun'u rerun.build/download adresinden indirin, ardından Google ile oturum aç ya da Apple ile oturum aç'a tıklayın. Uygulama kendini günceller.",
+                    "ui": {
+                        "1": "Google ile oturum aç",
+                        "2": "Apple ile oturum aç"
+                    }
+                },
+                "2": {
+                    "title": "⌘⇧Space'e basın",
+                    "body": "Herhangi bir uygulamada Chief of Staff'ınıza bir soru yazın ve Enter'a basın. Ya da boş alanda Space'i basılı tutup konuşun.",
+                    "ui": {
+                        "2": "Chief of Staff'ınıza sorun…"
+                    }
+                },
+                "3": {
+                    "title": "Dock'tan yanıtlayın",
+                    "body": "Ekranın kenarında her Coworker için bir arkadaş. Uygulamanızdan çıkmadan bir soruyu yanıtlayın, onaylayın ya da cevap yazın.",
+                    "ui": {
+                        "1": "Tüm bildirimler",
+                        "2": "Gelen Kutusu Asistanı'na yanıt verin",
+                        "3": "Rerun'da aç"
+                    }
+                }
+            },
+            "abilitiesTitle": "Bir tarayıcı sekmesinin yapamadıkları.",
+            "abilities": {
+                "quick-ask": {
+                    "title": "Hızlı soru",
+                    "line": "Mac'te ⌘⇧Space, Windows ve Linux'ta Ctrl Shift Space. Ayarlardan başka bir kısayol kaydedin."
+                },
+                "voice": {
+                    "title": "Sesli hızlı soru",
+                    "line": "⌥⇧Space, Hızlı soru'yu dinleme modunda açar. Yüksek sesle sorun, yazıya döküldüğü anda gönderilir."
+                },
+                "dock": {
+                    "title": "Coworker dock'u",
+                    "line": "Her arkadaş, Coworker'ının çalıştığını, beklediğini, başarısız olduğunu ya da dinlendiğini ve sizin için kaç şeyi olduğunu gösterir."
+                },
+                "notifications": {
+                    "title": "Yerel bildirimler",
+                    "line": "Başka bir uygulamaya geçtiğiniz anda gelir, Mac'inizin Dock simgesinde bir sayaçla."
+                }
+            },
+            "templatesTitle": "Dock'ta tutmaya değer Coworker'lar.",
+            "faq": {
+                "1": {
+                    "question": "Masaüstü uygulaması hangi sistemlerde çalışır?",
+                    "answer": "Apple Silicon ya da Intel üzerinde macOS 13 veya üzeri, x64 ya da Arm üzerinde Windows 10 veya üzeri (beta) ve AppImage, .deb ya da .rpm olarak Linux x64. Kendini günceller."
+                },
+                "2": {
+                    "question": "Hızlı soru ne işe yarar?",
+                    "answer": "Hangi uygulamadaysanız onun üzerinde Chief of Staff'ınız için bir alan açar. Yazıp Enter'a basın ya da konuşmak için Space'i basılı tutun; uygulama yanıtla birlikte açılır."
+                },
+                "3": {
+                    "question": "Hızlı soru kısayolunu değiştirebilir miyim?",
+                    "answer": "Evet. Hesabınızda, Masaüstü uygulaması altında Hızlı soru kısayoluna tıklayın ve istediğiniz tuşlara basın. ⌘, ⌥ ya da ⌃ gerekir (Windows ve Linux'ta Ctrl veya Alt). Hızlı soru'yu kapatmak için bunun yerine ⌫'ya basın."
+                },
+                "4": {
+                    "question": "Web uygulamasından farklı mı?",
+                    "answer": "Aynı uygulamadır, aynı anda güncellenir; üstüne bir tarayıcı sekmesinin yapamadıkları gelir: Hızlı soru, Coworker dock'u, sistem bildirimleri, birden çok pencere ve bu bilgisayarı çalışma alanınıza bağlamak."
+                },
+                "5": {
+                    "question": "Kendi barındırdığım Rerun ile çalışır mı?",
+                    "answer": "Evet. Mac'te Rerun menüsünde, Windows ve Linux'ta Dosya menüsünde Sunucuyu Değiştir…'e tıklayın ve sunucunuzun adresini girin. Rerun Cloud'u kullan sizi geri getirir."
+                }
+            },
+            "docsLabel": "Masaüstü dokümanlarını okuyun"
+        },
+        "mobile-app": {
+            "crumb": "Mobil uygulama",
+            "title": "Coworker'larınız cebinizde.",
+            "lede": "iPhone, iPad ve Android için Rerun. Bir Coworker'ı bildirimden yanıtlayın, ekibinizi bir widget'tan takip edin ve yoldayken Chief of Staff'ınızla konuşun.",
+            "metaTitle": "iPhone, iPad ve Android için mobil uygulama",
+            "metaDescription": "iPhone, iPad ve Android için Rerun: Coworker'larınızla sohbet edin, bildirimden onaylayın, onları bir widget ve Canlı Etkinlik ile takip edin.",
+            "caption": "Bildirimden Face ID ile yanıtlanan bir onay, uygulama hâlâ kapalı.",
+            "plate": {
+                "name": "Sipariş Yöneticisi",
+                "job": "Geciken gönderileri işaretler"
+            },
+            "steps": {
+                "1": {
+                    "title": "Hesabınızla oturum açın",
+                    "body": "Apple, Google, telefonunuz ya da e-postanızla devam edin. Çalışma alanınız, Coworker'larınız ve sohbetleriniz zaten orada.",
+                    "ui": {
+                        "1": "Apple ile devam et",
+                        "2": "Google ile devam et"
+                    }
+                },
+                "2": {
+                    "title": "Bildirimleri açın",
+                    "body": "Tercihler > Bildirimler'de size neyin ulaşacağını seçin. Size ihtiyaç duyan bir Coworker anlık bildirim gönderir.",
+                    "ui": {
+                        "1": "Tercihler",
+                        "2": "Bildirimler",
+                        "3": "Anlık bildirimler"
+                    }
+                },
+                "3": {
+                    "title": "Bildirimden yanıtlayın",
+                    "body": "Onayla, Reddet, Yanıt ya da Yanıtla için bildirime basılı tutun. iPhone'da Face ID onaylar ve uygulama kapalı kalır.",
+                    "ui": {
+                        "1": "Onayla",
+                        "2": "Reddet",
+                        "3": "Yanıt",
+                        "4": "Yanıtla"
+                    }
+                }
+            },
+            "abilitiesTitle": "Küçük ekran için tasarlandı.",
+            "abilities": {
+                "widget": {
+                    "title": "Ekibiniz widget'ı",
+                    "line": "Ana ekranda ya da kilit ekranında: size ihtiyacı olan ya da iş başındaki ekibiniz. Android'de de."
+                },
+                "live-activity": {
+                    "title": "Canlı Etkinlik",
+                    "line": "iPhone'da kilit ekranı ve Dynamic Island kimin ne kadar süredir çalıştığını gösterir."
+                },
+                "reply": {
+                    "title": "Bildirimden yanıtlayın",
+                    "line": "Bir harcamayı onaylayın, bir soruyu yanıtlayın ya da biten bir göreve doğrudan bildirimden cevap verin."
+                },
+                "chat": {
+                    "title": "Mesajlar, fotoğraflar, ses",
+                    "line": "Mesaj, fotoğraf, dosya ya da sesli mesaj gönderin; @, / ve # işaretlerini web'deki gibi kullanın."
+                }
+            },
+            "templatesTitle": "Telefonunuzdan kontrol ettiğiniz Coworker'lar.",
+            "faq": {
+                "1": {
+                    "question": "Android uygulaması var mı?",
+                    "answer": "Evet. Rerun, iPhone ve iPad için App Store'da, Android için Google Play'de. İkisi de web uygulamasıyla aynı çalışma alanını açar; birinden gönderilen mesaj diğerinde görünür."
+                },
+                "2": {
+                    "question": "Uygulamayı açmadan bir şeyi onaylayabilir miyim?",
+                    "answer": "iPhone'da evet: bildirime basılı tutun, Onayla, Reddet, Yanıt ya da Yanıtla'ya dokunun, Face ID onaylar. Android'de düğmeler telefonun kilidini açar ve Rerun'u açar. Bağlanacak bir uygulama ya da bir anahtar her zaman uygulamayı açar."
+                },
+                "3": {
+                    "question": "Widget neyi gösterir?",
+                    "answer": "Ana ekranda, size ihtiyacı olanı (küçük) ya da iş başındaki ekibinizi (orta). Kilit ekranında, saatin üstünde bir satır, altında üç satır ya da bekleyenin yüzü. Bir dokunuş sohbeti açar."
+                },
+                "4": {
+                    "question": "Telefonumda neleri yapamam?",
+                    "answer": "Faturalandırma gibi daha büyük ekran gerektiren ayarlar web uygulamasında kalır. Geri kalan her şey orada: sohbetler, onaylar, dosyalar, uygulamalar, rutinler, model seçici ve bildirim ayarlarınız."
+                },
+                "5": {
+                    "question": "Denemeyi telefonumdan başlatabilir miyim?",
+                    "answer": "Evet. Mobil uygulamadan başlatılan bir deneme kart gerektirmez: {trialDays} gün sürer ve siz kart eklemezseniz sonunda durur."
+                }
+            },
+            "docsLabel": "Mobil uygulama dokümanlarını okuyun"
+        },
+        "runs-24-7": {
+            "crumb": "7/24 çalışır",
+            "title": "Avrupa'daki sunucularda 7/24 çalışır.",
+            "lede": "Çalışma alanınız, bulutta, Avrupa'da kendine özel bir makineye sahip olur. Coworker'larınız dizüstünüz açık olsun ya da olmasın programlarına ve olaylara göre çalışır.",
+            "metaTitle": "Avrupa'daki sunucularda 7/24 çalışan yapay zeka ajanları",
+            "metaDescription": "Her Rerun çalışma alanı Avrupa'da özel bir makinede çalışır. Coworker'lar program, webhook, LinkedIn ya da WhatsApp yanıtıyla, dizüstü kapalıyken başlar.",
+            "caption": "Aynı çalışma alanı sabah 7'de ve gece 3'te: çalıştırma her iki durumda da gerçekleşir.",
+            "plate": {
+                "name": "Kesinti İzleyicisi",
+                "job": "Sitelerinizi her saat kontrol eder"
+            },
+            "steps": {
+                "1": {
+                    "title": "Programı anlatın",
+                    "body": "Rutinler'de Yeni'ye tıklayın ve hafta içi her gün saat 8'de ya da yarın saat 15'te yazın. Saat diliminizde bir programa dönüşür.",
+                    "ui": {
+                        "1": "Rutinler",
+                        "2": "Yeni",
+                        "3": "hafta içi her gün saat 8'de",
+                        "4": "Görev oluştur"
+                    }
+                },
+                "2": {
+                    "title": "Ya da ona bir webhook verin",
+                    "body": "Bir tetikleyici oluşturun, Webhook URL'sini kopyalayın ve Stripe'a ya da herhangi bir hizmete yapıştırın. Her çağrı, yükle birlikte bir çalıştırma başlatır.",
+                    "ui": {
+                        "1": "Tetikleyiciler",
+                        "2": "Tetikleyici oluştur",
+                        "3": "Webhook URL'si"
+                    }
+                },
+                "3": {
+                    "title": "Çalıştırmayı sabah okuyun",
+                    "body": "Her otomatik çalıştırma kendi konusunu açar. Gece 3'te size ihtiyacı olursa durur ve yanıtınızı bekler.",
+                    "ui": {
+                        "1": "Otomasyonlar",
+                        "2": "Sizi bekliyor"
+                    }
+                }
+            },
+            "abilitiesTitle": "Dizüstünüz olmadan, her zaman açık.",
+            "abilities": {
+                "machine": {
+                    "title": "Kendine ait bir makine",
+                    "line": "Diğer tüm hesaplardan yalıtılmıştır; Coworker'larınızın dosyalarını, veritabanlarını, oturumlarını ve ekranlarını barındırır."
+                },
+                "europe": {
+                    "title": "Avrupa'da barındırılır",
+                    "line": "Çalışma alanınızın makinesi Avrupa'dadır ve Coworker'larınız verileriniz üzerinde orada çalışır."
+                },
+                "schedules": {
+                    "title": "Sade sözlerle programlar",
+                    "line": "Tekrarlayan ya da tek seferlik, seçtiğiniz saat diliminde; gece çalışan bir iş daha ucuza mal olsun diye her birinin kendi modeli olabilir."
+                },
+                "webhooks": {
+                    "title": "Webhook'lar ve uyandırmalar",
+                    "line": "Başka bir hizmetin çağırdığı herkese açık bir URL ya da Coworker'ı uyandıran bir LinkedIn veya WhatsApp yanıtı."
+                }
+            },
+            "templatesTitle": "Siz uyurken çalışan Coworker'lar.",
+            "faq": {
+                "1": {
+                    "question": "Bilgisayarımın açık kalması gerekiyor mu?",
+                    "answer": "Hayır. Coworker'larınız dizüstünüzde değil, bulutta çalışma alanınızın makinesinde çalışır. Kapatın, bir yere uçun; pazartesi sabahki çalıştırma yine gerçekleşir."
+                },
+                "2": {
+                    "question": "Sunucular nerede?",
+                    "answer": "Avrupa'da. Her çalışma alanının orada, diğer tüm hesaplardan yalıtılmış özel bir makinesi vardır; Coworker'larınız orada çalışır ve çalıştırmalar arasında gerekenleri orada tutar."
+                },
+                "3": {
+                    "question": "Zamanlanmış bir çalıştırma bir öncekini hatırlar mı?",
+                    "answer": "Her çalıştırma yeni bir konu açar. Aktarılan şey Coworker'ın belleği ve veritabanıdır; kaldığı yeri bilmesi gereken bir görev bunu oraya yazar."
+                },
+                "4": {
+                    "question": "Bir rutini yayına almadan önce test edebilir miyim?",
+                    "answer": "Evet. Test et, görevi kapalıyken bile hemen çalıştırır ve programına dokunmaz."
+                },
+                "5": {
+                    "question": "Bir webhook URL'si sızarsa ne olur?",
+                    "answer": "URL kimlik bilgisinin kendisidir; Gizli anahtarı yenile'ye tıklayın: eski URL anında çalışmayı bırakır, yenisini tetikleyicinin çağrıldığı her yere yapıştırırsınız."
+                }
+            },
+            "docsLabel": "Otomasyonlar dokümanlarını okuyun"
+        },
+        "human-in-the-loop": {
+            "crumb": "Döngüde insan",
+            "title": "Bir onay gerekene kadar otonom.",
+            "lede": "Coworker'ınız tek başına çalışır ve önemli her şeyden önce durur: bir gönderim, bir harcama, bir komut. Tek bir kartla sorar, bekler ve ekipten herkes yanıt verebilir.",
+            "metaTitle": "Döngüde insan: yapay zeka ajanınız önce sorar",
+            "metaDescription": "Rerun Coworker'ı önemli işlemlerden önce durur, tek kartla sorar ve bekler. Gelen kutusundan, masaüstü dock'undan ya da telefon bildiriminden yanıtlayın.",
+            "caption": "Onay gerekli: gönderilecek üç hatırlatma, her biri için Onayla ya da Şimdi değil.",
+            "plate": {
+                "name": "Fatura Takipçisi",
+                "job": "Ödeme hatırlatmaları gönderir"
+            },
+            "steps": {
+                "1": {
+                    "title": "Durur ve sorar",
+                    "body": "Önemli bir adımdan önce bir kart gösterir: bir soru, bir onay, bir harcama ya da bir oturum açma. Konuda Sizi bekliyor yazar.",
+                    "ui": {
+                        "1": "Onay gerekli",
+                        "2": "Sizi bekliyor"
+                    }
+                },
+                "2": {
+                    "title": "Her yerden yanıtlarsınız",
+                    "body": "Sohbetten, gelen kutusundan, masaüstü dock'undan ya da telefonunuzdaki bir bildirimden. Box'ını kullanabilen herkes yanıt verebilir.",
+                    "ui": {
+                        "1": "Sizi bekliyor",
+                        "2": "Sohbeti aç"
+                    }
+                },
+                "3": {
+                    "title": "Kaldığı yerden devam eder",
+                    "body": "Onaylayın, çalıştırma yanıtınızdan devam etsin. Açıkla, Coworker'ın okuyacağı bir gerekçeyle reddeder.",
+                    "ui": {
+                        "1": "Onayla",
+                        "2": "Açıkla",
+                        "3": "Neden olmasın? (isteğe bağlı)"
+                    }
+                }
+            },
+            "abilitiesTitle": "Kararı size geri verme yolları.",
+            "abilities": {
+                "approvals": {
+                    "title": "Öğe başına onay",
+                    "line": "Her işlem arkasındaki ayrıntıyla: hedef, komut ya da fark. Her biri için Onayla ya da Şimdi değil."
+                },
+                "questions": {
+                    "title": "Yanıtlı sorular",
+                    "line": "Düğme olarak önerilen yanıtlar, kendi yanıtınızı yazmak için Başka bir şey, sesli yanıt ya da ekli dosyalar."
+                },
+                "inbox": {
+                    "title": "Tek gelen kutusu",
+                    "line": "Her Coworker'dan sizi bekleyen her şey, sohbeti açmadan yanıtlanır."
+                },
+                "spend": {
+                    "title": "Harcama sizi bekler",
+                    "line": "Ücretli veri, tahmini maliyet için onayınızı bekler; Faturalandırma'daki Harcamaya izin ver tüm kredi harcamasını durdurur."
+                }
+            },
+            "templatesTitle": "Kısa tasmayla tutmak istediğiniz Coworker'lar.",
+            "faq": {
+                "1": {
+                    "question": "Bir Coworker neyin önünde durur?",
+                    "answer": "Kredi harcamak, siz izin vermedikçe onay bekler. Geri kalanında neyin önemli sayılacağını (bir müşteriye göndermek, kayıt silmek, yayınlamak gibi) soul'u söyler; böylece ona ne kadar serbestlik tanıyacağınıza siz karar verirsiniz."
+                },
+                "2": {
+                    "question": "Bir isteği kim yanıtlayabilir?",
+                    "answer": "Coworker'ın Box'ını kullanabilen herkes. Kullanıcılar ücretsiz olduğundan, karar vermesi gereken kişi kararı kendisi verebilir."
+                },
+                "3": {
+                    "question": "Kimse yanıt vermezse ne olur?",
+                    "answer": "Çalıştırma bekler ve konu Sizi bekliyor rozetini korur. Gece 3'te başlayan bir çalıştırma da aynı şekilde durur ve yanıtı ne zaman verirseniz oradan devam eder. Kimse bakmıyor diye hiçbir şey atlanmaz."
+                },
+                "4": {
+                    "question": "Chief of Staff benim yerime yanıt verebilir mi?",
+                    "answer": "Evet, ne diyeceğini ona söylediğinizde. Soruları, onayları ve skill önerilerini gelen kutusunun yaptığı gibi sizin adınıza yanıtlar ve bir harcamayı onaylamadan önce size sorar."
+                },
+                "5": {
+                    "question": "Bir tür duraklamayı kapatabilir miyim?",
+                    "answer": "Evet. Her duraklama, Size soru sorma ya da Onay isteme gibi bir yetenekten gelir. Onu Coworker'ın Yetenekler bölümünden kapatın, artık o şekilde duramaz."
+                }
+            },
+            "docsLabel": "Döngüde insan dokümanlarını okuyun"
+        },
+        "bring-your-own-ai": {
+            "crumb": "Kendi yapay zekanızı getirin",
+            "title": "Coworker'larınızı ödediğiniz yapay zekayla çalıştırın.",
+            "lede": "Claude ya da ChatGPT planınızı, bir API anahtarını ya da kendi modelinizi bağlayın. Ya da planınızın kredileriyle ödenen Rerun modeliyle çalışın. Bir Coworker'ı yeniden yazmadan geçiş yapın.",
+            "metaTitle": "Kendi yapay zekanızı getirin: Claude, ChatGPT ya da anahtar",
+            "metaDescription": "Rerun Coworker'larını Claude ya da ChatGPT planınızla, Anthropic, OpenAI, Google, OpenRouter anahtarıyla ya da kendi modelinizle, yedeklerle çalıştırın.",
+            "caption": "Claude sınırına ulaşıldı: Coworker aynı sohbette yedeğiyle devam ediyor.",
+            "plate": {
+                "name": "Geliştirici",
+                "job": "Talepleri pull request'e dönüştürür"
+            },
+            "steps": {
+                "1": {
+                    "title": "Yapay zeka sağlayıcılarını açın",
+                    "body": "Çalışma alanı düğmesinden Yapay zeka sağlayıcıları'na tıklayın. Abonelik ekle, Claude ya da ChatGPT'de bir kez oturum açar; API anahtarı ekle bir anahtar alır.",
+                    "ui": {
+                        "1": "Acme",
+                        "2": "Yapay zeka sağlayıcıları",
+                        "3": "Abonelik ekle",
+                        "4": "API anahtarı ekle"
+                    }
+                },
+                "2": {
+                    "title": "Modeli seçin",
+                    "body": "Çalışma alanının varsayılanını ayarlayın ya da herhangi bir sohbette model düğmesine tıklayın. Yıldız, onu o Coworker'ın varsayılanı olarak kaydeder.",
+                    "ui": {
+                        "1": "Varsayılan model",
+                        "2": "Değiştir",
+                        "3": "Opus 5.5"
+                    }
+                },
+                "3": {
+                    "title": "Bir yedek ekleyin",
+                    "body": "Yedekler altında, biri sınırına ulaştığında devreye girecek planları ekleyin. Coworker aynı sohbette devam eder.",
+                    "ui": {
+                        "1": "Yapay zeka sağlayıcıları",
+                        "2": "Yedekler",
+                        "3": "Yedek ekle"
+                    }
+                }
+            },
+            "abilitiesTitle": "Modelleriniz, faturanız.",
+            "abilities": {
+                "subscriptions": {
+                    "title": "Aboneliğiniz",
+                    "line": "Claude Pro ya da Max, ChatGPT Plus ya da Pro. Model bu durumda Rerun tarafında hiçbir şeye mal olmaz."
+                },
+                "keys": {
+                    "title": "API anahtarlarınız",
+                    "line": "Anthropic, OpenAI, Google ya da OpenRouter veya OpenAI sohbet biçimini konuşan özel bir uç nokta."
+                },
+                "backups": {
+                    "title": "Yedek modeller",
+                    "line": "En fazla {maxBackups} yedek; bir plan sınırına ulaştığında, plan sıfırlanana kadar sırayla denenir."
+                },
+                "reasoning": {
+                    "title": "Akıl yürütme düzeyi",
+                    "line": "Her model için Varsayılan, Düşük, Orta ya da Yüksek; bir Coworker'ın varsayılanı olarak modelle birlikte kaydedilir."
+                }
+            },
+            "templatesTitle": "Ağır düşünme işini yapan Coworker'lar.",
+            "faq": {
+                "1": {
+                    "question": "Claude ya da ChatGPT aboneliğimi kullanabilir miyim?",
+                    "answer": "Evet. Yapay zeka sağlayıcıları altında Abonelik ekle'ye tıklayın ve Claude Pro ya da Max veya ChatGPT Plus ya da Pro'da oturum açın. Onunla çalışan Coworker'lar Rerun kredisi harcamaz. Bağlamak için etkin bir plan ya da süren bir deneme gerekir."
+                },
+                "2": {
+                    "question": "Açık kaynak ya da kendi barındırdığım bir modeli çalıştırabilir miyim?",
+                    "answer": "Evet, Özel uç nokta ile: çalışma alanınızın makinesinin ulaşabildiği bir adreste OpenAI sohbet biçimini konuşan her sunucu. OpenRouter da açık modelleri kendi anahtarınızla sunar."
+                },
+                "3": {
+                    "question": "Planım sınırına ulaşırsa ne olur?",
+                    "answer": "Coworker aynı sohbette listenizdeki ilk yedekle devam eder ve bir satır hangi modelin devraldığını söyler. Plan sıfırlanınca geri döner. Son çare olarak Rerun kredisi, siz açmadıkça kapalı kalır."
+                },
+                "4": {
+                    "question": "Akıl yürütme düzeyi nedir?",
+                    "answer": "Bir modelin yanıt vermeden önce ne kadar düşündüğü: Varsayılan, Düşük, Orta ya da Yüksek; seçicideki satırının ayarlar simgesinden. Claude, OpenAI ve Google modellerinde vardır; Rerun modeli sağlayıcısının seçtiği düzeyde çalışır."
+                },
+                "5": {
+                    "question": "Rerun kredileri neyin karşılığıdır?",
+                    "answer": "Rerun modeli ve ücretli veriler. Pro her ay {monthlyCredits} kredi içerir. Kendi anahtarınız ya da aboneliğinizle çalışan bir Coworker Rerun tarafında hiçbir şeye mal olmaz."
+                }
+            },
+            "docsLabel": "Model dokümanlarını okuyun"
+        },
+        "security": {
+            "crumb": "Güvenlik",
+            "title": "Verileriniz yedekli ve ayrı tutulur.",
+            "lede": "Her çalışma alanı Avrupa'da özel bir makinede çalışır, her gece yedeklenir ve şifrelenir. Anahtarlar asla modele ulaşmaz, harcamanın bir anahtarı vardır ve kod açık kaynaktır.",
+            "metaTitle": "Güvenlik: yedekler, gizli bilgiler ve açık kaynak",
+            "metaDescription": "Rerun her ücretli çalışma alanını her gece şifreli olarak, Avrupa'daki özel makinesinden ayrı yedekler. Gizli bilgiler modele ulaşmaz, kod AGPL-3.0.",
+            "caption": "Maskeli bir form: anahtar makineye gider, Coworker yalnızca adını öğrenir.",
+            "plate": {
+                "name": "Bordro Sorumlusu",
+                "job": "Kesimden önce bordroyu kontrol eder"
+            },
+            "steps": {
+                "1": {
+                    "title": "Size ait bir makine",
+                    "body": "Çalışma alanınız Avrupa'da, diğer tüm hesaplardan yalıtılmış özel bir makinede çalışır. Çalışma alanları arasında hiçbir şey geçmez."
+                },
+                "2": {
+                    "title": "Maskeli formlarda anahtarlar",
+                    "body": "Bir Coworker'ın anahtara ihtiyacı olduğunda maskeli bir form açar. Değer makineye gider ve asla sohbete girmez.",
+                    "ui": {
+                        "1": "Kimlik bilgisi gerekli",
+                        "2": "Değeri yapıştırın",
+                        "3": "Kaydet"
+                    }
+                },
+                "3": {
+                    "title": "Her gece yedeklenir",
+                    "body": "Ücretli bir çalışma alanının makinesi her gece yedeklenir, şifrelenir ve ondan ayrı bir yerde saklanır. İstek üzerine geri yükleriz."
+                }
+            },
+            "abilitiesTitle": "Çalışma alanınızı güvende tutanlar.",
+            "abilities": {
+                "backups": {
+                    "title": "Gecelik şifreli yedekler",
+                    "line": "Coworker'lar, anılar, skill'ler, dosyalar, veritabanları ve Vault; saat diliminize göre gece alınır."
+                },
+                "secrets": {
+                    "title": "Modelin asla görmediği gizli bilgiler",
+                    "line": "Coworker bir değişken adı alır ve $'{NAME}' kullanır: değer çalışma anında makinede çözülür."
+                },
+                "spending": {
+                    "title": "Harcamaya izin ver",
+                    "line": "Faturalandırma'daki tek anahtar tüm Rerun kredisi harcamasını durdurur. Kendi yapay zekanızdaki Coworker'lar çalışmayı sürdürür."
+                },
+                "open-source": {
+                    "title": "Açık kaynak, AGPL-3.0",
+                    "line": "Rerun Cloud'un çalıştırdığı kodu okuyun ya da Docker ile kendi sunucunuzda kendiniz barındırın."
+                }
+            },
+            "templatesTitle": "Hassas işleri üstlenen Coworker'lar.",
+            "faq": {
+                "1": {
+                    "question": "Verilerim nerede saklanır?",
+                    "answer": "Çalışma alanınızın Avrupa'daki, diğer tüm hesaplardan yalıtılmış özel makinesinde. Kimlik bilgileri o makinede kalır: Rerun'un veritabanı her değişkenin yalnızca adını tutar, asla değerini tutmaz."
+                },
+                "2": {
+                    "question": "Yedekler nasıl yönetilir?",
+                    "answer": "Rerun, saat diliminize göre her gece, ücretli her çalışma alanının makinesini şifreli olarak yedekler ve ondan ayrı bir yerde saklar. Çalıştırmanın ortasındaki bir Coworker asla kesintiye uğramaz. Bir sorun olursa help@rerun.build adresine yazın, geri yükleyelim."
+                },
+                "3": {
+                    "question": "Bir Coworker'a verdiğim anahtar modele gönderilir mi?",
+                    "answer": "Hayır. Maskeli bir formla doğrudan makineye gider ve Coworker yalnızca hangi değişkenin doldurulduğunu öğrenir. Bir gizli bilgiyi asla sohbetin kendisine yapıştırmayın: sohbet saklanır ve modele gönderilir."
+                },
+                "4": {
+                    "question": "Bir Coworker kendi başına para harcayabilir mi?",
+                    "answer": "Ücretli veri, siz bir Coworker'ın sormadan harcamasına izin vermedikçe tahmini maliyet için onayınızı bekler. Faturalandırma'daki Harcamaya izin ver anahtarı, Rerun modeli ve ücretli veri için tüm kredi harcamasını anında durdurur."
+                },
+                "5": {
+                    "question": "Kodu okuyabilir ya da kendim barındırabilir miyim?",
+                    "answer": "Evet. Rerun, AGPL-3.0 lisanslı açık kaynaktır: Rerun Cloud'un çalıştırdığı ürünün aynısı, kendi sunucunuzda barındırmanız için; plan yok, kredi yok, Coworker ya da kullanıcı sınırı yok."
+                }
+            },
+            "docsLabel": "Yedekler hakkında okuyun"
+        },
+        "workspaces": {
+            "crumb": "Çalışma alanları ve ekip",
+            "title": "Her işletme için bir çalışma alanı, ekibiniz ücretsiz.",
+            "lede": "Her işletme, müşteri ya da marka kendi çalışma alanını alır: kendi Coworker'ları, uygulamaları, Brain'i ve makinesi. Tüm ekibinizi ek ücret olmadan davet edin ve her Box'a kimin erişeceğini seçin.",
+            "metaTitle": "Çalışma alanları ve ücretsiz kullanıcılar",
+            "metaDescription": "Tek Rerun hesabında her işletmeye bir çalışma alanı: kendi Coworker'ları, uygulamaları ve Brain'i. Ekibi ücretsiz davet edin, her Box'a erişimi seçin.",
+            "caption": "Çalışma alanı değiştirici ve aynı panodaki tüm ekip.",
+            "plate": {
+                "name": "Müşteri Raporlayıcı",
+                "job": "Her müşteriye haftalık rapor gönderir"
+            },
+            "steps": {
+                "1": {
+                    "title": "Bir çalışma alanı oluşturun",
+                    "body": "Sol üst köşedeki düğmeyi açın ve bir tane oluşturun. Kendi ilk kurulumuyla ve kendine ait bir makineyle açılır.",
+                    "ui": {
+                        "1": "Acme",
+                        "2": "Yeni çalışma alanı",
+                        "3": "ör. Acme A.Ş.",
+                        "4": "Çalışma alanı oluştur"
+                    }
+                },
+                "2": {
+                    "title": "Ekibinizi davet edin",
+                    "body": "Üyeler'de bir e-posta yazın ve erişecekleri Boxes'ı seçin: Tüm Boxes ya da Hiçbiri, sonra ata. Ardından Davet et'e tıklayın.",
+                    "ui": {
+                        "1": "Üyeler",
+                        "2": "teammate@rerun.build",
+                        "3": "Tüm Boxes",
+                        "4": "Davet et"
+                    }
+                },
+                "3": {
+                    "title": "Erişimi Box bazında ayarlayın",
+                    "body": "Bir Box'a sağ tıklayın, ardından Erişimi yönet: herkes ya da yalnızca seçilen kişiler, her biri Kullanabilir veya Yönetebilir yetkisiyle.",
+                    "ui": {
+                        "1": "Erişimi yönet",
+                        "2": "Yalnızca seçilen kişiler",
+                        "3": "Yönetebilir"
+                    }
+                }
+            },
+            "abilitiesTitle": "Ayrı tutulur, ekipçe paylaşılır.",
+            "abilities": {
+                "boundary": {
+                    "title": "Kesin bir sınır",
+                    "line": "Çalışma alanları arasında hiçbir şey geçmez: ne bir Coworker, ne ortak veritabanı, ne bir API anahtarı."
+                },
+                "boxes": {
+                    "title": "Her birinin içinde Boxes",
+                    "line": "Coworker'ları ekibe, müşteriye ya da projeye göre gruplayın. Box ücretsizdir ve bir Coworker'ı taşımak sahip olduğu her şeyi korur."
+                },
+                "seats": {
+                    "title": "Ücretsiz kullanıcılar",
+                    "line": "Ne Pro ne de deneme kullanıcı sayısını sınırlar. Bir iş arkadaşı eklemek faturayı değiştirmez."
+                },
+                "roles": {
+                    "title": "Yöneticiler ve üyeler",
+                    "line": "Yöneticiler faturalandırmayı, üyeleri ve yapay zeka sağlayıcılarını yönetir. Üyeler erişebildikleri Boxes'taki Coworker'ları kullanır."
+                }
+            },
+            "templatesTitle": "Tüm ekibin güvendiği Coworker'lar.",
+            "faq": {
+                "1": {
+                    "question": "Ek bir kullanıcı ne kadar?",
+                    "answer": "Hiçbir şey. Ne Pro ne de deneme kullanıcı sayısını sınırlar; haftada bir kez bir soruyu yanıtlayanlar dahil tüm ekibi davet edin."
+                },
+                "2": {
+                    "question": "Ne zaman birden çok çalışma alanı kullanmalıyım?",
+                    "answer": "İşletmelerin paylaştığı hiçbir şey olmadığında: her müşteri için bir tane kullanan bir ajans, bir şirketi ve bir yan projesi olan bir kurucu. Birkaç ekibi olan tek bir işletme için bunun yerine tek çalışma alanında Boxes kullanın."
+                },
+                "3": {
+                    "question": "Her çalışma alanının kendi planı mı olmalı?",
+                    "answer": "Evet. Bir çalışma alanı tek plan, tek makine ve tek üye grubudur; onu diğerlerinden ayrı tutan da budur. Aralarında sol üst köşedeki düğmeden geçiş yapın."
+                },
+                "4": {
+                    "question": "Bir Box'ı özel tutabilir miyim?",
+                    "answer": "Evet. Ona sağ tıklayın, Erişimi yönet'i, ardından Yalnızca seçilen kişiler'i seçin. Kullanabilir, Coworker'larıyla sohbet eder ve işlerini görür; Yönetebilir ayrıca onları düzenler, taşır ve siler. Yöneticiler her zaman tüm Boxes'a erişir."
+                },
+                "5": {
+                    "question": "Bir iş arkadaşım işe aldığım bir Coworker'la konuşabilir mi?",
+                    "answer": "Evet, Box'ını kullanabiliyorsa. Bir Coworker onu oluşturan kişiye değil çalışma alanına aittir: erişimi olan herkes ona iş verebilir, ne yaptığını okuyabilir ve sorularını yanıtlayabilir."
+                }
+            },
+            "docsLabel": "Ekipler ve çalışma alanları dokümanlarını okuyun"
+        }
+    },
+    "mocks": {
+        "bringYourOwnAi": {
+            "ask": "214 numaralı talebi bir pull request'e dönüştür",
+            "readIssue": "GitHub · #214 numaralı issue'yu oku",
+            "createBranch": "GitHub · Branch oluştur",
+            "switch": "Claude sınırına ulaşıldı · 16:40'a kadar GPT-6 Sol",
+            "openPullRequest": "GitHub · Pull request aç",
+            "pullRequest": "#215 Alacak dekontlarında KDV yuvarlamasını düzelt",
+            "reply": "Kaldığım yerden devam ettim: #215 numaralı pull request açık ve testler yeşil.",
+            "providers": {
+                "title": "Yapay zeka sağlayıcıları",
+                "description": "Coworker'larınızın çalıştığı planlar ve API anahtarları."
+            },
+            "defaultModel": "Varsayılan model",
+            "defaultModelDescription": "Claude üzerinden. Kendi modeli olmayan Coworker'lar bununla çalışır.",
+            "change": "Değiştir",
+            "backups": "Yedekler",
+            "addBackup": "Yedek ekle",
+            "backupMeta": "1. · ChatGPT üzerinden",
+            "lastResort": "Son çare olarak Rerun kredisi",
+            "lastResortDescription": "Yalnızca tüm planlar tükendiğinde"
+        },
+        "desktopApp": {
+            "menubarApp": "Numbers",
+            "menubarItems": "Dosya Düzen Ekle Tablo Biçim",
+            "menubarClock": "Sal 9:41",
+            "sheetTitle": "3. çeyrek planı",
+            "quickAsk": {
+                "placeholder": "Chief of Staff'ınıza sorun…",
+                "hint": "Göndermek için Enter, kapatmak için Esc",
+                "holdToTalk": "Konuşmak için <key>Space</key> tuşunu basılı tutun",
+                "send": "Gönder"
+            },
+            "bubble": {
+                "status": "onayınızı bekliyor",
+                "message": "Marc gelecek hafta için zaman aralığı istiyor. Seçtiğim üçünü ona göndereyim mi?"
+            }
+        },
+        "leadData": {
+            "intro": "Listenizdeki şirketlerde {people, plural, one {# karar verici} other {# karar verici}} buldum. İş e-postaları ve telefon numaraları ücretli veri, bu yüzden önce onayınız gerekiyor.",
+            "title": "{people, plural, one {# karar vericinin} other {# karar vericinin}} iş e-postaları ve telefon numaraları",
+            "lines": {
+                "1": "E-postalar bulunuyor",
+                "2": "Telefon numaraları bulunuyor"
+            },
+            "total": "Tahmini toplam",
+            "credits": "{count, plural, one {kredi} other {kredi}}",
+            "notNow": "Şimdi değil",
+            "alwaysAllow": "Her zaman izin ver",
+            "approveOnce": "Bir kez onayla"
+        },
+        "mobileApp": {
+            "now": "şimdi",
+            "pushTitle": "Geciken gönderiler · Onay bekliyor",
+            "pushBody": "3 sipariş 2 gün geç kargolanacak. 3 müşteriye, onlar sormadan yeni tarihi e-postayla bildireyim mi?",
+            "actions": {
+                "1": "Onayla",
+                "2": "Reddet",
+                "3": "Aç"
+            },
+            "faceId": "Face ID"
+        },
+        "security": {
+            "ask": "Mart bordrosunu kesimden önce kontrol etmek için bordro aracınızdaki dışa aktarımı okumam gerekiyor.",
+            "form": {
+                "title": "Kimlik bilgisi gerekli",
+                "description": "Yalnızca bordro dışa aktarımını okurum, hiçbir şey değiştirilmez.",
+                "label": "Bordro API anahtarı",
+                "helper": "Ayarlar > Geliştiriciler > API anahtarları · Şu adla saklanır: {key}",
+                "whereToFind": "Nerede bulunur",
+                "note": "Motorunuzda bir coworker değişkeni olarak saklanır. Modele asla gönderilmez.",
+                "skip": "Atla",
+                "save": "Kaydet"
+            },
+            "receipt": {
+                "title": "Anahtarlar",
+                "meta": "1 / 1 kaydedildi",
+                "label": "Bordro API anahtarı",
+                "stored": "Kaydedildi",
+                "note": "Box üzerinde saklanır. Coworker yalnızca adları görür."
+            },
+            "runCommand": "Bir komut çalıştır",
+            "reply": "Mart dışa aktarımını okudum: 42 bordro pusulası, şubattan beri 2'si değişmiş."
+        },
+        "yourComputer": {
+            "ask": "<computer></computer> editör için 2. günün ham çekimlerini kodla",
+            "reply": "day-2 klasöründe 46 klip var. Ayarları kontrol etmek için ilkiyle başlıyorum, sonra diğerlerini bir iş olarak çalıştırıyorum.",
+            "cardTitle": "<computer></computer> üzerinde bir komut çalıştır",
+            "purpose": "2. günün ilk klibini editör için ProRes proxy olarak kodla.",
+            "folder": "Klasör: {folder}",
+            "deny": "Reddet",
+            "alwaysAllow": "{program} için her zaman izin ver",
+            "allow": "İzin ver"
+        }
+    }
+}

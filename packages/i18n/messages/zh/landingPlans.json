@@ -1,0 +1,127 @@
+{
+    "hero": {
+        "crumb": "价格",
+        "title": "{price}/月。包含所有同事。",
+        "lede": "一个套餐，同事和席位不限，配备云端专属机器，每月赠送 Rerun 积分。免费试用 {trialDays} 天。"
+    },
+    "faqSub": "关于账单的常见问题都在这里。没有您的问题？创始人就在下方。",
+    "plans": {
+        "billingPeriod": "计费周期",
+        "monthly": "按月",
+        "yearly": "按年",
+        "discount": "-{percent}",
+        "save": "节省 {percent}",
+        "recommended": "推荐",
+        "included": "包含",
+        "rowIncluded": "包含",
+        "rowNotIncluded": "不包含",
+        "names": {
+            "trial": "免费试用",
+            "pro": "Pro",
+            "enterprise": "企业版"
+        },
+        "lines": {
+            "trial": "让您的第一批同事开始工作，看看他们能做什么。",
+            "pro": "您的业务所需的每一位同事，每天都在工作。",
+            "enterprise": "适合有特殊要求的组织。"
+        },
+        "rows": {
+            "coworkers": {
+                "trial": "同时运行 {trialAgents} 位同事",
+                "pro": "不限数量的同事",
+                "enterprise": "不限数量的同事"
+            },
+            "team": "免费邀请整个团队",
+            "own-ai": "使用您自己的 AI",
+            "devices": "桌面端和移动端应用",
+            "apps": "{connectors}+ 个应用、MCP 和 API",
+            "sso": "SSO",
+            "sla": "SLA"
+        },
+        "trial": {
+            "priceNote": "{trialDays} 天，之后升级为 Pro",
+            "cta": "开始免费试用"
+        },
+        "pro": {
+            "monthlyNote": "每月，按月计费",
+            "yearlyNote": "每月，按年计费 {total}",
+            "cta": "立即开始"
+        },
+        "enterprise": {
+            "perks": {
+                "1": "包含 Pro 的全部功能",
+                "2": "定制基础设施",
+                "3": "专属支持",
+                "4": "SSO",
+                "5": "SLA"
+            },
+            "cta": "联系销售"
+        }
+    },
+    "credits": {
+        "title": "什么是 Rerun 积分？",
+        "lead": "您通常要为专门工具付费的数据，现已内置于 Rerun，按用量付费。无需再逐个订阅：同事会查找任务所需的数据，只为此付费。",
+        "items": {
+            "leads": {
+                "title": "潜在客户",
+                "body": "带有工作邮箱、电话和公司数据的潜在客户。",
+                "insteadOf": "FullEnrich, Clay"
+            },
+            "seo": {
+                "title": "SEO",
+                "body": "搜索量、关键词创意和反向链接，Google 搜索结果和本地商家。",
+                "insteadOf": "Semrush, Ahrefs"
+            },
+            "social": {
+                "title": "社交媒体",
+                "body": "LinkedIn、TikTok、Instagram、X、YouTube、Facebook 和 Reddit 上的公开主页和帖子。",
+                "insteadOf": "一款抓取工具"
+            }
+        },
+        "instead": "替代 <name>{tools}</name>",
+        "sources": "来源：{sources}",
+        "note": "Pro 每月包含 {monthlyCredits} 积分，额外 {packCredits} 积分售价 {packPrice}。同事会在花费前显示费用并征求您的同意。"
+    },
+    "faq": {
+        "1": {
+            "question": "使用 Rerun 需要付积分吗？",
+            "answer": "不需要。套餐涵盖 Rerun 本身：您的同事、他们的应用、记忆、技能、例行任务和每一次运行。积分只用于 Rerun 模型和付费数据。使用您自己的 Claude 或 ChatGPT 套餐或 API 密钥的同事不会消耗积分。"
+        },
+        "2": {
+            "question": "积分用完会怎样？",
+            "answer": "使用您自己 AI 的同事会继续工作。使用 Rerun 模型的同事和付费数据会等到下月的 {monthlyCredits} 积分到账，或购买 {packCredits} 积分的积分包（{packPrice}，永不过期）。"
+        },
+        "3": {
+            "question": "积分会结转吗？",
+            "answer": "Pro 的每月积分会按月重置，剩余部分不会结转。积分包的积分永不过期，试用积分也一样：剩余部分会在 Pro 开始时结转。"
+        },
+        "4": {
+            "question": "是按同事还是按席位收费？",
+            "answer": "都不是。Pro 的同事和席位均不限数量。只有试用期限制同时运行的同事数量。"
+        },
+        "5": {
+            "question": "有免费试用吗？",
+            "answer": "有，{trialDays} 天，可同时运行 {trialAgents} 位同事，并赠送 {trialCredits} 积分。绑定银行卡即可开始试用，今天扣费 {free}。在第 {trialDays} 天前取消，您无需支付任何费用。"
+        },
+        "6": {
+            "question": "包含 LinkedIn 和 WhatsApp 吗？",
+            "answer": "它们是付费应用：LinkedIn Pro 每个账号每月 {linkedinPrice}，WhatsApp Pro 每个号码每月 {whatsappPrice}，与您的套餐合并在同一张发票上。库中的其他应用均已包含。"
+        },
+        "7": {
+            "question": "模板包含在内吗？",
+            "answer": "模板库中的模板均已包含，但创作者定价的除外：这些模板单独于您的套餐计费，其页面会注明。"
+        },
+        "8": {
+            "question": "按任务或按运行次数收费吗？",
+            "answer": "不会。您的同事可以每天每小时都运行，价格不变。运行次数从不计费。"
+        },
+        "9": {
+            "question": "可以随时取消吗？",
+            "answer": "可以，在“账单”中取消。您的同事会继续运行到已付费周期结束，之后工作区会保存 90 天，方便您随时回来。"
+        },
+        "10": {
+            "question": "价格含税吗？",
+            "answer": "显示的价格不含税。适用于您所在国家的增值税或销售税将在结账时加收。请在“账单”中添加您的增值税号或税号，以便开具发票。"
+        }
+    }
+}

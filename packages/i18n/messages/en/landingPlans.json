@@ -1,0 +1,151 @@
+{
+    "_context": {
+        "hero.crumb": "Breadcrumb above the title of the pricing page: the name of the page.",
+        "hero.title": "H1 of the pricing page. \"price\" is the monthly price of the plan, e.g. \"$29\".",
+        "faqSub": "Line under the title of the pricing questions; \"the founders\" are shown in a block right below.",
+        "plans.discount": "Short badge on the yearly billing option: the saving, \"percent\" already written as a percentage, e.g. \"-17%\".",
+        "plans.save": "Badge next to the yearly price, \"percent\" already written as a percentage, e.g. \"Save 17%\".",
+        "plans.recommended": "Badge next to the name of the recommended plan.",
+        "plans.included": "Small uppercase heading above the list of what a plan includes.",
+        "plans.rowIncluded": "Screen reader label of the check mark on a row the plan includes.",
+        "plans.rowNotIncluded": "Screen reader label of the cross on a row the plan does not include.",
+        "plans.trial.priceNote": "Under the zero price of the free trial, e.g. \"for 14 days, then Pro\".",
+        "plans.pro.monthlyNote": "Under the monthly price of Pro, billed every month.",
+        "plans.pro.yearlyNote": "Under the monthly price of Pro, billed once a year; \"total\" is the yearly amount, e.g. \"$290\".",
+        "plans.rows.apps": "\"connectors\" is a number of apps, e.g. \"3,000\"; the \"+\" means \"more than\".",
+        "plans.rows.sso": "Single sign-on: keep the acronym unless the language has its own.",
+        "plans.rows.sla": "Service level agreement: keep the acronym unless the language has its own.",
+        "plans.enterprise.perks.4": "Single sign-on: keep the acronym unless the language has its own.",
+        "plans.enterprise.perks.5": "Service level agreement: keep the acronym unless the language has its own.",
+        "credits.instead": "Under a card of paid data: the tools it replaces. <name></name> wraps the names of those tools, e.g. \"Instead of FullEnrich, Clay\".",
+        "credits.items.leads.insteadOf": "Product names: keep them as they are.",
+        "credits.items.seo.insteadOf": "Product names: keep them as they are.",
+        "credits.sources": "Screen reader label of a row of logos; \"sources\" is a list of company names.",
+        "faq.5.answer": "\"free\" is a zero price in the plan currency, e.g. \"$0\"."
+    },
+    "hero": {
+        "crumb": "Pricing",
+        "title": "{price}/month. Every Coworker included.",
+        "lede": "One plan with unlimited Coworkers and seats, your own machine in the cloud and Rerun credits every month. Try it free for {trialDays} days."
+    },
+    "faqSub": "Everything people ask about the bill. If yours is not in there, the founders are right below.",
+    "plans": {
+        "billingPeriod": "Billing period",
+        "monthly": "Monthly",
+        "yearly": "Yearly",
+        "discount": "-{percent}",
+        "save": "Save {percent}",
+        "recommended": "Recommended",
+        "included": "Included",
+        "rowIncluded": "Included",
+        "rowNotIncluded": "Not included",
+        "names": {
+            "trial": "Free trial",
+            "pro": "Pro",
+            "enterprise": "Enterprise"
+        },
+        "lines": {
+            "trial": "Put your first Coworkers to work and see what they do.",
+            "pro": "Every Coworker your business needs, working every day.",
+            "enterprise": "For organizations with their own requirements."
+        },
+        "rows": {
+            "coworkers": {
+                "trial": "{trialAgents} Coworkers at once",
+                "pro": "Unlimited Coworkers",
+                "enterprise": "Unlimited Coworkers"
+            },
+            "team": "Invite your whole team for free",
+            "own-ai": "Bring your own AI",
+            "devices": "Desktop and mobile app",
+            "apps": "{connectors}+ apps, MCP and API",
+            "sso": "SSO",
+            "sla": "SLA"
+        },
+        "trial": {
+            "priceNote": "for {trialDays} days, then Pro",
+            "cta": "Start your free trial"
+        },
+        "pro": {
+            "monthlyNote": "per month, billed monthly",
+            "yearlyNote": "per month, billed {total} a year",
+            "cta": "Get started"
+        },
+        "enterprise": {
+            "perks": {
+                "1": "Everything in Pro",
+                "2": "Custom infrastructure",
+                "3": "Dedicated support",
+                "4": "SSO",
+                "5": "SLA"
+            },
+            "cta": "Contact sales"
+        }
+    },
+    "credits": {
+        "title": "What are Rerun credits?",
+        "lead": "Data you would usually pay a dedicated tool for, built into Rerun and paid per use. No more subscription to each one: your Coworker looks up what the job needs, and pays only for that.",
+        "items": {
+            "leads": {
+                "title": "Leads",
+                "body": "Prospects with their work emails, phone numbers and company data.",
+                "insteadOf": "FullEnrich, Clay"
+            },
+            "seo": {
+                "title": "SEO",
+                "body": "Search volumes, keyword ideas and backlinks, Google results and local businesses.",
+                "insteadOf": "Semrush, Ahrefs"
+            },
+            "social": {
+                "title": "Social",
+                "body": "Public profiles and posts on LinkedIn, TikTok, Instagram, X, YouTube, Facebook and Reddit.",
+                "insteadOf": "a scraping tool"
+            }
+        },
+        "instead": "Instead of <name>{tools}</name>",
+        "sources": "Sources: {sources}",
+        "note": "Pro includes {monthlyCredits} credits a month, and {packCredits} more cost {packPrice}. Your Coworker shows the cost and asks before it spends."
+    },
+    "faq": {
+        "1": {
+            "question": "Do I pay credits to use Rerun?",
+            "answer": "No. The plan covers Rerun itself: your Coworkers, their apps, memory, skills, routines and every run. Credits only pay for the Rerun models and paid data. A Coworker on your own Claude or ChatGPT plan or API key spends none."
+        },
+        "2": {
+            "question": "What happens when I run out of credits?",
+            "answer": "Coworkers on your own AI keep working. The ones on the Rerun models, and paid data, wait until the next month's {monthlyCredits} credits or a pack of {packCredits} for {packPrice}, which never expires."
+        },
+        "3": {
+            "question": "Do credits roll over?",
+            "answer": "The monthly credits of Pro reset each month, so what is left does not carry over. Credits from a pack never expire, and neither do the trial credits: what is left of them carries over when Pro starts."
+        },
+        "4": {
+            "question": "Do I pay per Coworker or per seat?",
+            "answer": "No. Pro has unlimited Coworkers and unlimited seats. Only the trial runs a limited number of Coworkers at once."
+        },
+        "5": {
+            "question": "Is there a free trial?",
+            "answer": "Yes, {trialDays} days with {trialAgents} Coworkers running at once and {trialCredits} credits. A card starts the trial and {free} is charged today. Cancel before day {trialDays} and you pay nothing."
+        },
+        "6": {
+            "question": "Are LinkedIn and WhatsApp included?",
+            "answer": "They are paid apps: LinkedIn Pro at {linkedinPrice} a month per account and WhatsApp Pro at {whatsappPrice} a month per number, on the same invoice as your plan. Every other app of the library is included."
+        },
+        "7": {
+            "question": "Are templates included?",
+            "answer": "The templates of the library are included, except those whose creator set a price: those are billed apart from your plan, and their page says so."
+        },
+        "8": {
+            "question": "Do you charge per task or per run?",
+            "answer": "No. Your Coworkers can run every hour of every day for the same price. Runs are never counted."
+        },
+        "9": {
+            "question": "Can I cancel anytime?",
+            "answer": "Yes, from Billing. Your Coworkers keep running until the end of the period you paid for, then the workspace is saved for 90 days in case you come back."
+        },
+        "10": {
+            "question": "Are taxes included in the price?",
+            "answer": "Prices are shown excluding tax. VAT or sales tax, when it applies to your country, is added at checkout. Add your VAT number or tax ID in Billing for your invoices."
+        }
+    }
+}

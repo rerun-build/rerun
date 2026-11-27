@@ -173,5 +173,31 @@
                 "answer": "Her çalışma alanı seçtiğiniz AI ile çalışır: müşterinin ChatGPT veya Claude planı, kendi API anahtarlarınız ya da dahil olan Rerun kredileri."
             }
         }
+    },
+    "pricing": {
+        "title": "Müşteri çalışma alanı başına fiyat.",
+        "lead": "Ne kadar çok müşteri yönetirseniz her biri o kadar az tutar. Sayınızı seçin, ardından başlamak için kısa bir görüşme ayarlayın.",
+        "costAnswer": "Müşteri ekledikçe düşen, müşteri çalışma alanı başına aylık bir fiyat; en az {min} çalışma alanı: {tiers}. Her çalışma alanı, ulaştığınız kademenin fiyatından faturalandırılır.",
+        "tier": "{price} ({count} ve üzeri)",
+        "card": {
+            "title": "Beyaz etiket",
+            "line": "Kendi markanızla Rerun, her müşteriniz için bir çalışma alanı.",
+            "workspaces": "Müşteri çalışma alanları",
+            "valueText": "{count, plural, one {# müşteri çalışma alanı} other {# müşteri çalışma alanı}}",
+            "valueTextAtLeast": "{count, plural, one {#+ müşteri çalışma alanı} other {#+ müşteri çalışma alanı}}",
+            "perWorkspace": "Müşteri çalışma alanı başına",
+            "save": "{percent} tasarruf",
+            "perMonth": "/ay",
+            "total": "{count, plural, one {# çalışma alanı} other {# çalışma alanı}} için ayda <total></total>",
+            "totalAtLeast": "{count, plural, one {# çalışma alanı} other {# çalışma alanı}} için ayda <total></total>, sonra her ek çalışma alanı için {price}",
+            "start": "Başlayın",
+            "included": {
+                "label": "Neler alırsınız",
+                "brand": "<b>URL'niz, renkleriniz ve logonuz</b>: müşterileriniz Rerun'ı hiç görmez",
+                "mobile": "<b>Sizin adınızla bir mobil uygulama</b>",
+                "library": "Her müşteriye bırakılabilen <b>tek bir Coworker kitaplığı</b>",
+                "clients": "<b>Tüm müşteriler</b> tek yerden yönetilir"
+            }
+        }
     }
 }

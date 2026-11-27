@@ -1,0 +1,1391 @@
+{
+    "hub": {
+        "crumb": "Fonctionnalités",
+        "title": "Tout ce qu’il faut à un Coworker pour bien faire son travail.",
+        "lede": "De la mémoire, des skills, des apps et un ordinateur à lui. Voici ce que chaque Coworker apporte, et comment vous gardez la main.",
+        "metaTitle": "Fonctionnalités : tout ce qu’un Coworker IA apporte",
+        "metaDescription": "Mémoire, skills, apps et un ordinateur à lui : toutes les fonctionnalités d’un Coworker Rerun, du Chief of Staff à la sécurité, et votre contrôle.",
+        "all": {
+            "title": "Toutes les fonctionnalités",
+            "lead": "{count, plural, one {# fonctionnalité} other {# fonctionnalités}}, en quatre groupes : qui sont vos Coworkers, comment ils travaillent, où vous les suivez et comment vous gardez le contrôle."
+        },
+        "included": {
+            "title": "Inclus dans Pro",
+            "lines": {
+                "1": "Coworkers illimités",
+                "2": "Places illimitées",
+                "3": "Une machine privée dans le cloud",
+                "4": "{monthlyCredits} crédits Rerun par mois",
+                "5": "{connectors}+ apps",
+                "6": "Votre propre IA sans surcoût"
+            },
+            "extras": "LinkedIn Pro et WhatsApp Pro sont des apps payantes, et des crédits supplémentaires s’achètent par packs de {packCredits} pour {packPrice}.",
+            "cta": "Voir les offres"
+        },
+        "faq": {
+            "1": {
+                "question": "Toutes ces fonctionnalités sont-elles dans une seule offre ?",
+                "answer": "Oui. Pro inclut chaque fonctionnalité de cette page, avec des Coworkers et des places illimités et {monthlyCredits} crédits Rerun par mois. Seuls LinkedIn Pro, WhatsApp Pro, les crédits supplémentaires et les templates à prix propre se facturent à part."
+            },
+            "2": {
+                "question": "Puis-je les essayer avant de payer ?",
+                "answer": "Oui. L’essai de {trialDays} jours ouvre toutes les fonctionnalités, avec {trialAgents} Coworkers actifs en même temps et des places sans limite."
+            },
+            "3": {
+                "question": "Dois-je configurer chaque fonctionnalité ?",
+                "answer": "Non. Le Chief of Staff crée vos Coworkers avec leurs apps, leurs skills et leurs routines à partir de ce que vous lui dites. Vous connectez vos comptes quand un Coworker vous le demande."
+            },
+            "4": {
+                "question": "Puis-je faire tourner Rerun sur mes propres serveurs ?",
+                "answer": "Oui. Rerun est open source sous AGPL-3.0 et s’installe sur votre serveur avec Docker. Une installation auto-hébergée a les Coworkers, la mémoire, les skills, les routines et les apps, mais pas ce que seul un service hébergé propose : les crédits inclus, LinkedIn Pro, WhatsApp Pro et les données payantes."
+            }
+        }
+    },
+    "page": {
+        "more": {
+            "title": "Autres fonctionnalités",
+            "all": "Toutes les fonctionnalités"
+        },
+        "howItWorks": "Comment ça marche",
+        "worksWith": {
+            "title": "Fonctionne avec",
+            "leadWithApps": "Les apps dans lesquelles il travaille et les fonctionnalités avec lesquelles il joue.",
+            "lead": "Les fonctionnalités avec lesquelles il joue."
+        },
+        "templates": {
+            "lead": "Des Coworkers prêts à l’emploi, issus de la bibliothèque, installés en une minute.",
+            "cta": "Parcourir la bibliothèque"
+        }
+    },
+    "items": {
+        "coworkers": {
+            "crumb": "Coworkers",
+            "title": "Recrutez un Coworker IA, pas un workflow.",
+            "lede": "Donnez-lui un poste en une phrase. Il a sa propre mémoire, ses skills, ses apps et son ordinateur, tourne selon son planning et vous dit ce qu’il a fait.",
+            "metaTitle": "Coworkers IA : des agents IA qui tiennent un poste",
+            "metaDescription": "Un Coworker Rerun est un agent IA recruté pour un poste, avec mémoire, skills, apps et ordinateur cloud. Il tourne sur planning et rend compte chaque fois.",
+            "caption": "Un Coworker au travail sur son propre écran, puis qui dit ce qu’il vient de faire.",
+            "plate": {
+                "name": "Commercial",
+                "job": "Trouve de nouveaux leads chaque matin"
+            },
+            "steps": {
+                "1": {
+                    "title": "Décrivez le poste",
+                    "body": "Dites à votre Chief of Staff ce qu’il vous faut en une phrase, ou installez un Coworker prêt à l’emploi depuis la bibliothèque de templates.",
+                    "ui": {
+                        "2": "Crée-moi un nouveau coworker",
+                        "3": "Templates"
+                    }
+                },
+                "2": {
+                    "title": "Il se configure tout seul",
+                    "body": "Il écrit son âme, ses skills et son planning, puis affiche une carte pour chaque app à laquelle vous devez le connecter.",
+                    "ui": {
+                        "2": "Se connecter"
+                    }
+                },
+                "3": {
+                    "title": "Il travaille et rend compte",
+                    "body": "Chaque exécution laisse un fil avec ce qu’il a fait. Il s’arrête pour demander quand il a besoin de vous et retient chaque correction.",
+                    "ui": {
+                        "1": "Fils",
+                        "2": "Automatisations",
+                        "3": "Pour vous"
+                    }
+                }
+            },
+            "abilitiesTitle": "Ce que chaque Coworker apporte.",
+            "abilities": {
+                "memory": {
+                    "title": "Sa propre mémoire",
+                    "line": "Il note les faits durables et s’en souvient. Corrigez-le une fois, il retient la correction."
+                },
+                "skills": {
+                    "title": "Ses propres skills",
+                    "line": "Des procédures écrites qu’il n’ouvre que lorsqu’une tâche correspond, donc son prompt reste court à mesure qu’il apprend."
+                },
+                "computer": {
+                    "title": "Son propre ordinateur",
+                    "line": "Un écran dans le cloud avec un navigateur, des fichiers et un terminal. Regardez-le en direct, ou prenez la main."
+                },
+                "routines": {
+                    "title": "Ses propres routines",
+                    "line": "Un planning en langage courant, comme chaque jour de semaine à 8 h, ou un webhook appelé par un autre service."
+                }
+            },
+            "templatesTitle": "Des Coworkers à recruter dès aujourd’hui.",
+            "faq": {
+                "1": {
+                    "question": "Qu’est-ce qu’un Coworker IA ?",
+                    "answer": "Un agent que vous recrutez pour un poste, au lieu d’un workflow que vous dessinez. Il a un nom, une âme qui dit ce dont il est responsable, sa propre mémoire, ses skills, ses fichiers et sa base de données, les apps dont il a besoin et ses routines. Il fait ce travail exécution après exécution et consigne chaque étape."
+                },
+                "2": {
+                    "question": "Faut-il écrire des prompts ou du code ?",
+                    "answer": "Non. Décrivez le poste en langage courant et le Coworker écrit lui-même son âme, ses skills et son planning. Tout ce qu’il a configuré reste lisible et modifiable sur sa carte : Réglages, Skills, Routines et Apps."
+                },
+                "3": {
+                    "question": "Combien de Coworkers puis-je avoir ?",
+                    "answer": "Autant qu’il vous en faut : Pro n’a aucune limite. L’essai de {trialDays} jours en fait tourner {trialAgents} à la fois, et les autres sont créés puis attendent, désactivés, que Pro démarre."
+                },
+                "4": {
+                    "question": "Puis-je modifier un Coworker une fois configuré ?",
+                    "answer": "Oui. Modifiez son âme dans les Réglages, désactivez une capacité dont il n’a pas besoin, changez son modèle par conversation, ou demandez-lui de réécrire ses propres instructions. Les changements s’appliquent à sa prochaine exécution."
+                },
+                "5": {
+                    "question": "Puis-je copier un Coworker qui marche bien ?",
+                    "answer": "Oui. Dupliquer le copie dans le même workspace avec ses skills, ses souvenirs, ses fichiers, ses apps et ses routines. Partager crée un lien pour quelqu’un hors du workspace : les clés, les comptes connectés et l’historique des conversations ne voyagent jamais avec lui."
+                }
+            },
+            "docsLabel": "Découvrir ce qu’est un Coworker"
+        },
+        "chief-of-staff": {
+            "crumb": "Chief of Staff",
+            "title": "Un Chief of Staff qui dirige votre équipe IA.",
+            "lede": "Dites ce qu’il vous faut : il briefe le bon Coworker, ou en crée un. Il fait le point de lui-même, répond à votre boîte de réception une fois que vous lui avez dit comment, et prend le nom que vous lui donnez.",
+            "metaTitle": "Chief of Staff : le manager de votre équipe IA",
+            "metaDescription": "Le Chief of Staff Rerun crée votre équipe de Coworkers IA, briefe le bon, fait le point chaque jour et répond pour vous, par écrit ou à la voix.",
+            "caption": "Maintenez Espace et dites ce qu’il vous faut : le Chief of Staff briefe le Coworker qui s’en charge.",
+            "plate": {
+                "name": "Rédacteur de contenu",
+                "job": "Rédige les posts du lundi"
+            },
+            "steps": {
+                "1": {
+                    "title": "Parlez-lui de votre activité",
+                    "body": "À l’onboarding, il lit votre site, remplit le Brain et propose une équipe de départ adaptée à votre type d’activité.",
+                    "ui": {
+                        "1": "acme.com",
+                        "2": "Continuer"
+                    }
+                },
+                "2": {
+                    "title": "Demandez en langage courant",
+                    "body": "Cliquez sur son orbe, appuyez sur ⌘K ou maintenez Espace. Il crée un Coworker, envoie une tâche au bon et suit l’exécution.",
+                    "ui": {
+                        "3": "Qu’est-ce qui a tourné cette nuit ?"
+                    }
+                },
+                "3": {
+                    "title": "Laissez-le faire le point",
+                    "body": "Il surveille votre workspace de lui-même. Quand quelque chose mérite votre temps, il ouvre un fil avec une prochaine étape.",
+                    "ui": {
+                        "1": "Faire des check-ins de lui-même",
+                        "2": "Général",
+                        "3": "Pour vous"
+                    }
+                }
+            },
+            "abilitiesTitle": "Ce qu’il fait pour vous.",
+            "abilities": {
+                "team": {
+                    "title": "Il crée votre équipe",
+                    "line": "Il écrit l’âme, les skills et le planning de chaque Coworker, le place dans une Box et installe des templates de la bibliothèque."
+                },
+                "voice": {
+                    "title": "Maintenez Espace et parlez",
+                    "line": "Sur le board, maintenez Espace, dites ce qu’il vous faut et relâchez. Dans l’app de bureau, Quick ask le joint depuis n’importe quelle app."
+                },
+                "inbox": {
+                    "title": "Il répond à votre boîte de réception",
+                    "line": "Dites-lui quoi répondre et il traite les questions, les validations et les propositions de skills de vos Coworkers en votre nom."
+                },
+                "check-ins": {
+                    "title": "Check-ins quotidiens",
+                    "line": "Il lit les exécutions, le Brain et les données partagées, ne change rien, et n’écrit que lorsque cela en vaut la peine."
+                }
+            },
+            "templatesTitle": "Donnez-lui une équipe à diriger.",
+            "faq": {
+                "1": {
+                    "question": "Qu’est-ce que le Chief of Staff ?",
+                    "answer": "L’assistant fourni avec chaque workspace. Il connaît chaque Coworker, ce que chacun fait et sur quoi il travaille. Il en crée de nouveaux, les briefe, explique une exécution en échec, tient le Brain avec vous et répond aux questions sur Rerun à partir de la documentation."
+                },
+                "2": {
+                    "question": "Est-ce la même chose que le manager de Coworkers ?",
+                    "answer": "Oui. Le manager de Coworkers s’appelle désormais le Chief of Staff, et il fait davantage : il crée votre première équipe, fait le point de lui-même et répond à votre boîte de réception. Même page, même place dans un coin du board."
+                },
+                "3": {
+                    "question": "Puis-je lui donner un nom ?",
+                    "answer": "Oui. Il propose d’en prendre un tôt dans une conversation, et un admin peut le changer sur sa carte. Le nom appartient au workspace : chaque membre le voit dans la liste, le chat et les raccourcis. Videz le champ pour revenir à Chief of Staff."
+                },
+                "4": {
+                    "question": "Que se passe-t-il pendant un check-in ?",
+                    "answer": "Une fois par jour, pendant vos heures de travail, il lit vos Coworkers, leurs exécutions, le Brain et les données partagées. Il ne change rien. Si quelque chose a besoin de vous, il ouvre un fil avec ce qu’il a vu et une étape suggérée, puis l’envoie sur votre téléphone."
+                },
+                "5": {
+                    "question": "Validera-t-il des choses sans moi ?",
+                    "answer": "Seulement ce que vous lui avez dit de traiter. Il demande votre accord dans son chat avant de valider une dépense, et il ne saisit jamais de clé, ne se connecte jamais à une app et ne prend jamais le contrôle d’un navigateur en votre nom : cela reste à vous."
+                }
+            },
+            "docsLabel": "Lire la documentation du Chief of Staff"
+        },
+        "coworkers-work-together": {
+            "crumb": "Collaboration",
+            "title": "Vos Coworkers se passent le travail.",
+            "lede": "L’un trouve les leads, le suivant leur écrit, un troisième les range dans votre CRM. Ils s’appellent par leur handle et travaillent sur les mêmes tables, les mêmes fichiers et le même Brain.",
+            "metaTitle": "Des Coworkers IA qui se passent le relais",
+            "metaDescription": "Les Coworkers Rerun s’appellent par @handle, se passent leurs trouvailles et partagent base, dossier et Brain. Toute la chaîne se lit au même endroit.",
+            "caption": "Trois Coworkers qui se passent le même travail, sur un seul board.",
+            "plate": {
+                "name": "Éclaireur de leads",
+                "job": "Trouve des leads pour le Commercial"
+            },
+            "steps": {
+                "1": {
+                    "title": "Donnez à chacun son rôle",
+                    "body": "Recrutez un Coworker par étape, ou installez un template d’équipe. Chaque âme dit ce dont il est responsable et à qui il passe le relais.",
+                    "ui": {
+                        "1": "Templates",
+                        "2": "Utiliser gratuitement"
+                    }
+                },
+                "2": {
+                    "title": "Ils s’appellent entre eux",
+                    "body": "Un Coworker écrit au suivant par son @handle avec ce qu’il a trouvé. Celui qu’il appelle sait qui l’appelle.",
+                    "ui": {
+                        "2": "@sales_rep"
+                    }
+                },
+                "3": {
+                    "title": "Lisez la chaîne",
+                    "body": "Chaque passage de relais ouvre un fil chez le Coworker qui le reçoit, listé sous Tous, avec ce qui a été demandé et ce qui est revenu.",
+                    "ui": {
+                        "1": "Fils",
+                        "2": "Tous"
+                    }
+                }
+            },
+            "abilitiesTitle": "Une équipe, un seul jeu de tables.",
+            "abilities": {
+                "handles": {
+                    "title": "Appels par @handle",
+                    "line": "Tapez @ pour mentionner un Coworker. Renommez-en un et chaque @handle dans les âmes, skills et routines des autres suit."
+                },
+                "shared-db": {
+                    "title": "Une base de données partagée",
+                    "line": "Chaque Coworker du workspace lit et écrit les mêmes tables et le même dossier, quelle que soit sa Box."
+                },
+                "brain": {
+                    "title": "Un seul Brain",
+                    "line": "Ils lisent les mêmes pages sur votre entreprise, donc rien n’a besoin d’être expliqué deux fois."
+                },
+                "team": {
+                    "title": "Ils se voient entre eux",
+                    "line": "Un Coworker peut lire le statut, les routines et les dernières exécutions des autres, sans rien modifier."
+                }
+            },
+            "templatesTitle": "Des équipes où plusieurs Coworkers se partagent le travail.",
+            "faq": {
+                "1": {
+                    "question": "Comment un Coworker passe-t-il le travail à un autre ?",
+                    "answer": "Il écrit à l’autre par son @handle, comme vous le feriez, et transmet ce qu’il a trouvé. L’autre travaille dans un fil à lui et répond. Un Coworker réveillé par la fin d’un travail reprend à partir de là."
+                },
+                "2": {
+                    "question": "Dois-je câbler la chaîne moi-même ?",
+                    "answer": "Non. Écrivez dans chaque âme ce dont il est responsable et qui vient ensuite, ou demandez au Chief of Staff de monter l’équipe. Il sait qui gère quoi et briefe le bon."
+                },
+                "3": {
+                    "question": "Où gardent-ils ce qu’ils partagent ?",
+                    "answer": "Dans la base de données partagée et le dossier partagé, tous deux sous Brain, communs à chaque Coworker du workspace. Chacun garde aussi une base et un dossier privés qu’aucun autre Coworker ne peut lire."
+                },
+                "4": {
+                    "question": "Un Coworker peut-il découper une grosse tâche ?",
+                    "answer": "Oui. Avec Déléguer activé, il confie des sous-tâches autonomes à des sous-coworkers jetables qui travaillent dans son dossier, sur ses fichiers, et il rassemble ce qu’ils rapportent."
+                },
+                "5": {
+                    "question": "Est-ce un outil de workflows multi-agents ?",
+                    "answer": "Cela résout le même problème, sans canevas. Il n’y a aucun nœud à maintenir : vous recrutez des Coworkers pour des postes, et le travail circule entre eux comme dans une équipe."
+                }
+            },
+            "docsLabel": "Découvrir comment les Coworkers partagent les données"
+        },
+        "second-brain": {
+            "crumb": "Second cerveau",
+            "title": "Un second cerveau pour votre entreprise.",
+            "lede": "Ce que vous vendez, à qui, à quel prix et sur quel ton, écrit une fois dans des pages que chaque Coworker lit avant de travailler. Rempli depuis votre site, tenu à jour avec vous.",
+            "metaTitle": "Un second cerveau que vos Coworkers IA lisent",
+            "metaDescription": "Le Brain Rerun garde votre offre, votre marché et votre ton dans des pages que chaque Coworker lit. Importez fichiers et .zip, restaurez toute version.",
+            "caption": "Le Brain ouvert sur la page de votre entreprise, avec la proposition d’un Coworker en attente.",
+            "plate": {
+                "name": "Rédacteur",
+                "job": "Écrit avec votre ton"
+            },
+            "steps": {
+                "1": {
+                    "title": "Remplissez-le depuis votre site",
+                    "body": "Saisissez votre site et cliquez sur Remplir depuis mon site. Les pages entreprise, offre, marché et ton apparaissent en quelques minutes, avec leurs sources.",
+                    "ui": {
+                        "1": "Brain",
+                        "2": "acme.com",
+                        "3": "Remplir depuis mon site"
+                    }
+                },
+                "2": {
+                    "title": "Importez ce que vous avez",
+                    "body": "Déposez des fichiers, un .zip ou un dossier entier. Un .zip est décompressé avec ses dossiers, classé sous la Box et les tags que vous choisissez.",
+                    "ui": {
+                        "1": "Importer",
+                        "2": "Choisir un dossier",
+                        "3": "Importer 12 fichiers"
+                    }
+                },
+                "3": {
+                    "title": "Relisez ce qu’ils proposent",
+                    "body": "Quand un Coworker trouve un nouveau fait, il le propose. Cliquez sur Examiner, lisez l’avant et l’après, puis Accepter ou Ignorer.",
+                    "ui": {
+                        "1": "Examiner",
+                        "2": "Accepter",
+                        "3": "Ignorer"
+                    }
+                }
+            },
+            "abilitiesTitle": "Écrit une fois, lu par chaque Coworker.",
+            "abilities": {
+                "pages": {
+                    "title": "Des pages que vous modifiez sur place",
+                    "line": "Tapez / pour des blocs et [[ pour lier une autre page. Tout s’enregistre pendant la frappe, et chaque membre peut modifier."
+                },
+                "import": {
+                    "title": "Fichiers .zip et dossiers",
+                    "line": "Un import garde l’arborescence d’un dossier ou d’un .zip, et laisse de côté les fichiers qu’ajoute un Mac."
+                },
+                "history": {
+                    "title": "Chaque version conservée",
+                    "line": "L’historique des versions montre qui a changé quoi : une personne, un Coworker ou l’import du site. Restaurez n’importe quelle version."
+                },
+                "boxes": {
+                    "title": "Classé par Box",
+                    "line": "Les pages de chaque équipe passent en premier pour ses Coworkers. Le classement ne cache rien : tout le monde peut tout lire."
+                }
+            },
+            "templatesTitle": "Des Coworkers qui doivent parler comme vous.",
+            "faq": {
+                "1": {
+                    "question": "Que met-on dans le Brain ?",
+                    "answer": "Ce que vous diriez à une nouvelle recrue : ce que vous vendez et à quel prix, qui l’achète, votre équipe, votre ton, vos outils et vos priorités, plus des pages sur les clients, les concurrents, les produits et les décisions. Il contient aussi le dossier partagé et la base de données partagée."
+                },
+                "2": {
+                    "question": "Puis-je importer les documents que j’ai déjà ?",
+                    "answer": "Oui. Déposez des fichiers, une archive .zip ou un dossier dans la section Fichiers ou dans une Box. Un .zip est décompressé dans un dossier du même nom, ses propres dossiers conservés. Vous voyez la liste, et pouvez retirer un fichier, avant de cliquer sur Importer."
+                },
+                "3": {
+                    "question": "Un Coworker peut-il modifier une page seul ?",
+                    "answer": "Non. Un fait qu’il trouve lui-même devient une proposition que vous Acceptez ou Ignorez, et un changement ignoré n’est jamais reproposé. Un fait que vous lui dites dans le chat est écrit aussitôt, avec Annuler."
+                },
+                "4": {
+                    "question": "Et si une page est écrasée ?",
+                    "answer": "Chaque modification est conservée. Ouvrez l’Historique des versions depuis le menu Plus de la page, choisissez une version et cliquez sur Restaurer cette version. La version actuelle reste dans l’historique."
+                },
+                "5": {
+                    "question": "En quoi le Brain diffère-t-il de la mémoire d’un Coworker ?",
+                    "answer": "Le Brain, c’est ce que tout le workspace sait de l’entreprise. La mémoire d’un Coworker garde des faits sur son propre travail et s’estompe quand rien ne l’utilise. Ce qu’une personne a écrit ou confirmé dans le Brain prime sur la mémoire."
+                }
+            },
+            "docsLabel": "Découvrir la documentation du Brain"
+        },
+        "computer-use": {
+            "crumb": "Utilisation de l’ordinateur",
+            "title": "Chaque Coworker travaille sur son propre écran.",
+            "lede": "Quand une app n’a pas d’API, votre Coworker l’ouvre dans un vrai navigateur sur son ordinateur cloud et clique dedans. Regardez-le en direct et prenez la main quand vous voulez.",
+            "metaTitle": "Utilisation de l’ordinateur : un agent IA avec son écran",
+            "metaDescription": "Chaque Coworker Rerun a un ordinateur cloud avec navigateur et terminal. Il navigue sur les sites sans API et tape des mots de passe que le modèle ignore.",
+            "caption": "Un vrai navigateur sur l’écran du Coworker, connecté à votre compte.",
+            "plate": {
+                "name": "Chasseur d’appels d’offres",
+                "job": "Consulte les portails d’appels d’offres chaque jour"
+            },
+            "steps": {
+                "1": {
+                    "title": "Il ouvre son navigateur",
+                    "body": "Quand une tâche exige un site sans API, il ouvre son navigateur, clique, tape et défile comme le ferait une personne."
+                },
+                "2": {
+                    "title": "Vous regardez ou prenez la main",
+                    "body": "La miniature sur sa carte montre son écran en direct. Cliquez dessus pour ouvrir le bureau, puis sur Prendre la main pour piloter.",
+                    "ui": {
+                        "1": "Son ordinateur",
+                        "2": "Bureau de Chasseur d’appels d’offres",
+                        "3": "Prendre la main"
+                    }
+                },
+                "3": {
+                    "title": "Il vous passe les parties difficiles",
+                    "body": "Pour une connexion ou un captcha, il vous le demande : Ouvrir le navigateur, faites l’étape, cliquez sur Terminé. Il reprend ensuite.",
+                    "ui": {
+                        "1": "Ouvrir le navigateur",
+                        "2": "Terminé"
+                    }
+                }
+            },
+            "abilitiesTitle": "Un ordinateur à lui, dans le cloud.",
+            "abilities": {
+                "desktop": {
+                    "title": "Un bureau complet",
+                    "line": "Un navigateur, un gestionnaire de fichiers et un terminal, sur un écran à lui, sur la machine de votre workspace."
+                },
+                "take-control": {
+                    "title": "Prendre la main",
+                    "line": "Pilotez son écran vous-même à tout moment. Le Coworker retrouve ensuite ce que vous y avez fait."
+                },
+                "secrets": {
+                    "title": "Mots de passe saisis à l’aveugle",
+                    "line": "Il saisit un secret enregistré par son nom de variable : la valeur va dans la page, jamais au modèle."
+                },
+                "session": {
+                    "title": "Connecté une seule fois",
+                    "line": "Ce à quoi vous vous connectez reste dans le navigateur de ce Coworker, prêt pour ses prochaines exécutions."
+                }
+            },
+            "templatesTitle": "Des Coworkers qui vont là où aucune API ne va.",
+            "faq": {
+                "1": {
+                    "question": "Qu’est-ce que l’utilisation de l’ordinateur ?",
+                    "answer": "Un Coworker voit et pilote son propre écran : il clique, tape et défile dans son navigateur, ses fichiers et son terminal. C’est ainsi qu’il utilise un portail sans API, remplit des formulaires et lit des résultats comme le ferait une personne."
+                },
+                "2": {
+                    "question": "Puis-je voir ce qu’il fait ?",
+                    "answer": "Oui. La miniature sur sa carte montre l’écran en direct pendant qu’il travaille. Cliquez dessus pour ouvrir le bureau dans une fenêtre, ou sur Prendre la main pour le piloter vous-même, puis laissez-le continuer."
+                },
+                "3": {
+                    "question": "Comment se connecte-t-il à mes comptes ?",
+                    "answer": "Il vous passe la main sur l’écran : Ouvrir le navigateur l’ouvre pour vous, vous vous connectez ou résolvez le captcha, puis cliquez sur Terminé. Ce à quoi vous vous êtes connecté reste dans le navigateur de ce Coworker."
+                },
+                "4": {
+                    "question": "L’IA voit-elle les mots de passe qu’elle saisit ?",
+                    "answer": "Non. Un secret est stocké sur la machine de votre workspace sous un nom de variable. Le Coworker le saisit dans une page par ce nom, et la valeur n’entre jamais dans la conversation ni n’atteint le modèle."
+                },
+                "5": {
+                    "question": "Mes Coworkers partagent-ils un seul ordinateur ?",
+                    "answer": "Ils partagent la machine du workspace, et chacun a son propre écran, son propre navigateur avec ses propres connexions, son propre dossier et sa propre base de données."
+                }
+            },
+            "docsLabel": "En savoir plus sur son ordinateur"
+        },
+        "your-computer": {
+            "crumb": "Votre ordinateur",
+            "title": "Prêtez votre ordinateur à vos Coworkers.",
+            "lede": "Liez votre Mac ou PC depuis l’app de bureau. Nommez-le avec # dans le chat, et vos Coworkers y lancent des commandes, lisent des fichiers et démarrent de longs travaux, avec votre accord.",
+            "metaTitle": "Liez votre ordinateur à vos Coworkers IA",
+            "metaDescription": "Liez votre Mac, Windows ou Linux à Rerun. Nommez-le avec # dans le chat et vos Coworkers y lancent commandes et longs travaux, avec votre accord.",
+            "caption": "Encoder les rushes du jour 2 sur #studio-pc : la commande attend Autoriser.",
+            "plate": {
+                "name": "Monteur vidéo",
+                "job": "Découpe les rushes sur votre Mac"
+            },
+            "steps": {
+                "1": {
+                    "title": "Liez-le depuis l’app de bureau",
+                    "body": "Installez l’app de bureau, ouvrez votre compte, puis App de bureau. Sous Cet ordinateur, cliquez sur Lier et nommez-le.",
+                    "ui": {
+                        "1": "Compte",
+                        "2": "App de bureau",
+                        "3": "Cet ordinateur",
+                        "4": "Lier"
+                    }
+                },
+                "2": {
+                    "title": "Nommez-le avec #",
+                    "body": "Tapez # dans la zone de message et choisissez l’ordinateur : #studio-pc s’ajoute à votre message, pour que le Coworker connaisse la machine.",
+                    "ui": {
+                        "2": "#studio-pc"
+                    }
+                },
+                "3": {
+                    "title": "Validez la commande",
+                    "body": "La carte montre la commande et son dossier. Autorisez-la une fois, Toujours autoriser le programme, ou Refuser.",
+                    "ui": {
+                        "1": "Autoriser",
+                        "2": "Toujours autoriser ffmpeg",
+                        "3": "Refuser"
+                    }
+                }
+            },
+            "abilitiesTitle": "Une paire de mains sur votre propre machine.",
+            "abilities": {
+                "jobs": {
+                    "title": "Longs travaux",
+                    "line": "Rendus, entraînements et gros téléchargements tournent comme des travaux, jusqu’à {remoteMaxJobs} à la fois. Le Coworker se réveille avec le résultat."
+                },
+                "files": {
+                    "title": "Vos fichiers restent en place",
+                    "line": "Il ne lit que ce dont il a besoin, là où se trouve le fichier, et demande d’abord en dehors de votre dossier de travail."
+                },
+                "approvals": {
+                    "title": "Trois modes de validation",
+                    "line": "Demander puis retenir (par défaut), Toujours demander, ou Accès complet. Jamais de sudo, jamais d’effacement de disque."
+                },
+                "pause": {
+                    "title": "Pause en un clic",
+                    "line": "Pause, dans l’app ou son icône de barre d’état, arrête tout ce qui tourne là et refuse tout nouveau travail jusqu’à la reprise."
+                }
+            },
+            "templatesTitle": "Des Coworkers qui ont besoin de votre machine.",
+            "faq": {
+                "1": {
+                    "question": "Pourquoi lier mon propre ordinateur ?",
+                    "answer": "Pour le travail qui a sa place sur votre machine : montage vidéo, votre GPU, modèles locaux, fichiers trop gros pour être déplacés. Le Coworker reste dans le cloud, et votre ordinateur n’exécute que ce qu’on lui demande, tant que l’app de bureau tourne."
+                },
+                "2": {
+                    "question": "Que peut lancer un Coworker sans demander ?",
+                    "answer": "En mode par défaut, seulement les programmes pour lesquels vous avez cliqué sur Toujours autoriser. Chaque nouveau programme demande, tout chemin hors de votre dossier de travail aussi, et les lieux où vivent les secrets demandent toujours, même en Accès complet."
+                },
+                "3": {
+                    "question": "Quels ordinateurs puis-je lier ?",
+                    "answer": "Tout ordinateur qui fait tourner l’app de bureau : un Mac sous macOS 13 ou plus récent, un PC sous Windows 10 ou plus récent (en bêta), ou une machine Linux x64."
+                },
+                "4": {
+                    "question": "Que se passe-t-il quand mon portable se met en veille ?",
+                    "answer": "Un travail en cours garde l’ordinateur éveillé, mais un capot fermé le met quand même en veille : le travail reprend au réveil. Fermer la fenêtre de l’app laisse les travaux tourner ; quitter l’app les arrête, après vous avoir demandé."
+                },
+                "5": {
+                    "question": "Mes collègues peuvent-ils utiliser mon ordinateur ?",
+                    "answer": "Tous les membres du workspace peuvent utiliser un ordinateur lié via leurs Coworkers, et chaque nouveau programme demande toujours un accord. Un admin, ou la personne qui l’a lié, modifie ses réglages ou le retire, ce qui arrête tout d’un coup."
+                }
+            },
+            "docsLabel": "Découvrir la documentation des ordinateurs"
+        },
+        "tools": {
+            "crumb": "Outils",
+            "title": "Connecté à {connectors}+ outils.",
+            "lede": "Gmail, Slack, Stripe, HubSpot, Notion, Shopify, votre LinkedIn, votre WhatsApp et tout serveur MCP que vous lui indiquez. Connectez-vous une fois, et chaque Coworker choisi peut l’utiliser.",
+            "metaTitle": "{connectors}+ outils et intégrations, inclus",
+            "metaDescription": "Vos Coworkers accèdent à Gmail, Slack, Stripe, HubSpot, Shopify et {connectors}+ autres outils, plus tout serveur MCP ou API. Une connexion, aucun frais par app.",
+            "caption": "Les apps qu’un Coworker peut ouvrir, et les {connectors}+ qu’il atteint au-delà.",
+            "plate": {
+                "name": "Agent de support",
+                "job": "Répond depuis Gmail et Shopify"
+            },
+            "steps": {
+                "1": {
+                    "title": "Choisissez l’app",
+                    "body": "Ouvrez l’écran Apps du Coworker et cherchez dans la bibliothèque, ou nommez simplement le service dans le chat.",
+                    "ui": {
+                        "1": "Apps",
+                        "2": "Bibliothèque",
+                        "3": "Rechercher des apps…"
+                    }
+                },
+                "2": {
+                    "title": "Connectez-vous une fois",
+                    "body": "Connectez-vous, ou collez une clé dans un formulaire masqué. Le compte va dans le Vault, prêt pour vos autres Coworkers.",
+                    "ui": {
+                        "2": "Connecter",
+                        "3": "Vault"
+                    }
+                },
+                "3": {
+                    "title": "Il l’utilise à sa prochaine exécution",
+                    "body": "L’app apporte ses outils et un skill pour s’en servir. Un grand ensemble d’outils ne se charge que lorsqu’une tâche en a besoin.",
+                    "ui": {
+                        "1": "Installées",
+                        "2": "Skills"
+                    }
+                }
+            },
+            "abilitiesTitle": "Vos outils, connectés une fois.",
+            "abilities": {
+                "library": {
+                    "title": "Une bibliothèque d’apps",
+                    "line": "Des apps prêtes à l’emploi pour l’e-mail, les agendas, les CRM, les paiements, les boutiques, les drives et les pubs, chacune avec son propre skill."
+                },
+                "mcp": {
+                    "title": "Tout serveur MCP",
+                    "line": "Enregistrez un serveur par HTTP, SSE ou une commande locale, avec ses en-têtes et ses variables. Ses outils s’ajoutent aux siens."
+                },
+                "linkedin-whatsapp": {
+                    "title": "LinkedIn et WhatsApp Pro",
+                    "line": "Prospectez depuis votre LinkedIn, répondez depuis votre numéro WhatsApp. Une réponse réveille le Coworker. {linkedinPrice} par mois et par compte."
+                },
+                "included": {
+                    "title": "Inclus dans l’offre",
+                    "line": "Toutes les autres apps de la bibliothèque, plusieurs comptes par app, sans frais par app ni par exécution."
+                }
+            },
+            "templatesTitle": "Des Coworkers qui vivent dans vos apps.",
+            "faq": {
+                "1": {
+                    "question": "Quels outils font partie des {connectors}+ ?",
+                    "answer": "La bibliothèque contient les apps dont une entreprise a besoin : Gmail et Outlook, les agendas, Slack, des CRM comme HubSpot, Stripe, Shopify, Notion, les drives et les plateformes publicitaires. Les serveurs MCP hébergés couvrent le reste."
+                },
+                "2": {
+                    "question": "Et si mon outil n’est pas dans la bibliothèque ?",
+                    "answer": "Enregistrez vous-même son serveur MCP depuis l’onglet MCP, ou cliquez sur Demander une app sous la bibliothèque. S’il n’a aucune API, le Coworker l’ouvre sur son propre écran et clique dedans."
+                },
+                "3": {
+                    "question": "Les apps connectées coûtent-elles en plus ?",
+                    "answer": "Non. Chaque app de la bibliothèque est dans l’offre, tout comme tout serveur MCP ou API que vous branchez vous-même. Seuls LinkedIn Pro et WhatsApp Pro se vendent à part, par compte connecté."
+                },
+                "4": {
+                    "question": "Combien coûtent LinkedIn Pro et WhatsApp Pro ?",
+                    "answer": "Chaque compte connecté occupe une place : {linkedinPrice} par mois pour LinkedIn Pro, {whatsappPrice} par mois pour WhatsApp Pro, sur la même facture que votre offre, quel que soit le nombre de Coworkers qui l’utilisent. Pendant l’essai, une place par app ne coûte rien jusqu’au début de Pro."
+                },
+                "5": {
+                    "question": "Mon compte LinkedIn est-il en danger ?",
+                    "answer": "Chaque compte a un rythme quotidien recommandé d’invitations et de visites de profil. Au-delà, le Coworker fait quand même ce que vous demandez et vous prévient une fois. Si LinkedIn demande lui-même au compte de ralentir, les Coworkers cessent de l’utiliser pendant un jour."
+                },
+                "6": {
+                    "question": "Un Coworker peut-il appeler une API qui n’a pas d’app ?",
+                    "answer": "Oui. Il demande la clé via un formulaire masqué, puis appelle l’API depuis sa machine en nommant la clé $'{VARIABLE_NAME}'. La valeur se résout à l’exécution et n’atteint jamais le modèle."
+                },
+                "7": {
+                    "question": "Chaque Coworker a-t-il toutes les apps ?",
+                    "answer": "Seulement celles que vous choisissez. Une app vit dans le Vault : activez-la pour les Coworkers qui en ont besoin, ou pour Tous les coworkers. Une app installée depuis un Coworker n’est activée que pour ce Coworker."
+                }
+            },
+            "docsLabel": "Découvrir la documentation des Apps"
+        },
+        "lead-data": {
+            "crumb": "Données leads et SEO",
+            "title": "E-mails, numéros et classements à la demande.",
+            "lede": "Votre Coworker trouve des prospects avec leurs e-mails pro et leurs numéros de téléphone, vérifie volumes de recherche et backlinks, et paie avec vos crédits Rerun une fois le coût approuvé.",
+            "metaTitle": "Enrichissement de leads et données SEO pour agents IA",
+            "metaDescription": "Les Coworkers Rerun achètent e-mails pro, numéros, volumes de recherche et backlinks en crédits Rerun, après votre accord. Ou utilisez Apollo ou Prospeo.",
+            "caption": "Le Total estimé en crédits, puis Valider cette fois, Toujours autoriser ou Plus tard.",
+            "plate": {
+                "name": "Chercheur de leads",
+                "job": "Trouve des décideurs à appeler"
+            },
+            "steps": {
+                "1": {
+                    "title": "Demandez les données",
+                    "body": "Dites au Coworker qui vous voulez joindre : un poste, un secteur, une ville. Ou demandez les mots-clés sur lesquels un concurrent est classé.",
+                    "ui": {
+                        "1": "@lead_researcher",
+                        "2": "Dentistes à Lyon"
+                    }
+                },
+                "2": {
+                    "title": "Approuvez le coût",
+                    "body": "Avant d’acheter, il affiche le Total estimé en crédits et ce qu’il vous reste. Valider cette fois, ou Toujours autoriser.",
+                    "ui": {
+                        "1": "Valider cette fois",
+                        "2": "Toujours autoriser",
+                        "3": "Plus tard"
+                    }
+                },
+                "3": {
+                    "title": "Récupérez les lignes",
+                    "body": "Il garde ce qu’il a acheté dans sa base de données et l’affiche en tableau dans le chat, prêt pour le Coworker suivant.",
+                    "ui": {
+                        "1": "Base de données"
+                    }
+                }
+            },
+            "abilitiesTitle": "Des données en direct, payées à l’appel.",
+            "abilities": {
+                "leads": {
+                    "title": "Des leads avec leurs contacts",
+                    "line": "Des prospects avec leurs e-mails pro, leurs numéros de téléphone et les données de leur entreprise."
+                },
+                "seo": {
+                    "title": "Données SEO",
+                    "line": "Volumes de recherche, idées de mots-clés, backlinks, résultats Google et commerces locaux."
+                },
+                "social": {
+                    "title": "Données sociales publiques",
+                    "line": "Profils et posts publics sur LinkedIn, TikTok, Instagram, X, YouTube, Facebook et Reddit."
+                },
+                "own-accounts": {
+                    "title": "Ou vos propres comptes",
+                    "line": "Connectez Apollo, Prospeo ou Clay depuis la bibliothèque, et le Coworker travaille sur votre propre offre chez eux."
+                }
+            },
+            "templatesTitle": "Des Coworkers qui tournent sur des données fraîches.",
+            "faq": {
+                "1": {
+                    "question": "Comment les données payantes sont-elles facturées ?",
+                    "answer": "Chaque appel est payé avec vos crédits Rerun. Pro inclut {monthlyCredits} crédits chaque mois, et un pack de {packCredits} crédits coûte {packPrice}, n’expire jamais et est entamé une fois les crédits du mois épuisés."
+                },
+                "2": {
+                    "question": "Un Coworker dépensera-t-il des crédits sans demander ?",
+                    "answer": "Pas par défaut. Il affiche le coût estimé et attend votre accord. Toujours autoriser, ou Dépenser sans demander dans ses Capacités, permet aux exécutions planifiées d’acheter des données en votre absence. Désactivez-le à tout moment."
+                },
+                "3": {
+                    "question": "Puis-je utiliser mon propre compte Apollo, Clay ou Prospeo ?",
+                    "answer": "Oui. Apollo, Prospeo et Clay sont des apps de la bibliothèque : connectez votre compte une fois et le Coworker passe par lui, sur votre offre chez ce fournisseur, sans dépenser de crédits Rerun."
+                },
+                "4": {
+                    "question": "La lecture de profils LinkedIn coûte-t-elle des crédits ?",
+                    "answer": "Pas avec LinkedIn Pro : le Coworker lit LinkedIn d’abord avec votre compte, sans crédit. Il n’achète des données LinkedIn que pour ce que votre compte ne peut pas lire, ou une fois le rythme quotidien du compte dépassé, et vous dit pourquoi."
+                },
+                "5": {
+                    "question": "Les données payantes existent-elles en auto-hébergement ?",
+                    "answer": "Non. Un Rerun auto-hébergé ne vend aucune donnée. Ajoutez-y des fournisseurs comme Apollo ou Semrush en apps ou serveurs MCP, avec vos propres clés API."
+                }
+            },
+            "docsLabel": "Découvrir la documentation des données payantes"
+        },
+        "desktop-app": {
+            "crumb": "App de bureau",
+            "title": "Vos Coworkers, à un raccourci.",
+            "lede": "Rerun pour macOS, Windows et Linux. Appuyez sur ⌘⇧Espace dans n’importe quelle app pour interroger votre Chief of Staff, et gardez vos Coworkers dans un dock au bord de l’écran.",
+            "metaTitle": "App de bureau pour Mac, Windows et Linux",
+            "metaDescription": "L’app de bureau Rerun ouvre Quick ask depuis toute app avec ⌘⇧Espace, accepte la voix et garde un dock de vos Coworkers au bord de l’écran.",
+            "caption": "Quick ask par-dessus une autre app, et le dock des Coworkers au bord de l’écran.",
+            "plate": {
+                "name": "Assistant de boîte mail",
+                "job": "Trie vos e-mails chaque matin"
+            },
+            "steps": {
+                "1": {
+                    "title": "Téléchargez et connectez-vous",
+                    "body": "Récupérez Rerun sur rerun.build/download, puis Se connecter avec Google ou Se connecter avec Apple. L’app se met à jour toute seule.",
+                    "ui": {
+                        "1": "Se connecter avec Google",
+                        "2": "Se connecter avec Apple"
+                    }
+                },
+                "2": {
+                    "title": "Appuyez sur ⌘⇧Espace",
+                    "body": "Dans n’importe quelle app, tapez une question pour votre Chief of Staff et appuyez sur Entrée. Ou maintenez Espace dans le champ vide et parlez.",
+                    "ui": {
+                        "2": "Demandez à votre Chief of Staff…"
+                    }
+                },
+                "3": {
+                    "title": "Répondez depuis le dock",
+                    "body": "Un buddy par Coworker au bord de l’écran. Répondez à une question, validez ou répondez, sans quitter votre app.",
+                    "ui": {
+                        "1": "Toutes les notifications",
+                        "2": "Répondre à Assistant de boîte mail",
+                        "3": "Ouvrir dans Rerun"
+                    }
+                }
+            },
+            "abilitiesTitle": "Ce qu’un onglet de navigateur ne peut pas faire.",
+            "abilities": {
+                "quick-ask": {
+                    "title": "Quick ask",
+                    "line": "⌘⇧Espace sur Mac, Ctrl Maj Espace sous Windows et Linux. Enregistrez un autre raccourci dans les réglages."
+                },
+                "voice": {
+                    "title": "Quick ask vocal",
+                    "line": "⌥⇧Espace ouvre Quick ask en écoute. Posez votre question à voix haute, elle part dès qu’elle est transcrite."
+                },
+                "dock": {
+                    "title": "Le dock des Coworkers",
+                    "line": "Chaque buddy indique si son Coworker travaille, attend, a échoué ou se repose, avec le nombre de choses qu’il a pour vous."
+                },
+                "notifications": {
+                    "title": "Notifications natives",
+                    "line": "Elles arrivent dès que vous êtes dans une autre app, avec un compteur sur l’icône du Dock de votre Mac."
+                }
+            },
+            "templatesTitle": "Des Coworkers qui méritent leur place dans le dock.",
+            "faq": {
+                "1": {
+                    "question": "Sur quels systèmes tourne l’app de bureau ?",
+                    "answer": "macOS 13 ou plus récent sur Apple Silicon ou Intel, Windows 10 ou plus récent sur x64 ou Arm (en bêta), et Linux x64 en AppImage, .deb ou .rpm. Elle se met à jour toute seule."
+                },
+                "2": {
+                    "question": "À quoi sert Quick ask ?",
+                    "answer": "Il ouvre un champ pour votre Chief of Staff par-dessus l’app où vous vous trouvez. Tapez et appuyez sur Entrée, ou maintenez Espace pour parler, et l’app s’ouvre sur la réponse."
+                },
+                "3": {
+                    "question": "Puis-je changer le raccourci de Quick ask ?",
+                    "answer": "Oui. Dans votre compte, sous App de bureau, cliquez sur le raccourci Quick ask et appuyez sur les touches voulues. Il faut ⌘, ⌥ ou ⌃ (Ctrl ou Alt sous Windows et Linux). Appuyez sur ⌫ à la place pour désactiver Quick ask."
+                },
+                "4": {
+                    "question": "Est-ce différent de l’app web ?",
+                    "answer": "C’est la même app, mise à jour en même temps, avec en plus ce qu’un onglet de navigateur ne peut pas faire : Quick ask, le dock des Coworkers, les notifications système, plusieurs fenêtres et la liaison de cet ordinateur à votre workspace."
+                },
+                "5": {
+                    "question": "Fonctionne-t-elle avec un Rerun auto-hébergé ?",
+                    "answer": "Oui. Cliquez sur Changer de serveur… dans le menu Rerun sur Mac, ou le menu Fichier sous Windows et Linux, et saisissez l’adresse de votre serveur. Utiliser Rerun Cloud vous ramène en arrière."
+                }
+            },
+            "docsLabel": "Découvrir la documentation de l’app de bureau"
+        },
+        "mobile-app": {
+            "crumb": "App mobile",
+            "title": "Vos Coworkers dans votre poche.",
+            "lede": "Rerun pour iPhone, iPad et Android. Répondez à un Coworker depuis la notification, suivez votre équipe depuis un widget et parlez à votre Chief of Staff en déplacement.",
+            "metaTitle": "App mobile pour iPhone, iPad et Android",
+            "metaDescription": "L’app Rerun pour iPhone, iPad et Android : discutez avec vos Coworkers, validez depuis la notification et suivez-les dans un widget et une Live Activity.",
+            "caption": "Une validation donnée depuis la notification avec Face ID, l’app toujours fermée.",
+            "plate": {
+                "name": "Responsable des commandes",
+                "job": "Signale les expéditions en retard"
+            },
+            "steps": {
+                "1": {
+                    "title": "Connectez-vous avec votre compte",
+                    "body": "Continuez avec Apple, Google, votre téléphone ou votre e-mail. Votre workspace, vos Coworkers et vos conversations sont déjà là.",
+                    "ui": {
+                        "1": "Continuer avec Apple",
+                        "2": "Continuer avec Google"
+                    }
+                },
+                "2": {
+                    "title": "Activez les notifications",
+                    "body": "Dans Préférences > Notifications, choisissez ce qui vous parvient. Un Coworker qui a besoin de vous envoie une notification push.",
+                    "ui": {
+                        "1": "Préférences",
+                        "2": "Notifications",
+                        "3": "Notifications push"
+                    }
+                },
+                "3": {
+                    "title": "Répondez depuis la notification",
+                    "body": "Appuyez longuement dessus pour Approuver, Refuser ou Répondre. Sur iPhone, Face ID confirme et l’app reste fermée.",
+                    "ui": {
+                        "1": "Approuver",
+                        "2": "Refuser",
+                        "3": "Répondre",
+                        "4": "Répondre"
+                    }
+                }
+            },
+            "abilitiesTitle": "Pensée pour un petit écran.",
+            "abilities": {
+                "widget": {
+                    "title": "Le widget Votre équipe",
+                    "line": "Sur l’écran d’accueil ou l’écran verrouillé : celui qui a besoin de vous, ou votre équipe au travail. Sur Android aussi."
+                },
+                "live-activity": {
+                    "title": "Live Activity",
+                    "line": "Sur iPhone, l’écran verrouillé et la Dynamic Island montrent qui travaille et depuis combien de temps."
+                },
+                "reply": {
+                    "title": "Répondre depuis la notification",
+                    "line": "Validez une dépense, répondez à une question ou répondez à une tâche terminée directement depuis la push."
+                },
+                "chat": {
+                    "title": "Messages, photos, voix",
+                    "line": "Envoyez un message, une photo, un fichier ou un message vocal, et utilisez @, / et # comme sur le web."
+                }
+            },
+            "templatesTitle": "Des Coworkers que vous suivez depuis votre téléphone.",
+            "faq": {
+                "1": {
+                    "question": "Existe-t-il une app Android ?",
+                    "answer": "Oui. Rerun est sur l’App Store pour iPhone et iPad, et sur Google Play pour Android. Les deux ouvrent le même workspace que l’app web, et un message envoyé depuis l’une apparaît sur l’autre."
+                },
+                "2": {
+                    "question": "Puis-je valider quelque chose sans ouvrir l’app ?",
+                    "answer": "Sur iPhone, oui : appuyez longuement sur la notification, touchez Approuver, Refuser ou Répondre, et Face ID confirme. Sur Android, les boutons déverrouillent le téléphone et ouvrent Rerun. Une app à connecter ou une clé ouvre toujours l’app."
+                },
+                "3": {
+                    "question": "Que montre le widget ?",
+                    "answer": "Sur l’écran d’accueil, celui qui a besoin de vous (petit) ou votre équipe au travail (moyen). Sur l’écran verrouillé, une ligne au-dessus de l’horloge, trois lignes dessous, ou le visage de celui qui attend. Un toucher ouvre la conversation."
+                },
+                "4": {
+                    "question": "Que ne puis-je pas faire sur mon téléphone ?",
+                    "answer": "Les réglages qui demandent un plus grand écran, comme la facturation, restent dans l’app web. Le reste y est : conversations, validations, fichiers, apps, routines, le sélecteur de modèle et vos réglages de notifications."
+                },
+                "5": {
+                    "question": "Puis-je démarrer l’essai depuis mon téléphone ?",
+                    "answer": "Oui. Un essai démarré depuis l’app mobile n’exige aucune carte : il dure {trialDays} jours et s’arrête à la fin, sauf si vous en ajoutez une."
+                }
+            },
+            "docsLabel": "Découvrir la documentation de l’app mobile"
+        },
+        "runs-24-7": {
+            "crumb": "Actif 24 h/24",
+            "title": "Actif 24 h/24, sur des serveurs en Europe.",
+            "lede": "Votre workspace a sa propre machine privée dans le cloud, en Europe. Vos Coworkers tournent selon leur planning et sur événement, que votre portable soit ouvert ou non.",
+            "metaTitle": "Des agents IA actifs 24 h/24 sur des serveurs en Europe",
+            "metaDescription": "Chaque workspace Rerun tourne sur sa machine privée en Europe. Les Coworkers démarrent sur planning, webhook ou réponse LinkedIn ou WhatsApp, PC fermé.",
+            "caption": "Le même workspace à 7 h et à 3 h du matin : l’exécution a lieu dans les deux cas.",
+            "plate": {
+                "name": "Moniteur de disponibilité",
+                "job": "Vérifie vos sites toutes les heures"
+            },
+            "steps": {
+                "1": {
+                    "title": "Décrivez le planning",
+                    "body": "Dans ses Routines, cliquez sur Nouvelle et tapez chaque jour de semaine à 8 h ou demain à 15 h. Cela devient un planning dans votre fuseau horaire.",
+                    "ui": {
+                        "1": "Routines",
+                        "2": "Nouvelle",
+                        "3": "chaque jour de semaine à 8 h",
+                        "4": "Créer la tâche"
+                    }
+                },
+                "2": {
+                    "title": "Ou donnez-lui un webhook",
+                    "body": "Créez un déclencheur, copiez son URL du webhook et collez-la dans Stripe ou n’importe quel service. Chaque appel lance une exécution avec le contenu reçu.",
+                    "ui": {
+                        "1": "Déclencheurs",
+                        "2": "Créer le trigger",
+                        "3": "URL du webhook"
+                    }
+                },
+                "3": {
+                    "title": "Lisez l’exécution le matin",
+                    "body": "Chaque exécution automatisée ouvre son propre fil. S’il a besoin de vous à 3 h du matin, il se met en pause et attend votre réponse.",
+                    "ui": {
+                        "1": "Automatisations",
+                        "2": "Pour vous"
+                    }
+                }
+            },
+            "abilitiesTitle": "Toujours actif, sans votre portable.",
+            "abilities": {
+                "machine": {
+                    "title": "Une machine à lui",
+                    "line": "Isolée de tous les autres comptes, elle garde les fichiers, bases de données, sessions et écrans de vos Coworkers."
+                },
+                "europe": {
+                    "title": "Hébergé en Europe",
+                    "line": "La machine de votre workspace est en Europe, et c’est là que vos Coworkers travaillent sur vos données."
+                },
+                "schedules": {
+                    "title": "Des plannings en langage courant",
+                    "line": "Récurrents ou ponctuels, dans le fuseau horaire de votre choix, chacun avec son propre modèle quand un travail de nuit doit coûter moins cher."
+                },
+                "webhooks": {
+                    "title": "Webhooks et réveils",
+                    "line": "Une URL publique qu’un autre service appelle, ou une réponse LinkedIn ou WhatsApp qui réveille le Coworker."
+                }
+            },
+            "templatesTitle": "Des Coworkers qui travaillent pendant que vous dormez.",
+            "faq": {
+                "1": {
+                    "question": "Mon ordinateur doit-il rester allumé ?",
+                    "answer": "Non. Vos Coworkers tournent sur la machine de votre workspace dans le cloud, pas sur votre portable. Fermez-le, partez en voyage, l’exécution du lundi matin a quand même lieu."
+                },
+                "2": {
+                    "question": "Où sont les serveurs ?",
+                    "answer": "En Europe. Chaque workspace y a une machine privée, isolée de tous les autres comptes, et c’est là que vos Coworkers travaillent et gardent ce dont ils ont besoin entre deux exécutions."
+                },
+                "3": {
+                    "question": "Une exécution planifiée se souvient-elle de la précédente ?",
+                    "answer": "Chaque exécution ouvre un nouveau fil. Ce qui se transmet, c’est la mémoire du Coworker et sa base de données : une tâche qui doit savoir où elle en était l’y note."
+                },
+                "4": {
+                    "question": "Puis-je tester une routine avant sa mise en service ?",
+                    "answer": "Oui. Lancer un test déclenche la tâche aussitôt, même désactivée, et laisse son planning intact."
+                },
+                "5": {
+                    "question": "Et si l’URL d’un webhook fuite ?",
+                    "answer": "L’URL fait office d’identifiant : cliquez sur Renouveler le secret, l’ancienne URL cesse de fonctionner aussitôt, et vous collez la nouvelle là où le trigger est appelé."
+                }
+            },
+            "docsLabel": "Découvrir la documentation des Automatisations"
+        },
+        "human-in-the-loop": {
+            "crumb": "Validation humaine",
+            "title": "Autonome, jusqu’à ce qu’il lui faille un oui.",
+            "lede": "Votre Coworker travaille seul et s’arrête avant toute action qui engage : un envoi, une dépense, une commande. Il demande en une carte, attend, et toute l’équipe peut répondre.",
+            "metaTitle": "Validation humaine : votre agent IA demande d’abord",
+            "metaDescription": "Un Coworker Rerun s’arrête avant les actions qui engagent, pose la question en une carte et attend. Répondez depuis la boîte, le dock ou votre téléphone.",
+            "caption": "Validation requise : trois relances à envoyer, Approuver ou Plus tard sur chacune.",
+            "plate": {
+                "name": "Relanceur de factures",
+                "job": "Envoie les relances de paiement"
+            },
+            "steps": {
+                "1": {
+                    "title": "Il s’arrête et demande",
+                    "body": "Avant une étape qui engage, il affiche une carte : une question, une validation, une dépense ou une connexion. Le fil indique Pour vous.",
+                    "ui": {
+                        "1": "Validation requise",
+                        "2": "Pour vous"
+                    }
+                },
+                "2": {
+                    "title": "Vous répondez de n’importe où",
+                    "body": "Depuis le chat, la boîte de réception, le dock du bureau ou une push sur votre téléphone. Toute personne qui peut utiliser sa Box peut répondre.",
+                    "ui": {
+                        "1": "Pour vous",
+                        "2": "Ouvrir la conversation"
+                    }
+                },
+                "3": {
+                    "title": "Il reprend où il s’était arrêté",
+                    "body": "Approuvez et l’exécution continue à partir de votre réponse. Expliquer refuse avec une raison que le Coworker lit.",
+                    "ui": {
+                        "1": "Approuver",
+                        "2": "Expliquer",
+                        "3": "Pourquoi pas ? (facultatif)"
+                    }
+                }
+            },
+            "abilitiesTitle": "Les façons dont il vous rend la décision.",
+            "abilities": {
+                "approvals": {
+                    "title": "Des validations une par une",
+                    "line": "Chaque action avec son détail : la cible, la commande ou le diff. Approuver ou Plus tard sur chacune."
+                },
+                "questions": {
+                    "title": "Des questions avec réponses",
+                    "line": "Des réponses suggérées en boutons, Autre chose pour saisir la vôtre, une réponse vocale ou des fichiers joints."
+                },
+                "inbox": {
+                    "title": "Une seule boîte de réception",
+                    "line": "Tout ce qui vous attend, de chaque Coworker, traité sans ouvrir la conversation."
+                },
+                "spend": {
+                    "title": "Les dépenses vous attendent",
+                    "line": "Les données payantes attendent votre oui sur le coût estimé, et Autoriser les dépenses dans Facturation bloque toute dépense de crédits."
+                }
+            },
+            "templatesTitle": "Des Coworkers que vous voulez tenir en laisse.",
+            "faq": {
+                "1": {
+                    "question": "Pour quoi un Coworker s’arrête-t-il ?",
+                    "answer": "Dépenser des crédits attend une validation, sauf si vous l’autorisez. Pour le reste, son âme dit ce qui engage, comme écrire à un client, supprimer des données ou publier : vous décidez de la longueur de sa laisse."
+                },
+                "2": {
+                    "question": "Qui peut répondre à une demande ?",
+                    "answer": "Toute personne qui peut utiliser la Box du Coworker. Les places ne coûtent rien, donc la personne qui doit décider peut être celle qui décide."
+                },
+                "3": {
+                    "question": "Que se passe-t-il si personne ne répond ?",
+                    "answer": "L’exécution attend, et le fil garde son badge Pour vous. Une exécution lancée à 3 h du matin se met en pause de la même façon et reprend à partir de votre réponse, quand vous la donnez. Rien n’est sauté parce que personne ne regardait."
+                },
+                "4": {
+                    "question": "Le Chief of Staff peut-il répondre à ma place ?",
+                    "answer": "Oui, une fois que vous lui avez dit quoi répondre. Il traite les questions, les validations et les propositions de skills en votre nom, comme le fait la boîte de réception, et vous demande d’abord avant de valider une dépense."
+                },
+                "5": {
+                    "question": "Puis-je désactiver un type de pause ?",
+                    "answer": "Oui. Chaque pause vient d’une capacité, comme Vous poser des questions ou Demander une validation. Désactivez-la dans les Capacités du Coworker et il ne peut plus se mettre en pause ainsi."
+                }
+            },
+            "docsLabel": "Découvrir la documentation de la validation humaine"
+        },
+        "bring-your-own-ai": {
+            "crumb": "Votre propre IA",
+            "title": "Faites tourner vos Coworkers sur l’IA que vous payez déjà.",
+            "lede": "Branchez votre offre Claude ou ChatGPT, une clé API ou votre propre modèle. Ou utilisez le modèle Rerun, payé avec les crédits de votre offre. Changez sans réécrire un Coworker.",
+            "metaTitle": "Votre propre IA : Claude, ChatGPT ou une clé",
+            "metaDescription": "Vos Coworkers Rerun tournent sur votre offre Claude ou ChatGPT, une clé Anthropic, OpenAI, Google ou OpenRouter, avec un relais si l’offre est épuisée.",
+            "caption": "Limite Claude atteinte : le Coworker continue avec son secours, dans la même conversation.",
+            "plate": {
+                "name": "Développeur",
+                "job": "Transforme les tickets en pull requests"
+            },
+            "steps": {
+                "1": {
+                    "title": "Ouvrez Fournisseurs d’IA",
+                    "body": "Depuis la pastille du workspace, cliquez sur Fournisseurs d’IA. Ajouter un abonnement connecte Claude ou ChatGPT une fois ; Ajouter une clé API prend une clé.",
+                    "ui": {
+                        "1": "Acme",
+                        "2": "Fournisseurs d’IA",
+                        "3": "Ajouter un abonnement",
+                        "4": "Ajouter une clé API"
+                    }
+                },
+                "2": {
+                    "title": "Choisissez le modèle",
+                    "body": "Définissez le modèle par défaut du workspace, ou cliquez sur la pastille du modèle dans n’importe quel chat. L’étoile l’enregistre comme modèle par défaut de ce Coworker.",
+                    "ui": {
+                        "1": "Modèle par défaut",
+                        "2": "Modifier",
+                        "3": "Opus 5.5"
+                    }
+                },
+                "3": {
+                    "title": "Ajoutez un secours",
+                    "body": "Sous Secours, ajoutez les offres sur lesquelles basculer quand l’une atteint sa limite. Le Coworker continue dans le même chat.",
+                    "ui": {
+                        "1": "Fournisseurs d’IA",
+                        "2": "Secours",
+                        "3": "Ajouter un secours"
+                    }
+                }
+            },
+            "abilitiesTitle": "Vos modèles, votre facture.",
+            "abilities": {
+                "subscriptions": {
+                    "title": "Votre abonnement",
+                    "line": "Claude Pro ou Max, ChatGPT Plus ou Pro. Le modèle ne coûte alors rien côté Rerun."
+                },
+                "keys": {
+                    "title": "Vos clés API",
+                    "line": "Anthropic, OpenAI, Google ou OpenRouter, ou un endpoint personnalisé qui parle le format de chat OpenAI."
+                },
+                "backups": {
+                    "title": "Modèles de secours",
+                    "line": "Jusqu’à {maxBackups} secours, essayés dans l’ordre quand une offre atteint sa limite, jusqu’à sa réinitialisation."
+                },
+                "reasoning": {
+                    "title": "Effort de raisonnement",
+                    "line": "Par défaut, Faible, Moyen ou Élevé pour chaque modèle, enregistré avec lui comme réglage par défaut d’un Coworker."
+                }
+            },
+            "templatesTitle": "Des Coworkers qui font le gros du raisonnement.",
+            "faq": {
+                "1": {
+                    "question": "Puis-je utiliser mon abonnement Claude ou ChatGPT ?",
+                    "answer": "Oui. Sous Fournisseurs d’IA, cliquez sur Ajouter un abonnement et connectez-vous à Claude Pro ou Max, ou à ChatGPT Plus ou Pro. Les Coworkers qui l’utilisent ne dépensent aucun crédit Rerun. En connecter un exige une offre active ou un essai en cours."
+                },
+                "2": {
+                    "question": "Puis-je utiliser un modèle open source ou auto-hébergé ?",
+                    "answer": "Oui, via un endpoint personnalisé : tout serveur qui parle le format de chat OpenAI, à une adresse que la machine de votre workspace peut joindre. OpenRouter propose aussi des modèles ouverts avec votre propre clé."
+                },
+                "3": {
+                    "question": "Que se passe-t-il quand mon offre atteint sa limite ?",
+                    "answer": "Le Coworker continue avec le premier secours de votre liste, dans la même conversation, et une ligne indique quel modèle a pris le relais. Une fois l’offre réinitialisée, il revient. Le crédit Rerun en dernier recours reste désactivé tant que vous ne l’activez pas."
+                },
+                "4": {
+                    "question": "Qu’est-ce que l’effort de raisonnement ?",
+                    "answer": "Le temps qu’un modèle réfléchit avant de répondre : Par défaut, Faible, Moyen ou Élevé, depuis l’icône de réglages sur sa ligne dans le sélecteur. Il existe pour les modèles Claude, OpenAI et Google ; le modèle Rerun tourne au niveau choisi par son fournisseur."
+                },
+                "5": {
+                    "question": "À quoi servent les crédits Rerun ?",
+                    "answer": "Au modèle Rerun et aux données payantes. Pro inclut {monthlyCredits} crédits chaque mois. Un Coworker sur votre propre clé ou abonnement ne coûte rien côté Rerun."
+                }
+            },
+            "docsLabel": "Découvrir la documentation des modèles"
+        },
+        "security": {
+            "crumb": "Sécurité",
+            "title": "Vos données, sauvegardées et séparées.",
+            "lede": "Chaque workspace tourne sur une machine privée en Europe, sauvegardée et chiffrée chaque nuit. Les clés n’atteignent jamais le modèle, les dépenses ont un interrupteur et le code est open source.",
+            "metaTitle": "Sécurité : sauvegardes, secrets et open source",
+            "metaDescription": "Rerun sauvegarde chaque nuit, chiffré, chaque workspace payant, hors de sa machine privée en Europe. Les secrets n’atteignent jamais le modèle. Code AGPL.",
+            "caption": "Un formulaire masqué : la clé va à la machine, le Coworker n’en apprend que le nom.",
+            "plate": {
+                "name": "Gestionnaire de paie",
+                "job": "Vérifie la paie avant la clôture"
+            },
+            "steps": {
+                "1": {
+                    "title": "Une machine à vous",
+                    "body": "Votre workspace tourne sur une machine privée en Europe, isolée de tous les autres comptes. Rien ne passe d’un workspace à l’autre."
+                },
+                "2": {
+                    "title": "Des clés dans des formulaires masqués",
+                    "body": "Quand un Coworker a besoin d’une clé, il ouvre un formulaire masqué. La valeur va à la machine et n’entre jamais dans le chat.",
+                    "ui": {
+                        "1": "Identifiant requis",
+                        "2": "Collez la valeur",
+                        "3": "Enregistrer"
+                    }
+                },
+                "3": {
+                    "title": "Sauvegardé chaque nuit",
+                    "body": "Chaque nuit, la machine d’un workspace payant est sauvegardée, chiffrée et stockée à l’écart. Nous restaurons sur demande."
+                }
+            },
+            "abilitiesTitle": "Ce qui protège votre workspace.",
+            "abilities": {
+                "backups": {
+                    "title": "Sauvegardes chiffrées chaque nuit",
+                    "line": "Coworkers, souvenirs, skills, fichiers, bases de données et Vault, pris pendant la nuit de votre fuseau horaire."
+                },
+                "secrets": {
+                    "title": "Des secrets que le modèle ne voit jamais",
+                    "line": "Le Coworker reçoit un nom de variable et utilise $'{NAME}' : la valeur se résout sur la machine à l’exécution."
+                },
+                "spending": {
+                    "title": "Autoriser les dépenses",
+                    "line": "Un interrupteur dans Facturation bloque toute dépense de crédits Rerun. Les Coworkers sur votre propre IA continuent de travailler."
+                },
+                "open-source": {
+                    "title": "Open source, AGPL-3.0",
+                    "line": "Lisez le code que fait tourner Rerun Cloud, ou hébergez-le vous-même sur votre serveur avec Docker."
+                }
+            },
+            "templatesTitle": "Des Coworkers qui traitent des tâches sensibles.",
+            "faq": {
+                "1": {
+                    "question": "Où sont stockées mes données ?",
+                    "answer": "Sur la machine privée de votre workspace, en Europe, isolée de tous les autres comptes. Les identifiants restent sur cette machine : la base de Rerun ne garde que le nom de chaque variable, jamais la valeur."
+                },
+                "2": {
+                    "question": "Comment les sauvegardes sont-elles gérées ?",
+                    "answer": "Chaque nuit de votre fuseau horaire, Rerun sauvegarde la machine de chaque workspace payant, chiffrée et stockée à l’écart. Un Coworker en pleine exécution n’est jamais interrompu. Si quelque chose tourne mal, écrivez à help@rerun.build et nous restaurons."
+                },
+                "3": {
+                    "question": "Une clé donnée à un Coworker est-elle envoyée au modèle ?",
+                    "answer": "Non. Elle passe par un formulaire masqué directement vers la machine, et le Coworker apprend seulement quelle variable a été remplie. Ne collez jamais un secret dans le chat lui-même : la conversation est stockée et envoyée au modèle."
+                },
+                "4": {
+                    "question": "Un Coworker peut-il dépenser de l’argent seul ?",
+                    "answer": "Les données payantes attendent votre oui sur un coût estimé, sauf si vous autorisez un Coworker à dépenser sans demander. L’interrupteur Autoriser les dépenses dans Facturation bloque toute dépense de crédits d’un coup, pour le modèle Rerun comme pour les données payantes."
+                },
+                "5": {
+                    "question": "Puis-je lire le code ou l’héberger moi-même ?",
+                    "answer": "Oui. Rerun est open source sous AGPL-3.0 : le même produit que fait tourner Rerun Cloud, à héberger sur votre propre serveur, sans offre, sans crédit et sans limite de Coworkers ni de places."
+                }
+            },
+            "docsLabel": "En savoir plus sur les sauvegardes"
+        },
+        "workspaces": {
+            "crumb": "Workspaces et équipe",
+            "title": "Un workspace par activité, votre équipe gratuite.",
+            "lede": "Chaque entreprise, client ou marque a son propre workspace : ses Coworkers, ses apps, son Brain et sa machine. Invitez toute votre équipe sans surcoût, et choisissez qui accède à chaque Box.",
+            "metaTitle": "Workspaces et places d’équipe gratuites",
+            "metaDescription": "Un compte Rerun contient un workspace par activité, chacun avec ses Coworkers, ses apps et son Brain. Invitez l’équipe gratis, réglez l’accès aux Box.",
+            "caption": "Le sélecteur de workspace, et toute l’équipe sur le même board.",
+            "plate": {
+                "name": "Reporter client",
+                "job": "Envoie chaque semaine un rapport à chaque client"
+            },
+            "steps": {
+                "1": {
+                    "title": "Créez un workspace",
+                    "body": "Ouvrez la pastille en haut à gauche et créez-en un. Il s’ouvre sur son propre onboarding, avec sa propre machine.",
+                    "ui": {
+                        "1": "Acme",
+                        "2": "Nouveau workspace",
+                        "3": "ex. Acme Inc.",
+                        "4": "Créer le workspace"
+                    }
+                },
+                "2": {
+                    "title": "Invitez votre équipe",
+                    "body": "Dans Membres, saisissez une adresse e-mail et choisissez les Boxes accessibles : Toutes les Boxes, ou Aucune, à attribuer plus tard. Puis cliquez sur Inviter.",
+                    "ui": {
+                        "1": "Membres",
+                        "2": "teammate@rerun.build",
+                        "3": "Toutes les Boxes",
+                        "4": "Inviter"
+                    }
+                },
+                "3": {
+                    "title": "Réglez l’accès par Box",
+                    "body": "Clic droit sur une Box, puis Gérer l’accès : tout le monde, ou seulement des personnes choisies, chacune avec Peut utiliser ou Peut gérer.",
+                    "ui": {
+                        "1": "Gérer l’accès",
+                        "2": "Seulement les personnes choisies",
+                        "3": "Peut gérer"
+                    }
+                }
+            },
+            "abilitiesTitle": "Séparés, partagés par l’équipe.",
+            "abilities": {
+                "boundary": {
+                    "title": "Une frontière étanche",
+                    "line": "Rien ne passe d’un workspace à l’autre : ni un Coworker, ni la base de données partagée, ni une clé API."
+                },
+                "boxes": {
+                    "title": "Des Boxes dans chacun",
+                    "line": "Regroupez les Coworkers par équipe, client ou projet. Une Box est gratuite, et déplacer un Coworker lui garde tout ce qu’il a."
+                },
+                "seats": {
+                    "title": "Des places sans frais",
+                    "line": "Ni Pro ni l’essai ne limitent les places. Ajouter un collègue ne change pas la facture."
+                },
+                "roles": {
+                    "title": "Admins et membres",
+                    "line": "Les admins gèrent la facturation, les membres et les fournisseurs d’IA. Les membres utilisent les Coworkers des Boxes auxquelles ils accèdent."
+                }
+            },
+            "templatesTitle": "Des Coworkers sur lesquels toute l’équipe s’appuie.",
+            "faq": {
+                "1": {
+                    "question": "Combien coûte une place supplémentaire ?",
+                    "answer": "Rien. Ni Pro ni l’essai ne limitent les places : invitez toute l’équipe, y compris ceux qui ne répondent à une question qu’une fois par semaine."
+                },
+                "2": {
+                    "question": "Quand utiliser plusieurs workspaces ?",
+                    "answer": "Quand les activités ne partagent rien : une agence avec un workspace par client, un fondateur avec une entreprise et un projet perso. Pour une activité avec plusieurs équipes, utilisez plutôt des Boxes dans un seul workspace."
+                },
+                "3": {
+                    "question": "Chaque workspace a-t-il besoin de sa propre offre ?",
+                    "answer": "Oui. Un workspace, c’est une offre, une machine et un ensemble de membres, ce qui le sépare des autres. Passez de l’un à l’autre depuis la pastille en haut à gauche."
+                },
+                "4": {
+                    "question": "Puis-je garder une Box privée ?",
+                    "answer": "Oui. Clic droit dessus, choisissez Gérer l’accès, puis Seulement les personnes choisies. Peut utiliser discute avec ses Coworkers et voit leur travail ; Peut gérer les modifie, les déplace et les supprime aussi. Les admins accèdent toujours à chaque Box."
+                },
+                "5": {
+                    "question": "Un collègue peut-il parler à un Coworker que j’ai recruté ?",
+                    "answer": "Oui, s’il peut utiliser sa Box. Un Coworker appartient au workspace, pas à la personne qui l’a créé : toute personne ayant accès peut lui donner du travail, lire ce qu’il a fait et répondre à ses questions."
+                }
+            },
+            "docsLabel": "Découvrir la documentation des équipes et workspaces"
+        }
+    },
+    "mocks": {
+        "bringYourOwnAi": {
+            "ask": "Transforme le ticket 214 en pull request",
+            "readIssue": "GitHub · Lire le ticket #214",
+            "createBranch": "GitHub · Créer une branche",
+            "switch": "Limite Claude atteinte · GPT-6 Sol jusqu’à 16 h 40",
+            "openPullRequest": "GitHub · Ouvrir une pull request",
+            "pullRequest": "#215 Corriger l’arrondi de la TVA sur les avoirs",
+            "reply": "J’ai repris où j’en étais : la pull request #215 est ouverte et les tests sont verts.",
+            "providers": {
+                "title": "Fournisseurs d’IA",
+                "description": "Les offres et clés API sur lesquelles tournent vos coworkers."
+            },
+            "defaultModel": "Modèle par défaut",
+            "defaultModelDescription": "Via Claude. Les coworkers sans modèle propre tournent dessus.",
+            "change": "Modifier",
+            "backups": "Secours",
+            "addBackup": "Ajouter un secours",
+            "backupMeta": "1er · via ChatGPT",
+            "lastResort": "Crédit Rerun en dernier recours",
+            "lastResortDescription": "Seulement quand toutes les offres sont épuisées"
+        },
+        "desktopApp": {
+            "menubarApp": "Numbers",
+            "menubarItems": "Fichier Édition Insertion Tableau Format",
+            "menubarClock": "mar. 9:41",
+            "sheetTitle": "Plan T3",
+            "quickAsk": {
+                "placeholder": "Demandez à votre Chief of Staff…",
+                "hint": "Entrée pour envoyer, Échap pour fermer",
+                "holdToTalk": "Maintenez <key>Espace</key> pour parler",
+                "send": "Envoyer"
+            },
+            "bubble": {
+                "status": "attend votre feu vert",
+                "message": "Marc demande des créneaux la semaine prochaine. Je lui envoie les trois que j’ai choisis ?"
+            }
+        },
+        "leadData": {
+            "intro": "J’ai trouvé {people, plural, one {# décideur} other {# décideurs}} dans les entreprises de votre liste. Leurs e-mails pro et leurs numéros de téléphone sont des données payantes, donc il me faut d’abord votre feu vert.",
+            "title": "E-mails pro et numéros de téléphone de {people, plural, one {# décideur} other {# décideurs}}",
+            "lines": {
+                "1": "Recherche des e-mails",
+                "2": "Recherche des numéros de téléphone"
+            },
+            "total": "Total estimé",
+            "credits": "{count, plural, one {crédit} other {crédits}}",
+            "notNow": "Plus tard",
+            "alwaysAllow": "Toujours autoriser",
+            "approveOnce": "Valider cette fois"
+        },
+        "mobileApp": {
+            "now": "à l’instant",
+            "pushTitle": "Livraisons en retard · Validation requise",
+            "pushBody": "3 commandes seront expédiées avec 2 jours de retard. Écrire aux 3 clients avec la nouvelle date avant qu’ils ne demandent ?",
+            "actions": {
+                "1": "Approuver",
+                "2": "Refuser",
+                "3": "Ouvrir"
+            },
+            "faceId": "Face ID"
+        },
+        "security": {
+            "ask": "Pour vérifier la paie de mars avant la clôture, je dois lire l’export dans votre outil de paie.",
+            "form": {
+                "title": "Identifiant requis",
+                "description": "Je lis seulement l’export de paie, rien n’est modifié.",
+                "label": "Clé API de paie",
+                "helper": "Réglages > Développeurs > Clés API · Stockée sous {key}",
+                "whereToFind": "Où la trouver",
+                "note": "Stockée sur votre engine comme variable du coworker. Jamais envoyée au modèle.",
+                "skip": "Ignorer",
+                "save": "Enregistrer"
+            },
+            "receipt": {
+                "title": "Clés",
+                "meta": "1 sur 1 stockée",
+                "label": "Clé API de paie",
+                "stored": "Stockée",
+                "note": "Stockée sur la Box. Le coworker ne voit que les noms."
+            },
+            "runCommand": "Exécuter une commande",
+            "reply": "J’ai lu l’export de mars : 42 bulletins de paie, 2 modifiés depuis février."
+        },
+        "yourComputer": {
+            "ask": "<computer></computer> encode les rushes du jour 2 pour le monteur",
+            "reply": "46 clips dans day-2. Je commence par le premier pour vérifier les réglages, puis je lance les autres comme un travail.",
+            "cardTitle": "Exécuter une commande sur <computer></computer>",
+            "purpose": "Encoder le premier clip du jour 2 en proxy ProRes pour le monteur.",
+            "folder": "Dans {folder}",
+            "deny": "Refuser",
+            "alwaysAllow": "Toujours autoriser {program}",
+            "allow": "Autoriser"
+        }
+    }
+}

@@ -1,0 +1,127 @@
+{
+    "hero": {
+        "crumb": "Preise",
+        "title": "{price}/Monat. Jeder Coworker inklusive.",
+        "lede": "Ein Tarif mit unbegrenzt vielen Coworkern und Plätzen, deiner eigenen Maschine in der Cloud und jeden Monat Rerun-Credits. {trialDays} Tage kostenlos testen."
+    },
+    "faqSub": "Alles, was man zur Rechnung wissen will. Fehlt deine Frage, sind die Gründer direkt darunter.",
+    "plans": {
+        "billingPeriod": "Abrechnungszeitraum",
+        "monthly": "Monatlich",
+        "yearly": "Jährlich",
+        "discount": "-{percent}",
+        "save": "{percent} sparen",
+        "recommended": "Empfohlen",
+        "included": "Enthalten",
+        "rowIncluded": "Enthalten",
+        "rowNotIncluded": "Nicht enthalten",
+        "names": {
+            "trial": "Kostenloser Test",
+            "pro": "Pro",
+            "enterprise": "Enterprise"
+        },
+        "lines": {
+            "trial": "Bring deine ersten Coworker an die Arbeit und sieh, was sie können.",
+            "pro": "Jeder Coworker, den dein Unternehmen braucht, jeden Tag im Einsatz.",
+            "enterprise": "Für Organisationen mit eigenen Anforderungen."
+        },
+        "rows": {
+            "coworkers": {
+                "trial": "{trialAgents} Coworker gleichzeitig",
+                "pro": "Unbegrenzt viele Coworker",
+                "enterprise": "Unbegrenzt viele Coworker"
+            },
+            "team": "Lade dein ganzes Team kostenlos ein",
+            "own-ai": "Bring deine eigene KI mit",
+            "devices": "Desktop- und Mobile-App",
+            "apps": "{connectors}+ Apps, MCP und API",
+            "sso": "SSO",
+            "sla": "SLA"
+        },
+        "trial": {
+            "priceNote": "für {trialDays} Tage, dann Pro",
+            "cta": "Kostenlosen Test starten"
+        },
+        "pro": {
+            "monthlyNote": "pro Monat, monatlich abgerechnet",
+            "yearlyNote": "pro Monat, {total} pro Jahr abgerechnet",
+            "cta": "Jetzt starten"
+        },
+        "enterprise": {
+            "perks": {
+                "1": "Alles aus Pro",
+                "2": "Individuelle Infrastruktur",
+                "3": "Persönlicher Support",
+                "4": "SSO",
+                "5": "SLA"
+            },
+            "cta": "Vertrieb kontaktieren"
+        }
+    },
+    "credits": {
+        "title": "Was sind Rerun-Credits?",
+        "lead": "Daten, für die du sonst ein eigenes Tool bezahlst, in Rerun eingebaut und nach Nutzung abgerechnet. Kein Abo mehr für jedes einzelne: Dein Coworker holt, was der Job braucht, und zahlt nur dafür.",
+        "items": {
+            "leads": {
+                "title": "Leads",
+                "body": "Interessenten mit Geschäfts-E-Mails, Telefonnummern und Firmendaten.",
+                "insteadOf": "FullEnrich, Clay"
+            },
+            "seo": {
+                "title": "SEO",
+                "body": "Suchvolumen, Keyword-Ideen und Backlinks, Google-Ergebnisse und lokale Unternehmen.",
+                "insteadOf": "Semrush, Ahrefs"
+            },
+            "social": {
+                "title": "Social",
+                "body": "Öffentliche Profile und Beiträge auf LinkedIn, TikTok, Instagram, X, YouTube, Facebook und Reddit.",
+                "insteadOf": "ein Scraping-Tool"
+            }
+        },
+        "instead": "Statt <name>{tools}</name>",
+        "sources": "Quellen: {sources}",
+        "note": "In Pro sind {monthlyCredits} Credits im Monat enthalten, {packCredits} weitere kosten {packPrice}. Dein Coworker zeigt die Kosten und fragt, bevor er etwas ausgibt."
+    },
+    "faq": {
+        "1": {
+            "question": "Bezahle ich Credits, um Rerun zu nutzen?",
+            "answer": "Nein. Der Tarif deckt Rerun selbst ab: deine Coworker, ihre Apps, Gedächtnis, Skills, Routinen und jede Ausführung. Credits bezahlen nur die Rerun-Modelle und kostenpflichtige Daten. Ein Coworker mit deinem eigenen Claude- oder ChatGPT-Tarif oder API-Schlüssel verbraucht keine."
+        },
+        "2": {
+            "question": "Was passiert, wenn mir die Credits ausgehen?",
+            "answer": "Coworker mit deiner eigenen KI arbeiten weiter. Die mit den Rerun-Modellen und kostenpflichtigen Daten warten bis zu den {monthlyCredits} Credits des nächsten Monats oder auf ein Paket mit {packCredits} für {packPrice}, das nie verfällt."
+        },
+        "3": {
+            "question": "Werden Credits übertragen?",
+            "answer": "Die monatlichen Credits von Pro werden jeden Monat zurückgesetzt, Reste werden nicht übertragen. Credits aus einem Paket verfallen nie, ebenso die Test-Credits: Was davon übrig ist, wird beim Start von Pro übernommen."
+        },
+        "4": {
+            "question": "Zahle ich pro Coworker oder pro Platz?",
+            "answer": "Nein. Pro bietet unbegrenzt viele Coworker und Plätze. Nur der Test begrenzt, wie viele Coworker gleichzeitig laufen."
+        },
+        "5": {
+            "question": "Gibt es einen kostenlosen Test?",
+            "answer": "Ja, {trialDays} Tage mit {trialAgents} gleichzeitig laufenden Coworkern und {trialCredits} Credits. Eine Karte startet den Test, heute werden {free} abgebucht. Kündige vor Tag {trialDays}, und du zahlst nichts."
+        },
+        "6": {
+            "question": "Sind LinkedIn und WhatsApp enthalten?",
+            "answer": "Das sind kostenpflichtige Apps: LinkedIn Pro für {linkedinPrice} im Monat pro Konto und WhatsApp Pro für {whatsappPrice} im Monat pro Nummer, auf derselben Rechnung wie dein Tarif. Jede andere App der Bibliothek ist enthalten."
+        },
+        "7": {
+            "question": "Sind Vorlagen enthalten?",
+            "answer": "Die Vorlagen der Bibliothek sind enthalten, außer denen, deren Ersteller einen Preis festgelegt hat: Diese werden getrennt von deinem Tarif abgerechnet, und ihre Seite weist darauf hin."
+        },
+        "8": {
+            "question": "Berechnet ihr pro Aufgabe oder pro Ausführung?",
+            "answer": "Nein. Deine Coworker können jede Stunde jedes Tages laufen, zum selben Preis. Ausführungen werden nie gezählt."
+        },
+        "9": {
+            "question": "Kann ich jederzeit kündigen?",
+            "answer": "Ja, unter Abrechnung. Deine Coworker laufen bis zum Ende des bezahlten Zeitraums weiter, danach wird der Workspace 90 Tage lang gesichert, falls du zurückkommst."
+        },
+        "10": {
+            "question": "Sind Steuern im Preis enthalten?",
+            "answer": "Die Preise verstehen sich ohne Steuern. Mehrwertsteuer oder Sales Tax wird, wenn sie in deinem Land anfällt, an der Kasse hinzugefügt. Hinterlege deine USt-IdNr. oder Steuernummer unter Abrechnung für deine Rechnungen."
+        }
+    }
+}

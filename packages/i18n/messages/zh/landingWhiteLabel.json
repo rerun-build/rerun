@@ -173,5 +173,31 @@
                 "answer": "每个工作区都使用您为它选择的 AI：客户的 ChatGPT 或 Claude 套餐、您自己的 API 密钥，或附带的 Rerun 积分。"
             }
         }
+    },
+    "pricing": {
+        "title": "按客户工作区计价。",
+        "lead": "您管理的客户越多，每个客户的成本越低。选好数量，再预约一次简短通话即可开始。",
+        "costAnswer": "按客户工作区和月份计价，客户越多单价越低，{min} 个工作区起：{tiers}。每个工作区都按您达到的档位价格计费。",
+        "tier": "{count} 个起 {price}",
+        "card": {
+            "title": "白标",
+            "line": "以您的品牌使用 Rerun，为每位客户提供一个工作区。",
+            "workspaces": "客户工作区",
+            "valueText": "{count, plural, other {# 个客户工作区}}",
+            "valueTextAtLeast": "{count, plural, other {# 个及以上客户工作区}}",
+            "perWorkspace": "每个客户工作区",
+            "save": "节省 {percent}",
+            "perMonth": "/月",
+            "total": "<total></total>/月，共 {count, plural, other {# 个工作区}}",
+            "totalAtLeast": "<total></total>/月，共 {count, plural, other {# 个工作区}}，每多一个再加 {price}",
+            "start": "立即开始",
+            "included": {
+                "label": "您将获得",
+                "brand": "<b>您的网址、配色和标志</b>：客户永远看不到 Rerun",
+                "mobile": "<b>以您命名的移动应用</b>",
+                "library": "<b>一个同事库</b>，可投放到任何客户",
+                "clients": "<b>所有客户</b>在一处管理"
+            }
+        }
     }
 }

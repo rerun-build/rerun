@@ -173,5 +173,31 @@
                 "answer": "Cada workspace roda na IA que você escolher para ele: o plano do ChatGPT ou do Claude do cliente, suas chaves de API ou os créditos Rerun incluídos."
             }
         }
+    },
+    "pricing": {
+        "title": "Preço por workspace de cliente.",
+        "lead": "Quanto mais clientes você atende com ele, menos cada um custa. Escolha a quantidade e agende uma conversa rápida para começar.",
+        "costAnswer": "Um preço por workspace de cliente e por mês que cai à medida que você adiciona clientes, a partir de {min} workspaces: {tiers}. Todo workspace é cobrado pelo preço da faixa que você atingir.",
+        "tier": "{price} a partir de {count}",
+        "card": {
+            "title": "White label",
+            "line": "O Rerun com a sua marca, um workspace para cada cliente.",
+            "workspaces": "Workspaces de clientes",
+            "valueText": "{count, plural, one {# workspace de cliente} other {# workspaces de clientes}}",
+            "valueTextAtLeast": "{count, plural, one {#+ workspace de cliente} other {#+ workspaces de clientes}}",
+            "perWorkspace": "Por workspace de cliente",
+            "save": "Economize {percent}",
+            "perMonth": "/mês",
+            "total": "<total></total> por mês para {count, plural, one {# workspace} other {# workspaces}}",
+            "totalAtLeast": "<total></total> por mês para {count, plural, one {# workspace} other {# workspaces}}, depois {price} para cada um a mais",
+            "start": "Começar",
+            "included": {
+                "label": "O que você recebe",
+                "brand": "<b>Sua URL, suas cores e seu logo</b>: seus clientes nunca veem o Rerun",
+                "mobile": "Um <b>app mobile com o seu nome</b>",
+                "library": "<b>Uma biblioteca de Coworkers</b>, levada para qualquer cliente",
+                "clients": "<b>Todos os clientes</b> gerenciados em um só lugar"
+            }
+        }
     }
 }

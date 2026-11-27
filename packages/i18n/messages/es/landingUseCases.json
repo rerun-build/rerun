@@ -1,0 +1,889 @@
+{
+    "hub": {
+        "crumb": "Casos de uso",
+        "title": "Los trabajos que hacen los Coworkers cada día.",
+        "lede": "Elige el trabajo que le darías a un nuevo empleado. Cada página muestra una ejecución de la tarea, las apps por las que pasa y lo que te pregunta antes de actuar.",
+        "metaTitle": "Casos de uso de Coworkers de IA: sus tareas diarias",
+        "metaDescription": "Leads, ventas, anuncios, contenido, redes, clientes, bandeja de entrada, reuniones, pedidos, facturas y contratación: cada trabajo, paso a paso.",
+        "allTitle": "Todos los casos de uso",
+        "allLead": "Lo que trae el trabajo, y lo que mantiene la casa en marcha.",
+        "faq": {
+            "1": {
+                "question": "¿Puede un Coworker hacer varios de estos trabajos?",
+                "answer": "Sí, pero lo mejor es un trabajo por Coworker: cada uno guarda su propia memoria, skills y rutinas. Los Coworkers se pasan trabajo entre ellos, así que el que encuentra los leads puede dárselos al que les escribe."
+            },
+            "2": {
+                "question": "¿Y si mi trabajo no está en esta lista?",
+                "answer": "Descríbeselo al Chief of Staff con palabras sencillas. Te propone un Coworker para eso y lo crea con las apps, skills y rutinas que el trabajo necesita."
+            },
+            "3": {
+                "question": "¿Se ejecuta con mi ordenador apagado?",
+                "answer": "Sí. Cada workspace tiene su propia máquina en la nube, así que las rutinas y los disparadores se ejecutan de noche y en fin de semana, con tu portátil cerrado."
+            },
+            "4": {
+                "question": "¿Actuará sin preguntarme?",
+                "answer": "No en nada importante. Un Coworker pregunta antes de enviar, pagar, eliminar o gastar créditos, y tú respondes desde la web, la app de escritorio o el móvil."
+            }
+        }
+    },
+    "page": {
+        "crumbRoot": "Casos de uso",
+        "howItRunsTitle": "Cómo se ejecuta",
+        "howItRunsLead": "Una ejecución del trabajo, tal como se ve en tu chat.",
+        "appsTitle": "Las apps en las que trabaja",
+        "appsLead": "Se conectan una vez con tus propias cuentas. Inicia sesión y trabaja en ellas por su cuenta.",
+        "templatesLead": "Coworkers ya hechos de la biblioteca que ya hacen este trabajo.",
+        "templatesLink": "Explorar la biblioteca",
+        "featuresTitle": "Las funciones que lo hacen posible",
+        "industriesTitle": "Dónde es habitual",
+        "industriesLink": "Todos los casos de uso",
+        "thread": {
+            "scheduledRun": "Ejecución programada",
+            "webhookReceived": "Webhook recibido",
+            "approvalTitle": "Aprobación",
+            "approved": "Aprobado"
+        }
+    },
+    "items": {
+        "find-leads": {
+            "crumb": "Encontrar leads",
+            "title": "Tu Coworker encuentra leads mientras duermes.",
+            "lede": "Lee ofertas de empleo, LinkedIn y tu CRM cada semana, se queda con las empresas que se parecen a tus mejores clientes y te entrega la lista con el motivo de cada una.",
+            "metaTitle": "Un Coworker de IA que encuentra leads B2B",
+            "metaDescription": "Un Coworker de Rerun lee ofertas de empleo, LinkedIn y tu CRM, elige las empresas que encajan con tu oferta y pregunta antes de gastar o enviar nada.",
+            "coworker": {
+                "name": "Representante de ventas",
+                "job": "Encuentra empresas que encajan, cada lunes"
+            },
+            "thread": {
+                "trigger": "Cada lunes a las 8:00",
+                "work": "Leí 120 ofertas de empleo en LinkedIn, descarté las 14 empresas que ya están en HubSpot y me quedé con las 26 que se parecen a tus mejores clientes.",
+                "deliverable": {
+                    "title": "Leads del lunes",
+                    "rows": {
+                        "1": "Forma · Head of Sales · contrata a 2 account executives",
+                        "2": "Northstar · Director comercial · nuevo equipo en París",
+                        "3": "Arc Labs · VP de Ventas · contrata a 3 SDR",
+                        "4": "Kerio Supply · COO · levantó 4 M€ en enero"
+                    }
+                },
+                "approval": {
+                    "ask": "Encontrar los emails de trabajo de los 26 decisores cuesta unos 80 créditos. ¿Adelante?",
+                    "approve": "Gastar 80 créditos",
+                    "done": "23 emails de trabajo encontrados, ninguno inventado. Los 26 leads están en HubSpot, responsable: tú."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "Cada lunes a las 8:00",
+                    "body": "Una rutina lo despierta en su propia máquina, con tu portátil cerrado o no. Guarda cada nombre en una tabla, así que la semana siguiente trae solo nombres nuevos."
+                },
+                "2": {
+                    "title": "LinkedIn, tu CRM, una hoja",
+                    "body": "Lee ofertas de empleo y perfiles, descarta las empresas con las que ya hablas en HubSpot o Pipedrive y rellena la hoja."
+                },
+                "3": {
+                    "title": "Una lista ordenada con el porqué",
+                    "body": "Cada empresa llega con la persona a quien escribir y la señal que hay detrás: una contratación, una nueva oficina, una ronda de financiación."
+                },
+                "4": {
+                    "title": "Tú apruebas el gasto",
+                    "body": "Los emails de trabajo y los teléfonos son datos de pago. Muestra primero los créditos estimados y no gasta nada hasta que digas que sí."
+                }
+            },
+            "templatesTitle": "Plantillas que encuentran a tus próximos clientes",
+            "faq": {
+                "1": {
+                    "question": "¿De dónde saca los leads?",
+                    "answer": "De ofertas de empleo, páginas de empresas, resultados de Google y LinkedIn, y luego los contrasta con tu propio CRM. Describes a tus mejores clientes una vez, o dejas que lea tus operaciones ganadas, y guarda ese perfil en memoria."
+                },
+                "2": {
+                    "question": "¿Encontrar emails y teléfonos cuesta extra?",
+                    "answer": "Sí. Los emails de trabajo, los teléfonos y los datos de empresas son datos de pago, facturados en créditos de Rerun ({creditsPerUsd} créditos por 1 $). Antes de gastar, el Coworker muestra el total estimado y espera tu sí, salvo que actives Gastar sin preguntar."
+                },
+                "3": {
+                    "question": "¿Necesito LinkedIn Pro?",
+                    "answer": "No, encuentra leads sin él. LinkedIn Pro, un complemento de pago de {linkedinPrice}/mes por cuenta, le permite buscar y leer en LinkedIn desde tu cuenta sin gastar créditos, enviar invitaciones y mensajes a un ritmo diario seguro, y despertarse cuando alguien responde."
+                },
+                "4": {
+                    "question": "¿Escribirá a los leads por su cuenta?",
+                    "answer": "No sin ti. Redacta el primer mensaje para cada lead y pregunta antes de enviar un email o una invitación de LinkedIn. Otro Coworker puede tomar la lista desde ahí y encargarse de los seguimientos."
+                },
+                "5": {
+                    "question": "¿Se salta a la gente que ya conocemos?",
+                    "answer": "Sí. Revisa HubSpot, Pipedrive o tu hoja antes de añadir a nadie, y guarda cada empresa que encontró en su base de datos, así que un nombre nunca vuelve dos veces."
+                }
+            }
+        },
+        "track-sales": {
+            "crumb": "Seguir las ventas",
+            "title": "Tu Coworker sigue tus ventas cada mañana.",
+            "lede": "Suma los ingresos en Stripe, lee cada operación abierta en tu CRM, actualiza la hoja de ingresos y te avisa solo cuando algo se mueve.",
+            "metaTitle": "Un Coworker de IA que sigue ingresos y pipeline",
+            "metaDescription": "Un Coworker de Rerun lee Stripe y tu CRM cada día laborable, actualiza tu hoja de ingresos y señala las operaciones retrasadas antes de avisar al equipo.",
+            "coworker": {
+                "name": "Analista de ingresos",
+                "job": "Lee los ingresos y el pipeline cada día laborable"
+            },
+            "thread": {
+                "trigger": "Cada día laborable a las 8:00",
+                "work": "Sumé 30 días en Stripe: 482 k$, un 11 % más que el mes pasado. Leí 54 operaciones abiertas en HubSpot y actualicé 3 pestañas de la hoja de ingresos.",
+                "deliverable": {
+                    "title": "Lo que se movió desde el viernes",
+                    "rows": {
+                        "1": "Halden Group · 84 000 $ · de vuelta a Propuesta",
+                        "2": "Vessel · 61 500 $ · de Cierre a Negociación",
+                        "3": "Petra · 38 000 $ · de Propuesta a Cierre",
+                        "4": "Churn · 2 cuentas canceladas, 1240 $ de MRR"
+                    }
+                },
+                "approval": {
+                    "ask": "Dos de tus cinco mayores operaciones se retrasaron. ¿Las publico en #sales con un siguiente paso para cada responsable?",
+                    "approve": "Publicar en #sales",
+                    "done": "Publicado. Volveré a señalar Halden el jueves si su fecha de cierre no se ha movido."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "Cada día laborable a las 8:00",
+                    "body": "Una rutina se ejecuta antes de que abras el portátil. Guarda las cifras de cada día en su base de datos, para saber qué cambió."
+                },
+                "2": {
+                    "title": "Stripe, tu CRM, la hoja",
+                    "body": "Lee pagos y suscripciones en Stripe, operaciones en HubSpot o Pipedrive, y escribe los totales en Sheets o Airtable."
+                },
+                "3": {
+                    "title": "Solo lo que se movió",
+                    "body": "Ingresos frente al mes pasado, operaciones que se retrasaron o saltaron de etapa, cuentas que se dieron de baja. Un día tranquilo se queda en un mensaje corto."
+                },
+                "4": {
+                    "title": "Tú decides quién se entera",
+                    "body": "Pregunta antes de publicar en el canal del equipo, escribir a un comercial o cambiar una operación, y tú eliges qué sale."
+                }
+            },
+            "templatesTitle": "Plantillas que vigilan los ingresos",
+            "faq": {
+                "1": {
+                    "question": "¿Qué herramientas puede leer?",
+                    "answer": "Stripe, HubSpot, Pipedrive, QuickBooks, Google Sheets, Airtable y el resto de más de {connectors} apps. Una herramienta sin app pero con servidor MCP también sirve, y una sin ninguna de las dos la puede abrir en el navegador de su propio ordenador."
+                },
+                "2": {
+                    "question": "¿Cambiará algo en mi CRM?",
+                    "answer": "Solo cuando se lo pidas. Por defecto, lee. Cuando quieres que cambie una etapa o corrija una fecha de cierre, lista los cambios en una tarjeta de aprobación y no escribe nada hasta que apruebes."
+                },
+                "3": {
+                    "question": "¿Y si una cifra parece incorrecta?",
+                    "answer": "Cada cifra indica de dónde viene: los cobros de Stripe o las operaciones que contó. Corrígela una vez, por ejemplo para excluir reembolsos, y guarda la regla en memoria para las siguientes ejecuciones."
+                },
+                "4": {
+                    "question": "¿Se ejecuta de noche y en fin de semana?",
+                    "answer": "Sí. Se ejecuta en su propia máquina en Europa, así que una rutina se dispara a su hora con tu portátil cerrado. Defines el calendario con palabras sencillas, como cada lunes a las 7 de la mañana."
+                },
+                "5": {
+                    "question": "¿Cuánto cuesta una ejecución diaria?",
+                    "answer": "Funciona con la IA que elijas. Con tu plan de Claude o ChatGPT o tu propia clave de API, una ejecución no cuesta nada del lado de Rerun. Con los modelos de Rerun usa tus créditos: Pro incluye {monthlyCredits} al mes."
+                }
+            }
+        },
+        "run-ads": {
+            "crumb": "Gestionar tus anuncios",
+            "title": "Tu Coworker revisa tus anuncios cada mañana.",
+            "lede": "Lee el gasto y los resultados de ayer en Meta Ads, los compara con tus ventas reales y propone qué pausar y adónde mover el presupuesto.",
+            "metaTitle": "Un Coworker de IA que gestiona tu gasto en anuncios",
+            "metaDescription": "Un Coworker de Rerun lee tu gasto en anuncios cada mañana, lo compara con las ventas reales y propone qué pausar o escalar. Nada cambia sin tu aprobación.",
+            "coworker": {
+                "name": "Responsable de anuncios",
+                "job": "Lee el gasto a diario, señala lo que pierde dinero"
+            },
+            "thread": {
+                "trigger": "Cada día a las 7:00",
+                "work": "Leí 38 conjuntos de anuncios en Meta Ads y 142 pedidos de Shopify. El gasto de ayer fue de 1920 $ para un retorno de 2,4x. Cuatro conjuntos de anuncios perdieron dinero tres días seguidos.",
+                "deliverable": {
+                    "title": "Anuncios sobre los que actuar hoy",
+                    "rows": {
+                        "1": "Pausar · Promo de primavera, amplia · 312 $ gastados, 0 ventas",
+                        "2": "Pausar · Retargeting 30 días · retorno de 0,6x",
+                        "3": "Escalar · Vídeo UGC, lookalike · retorno de 4,1x",
+                        "4": "Probar · 3 ganchos nuevos redactados para el ganador"
+                    }
+                },
+                "approval": {
+                    "ask": "¿Pauso los 4 conjuntos de anuncios que pierden y muevo 150 $ al día al vídeo UGC?",
+                    "approve": "Pausar 4, mover 150 $",
+                    "done": "Hecho en Meta Ads. Leeré el nuevo reparto mañana a las 7:00 y te diré cómo fue."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "Cada día a las 7:00",
+                    "body": "Una rutina lee el día anterior antes de tu primer café, fines de semana incluidos, y guarda cada día en una tabla para detectar caídas lentas."
+                },
+                "2": {
+                    "title": "Meta Ads, tu tienda, una hoja",
+                    "body": "Lee las campañas a través de la app de Meta Ads y los pedidos en Shopify o Stripe. Otros gestores de anuncios los abre en su propio navegador."
+                },
+                "3": {
+                    "title": "Pausar, escalar o probar",
+                    "body": "Cada conjunto de anuncios recibe un veredicto con las cifras detrás, y los ganadores reciben nuevos ganchos y briefs para los siguientes creativos."
+                },
+                "4": {
+                    "title": "Tú apruebas cada cambio",
+                    "body": "Pausar un anuncio o mover presupuesto es decisión tuya. Lista cada cambio con su importe y espera tu sí."
+                }
+            },
+            "templatesTitle": "Plantillas que gestionan tu captación de pago",
+            "faq": {
+                "1": {
+                    "question": "¿En qué plataformas de anuncios trabaja?",
+                    "answer": "En Meta Ads a través de su app, para tus campañas de Facebook e Instagram. Para anuncios de Google, LinkedIn o TikTok usa el navegador de su propio ordenador: inicias sesión una vez cuando lo pide, y trabaja en el gestor de anuncios como lo haría una persona."
+                },
+                "2": {
+                    "question": "¿Puede cambiar mis presupuestos sin preguntar?",
+                    "answer": "No. Lee y propone. Pausar un conjunto de anuncios, cambiar un presupuesto o lanzar un anuncio te llega en una tarjeta de aprobación, con los importes, y nada se mueve hasta que haces clic en Aprobar."
+                },
+                "3": {
+                    "question": "¿Cómo sabe que un anuncio realmente gana dinero?",
+                    "answer": "Lee tus pedidos en Shopify o Stripe junto a las cifras de la propia plataforma, así que ves lo que gastaste frente a lo que entró, no solo lo que cuenta el gestor de anuncios."
+                },
+                "4": {
+                    "question": "¿Puede escribir los próximos anuncios?",
+                    "answer": "Sí. Redacta ganchos, textos y briefs para los próximos creativos a partir de lo que ya funciona, con el tono guardado en tu Brain. Cada borrador espera tu OK antes de salir."
+                },
+                "5": {
+                    "question": "¿Puede ver los anuncios de mi competencia?",
+                    "answer": "Conecta una app de investigación como Brandsearch o TrendTrack y lee los anuncios que tu competencia publica en Meta y TikTok, y te trae los ángulos que vale la pena probar."
+                }
+            }
+        },
+        "watch-competitors": {
+            "crumb": "Vigilar a la competencia",
+            "title": "Tu Coworker vigila a tu competencia cada día.",
+            "lede": "Revisa sus páginas de precios, lanzamientos, publicaciones y posiciones, y te avisa el día que cambia algo que importa para tu negocio.",
+            "metaTitle": "Un Coworker de IA que vigila a tu competencia",
+            "metaDescription": "Un Coworker de Rerun revisa a diario precios, lanzamientos, publicaciones y posiciones de tu competencia, y te escribe solo cuando cambia algo importante.",
+            "coworker": {
+                "name": "Analista de mercado",
+                "job": "Vigila a 3 competidores, escribe solo si hay cambios"
+            },
+            "thread": {
+                "trigger": "Cada día a las 8:00",
+                "work": "Revisé 3 páginas de precios, leí 18 publicaciones nuevas en LinkedIn y X, y comparé 212 brechas de palabras clave. Un cambio merece tu atención.",
+                "deliverable": {
+                    "title": "Competencia esta semana",
+                    "rows": {
+                        "1": "Northstar · plan de entrada de 79 $ a 59 $, nuevo plan gratuito",
+                        "2": "Cobalt · lanzó un directorio de integraciones",
+                        "3": "Tenley · nada se movió, precios sin cambios",
+                        "4": "Brecha · 14 palabras clave donde posicionan y tú no"
+                    }
+                },
+                "approval": {
+                    "ask": "Northstar ahora está 20 $ por debajo de ti. ¿Redacto una respuesta para tu página de precios y una nota para ventas?",
+                    "approve": "Redactar ambas",
+                    "done": "Los dos borradores están en Notion para que los leas. Sigo revisando Northstar cada día."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "Cada día a las 8:00",
+                    "body": "Una rutina revisa a cada competidor y compara lo que ve con lo que guardó la última vez, así que solo te llegan los cambios."
+                },
+                "2": {
+                    "title": "Su web, redes y búsquedas",
+                    "body": "Lee sus páginas en la web, sus publicaciones en LinkedIn y X, y sus posiciones con datos SEO o una app como Semrush."
+                },
+                "3": {
+                    "title": "Solo cambios reales",
+                    "body": "Cambios de precio, lanzamientos, páginas nuevas y las palabras clave que ganan, cada uno con el enlace y la fecha en que lo vio."
+                },
+                "4": {
+                    "title": "Tú eliges la respuesta",
+                    "body": "Propone la respuesta, una página que actualizar o una nota para ventas, y pregunta antes de publicar o cambiar nada."
+                }
+            },
+            "templatesTitle": "Plantillas que vigilan tu mercado",
+            "faq": {
+                "1": {
+                    "question": "¿Qué puede vigilar?",
+                    "answer": "Sus páginas públicas (precios, producto, changelog, empleo), sus publicaciones en LinkedIn, X, Instagram o YouTube, sus reseñas y su posición en Google. Los nombras una vez y guarda la lista en memoria."
+                },
+                "2": {
+                    "question": "¿Cómo sabe qué cambió?",
+                    "answer": "Guarda lo que vio en cada revisión en su base de datos y compara la siguiente con eso. Cada ejecución programada empieza de cero, así que esa tabla es su memoria."
+                },
+                "3": {
+                    "question": "¿Usa datos de pago?",
+                    "answer": "Posiciones, volúmenes de búsqueda, backlinks y perfiles sociales públicos son datos de pago, cobrados en créditos de Rerun, y muestra el coste estimado antes de gastar. Leer su web no necesita datos de pago."
+                },
+                "4": {
+                    "question": "¿Me avisará en cuanto cambie un precio?",
+                    "answer": "Sí. Revisa las páginas de precios cada hora y el resto una vez por semana, cada una con su propia rutina. Te envía una notificación o un mensaje de Slack solo cuando una ejecución encuentra un cambio."
+                },
+                "5": {
+                    "question": "¿Y los sitios que bloquean bots?",
+                    "answer": "Tiene su propio ordenador, con navegador, así que abre una página como lo haría una persona. Cuando una página pide iniciar sesión o un captcha, te pasa su navegador para ese paso."
+                }
+            }
+        },
+        "create-content": {
+            "crumb": "Crear contenido",
+            "title": "Tu Coworker escribe tu próximo artículo el martes.",
+            "lede": "Lee tu Search Console, encuentra la búsqueda que tienes más cerca de ganar, estudia las páginas que posicionan y redacta el artículo con tu tono.",
+            "metaTitle": "Un Coworker de IA que escribe contenido SEO",
+            "metaDescription": "Un Coworker de Rerun encuentra la búsqueda más cerca de ganar, estudia las páginas que posicionan y redacta el artículo con tu tono. Publica si apruebas.",
+            "coworker": {
+                "name": "Responsable de contenidos",
+                "job": "Escribe un artículo por semana con tus datos de búsqueda"
+            },
+            "thread": {
+                "trigger": "Cada martes a las 10:00",
+                "work": "Leí 1204 búsquedas en Search Console y los 3 primeros resultados de la más cercana. Reescribí el artículo que ya tenemos en vez de empezar uno que posicione por detrás.",
+                "deliverable": {
+                    "title": "Artículo de esta semana",
+                    "rows": {
+                        "1": "Palabra clave · orquestación de agentes · posición 11",
+                        "2": "Volumen · 2400 búsquedas al mes",
+                        "3": "Borrador · 1850 palabras sobre 3 preguntas que responde la primera página",
+                        "4": "Enlaces · 4 enlaces internos, 2 fuentes citadas"
+                    }
+                },
+                "approval": {
+                    "ask": "La reescritura está guardada como borrador en WordPress. ¿La publico ahora en la misma URL?",
+                    "approve": "Publicar la reescritura",
+                    "done": "Publicado. El próximo martes reviso su posición antes de elegir la siguiente palabra clave."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "Cada martes a las 10:00",
+                    "body": "Una rutina elige el tema de la semana a partir de tus datos de búsqueda, no a ojo. O pide en el chat un artículo sobre tu propio tema."
+                },
+                "2": {
+                    "title": "Búsquedas, documentos, tu CMS",
+                    "body": "Lee Google Search Console, abre las páginas que posicionan, usa tus notas de Notion o Drive y redacta en WordPress."
+                },
+                "3": {
+                    "title": "Un borrador con tu voz",
+                    "body": "Tu oferta y tu tono viven en el Brain, así que el borrador suena como tú, con sus fuentes y enlaces internos."
+                },
+                "4": {
+                    "title": "Tú lo publicas",
+                    "body": "El borrador espera en tu CMS. Publica un artículo nuevo, o actualiza uno ya publicado, solo cuando apruebas."
+                }
+            },
+            "templatesTitle": "Plantillas que escriben y planifican tu contenido",
+            "faq": {
+                "1": {
+                    "question": "¿De dónde saca los temas?",
+                    "answer": "De tus búsquedas en Google Search Console, datos de palabras clave y lo que publica tu competencia, o del tema que le des. Por defecto va a por la búsqueda que tienes más cerca de ganar."
+                },
+                "2": {
+                    "question": "¿Sonará como nosotros?",
+                    "answer": "Escribe desde tu Brain: tu oferta, tu mercado y tu tono, escritos una vez y compartidos por todos los Coworkers. Corrige un borrador y guarda la corrección en memoria, o propone convertirla en una skill."
+                },
+                "3": {
+                    "question": "¿En qué CMS puede publicar?",
+                    "answer": "WordPress, Webflow, Contentful, Sanity, Strapi y Notion a través de sus apps. Para un sitio sin app, trabaja en tu editor desde el navegador de su propio ordenador."
+                },
+                "4": {
+                    "question": "¿Los datos de palabras clave cuestan créditos?",
+                    "answer": "Tus propios datos de Search Console no cuestan nada una vez conectados. Volúmenes de búsqueda, ideas de palabras clave y backlinks son datos de pago, cobrados en créditos de Rerun, y pregunta antes de gastar."
+                },
+                "5": {
+                    "question": "¿Puede convertir el artículo en publicaciones?",
+                    "answer": "Sí. Pasa el artículo a tu Coworker de redes sociales, que lo convierte en una publicación de LinkedIn y un carrusel de Instagram, cada uno a la espera de tu OK."
+                }
+            }
+        },
+        "post-on-social": {
+            "crumb": "Publicar en redes",
+            "title": "Tu Coworker publica en redes cada mañana.",
+            "lede": "Convierte tus artículos, lanzamientos y novedades en una publicación para cada red, publica cuando apruebas y responde a los comentarios que llegan.",
+            "metaTitle": "Un Coworker de IA que publica en redes sociales",
+            "metaDescription": "Un Coworker de Rerun escribe una publicación por red con tus artículos, publica en LinkedIn, Instagram y Facebook si apruebas y responde comentarios.",
+            "coworker": {
+                "name": "Community manager",
+                "job": "Publica cada día laborable, responde comentarios"
+            },
+            "thread": {
+                "trigger": "Cada día laborable a las 9:00",
+                "work": "Leí el artículo de esta semana y 41 comentarios nuevos. Redacté una publicación de LinkedIn, un carrusel de 5 diapositivas para Instagram y respuestas a 12 comentarios.",
+                "deliverable": {
+                    "title": "Publicaciones de hoy",
+                    "rows": {
+                        "1": "LinkedIn · 9:30 · abre con los 20 tickets que todos repiten",
+                        "2": "Instagram · 12:00 · 5 diapositivas, una idea en cada una",
+                        "3": "Facebook · 17:00 · la versión corta, con el enlace",
+                        "4": "Comentarios · 12 respuestas redactadas, 2 para ti"
+                    }
+                },
+                "approval": {
+                    "ask": "¿Publico las 3 publicaciones a esas horas y envío las 12 respuestas?",
+                    "approve": "Publicar y responder",
+                    "done": "Todo listo. Mañana por la mañana leo las reacciones y te digo qué publicación funcionó."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "Cada día laborable a las 9:00",
+                    "body": "Una rutina prepara las publicaciones del día. También arranca cuando otro Coworker le pasa un artículo nuevo para compartir."
+                },
+                "2": {
+                    "title": "LinkedIn, Instagram, Facebook",
+                    "body": "Publica y responde comentarios a través de la app de cada red, y programa con Buffer para las demás."
+                },
+                "3": {
+                    "title": "Una publicación por red",
+                    "body": "Una idea adaptada a cada audiencia: una publicación, un carrusel, una versión corta, con el tono guardado en tu Brain."
+                },
+                "4": {
+                    "title": "Tú das el visto bueno",
+                    "body": "Nada sale antes de que lo apruebes, con su texto, su imagen y su hora. Las respuestas a comentarios también te esperan."
+                }
+            },
+            "templatesTitle": "Plantillas que gestionan tus redes sociales",
+            "faq": {
+                "1": {
+                    "question": "¿En qué redes puede publicar?",
+                    "answer": "LinkedIn, Instagram, Páginas de Facebook y YouTube a través de sus apps, y las demás con un programador como Buffer. También lee X y las noticias para encontrar de qué vale la pena publicar."
+                },
+                "2": {
+                    "question": "¿Publica sin mí?",
+                    "answer": "No, salvo que se lo digas. Cada publicación espera en una tarjeta de aprobación con su texto, su imagen y su hora. Puedes decirle qué respuestas puede enviar solo, y guarda esa regla en memoria."
+                },
+                "3": {
+                    "question": "¿Puede responder comentarios y mensajes directos?",
+                    "answer": "Sí: comentarios en LinkedIn, Facebook e Instagram, y mensajes directos de Instagram. Redacta con tu tono y te deja los delicados a ti."
+                },
+                "4": {
+                    "question": "¿De dónde salen las ideas?",
+                    "answer": "De tus artículos, lanzamientos e historias de clientes, del Brain y de lo que tu audiencia ya valoró antes. Tu Coworker de contenidos puede pasarle cada artículo nuevo en cuanto se publica."
+                },
+                "5": {
+                    "question": "¿Necesito LinkedIn Pro para publicar?",
+                    "answer": "No. Publicar y comentar pasa por la app de LinkedIn, sin coste extra. LinkedIn Pro, un complemento de pago de {linkedinPrice}/mes por cuenta, sirve para prospectar: buscar perfiles, enviar invitaciones y mensajes."
+                }
+            }
+        },
+        "reply-to-customers": {
+            "crumb": "Responder a clientes",
+            "title": "Tu Coworker responde a tus clientes en minutos.",
+            "lede": "Llega un mensaje de WhatsApp o un email: lee el pedido, revisa tus políticas y responde con tu tono. Los delicados te llegan a ti.",
+            "metaTitle": "Un Coworker de IA que responde a tus clientes",
+            "metaDescription": "Un Coworker de Rerun responde a clientes por WhatsApp y email con tus pedidos y tu ayuda, con tu tono, y pregunta antes de reembolsar o prometer nada.",
+            "coworker": {
+                "name": "Atención al cliente",
+                "job": "Responde WhatsApp y email con tus documentos"
+            },
+            "thread": {
+                "trigger": "Llega un mensaje de WhatsApp",
+                "work": "Leí el mensaje de Clara, encontré el pedido #1042 en Shopify y la política de devoluciones en Notion. Es el día 12 de 30, así que la devolución está permitida.",
+                "deliverable": {
+                    "title": "Respuesta redactada",
+                    "rows": {
+                        "1": "Clara Mendes · pedido #1042 · quiere devolver una chaqueta",
+                        "2": "Política · 30 días, sin usar, etiqueta de devolución gratis",
+                        "3": "Respuesta · devolución aceptada, etiqueta adjunta",
+                        "4": "Reembolso · 129 $ cuando se escanee el paquete"
+                    }
+                },
+                "approval": {
+                    "ask": "¿Envío a Clara la respuesta con la etiqueta de devolución y anoto la devolución en el pedido de Shopify?",
+                    "approve": "Enviar la respuesta",
+                    "done": "Enviado por WhatsApp. Avisaré a Clara cuando salga su reembolso."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "Un mensaje lo despierta",
+                    "body": "Con WhatsApp Pro, un mensaje nuevo inicia una ejecución al momento. Para el email, una rutina revisa la bandeja de soporte con la frecuencia que definas."
+                },
+                "2": {
+                    "title": "Tu bandeja, pedidos, documentos",
+                    "body": "Lee la conversación, encuentra el pedido en Shopify o el cliente en Stripe, y consulta tu documentación de ayuda en Notion."
+                },
+                "3": {
+                    "title": "Una respuesta con tu tono",
+                    "body": "Hecha a partir de tus políticas y de las respuestas que ya enviaste, con lo que comprobó debajo del borrador."
+                },
+                "4": {
+                    "title": "Tú apruebas lo que sale",
+                    "body": "Pregunta antes de enviar, reembolsar o prometer nada. Una disputa o una cuestión legal se queda contigo."
+                }
+            },
+            "templatesTitle": "Plantillas que cuidan de tus clientes",
+            "faq": {
+                "1": {
+                    "question": "¿Puede responder por WhatsApp?",
+                    "answer": "Sí, con WhatsApp Pro, un complemento de pago de {whatsappPrice}/mes por número. Se une a tu número como dispositivo vinculado, igual que WhatsApp Web, responde con texto, archivos y notas de voz, y nunca escribe a desconocidos."
+                },
+                "2": {
+                    "question": "¿Funciona con mis herramientas de soporte?",
+                    "answer": "Responde desde Gmail u Outlook y desde WhatsApp, y lee tus conversaciones de Intercom o Freshdesk a través de sus apps. Los pedidos vienen de Shopify, los clientes y pagos de Stripe."
+                },
+                "3": {
+                    "question": "¿Se inventará cosas?",
+                    "answer": "Responde a partir de tu documentación de ayuda, tus políticas y lo que respondiste antes, y muestra lo que comprobó. Cuando la respuesta no está, te pregunta en vez de adivinar."
+                },
+                "4": {
+                    "question": "¿Puede reembolsar a un cliente?",
+                    "answer": "Puede preparar un reembolso en Stripe o Shopify, pero el dinero que sale de tu cuenta lo decides tú: pregunta primero, con el importe y el pedido, y no hace nada hasta que apruebas."
+                },
+                "5": {
+                    "question": "¿Responde de noche?",
+                    "answer": "Sí. Se ejecuta en su propia máquina, así que un mensaje de WhatsApp a las 2 de la madrugada tiene su ejecución a las 2. Una respuesta que necesita tu sí espera en tu bandeja y en tu móvil."
+                }
+            }
+        },
+        "triage-inbox": {
+            "crumb": "Ordenar tu bandeja de entrada",
+            "title": "Tu Coworker vacía tu bandeja antes de que despiertes.",
+            "lede": "Lee el email de la noche, etiqueta cada hilo, redacta las respuestas que puede y te deja las pocas que necesitan tu criterio.",
+            "metaTitle": "Un Coworker de IA que ordena tu bandeja de entrada",
+            "metaDescription": "Un Coworker de Rerun lee tu Gmail u Outlook cada mañana, etiqueta cada hilo, archiva las facturas y redacta respuestas. No envía nada sin tu aprobación.",
+            "coworker": {
+                "name": "Asistente de dirección",
+                "job": "Ordena tu bandeja cada mañana"
+            },
+            "thread": {
+                "trigger": "Cada día laborable a las 7:00",
+                "work": "Leí 86 emails nuevos. Etiqueté 61 newsletters y recibos, archivé 9 facturas en Drive y redacté 14 respuestas a partir de lo que dijiste antes.",
+                "deliverable": {
+                    "title": "Tu bandeja esta mañana",
+                    "rows": {
+                        "1": "Respuestas · 14 redactadas, listas para enviar",
+                        "2": "Facturas · 9 archivadas en Drive, Facturas 2026",
+                        "3": "Reunión · Lena Haas pide el jueves a las 15:00, libre",
+                        "4": "Te necesita · duda de contrato de Halden Group"
+                    }
+                },
+                "approval": {
+                    "ask": "¿Envío las 14 respuestas redactadas y acepto la reunión de Lena el jueves a las 15:00?",
+                    "approve": "Enviar 14, aceptar 1",
+                    "done": "Enviado y reservado. La duda de contrato de Halden te espera arriba del todo."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "Cada día laborable a las 7:00",
+                    "body": "Una rutina lee lo que llegó durante la noche. Añade una segunda ejecución después de comer si tu bandeja lo necesita."
+                },
+                "2": {
+                    "title": "Gmail, Calendar, Drive",
+                    "body": "Trabaja en Gmail u Outlook, consulta tu calendario antes de proponer una hora y archiva los adjuntos en Drive."
+                },
+                "3": {
+                    "title": "Etiquetado, redactado, archivado",
+                    "body": "Cada hilo recibe una etiqueta, las respuestas se redactan a partir de tus respuestas pasadas y los recibos van donde los guardas."
+                },
+                "4": {
+                    "title": "Tú envías, o lo saltas",
+                    "body": "Los borradores siguen siendo borradores hasta que los apruebas. Lo que necesita tu criterio llega en una lista corta, lo más urgente primero."
+                }
+            },
+            "templatesTitle": "Plantillas que gestionan tu email",
+            "faq": {
+                "1": {
+                    "question": "¿Funciona con Gmail y Outlook?",
+                    "answer": "Con los dos, a través de sus apps, y con cualquier otro buzón por IMAP y SMTP. Puede manejar varias cuentas, cada una con su etiqueta, y siempre dice desde cuál actúa."
+                },
+                "2": {
+                    "question": "¿Enviará emails por su cuenta?",
+                    "answer": "No. Redacta. Enviar, aceptar una reunión o eliminar un hilo te llega en una tarjeta de aprobación, con cada email listado, y los apruebas uno a uno o todos juntos."
+                },
+                "3": {
+                    "question": "¿Cómo aprende mis reglas?",
+                    "answer": "Díselo una vez, como «los recibos van a Drive, las newsletters se archivan», y guarda la regla en memoria. Un procedimiento que repites puede convertirse en una skill que sigue cada mañana."
+                },
+                "4": {
+                    "question": "¿Quién lee mi email?",
+                    "answer": "Tu Coworker, en la propia máquina de tu workspace, donde se quedan las credenciales de tu buzón. El texto va a la IA que elijas: tu plan de Claude o ChatGPT, tu propia clave o los modelos de Rerun."
+                },
+                "5": {
+                    "question": "¿Puedo vaciarla desde el móvil?",
+                    "answer": "Sí. La tarjeta de aprobación llega a tu bandeja en las apps de iPhone y Android, y la apruebas o la saltas ahí con un toque."
+                }
+            }
+        },
+        "prepare-meetings": {
+            "crumb": "Preparar reuniones",
+            "title": "Tu Coworker te prepara antes de cada reunión.",
+            "lede": "Cada mañana lee tu calendario, busca con quién te reúnes, su empresa y tus últimos emails, y te escribe un resumen corto por llamada.",
+            "metaTitle": "Un Coworker de IA que prepara tus reuniones",
+            "metaDescription": "Un Coworker de Rerun lee tu calendario cada mañana y escribe un resumen de cada persona: quién es, qué os dijisteis, en qué punto está la operación.",
+            "coworker": {
+                "name": "Asistente de ventas",
+                "job": "Escribe un resumen para cada llamada del día"
+            },
+            "thread": {
+                "trigger": "Cada día laborable a las 7:30",
+                "work": "Encontré 4 reuniones externas hoy. Leí 23 emails anteriores, las 2 operaciones abiertas en HubSpot y los perfiles de LinkedIn de 6 asistentes.",
+                "deliverable": {
+                    "title": "Resumen · Halden Group, 14:00",
+                    "rows": {
+                        "1": "Anna Berg · Head of Ops · entró en marzo",
+                        "2": "Operación · 84 000 $ · de vuelta a Propuesta el viernes",
+                        "3": "Último email · pidió un SLA a medida",
+                        "4": "Preguntar · ¿quién más aprueba el presupuesto?"
+                    }
+                },
+                "approval": {
+                    "ask": "¿Envío a Anna la agenda y el borrador del SLA antes de la llamada?",
+                    "approve": "Enviar la agenda",
+                    "done": "Enviada. Después de la llamada, cuéntame cómo fue y actualizo la operación en HubSpot."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "Cada día laborable a las 7:30",
+                    "body": "Una rutina lee el calendario del día. Para una llamada reservada hace una hora, pide su resumen en el chat."
+                },
+                "2": {
+                    "title": "Calendario, email, CRM, LinkedIn",
+                    "body": "Lee tu calendario, los emails anteriores con cada asistente, la operación en tu CRM y su perfil público."
+                },
+                "3": {
+                    "title": "Un resumen corto por llamada",
+                    "body": "Quién es, qué os dijisteis la última vez, en qué punto está la operación y las dos preguntas que vale la pena hacer."
+                },
+                "4": {
+                    "title": "Tú apruebas lo que sale",
+                    "body": "Una agenda, un seguimiento o una actualización del CRM después de la llamada: los redacta y pregunta antes de enviar o guardar."
+                }
+            },
+            "templatesTitle": "Plantillas que preparan tus llamadas",
+            "faq": {
+                "1": {
+                    "question": "¿Dónde encuentra información sobre las personas?",
+                    "answer": "En tu email, tu calendario y tu CRM, y luego en fuentes públicas: la web de la empresa, las noticias y LinkedIn. Los perfiles de LinkedIn vienen de datos de pago, o de tu propia cuenta con LinkedIn Pro."
+                },
+                "2": {
+                    "question": "¿Puede leer mis notas de reuniones?",
+                    "answer": "Sí. Conecta Granola, Fathom o Fireflies y lee las notas de la última llamada, y después de la siguiente redacta el seguimiento y la actualización del CRM."
+                },
+                "3": {
+                    "question": "¿Con qué calendarios funciona?",
+                    "answer": "Google Calendar y Outlook a través de sus apps, y Calendly o Cal.com para ver qué se reservó y qué escribió la persona al reservar."
+                },
+                "4": {
+                    "question": "¿Puedo leer el resumen en el móvil?",
+                    "answer": "Sí. El resumen llega al hilo del Coworker, que abres en la app de iPhone o Android de camino a la reunión. También puede publicarlo en Slack."
+                },
+                "5": {
+                    "question": "¿Un resumen cuesta créditos?",
+                    "answer": "Leer tus propias apps no usa datos de pago. Buscar una persona o una empresa en datos de pago se cobra en créditos de Rerun, y muestra el coste estimado antes de gastar."
+                }
+            }
+        },
+        "track-orders": {
+            "crumb": "Seguir pedidos",
+            "title": "Tu Coworker detecta los pedidos con retraso antes que tus clientes.",
+            "lede": "Cada mañana revisa tus pedidos abiertos y su seguimiento, encuentra los atascados y avisa a tus clientes antes de que pregunten.",
+            "metaTitle": "Un Coworker de IA que sigue tus pedidos de Shopify",
+            "metaDescription": "Un Coworker de Rerun revisa cada mañana tus pedidos abiertos de Shopify, detecta retrasos y direcciones erróneas, y avisa a cada cliente si apruebas.",
+            "coworker": {
+                "name": "Gestor de pedidos",
+                "job": "Revisa cada pedido abierto cada mañana"
+            },
+            "thread": {
+                "trigger": "Cada día a las 8:00",
+                "work": "Revisé 312 pedidos abiertos en Shopify y su seguimiento. 9 van con retraso, 3 tienen una dirección errónea y 2 pedidos contra reembolso no están confirmados.",
+                "deliverable": {
+                    "title": "Pedidos que requieren acción",
+                    "rows": {
+                        "1": "#4821 · Lyon · 6 días en tránsito, paquete atascado",
+                        "2": "#4830 · Berlín · a la dirección le falta el número",
+                        "3": "#4836 · Madrid · contra reembolso, sin confirmar",
+                        "4": "8 más con retraso · un mensaje redactado para cada uno"
+                    }
+                },
+                "approval": {
+                    "ask": "¿Envío a los 9 clientes con retraso una breve actualización con su nueva fecha de entrega?",
+                    "approve": "Enviar las 9 actualizaciones",
+                    "done": "Enviado. Mañana vuelvo a revisar esos 9 y te digo cuáles siguen sin moverse."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "Cada día a las 8:00",
+                    "body": "Una rutina revisa cada pedido abierto. Apunta un webhook de Shopify hacia él y también revisa cada pedido nuevo en cuanto llega."
+                },
+                "2": {
+                    "title": "Shopify, email, WhatsApp",
+                    "body": "Lee pedidos y clientes en Shopify, abre las páginas de seguimiento en su propio navegador y escribe desde Gmail o WhatsApp."
+                },
+                "3": {
+                    "title": "Los pedidos que te necesitan",
+                    "body": "Con retraso, atascados, dirección errónea, sin confirmar: cada pedido con su siguiente paso y el mensaje al cliente listo."
+                },
+                "4": {
+                    "title": "Tú apruebas los mensajes",
+                    "body": "Envía actualizaciones, cancela o reembolsa solo cuando dices que sí, con cada pedido listado en la tarjeta."
+                }
+            },
+            "templatesTitle": "Plantillas que mantienen los pedidos en marcha",
+            "faq": {
+                "1": {
+                    "question": "¿Con qué tiendas funciona?",
+                    "answer": "Shopify a través de su app, y también Wix o Square. Para otro back office, inicia sesión una vez en el navegador de su propio ordenador y trabaja ahí como lo haría una persona."
+                },
+                "2": {
+                    "question": "¿Cómo ve dónde está un paquete?",
+                    "answer": "Con los números de seguimiento de tus pedidos: abre la página de seguimiento del transportista en su propio navegador y anota el último escaneo en su base de datos, así la ejecución de mañana sabe qué se movió."
+                },
+                "3": {
+                    "question": "¿Puede escribir a los clientes por WhatsApp?",
+                    "answer": "Sí, con WhatsApp Pro, un complemento de pago de {whatsappPrice}/mes por número. Escribe desde tu número con texto, archivos y notas de voz, y la respuesta de un cliente lo despierta. El email funciona sin él."
+                },
+                "4": {
+                    "question": "¿Puede revisar los pedidos a medida que llegan?",
+                    "answer": "Sí. Añade un disparador webhook al Coworker y pega su URL en los ajustes de webhooks de Shopify: cada pedido nuevo o actualización de envío inicia una ejecución con el pedido adjunto."
+                },
+                "5": {
+                    "question": "¿Cancelará o reembolsará pedidos?",
+                    "answer": "Solo cuando apruebas. Prepara la cancelación o el reembolso con el importe y el motivo, y nada cambia en Shopify hasta que haces clic en Aprobar."
+                }
+            }
+        },
+        "chase-invoices": {
+            "crumb": "Reclamar facturas",
+            "title": "Tu Coworker reclama las facturas el día que vencen.",
+            "lede": "Cuando una factura vence sin pagar, escribe un recordatorio amable, insiste con la cadencia que definas y concilia cada pago que entra.",
+            "metaTitle": "Un Coworker de IA que reclama facturas vencidas",
+            "metaDescription": "Un Coworker de Rerun reclama cada factura vencida con tu tono y tu cadencia, y concilia los pagos que entran. Cada recordatorio espera tu sí.",
+            "coworker": {
+                "name": "Gestor de cobros",
+                "job": "Reclama facturas vencidas, concilia pagos"
+            },
+            "thread": {
+                "trigger": "Factura vencida en Stripe",
+                "work": "La factura #1057 a Northwind, de 2400 $, lleva 7 días de retraso. Ningún pago en Stripe y ninguna respuesta al primer recordatorio en Gmail.",
+                "deliverable": {
+                    "title": "Vencidas esta semana",
+                    "rows": {
+                        "1": "Northwind · #1057 · 2400 $ · 7 días de retraso",
+                        "2": "Acme · #1042 · 1150 $ · tarjeta caducada",
+                        "3": "Halden Group · #1061 · pagó 120 $ de menos, comisión bancaria",
+                        "4": "Petra · #1066 · pagada hoy, recibo enviado"
+                    }
+                },
+                "approval": {
+                    "ask": "¿Envío a Northwind un segundo recordatorio con el enlace de pago, con copia a su equipo de contabilidad?",
+                    "approve": "Enviar el recordatorio",
+                    "done": "Enviado. Si no entra nada antes del martes, preparo el tercero."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "El día que vence una factura",
+                    "body": "Un webhook de Stripe lo despierta cuando una factura vence. Para QuickBooks o una hoja, una rutina revisa cada mañana."
+                },
+                "2": {
+                    "title": "Stripe, tu contabilidad, email",
+                    "body": "Lee las facturas en Stripe o QuickBooks, los pagos en la app de tu banco y el hilo con cada cliente en Gmail."
+                },
+                "3": {
+                    "title": "Un recordatorio por factura",
+                    "body": "Amable primero, más firme después, con el importe, la fecha de vencimiento y el enlace de pago. Los pagos recibidos se concilian."
+                },
+                "4": {
+                    "title": "Tú apruebas cada recordatorio",
+                    "body": "Nada llega a un cliente sin tu sí. Una disputa o un pago parcial te llega a ti con los hechos."
+                }
+            },
+            "templatesTitle": "Plantillas que te ayudan a cobrar",
+            "faq": {
+                "1": {
+                    "question": "¿Con qué herramientas de facturación funciona?",
+                    "answer": "Stripe, QuickBooks y PayPal a través de sus apps, o una hoja o Airtable si ahí viven tus facturas. Los pagos se concilian con Stripe, Mercury, GoCardless o una exportación bancaria."
+                },
+                "2": {
+                    "question": "¿Cómo sabe que una factura está vencida?",
+                    "answer": "Pega la URL del webhook del Coworker en Stripe y una factura vencida inicia una ejecución al momento, con la factura adjunta. Sin webhook, una rutina revisa tus facturas cada mañana."
+                },
+                "3": {
+                    "question": "¿Molestará a mis clientes?",
+                    "answer": "Sigue la cadencia que definas, por ejemplo 3, 10 y 20 días después del vencimiento, con tu tono. Cada recordatorio espera tu aprobación, y un cliente que paga o responde sale de la secuencia."
+                },
+                "4": {
+                    "question": "¿Puede conciliar pagos con facturas?",
+                    "answer": "Sí. Lee los pagos entrantes, los concilia con las facturas abiertas por importe y referencia, y señala los que no cuadran, como una transferencia con 120 $ de menos. Marca una factura como pagada cuando apruebas."
+                },
+                "5": {
+                    "question": "¿Dónde lleva el registro de todo esto?",
+                    "answer": "En su propia base de datos, en la máquina de tu workspace: cada factura, cada recordatorio enviado, cada pago conciliado. Exporta cualquier tabla en CSV o JSON cuando lo necesites."
+                }
+            }
+        },
+        "screen-candidates": {
+            "crumb": "Filtrar candidatos",
+            "title": "Tu Coworker filtra candidatos mientras trabajas.",
+            "lede": "Lee cada candidatura según los criterios del puesto, puntúa cada una y te entrega una lista corta con el motivo detrás de cada nombre.",
+            "metaTitle": "Un Coworker de IA que filtra candidatos",
+            "metaDescription": "Un Coworker de Rerun lee cada candidatura según tus criterios, puntúa cada CV con pruebas y te entrega una lista corta. Tú decides quién sigue.",
+            "coworker": {
+                "name": "Reclutador",
+                "job": "Lee candidaturas, arma la lista corta"
+            },
+            "thread": {
+                "trigger": "Haz la lista corta del puesto de Account Executive",
+                "work": "Leí 64 candidaturas y sus CV en Gmail y Drive, y puntué cada una según tus 5 requisitos. 9 cumplen los cinco, 3 destacan.",
+                "deliverable": {
+                    "title": "Lista corta · Account Executive",
+                    "rows": {
+                        "1": "Maya Okafor · 5/5 · 4 años vendiendo SaaS a pymes",
+                        "2": "Tom Riedel · 5/5 · superó su cuota 6 trimestres seguidos",
+                        "3": "Inès Garnier · 5/5 · vende en francés y alemán",
+                        "4": "61 más · puntuados, con el motivo de cada uno"
+                    }
+                },
+                "approval": {
+                    "ask": "¿Invito a los 3 primeros a una primera llamada esta semana, en tus huecos libres del calendario?",
+                    "approve": "Invitar a los 3",
+                    "done": "Invitaciones enviadas. Cada llamada entra en tu calendario en cuanto eligen un hueco."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "Cuando abres un puesto",
+                    "body": "Pídelo en el chat, o programa una rutina cada viernes para las candidaturas de la semana. El webhook de un formulario puede lanzarlo por candidatura."
+                },
+                "2": {
+                    "title": "Tu bandeja, archivos, calendario",
+                    "body": "Lee las candidaturas en Gmail o tu formulario, los CV en Drive, y tu calendario para proponer horarios de entrevista."
+                },
+                "3": {
+                    "title": "Una lista corta con el porqué",
+                    "body": "Cada candidato se puntúa según los criterios que defines, con las pruebas del CV, para que puedas revisar la clasificación."
+                },
+                "4": {
+                    "title": "Tú decides quién sigue",
+                    "body": "Redacta invitaciones y rechazos y no envía nada hasta que apruebas. La decisión final es tuya."
+                }
+            },
+            "templatesTitle": "Plantillas que te ayudan a contratar",
+            "faq": {
+                "1": {
+                    "question": "¿Dónde lee las candidaturas?",
+                    "answer": "En Gmail u Outlook, en un formulario como Typeform, Tally o Jotform, o en los archivos que dejas en su carpeta o en Drive. Apunta el webhook de un formulario al Coworker y cada candidatura nueva inicia una ejecución."
+                },
+                "2": {
+                    "question": "¿Decide a quién se contrata?",
+                    "answer": "No. Puntúa cada candidatura según los criterios que escribiste y muestra las pruebas. Invitaciones, rechazos y la decisión final esperan tu aprobación."
+                },
+                "3": {
+                    "question": "¿Cómo mantengo un filtrado justo?",
+                    "answer": "Escribe los criterios del puesto como una skill: qué es obligatorio, qué suma, qué se debe ignorar. Aplica las mismas reglas a cada candidatura y registra el motivo de cada puntuación."
+                },
+                "4": {
+                    "question": "¿También puede encontrar candidatos?",
+                    "answer": "Sí. Con LinkedIn Pro, un complemento de pago de {linkedinPrice}/mes por cuenta, busca perfiles y escribe a personas desde tu cuenta a un ritmo diario seguro. Los emails de trabajo vienen de datos de pago, en créditos de Rerun, tras tu sí."
+                },
+                "5": {
+                    "question": "¿Dónde se guardan los datos de los candidatos?",
+                    "answer": "En la propia base de datos y carpeta del Coworker, en la máquina de tu workspace en Europa. Elimina las filas o la tabla entera cuando se cierre el puesto."
+                }
+            }
+        }
+    }
+}

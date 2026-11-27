@@ -1,0 +1,127 @@
+{
+    "hero": {
+        "crumb": "Preços",
+        "title": "{price}/mês. Todos os Coworkers incluídos.",
+        "lede": "Um plano com Coworkers e usuários ilimitados, sua própria máquina na nuvem e créditos Rerun todo mês. Teste grátis por {trialDays} dias."
+    },
+    "faqSub": "Tudo o que as pessoas perguntam sobre a cobrança. Se a sua dúvida não está aqui, os fundadores estão logo abaixo.",
+    "plans": {
+        "billingPeriod": "Período de cobrança",
+        "monthly": "Mensal",
+        "yearly": "Anual",
+        "discount": "-{percent}",
+        "save": "Economize {percent}",
+        "recommended": "Recomendado",
+        "included": "Incluso",
+        "rowIncluded": "Incluso",
+        "rowNotIncluded": "Não incluso",
+        "names": {
+            "trial": "Teste grátis",
+            "pro": "Pro",
+            "enterprise": "Enterprise"
+        },
+        "lines": {
+            "trial": "Coloque seus primeiros Coworkers para trabalhar e veja o que eles fazem.",
+            "pro": "Todos os Coworkers de que o seu negócio precisa, trabalhando todo dia.",
+            "enterprise": "Para organizações com requisitos próprios."
+        },
+        "rows": {
+            "coworkers": {
+                "trial": "{trialAgents} Coworkers ao mesmo tempo",
+                "pro": "Coworkers ilimitados",
+                "enterprise": "Coworkers ilimitados"
+            },
+            "team": "Convide toda a sua equipe de graça",
+            "own-ai": "Use a sua própria IA",
+            "devices": "App para desktop e celular",
+            "apps": "Mais de {connectors} apps, MCP e API",
+            "sso": "SSO",
+            "sla": "SLA"
+        },
+        "trial": {
+            "priceNote": "por {trialDays} dias, depois Pro",
+            "cta": "Comece seu teste grátis"
+        },
+        "pro": {
+            "monthlyNote": "por mês, cobrado mensalmente",
+            "yearlyNote": "por mês, cobrado {total} por ano",
+            "cta": "Começar"
+        },
+        "enterprise": {
+            "perks": {
+                "1": "Tudo do Pro",
+                "2": "Infraestrutura sob medida",
+                "3": "Suporte dedicado",
+                "4": "SSO",
+                "5": "SLA"
+            },
+            "cta": "Falar com vendas"
+        }
+    },
+    "credits": {
+        "title": "O que são os créditos Rerun?",
+        "lead": "Dados pelos quais você normalmente pagaria uma ferramenta dedicada, integrados ao Rerun e pagos por uso. Chega de uma assinatura para cada uma: seu Coworker consulta o que o trabalho pede e paga só por isso.",
+        "items": {
+            "leads": {
+                "title": "Leads",
+                "body": "Prospects com e-mail corporativo, telefone e dados da empresa.",
+                "insteadOf": "FullEnrich, Clay"
+            },
+            "seo": {
+                "title": "SEO",
+                "body": "Volumes de busca, ideias de palavras-chave e backlinks, resultados do Google e negócios locais.",
+                "insteadOf": "Semrush, Ahrefs"
+            },
+            "social": {
+                "title": "Redes sociais",
+                "body": "Perfis e posts públicos no LinkedIn, TikTok, Instagram, X, YouTube, Facebook e Reddit.",
+                "insteadOf": "uma ferramenta de scraping"
+            }
+        },
+        "instead": "No lugar de <name>{tools}</name>",
+        "sources": "Fontes: {sources}",
+        "note": "O Pro inclui {monthlyCredits} créditos por mês, e mais {packCredits} custam {packPrice}. Seu Coworker mostra o custo e pergunta antes de gastar."
+    },
+    "faq": {
+        "1": {
+            "question": "Eu pago créditos para usar o Rerun?",
+            "answer": "Não. O plano cobre o próprio Rerun: seus Coworkers, os apps deles, memória, skills, rotinas e cada execução. Os créditos pagam só os modelos do Rerun e os dados pagos. Um Coworker no seu próprio plano do Claude ou do ChatGPT, ou na sua chave de API, não gasta nenhum."
+        },
+        "2": {
+            "question": "O que acontece quando meus créditos acabam?",
+            "answer": "Os Coworkers na sua própria IA continuam trabalhando. Os que usam os modelos do Rerun, e os dados pagos, esperam os {monthlyCredits} créditos do mês seguinte ou um pacote de {packCredits} por {packPrice}, que nunca expira."
+        },
+        "3": {
+            "question": "Os créditos acumulam?",
+            "answer": "Os créditos mensais do Pro são renovados todo mês, então o que sobra não passa para o mês seguinte. Os créditos de um pacote nunca expiram, nem os do teste: o que sobrar deles passa para o Pro quando ele começa."
+        },
+        "4": {
+            "question": "Eu pago por Coworker ou por usuário?",
+            "answer": "Não. O Pro tem Coworkers ilimitados e usuários ilimitados. Só o teste roda um número limitado de Coworkers ao mesmo tempo."
+        },
+        "5": {
+            "question": "Existe um teste grátis?",
+            "answer": "Sim, {trialDays} dias com {trialAgents} Coworkers rodando ao mesmo tempo e {trialCredits} créditos. Um cartão inicia o teste e {free} é cobrado hoje. Cancele antes do dia {trialDays} e você não paga nada."
+        },
+        "6": {
+            "question": "LinkedIn e WhatsApp estão incluídos?",
+            "answer": "São apps pagos: LinkedIn Pro a {linkedinPrice} por mês por conta e WhatsApp Pro a {whatsappPrice} por mês por número, na mesma fatura do seu plano. Todos os outros apps da biblioteca estão incluídos."
+        },
+        "7": {
+            "question": "Os templates estão incluídos?",
+            "answer": "Os templates da biblioteca estão incluídos, exceto aqueles cujo criador definiu um preço: esses são cobrados à parte do seu plano, e a página deles avisa."
+        },
+        "8": {
+            "question": "Vocês cobram por tarefa ou por execução?",
+            "answer": "Não. Seus Coworkers podem rodar todas as horas de todos os dias pelo mesmo preço. As execuções nunca são contadas."
+        },
+        "9": {
+            "question": "Posso cancelar quando quiser?",
+            "answer": "Sim, em Faturamento. Seus Coworkers continuam rodando até o fim do período que você pagou, e depois o workspace fica guardado por 90 dias caso você volte."
+        },
+        "10": {
+            "question": "Os impostos estão incluídos no preço?",
+            "answer": "Os preços são exibidos sem impostos. O IVA ou o imposto sobre vendas, quando se aplica ao seu país, é adicionado no checkout. Adicione seu número de IVA ou sua identificação fiscal em Faturamento para as suas faturas."
+        }
+    }
+}

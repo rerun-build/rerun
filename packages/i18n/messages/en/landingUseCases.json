@@ -1,0 +1,1030 @@
+{
+    "_context": {
+        "hub.allLead": "\"The house\" is the business: first the jobs that bring work in, then those that keep it running.",
+        "page.templatesLink": "Link to the template library.",
+        "page.industriesLink": "Link back to the use cases hub.",
+        "page.thread.scheduledRun": "Label of the chat divider when a routine (a schedule) starts the run, followed by the schedule.",
+        "page.thread.webhookReceived": "Label of the chat divider when a webhook starts the run, followed by the event.",
+        "page.thread.approvalTitle": "Title of the receipt card recording the user’s approval in the chat.",
+        "page.thread.approved": "Badge on the approval receipt: the request was approved.",
+        "items.find-leads.coworker.name": "Job title of the Coworker, shown as its name at the top of the mock chat.",
+        "items.find-leads.thread.trigger": "In the mock chat: what started the run, shown on a divider line (a schedule, an app event or a webhook).",
+        "items.find-leads.thread.work": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written.",
+        "items.find-leads.thread.deliverable.title": "Title of the database card the Coworker sends in the mock chat; also turned into the lowercase table name shown in monospace on it.",
+        "items.find-leads.thread.deliverable.rows.1": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.find-leads.thread.deliverable.rows.2": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.find-leads.thread.deliverable.rows.3": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.find-leads.thread.deliverable.rows.4": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.find-leads.thread.approval.ask": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written. The Coworker asks for approval.",
+        "items.find-leads.thread.approval.approve": "In the mock chat: the action as the user approved it, shown next to an \"Approved\" badge.",
+        "items.find-leads.thread.approval.done": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written. The Coworker's last word after the approval.",
+        "items.track-sales.coworker.name": "Job title of the Coworker, shown as its name at the top of the mock chat.",
+        "items.track-sales.thread.trigger": "In the mock chat: what started the run, shown on a divider line (a schedule, an app event or a webhook).",
+        "items.track-sales.thread.work": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written.",
+        "items.track-sales.thread.deliverable.title": "Title of the database card the Coworker sends in the mock chat; also turned into the lowercase table name shown in monospace on it.",
+        "items.track-sales.thread.deliverable.rows.1": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.track-sales.thread.deliverable.rows.2": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.track-sales.thread.deliverable.rows.3": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.track-sales.thread.deliverable.rows.4": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.track-sales.thread.approval.ask": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written. The Coworker asks for approval.",
+        "items.track-sales.thread.approval.approve": "In the mock chat: the action as the user approved it, shown next to an \"Approved\" badge.",
+        "items.track-sales.thread.approval.done": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written. The Coworker's last word after the approval.",
+        "items.run-ads.coworker.name": "Job title of the Coworker, shown as its name at the top of the mock chat.",
+        "items.run-ads.thread.trigger": "In the mock chat: what started the run, shown on a divider line (a schedule, an app event or a webhook).",
+        "items.run-ads.thread.work": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written.",
+        "items.run-ads.thread.deliverable.title": "Title of the database card the Coworker sends in the mock chat; also turned into the lowercase table name shown in monospace on it.",
+        "items.run-ads.thread.deliverable.rows.1": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.run-ads.thread.deliverable.rows.2": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.run-ads.thread.deliverable.rows.3": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.run-ads.thread.deliverable.rows.4": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.run-ads.thread.approval.ask": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written. The Coworker asks for approval.",
+        "items.run-ads.thread.approval.approve": "In the mock chat: the action as the user approved it, shown next to an \"Approved\" badge.",
+        "items.run-ads.thread.approval.done": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written. The Coworker's last word after the approval.",
+        "items.watch-competitors.coworker.name": "Job title of the Coworker, shown as its name at the top of the mock chat.",
+        "items.watch-competitors.thread.trigger": "In the mock chat: what started the run, shown on a divider line (a schedule, an app event or a webhook).",
+        "items.watch-competitors.thread.work": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written.",
+        "items.watch-competitors.thread.deliverable.title": "Title of the database card the Coworker sends in the mock chat; also turned into the lowercase table name shown in monospace on it.",
+        "items.watch-competitors.thread.deliverable.rows.1": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.watch-competitors.thread.deliverable.rows.2": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.watch-competitors.thread.deliverable.rows.3": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.watch-competitors.thread.deliverable.rows.4": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.watch-competitors.thread.approval.ask": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written. The Coworker asks for approval.",
+        "items.watch-competitors.thread.approval.approve": "In the mock chat: the action as the user approved it, shown next to an \"Approved\" badge.",
+        "items.watch-competitors.thread.approval.done": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written. The Coworker's last word after the approval.",
+        "items.create-content.coworker.name": "Job title of the Coworker, shown as its name at the top of the mock chat.",
+        "items.create-content.thread.trigger": "In the mock chat: what started the run, shown on a divider line (a schedule, an app event or a webhook).",
+        "items.create-content.thread.work": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written.",
+        "items.create-content.thread.deliverable.title": "Title of the database card the Coworker sends in the mock chat; also turned into the lowercase table name shown in monospace on it.",
+        "items.create-content.thread.deliverable.rows.1": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.create-content.thread.deliverable.rows.2": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.create-content.thread.deliverable.rows.3": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.create-content.thread.deliverable.rows.4": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.create-content.thread.approval.ask": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written. The Coworker asks for approval.",
+        "items.create-content.thread.approval.approve": "In the mock chat: the action as the user approved it, shown next to an \"Approved\" badge.",
+        "items.create-content.thread.approval.done": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written. The Coworker's last word after the approval.",
+        "items.post-on-social.coworker.name": "Job title of the Coworker, shown as its name at the top of the mock chat.",
+        "items.post-on-social.thread.trigger": "In the mock chat: what started the run, shown on a divider line (a schedule, an app event or a webhook).",
+        "items.post-on-social.thread.work": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written.",
+        "items.post-on-social.thread.deliverable.title": "Title of the database card the Coworker sends in the mock chat; also turned into the lowercase table name shown in monospace on it.",
+        "items.post-on-social.thread.deliverable.rows.1": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.post-on-social.thread.deliverable.rows.2": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.post-on-social.thread.deliverable.rows.3": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.post-on-social.thread.deliverable.rows.4": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.post-on-social.thread.approval.ask": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written. The Coworker asks for approval.",
+        "items.post-on-social.thread.approval.approve": "In the mock chat: the action as the user approved it, shown next to an \"Approved\" badge.",
+        "items.post-on-social.thread.approval.done": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written. The Coworker's last word after the approval.",
+        "items.reply-to-customers.coworker.name": "Job title of the Coworker, shown as its name at the top of the mock chat.",
+        "items.reply-to-customers.thread.trigger": "In the mock chat: what started the run, shown on a divider line (a schedule, an app event or a webhook).",
+        "items.reply-to-customers.thread.work": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written.",
+        "items.reply-to-customers.thread.deliverable.title": "Title of the database card the Coworker sends in the mock chat; also turned into the lowercase table name shown in monospace on it.",
+        "items.reply-to-customers.thread.deliverable.rows.1": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.reply-to-customers.thread.deliverable.rows.2": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.reply-to-customers.thread.deliverable.rows.3": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.reply-to-customers.thread.deliverable.rows.4": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.reply-to-customers.thread.approval.ask": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written. The Coworker asks for approval.",
+        "items.reply-to-customers.thread.approval.approve": "In the mock chat: the action as the user approved it, shown next to an \"Approved\" badge.",
+        "items.reply-to-customers.thread.approval.done": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written. The Coworker's last word after the approval.",
+        "items.triage-inbox.coworker.name": "Job title of the Coworker, shown as its name at the top of the mock chat.",
+        "items.triage-inbox.thread.trigger": "In the mock chat: what started the run, shown on a divider line (a schedule, an app event or a webhook).",
+        "items.triage-inbox.thread.work": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written.",
+        "items.triage-inbox.thread.deliverable.title": "Title of the database card the Coworker sends in the mock chat; also turned into the lowercase table name shown in monospace on it.",
+        "items.triage-inbox.thread.deliverable.rows.1": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.triage-inbox.thread.deliverable.rows.2": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.triage-inbox.thread.deliverable.rows.3": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.triage-inbox.thread.deliverable.rows.4": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.triage-inbox.thread.approval.ask": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written. The Coworker asks for approval.",
+        "items.triage-inbox.thread.approval.approve": "In the mock chat: the action as the user approved it, shown next to an \"Approved\" badge.",
+        "items.triage-inbox.thread.approval.done": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written. The Coworker's last word after the approval.",
+        "items.prepare-meetings.coworker.name": "Job title of the Coworker, shown as its name at the top of the mock chat.",
+        "items.prepare-meetings.thread.trigger": "In the mock chat: what started the run, shown on a divider line (a schedule, an app event or a webhook).",
+        "items.prepare-meetings.thread.work": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written.",
+        "items.prepare-meetings.thread.deliverable.title": "Title of the database card the Coworker sends in the mock chat; also turned into the lowercase table name shown in monospace on it.",
+        "items.prepare-meetings.thread.deliverable.rows.1": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.prepare-meetings.thread.deliverable.rows.2": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.prepare-meetings.thread.deliverable.rows.3": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.prepare-meetings.thread.deliverable.rows.4": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.prepare-meetings.thread.approval.ask": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written. The Coworker asks for approval.",
+        "items.prepare-meetings.thread.approval.approve": "In the mock chat: the action as the user approved it, shown next to an \"Approved\" badge.",
+        "items.prepare-meetings.thread.approval.done": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written. The Coworker's last word after the approval.",
+        "items.track-orders.coworker.name": "Job title of the Coworker, shown as its name at the top of the mock chat.",
+        "items.track-orders.thread.trigger": "In the mock chat: what started the run, shown on a divider line (a schedule, an app event or a webhook).",
+        "items.track-orders.thread.work": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written.",
+        "items.track-orders.thread.deliverable.title": "Title of the database card the Coworker sends in the mock chat; also turned into the lowercase table name shown in monospace on it.",
+        "items.track-orders.thread.deliverable.rows.1": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.track-orders.thread.deliverable.rows.2": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.track-orders.thread.deliverable.rows.3": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.track-orders.thread.deliverable.rows.4": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.track-orders.thread.approval.ask": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written. The Coworker asks for approval.",
+        "items.track-orders.thread.approval.approve": "In the mock chat: the action as the user approved it, shown next to an \"Approved\" badge.",
+        "items.track-orders.thread.approval.done": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written. The Coworker's last word after the approval.",
+        "items.chase-invoices.coworker.name": "Job title of the Coworker, shown as its name at the top of the mock chat.",
+        "items.chase-invoices.thread.trigger": "In the mock chat: what started the run, shown on a divider line (a schedule, an app event or a webhook).",
+        "items.chase-invoices.thread.work": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written.",
+        "items.chase-invoices.thread.deliverable.title": "Title of the database card the Coworker sends in the mock chat; also turned into the lowercase table name shown in monospace on it.",
+        "items.chase-invoices.thread.deliverable.rows.1": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.chase-invoices.thread.deliverable.rows.2": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.chase-invoices.thread.deliverable.rows.3": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.chase-invoices.thread.deliverable.rows.4": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.chase-invoices.thread.approval.ask": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written. The Coworker asks for approval.",
+        "items.chase-invoices.thread.approval.approve": "In the mock chat: the action as the user approved it, shown next to an \"Approved\" badge.",
+        "items.chase-invoices.thread.approval.done": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written. The Coworker's last word after the approval.",
+        "items.screen-candidates.coworker.name": "Job title of the Coworker, shown as its name at the top of the mock chat.",
+        "items.screen-candidates.thread.trigger": "In the mock chat: the message the user sent to start the run.",
+        "items.screen-candidates.thread.work": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written.",
+        "items.screen-candidates.thread.deliverable.title": "Title of the database card the Coworker sends in the mock chat; also turned into the lowercase table name shown in monospace on it.",
+        "items.screen-candidates.thread.deliverable.rows.1": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.screen-candidates.thread.deliverable.rows.2": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.screen-candidates.thread.deliverable.rows.3": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.screen-candidates.thread.deliverable.rows.4": "Row of the database card in the mock chat. The text before the first \" · \" is the row title, the rest its subtitle: keep the \" · \" separators. Names of people and companies stay as written.",
+        "items.screen-candidates.thread.approval.ask": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written. The Coworker asks for approval.",
+        "items.screen-candidates.thread.approval.approve": "In the mock chat: the action as the user approved it, shown next to an \"Approved\" badge.",
+        "items.screen-candidates.thread.approval.done": "Message of the mock chat thread the page shows as a still picture of the app. Names of people, companies and apps stay as written. The Coworker's last word after the approval."
+    },
+    "hub": {
+        "crumb": "Use cases",
+        "title": "The jobs Coworkers do every day.",
+        "lede": "Pick the work you would hand a new hire. Each page shows one run of the job, the apps it goes through, and what it asks you before it acts.",
+        "metaTitle": "AI Coworker Use Cases: The Jobs They Do Every Day",
+        "metaDescription": "Leads, sales, ads, content, social media, customer replies, the inbox, meetings, orders, invoices and hiring: one run of each job, step by step.",
+        "allTitle": "Every use case",
+        "allLead": "What brings the work in, then what keeps the house running.",
+        "faq": {
+            "1": {
+                "question": "Can one Coworker do several of these jobs?",
+                "answer": "Yes, but one job per Coworker works best: each keeps its own memory, skills and routines. Coworkers hand work to each other, so the one that finds the leads can pass them to the one that writes to them."
+            },
+            "2": {
+                "question": "What if my job is not on this list?",
+                "answer": "Describe it to the Chief of Staff in plain words. It proposes a Coworker for it and builds it with the apps, skills and routines the job needs."
+            },
+            "3": {
+                "question": "Does it run when my computer is off?",
+                "answer": "Yes. Each workspace has its own machine in the cloud, so routines and triggers run at night and on weekends, with your laptop shut."
+            },
+            "4": {
+                "question": "Will it act without asking me?",
+                "answer": "Not on anything consequential. A Coworker asks before it sends, pays, deletes or spends credits, and you answer from the web, the desktop app or your phone."
+            }
+        }
+    },
+    "page": {
+        "crumbRoot": "Use cases",
+        "howItRunsTitle": "How it runs",
+        "howItRunsLead": "One run of the job, as it shows in your chat.",
+        "appsTitle": "The apps it works in",
+        "appsLead": "Connected once with your own accounts. It signs in and works in them on its own.",
+        "templatesLead": "Ready-made Coworkers from the library that already do this job.",
+        "templatesLink": "Browse the library",
+        "featuresTitle": "The features behind it",
+        "industriesTitle": "Where it is common",
+        "industriesLink": "Every use case",
+        "thread": {
+            "scheduledRun": "Scheduled run",
+            "webhookReceived": "Webhook received",
+            "approvalTitle": "Approval",
+            "approved": "Approved"
+        }
+    },
+    "items": {
+        "find-leads": {
+            "crumb": "Find leads",
+            "title": "Your Coworker finds leads while you sleep.",
+            "lede": "It reads job posts, LinkedIn and your CRM every week, keeps the companies that look like your best customers, and hands you the list with the reason for each.",
+            "metaTitle": "An AI Coworker That Finds B2B Leads",
+            "metaDescription": "A Rerun Coworker reads job posts, LinkedIn and your CRM, keeps the companies that fit your offer, and asks before it spends a credit or sends a word.",
+            "coworker": {
+                "name": "Sales Rep",
+                "job": "Finds companies that fit, every Monday"
+            },
+            "thread": {
+                "trigger": "Every Monday at 8:00",
+                "work": "Read 120 job posts on LinkedIn, dropped the 14 companies already in HubSpot and kept the 26 that look like your best customers.",
+                "deliverable": {
+                    "title": "Leads for Monday",
+                    "rows": {
+                        "1": "Forma · Head of Sales · hiring 2 account executives",
+                        "2": "Northstar · Sales Director · new team in Paris",
+                        "3": "Arc Labs · VP Sales · hiring 3 SDRs",
+                        "4": "Kerio Supply · COO · raised €4M in January"
+                    }
+                },
+                "approval": {
+                    "ask": "Finding the work emails of the 26 decision-makers costs about 80 credits. Go ahead?",
+                    "approve": "Spend 80 credits",
+                    "done": "23 work emails found, none guessed. The 26 leads are in HubSpot, owner: you."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "Every Monday at 8:00",
+                    "body": "A routine wakes it on its own machine, laptop shut or not. It keeps every name in a table, so next week brings new ones only."
+                },
+                "2": {
+                    "title": "LinkedIn, your CRM, a sheet",
+                    "body": "It reads job posts and profiles, drops the companies you already talk to in HubSpot or Pipedrive, and fills the sheet."
+                },
+                "3": {
+                    "title": "A ranked list with the why",
+                    "body": "Each company comes with the person to write to and the signal behind it: a hire, a new office, a funding round."
+                },
+                "4": {
+                    "title": "You approve the spend",
+                    "body": "Work emails and phone numbers are paid data. It shows the estimated credits first and spends nothing until you say yes."
+                }
+            },
+            "templatesTitle": "Templates that find your next customers",
+            "faq": {
+                "1": {
+                    "question": "Where does it find the leads?",
+                    "answer": "In job posts, company pages, Google results and LinkedIn, then it checks them against your own CRM. You describe your best customers once, or let it read your closed-won deals, and it keeps that profile in memory."
+                },
+                "2": {
+                    "question": "Does finding emails and phone numbers cost extra?",
+                    "answer": "Yes. Work emails, phone numbers and company data are paid data, billed in Rerun credits ({creditsPerUsd} credits for $1). Before it spends, the Coworker shows the estimated total and waits for your yes, unless you switch on Spend without asking."
+                },
+                "3": {
+                    "question": "Do I need LinkedIn Pro?",
+                    "answer": "No, it finds leads without it. LinkedIn Pro, a paid add-on at {linkedinPrice}/mo per account, lets it search and read LinkedIn from your account without spending credits, send invitations and messages at a safe daily pace, and wake up when someone replies."
+                },
+                "4": {
+                    "question": "Will it write to the leads on its own?",
+                    "answer": "Not without you. It drafts the first message for each lead and asks before it sends an email or a LinkedIn invitation. Another Coworker can take the list from there and handle the follow-ups."
+                },
+                "5": {
+                    "question": "Does it skip people we already know?",
+                    "answer": "Yes. It checks HubSpot, Pipedrive or your sheet before it adds anyone, and keeps every company it found in its database, so a name never comes back twice."
+                }
+            }
+        },
+        "track-sales": {
+            "crumb": "Track sales",
+            "title": "Your Coworker tracks your sales every morning.",
+            "lede": "It adds up revenue in Stripe, reads every open deal in your CRM, updates the revenue sheet and tells you only when something moves.",
+            "metaTitle": "An AI Coworker That Tracks Revenue and Pipeline",
+            "metaDescription": "A Rerun Coworker reads Stripe and your CRM every weekday, updates the revenue sheet and tells you which deals slipped, before it posts to the team.",
+            "coworker": {
+                "name": "Revenue Analyst",
+                "job": "Reads revenue and the pipeline every weekday"
+            },
+            "thread": {
+                "trigger": "Every weekday at 8:00",
+                "work": "Added up 30 days in Stripe: $482k, up 11% on last month. Read 54 open deals in HubSpot and updated 3 tabs of the revenue sheet.",
+                "deliverable": {
+                    "title": "What moved since Friday",
+                    "rows": {
+                        "1": "Halden Group · $84,000 · back to Proposal",
+                        "2": "Vessel · $61,500 · Closing to Negotiation",
+                        "3": "Petra · $38,000 · Proposal to Closing",
+                        "4": "Churn · 2 accounts cancelled, $1,240 MRR"
+                    }
+                },
+                "approval": {
+                    "ask": "Two of your five biggest deals slipped. Post them to #sales with a next step for each owner?",
+                    "approve": "Post to #sales",
+                    "done": "Posted. I will flag Halden again on Thursday if its close date has not moved."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "Every weekday at 8:00",
+                    "body": "A routine runs before you open your laptop. It keeps each day’s figures in its database, so it can tell what changed."
+                },
+                "2": {
+                    "title": "Stripe, your CRM, the sheet",
+                    "body": "It reads payments and subscriptions in Stripe, deals in HubSpot or Pipedrive, and writes the totals to Sheets or Airtable."
+                },
+                "3": {
+                    "title": "Only what moved",
+                    "body": "Revenue against last month, deals that slipped or jumped a stage, accounts that churned. A quiet day stays a short message."
+                },
+                "4": {
+                    "title": "You decide who hears it",
+                    "body": "It asks before it posts to the team channel, writes to a rep or changes a deal, and you pick what goes out."
+                }
+            },
+            "templatesTitle": "Templates that keep an eye on revenue",
+            "faq": {
+                "1": {
+                    "question": "Which tools can it read?",
+                    "answer": "Stripe, HubSpot, Pipedrive, QuickBooks, Google Sheets, Airtable and the rest of {connectors}+ apps. A tool with no app but an MCP server works too, and one with neither it can open in the browser of its own computer."
+                },
+                "2": {
+                    "question": "Will it change anything in my CRM?",
+                    "answer": "Only when you ask it to. By default it reads. When you want it to move a stage or fix a close date, it lists the changes in an approval card and writes nothing until you approve."
+                },
+                "3": {
+                    "question": "What if a number looks wrong?",
+                    "answer": "Each figure says where it comes from: the Stripe charges or the deals it counted. Correct it once, for example to leave out refunds, and it keeps the rule in memory for the next runs."
+                },
+                "4": {
+                    "question": "Does it run at night and on weekends?",
+                    "answer": "Yes. It runs on its own machine in Europe, so a routine fires on time with your laptop shut. You set the schedule in plain words, like every Monday at 7am."
+                },
+                "5": {
+                    "question": "What does a daily run cost?",
+                    "answer": "It runs on the AI you choose. On your Claude or ChatGPT plan or your own API key, a run costs nothing on the Rerun side. On the Rerun models it draws on your credits: Pro includes {monthlyCredits} a month."
+                }
+            }
+        },
+        "run-ads": {
+            "crumb": "Run your ads",
+            "title": "Your Coworker checks your ads every morning.",
+            "lede": "It reads yesterday’s spend and results in Meta Ads, sets them beside your real sales, and proposes what to pause and where to move the budget.",
+            "metaTitle": "An AI Coworker That Manages Your Ad Spend",
+            "metaDescription": "A Rerun Coworker reads your ad spend every morning, sets it against real sales, and proposes what to pause or scale. Nothing changes before you approve.",
+            "coworker": {
+                "name": "Ads Manager",
+                "job": "Reads spend daily, flags what loses money"
+            },
+            "thread": {
+                "trigger": "Every day at 7:00",
+                "work": "Read 38 ad sets in Meta Ads and 142 Shopify orders. Spend was $1,920 yesterday for a 2.4x return. Four ad sets lost money three days running.",
+                "deliverable": {
+                    "title": "Ads to act on today",
+                    "rows": {
+                        "1": "Pause · Spring promo, broad · $312 spent, 0 sales",
+                        "2": "Pause · Retargeting 30 days · 0.6x return",
+                        "3": "Scale · UGC video, lookalike · 4.1x return",
+                        "4": "Test · 3 new hooks drafted for the winner"
+                    }
+                },
+                "approval": {
+                    "ask": "Pause the 4 losing ad sets and move $150 a day to the UGC video?",
+                    "approve": "Pause 4, move $150",
+                    "done": "Done in Meta Ads. I will read the new split tomorrow at 7:00 and tell you how it did."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "Every day at 7:00",
+                    "body": "A routine reads yesterday before your first coffee, weekends included, and keeps each day in a table to spot slow declines."
+                },
+                "2": {
+                    "title": "Meta Ads, your store, a sheet",
+                    "body": "It reads campaigns through the Meta Ads app and orders in Shopify or Stripe. Other ad managers it opens in its own browser."
+                },
+                "3": {
+                    "title": "Pause, scale or test",
+                    "body": "Each ad set gets a verdict with the numbers behind it, and the winners get new hooks and briefs for the next creatives."
+                },
+                "4": {
+                    "title": "You approve every change",
+                    "body": "Pausing an ad or moving budget is your call. It lists each change with its amount and waits for your yes."
+                }
+            },
+            "templatesTitle": "Templates that run your paid acquisition",
+            "faq": {
+                "1": {
+                    "question": "Which ad platforms does it work in?",
+                    "answer": "Meta Ads through its app, for your Facebook and Instagram campaigns. For Google, LinkedIn or TikTok ads it uses the browser of its own computer: you sign in once when it asks, and it works in the ads manager like a person would."
+                },
+                "2": {
+                    "question": "Can it change my budgets without asking?",
+                    "answer": "No. It reads and proposes. Pausing an ad set, changing a budget or launching an ad goes to you in an approval card, with the amounts, and nothing moves until you click Approve."
+                },
+                "3": {
+                    "question": "How does it know an ad really makes money?",
+                    "answer": "It reads your orders in Shopify or Stripe beside the platform’s own numbers, so you see what you spent against what came in, not only what the ads manager counts."
+                },
+                "4": {
+                    "question": "Can it write the next ads?",
+                    "answer": "Yes. It drafts hooks, copy and briefs for the next creatives from what already works, in the tone kept in your Brain. Each draft waits for your OK before it goes anywhere."
+                },
+                "5": {
+                    "question": "Can it look at my competitors’ ads?",
+                    "answer": "Connect a research app like Brandsearch or TrendTrack and it reads the ads your competitors run on Meta and TikTok, then brings you the angles worth testing."
+                }
+            }
+        },
+        "watch-competitors": {
+            "crumb": "Watch competitors",
+            "title": "Your Coworker watches your competitors every day.",
+            "lede": "It rechecks their pricing pages, launches, posts and rankings, and tells you the day something changes that matters to your business.",
+            "metaTitle": "An AI Coworker That Watches Your Competitors",
+            "metaDescription": "A Rerun Coworker rechecks competitor pricing, launches, posts and rankings every day, and writes to you only when something that matters has changed.",
+            "coworker": {
+                "name": "Market Analyst",
+                "job": "Watches 3 competitors, writes only on change"
+            },
+            "thread": {
+                "trigger": "Every day at 8:00",
+                "work": "Rechecked 3 pricing pages, read 18 new posts on LinkedIn and X, and compared 212 keyword gaps. One change is worth your time.",
+                "deliverable": {
+                    "title": "Competitors this week",
+                    "rows": {
+                        "1": "Northstar · entry plan $79 to $59, free tier added",
+                        "2": "Cobalt · launched an integrations directory",
+                        "3": "Tenley · nothing moved, pricing untouched",
+                        "4": "Gap · 14 keywords they rank on and you do not"
+                    }
+                },
+                "approval": {
+                    "ask": "Northstar now undercuts you by $20. Draft an answer for your pricing page and a note for sales?",
+                    "approve": "Draft both",
+                    "done": "Both drafts are in Notion for you to read. I keep checking Northstar every day."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "Every day at 8:00",
+                    "body": "A routine rechecks each competitor and compares what it sees with what it kept last time, so only changes reach you."
+                },
+                "2": {
+                    "title": "Their site, socials, search",
+                    "body": "It reads their pages on the web, their posts on LinkedIn and X, and their rankings through SEO data or an app like Semrush."
+                },
+                "3": {
+                    "title": "Real changes only",
+                    "body": "Price moves, launches, new pages and the keywords they win, each with the link and the date it saw it."
+                },
+                "4": {
+                    "title": "You choose the response",
+                    "body": "It proposes the answer, a page to update or a note for sales, and asks before it posts or changes anything."
+                }
+            },
+            "templatesTitle": "Templates that keep watch on your market",
+            "faq": {
+                "1": {
+                    "question": "What can it watch?",
+                    "answer": "Their public pages (pricing, product, changelog, careers), their posts on LinkedIn, X, Instagram or YouTube, their reviews, and where they rank on Google. You name them once and it keeps the list in memory."
+                },
+                "2": {
+                    "question": "How does it know what changed?",
+                    "answer": "It saves what it saw at each check in its database and compares the next check against it. Every scheduled run starts fresh, so that table is how it remembers."
+                },
+                "3": {
+                    "question": "Does it use paid data?",
+                    "answer": "Rankings, search volumes, backlinks and public social profiles are paid data, billed in Rerun credits, and it shows the estimated cost before it spends. Reading their website needs no paid data."
+                },
+                "4": {
+                    "question": "Will it tell me right away when a price moves?",
+                    "answer": "Yes. Check pricing pages every hour and the rest once a week, each on its own routine. It sends you a notification or a Slack message only when a run finds a change."
+                },
+                "5": {
+                    "question": "What about sites that block bots?",
+                    "answer": "It has a computer of its own, with a browser, so it opens a page the way a person does. When a page asks for a sign-in or a captcha, it hands you its browser for that step."
+                }
+            }
+        },
+        "create-content": {
+            "crumb": "Create content",
+            "title": "Your Coworker writes your next article on Tuesday.",
+            "lede": "It reads your Search Console, finds the query you are closest to winning, studies the pages that rank and drafts the post in your tone.",
+            "metaTitle": "An AI Coworker That Writes SEO Content",
+            "metaDescription": "A Rerun Coworker finds the query you are closest to winning, studies pages that rank and drafts the article in your tone. It publishes once you approve.",
+            "coworker": {
+                "name": "Content Marketer",
+                "job": "Writes one article a week from your search data"
+            },
+            "thread": {
+                "trigger": "Every Tuesday at 10:00",
+                "work": "Read 1,204 queries in Search Console and the top 3 results for the closest one. Rewrote the post we have rather than start one that ranks behind it.",
+                "deliverable": {
+                    "title": "This week’s article",
+                    "rows": {
+                        "1": "Keyword · agent orchestration · position 11",
+                        "2": "Volume · 2,400 searches a month",
+                        "3": "Draft · 1,850 words on 3 questions page one answers",
+                        "4": "Links · 4 internal links, 2 sources cited"
+                    }
+                },
+                "approval": {
+                    "ask": "The rewrite is saved as a draft in WordPress. Publish it on the same URL now?",
+                    "approve": "Publish the rewrite",
+                    "done": "Published. Next Tuesday I check its position before I pick the next keyword."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "Every Tuesday at 10:00",
+                    "body": "A routine picks the week’s subject from your search data, not a guess. Or ask in the chat for a piece on your own topic."
+                },
+                "2": {
+                    "title": "Search data, docs, your CMS",
+                    "body": "It reads Google Search Console, opens the pages that rank, uses your notes in Notion or Drive and drafts in WordPress."
+                },
+                "3": {
+                    "title": "A draft in your voice",
+                    "body": "Your offer and your tone live in the Brain, so the draft sounds like you, with its sources and internal links."
+                },
+                "4": {
+                    "title": "You publish it",
+                    "body": "The draft waits in your CMS. It publishes a new post, or updates a live one, only once you approve."
+                }
+            },
+            "templatesTitle": "Templates that write and plan your content",
+            "faq": {
+                "1": {
+                    "question": "Where does it get the topics?",
+                    "answer": "From your Google Search Console queries, keyword data and what your competitors publish, or from the subject you give it. By default it goes for the query you are closest to winning."
+                },
+                "2": {
+                    "question": "Will it sound like us?",
+                    "answer": "It writes from your Brain: your offer, your market and your tone, written once and shared by every Coworker. Correct a draft and it keeps the correction in memory, or proposes to turn it into a skill."
+                },
+                "3": {
+                    "question": "Which CMS can it publish to?",
+                    "answer": "WordPress, Webflow, Contentful, Sanity, Strapi and Notion through their apps. For a site with no app, it works in your editor from the browser of its own computer."
+                },
+                "4": {
+                    "question": "Does keyword data cost credits?",
+                    "answer": "Your own Search Console data costs nothing once connected. Search volumes, keyword ideas and backlinks are paid data, billed in Rerun credits, and it asks before it spends."
+                },
+                "5": {
+                    "question": "Can it turn the article into posts?",
+                    "answer": "Yes. It hands the article to your social media Coworker, which turns it into a LinkedIn post and an Instagram carousel, each waiting for your OK."
+                }
+            }
+        },
+        "post-on-social": {
+            "crumb": "Post on social",
+            "title": "Your Coworker posts on social every morning.",
+            "lede": "It turns your articles, launches and news into a post for each network, publishes once you approve, and answers the comments that come in.",
+            "metaTitle": "An AI Coworker That Posts on Social Media",
+            "metaDescription": "A Rerun Coworker writes a post per network from your articles, publishes on LinkedIn, Instagram and Facebook once you approve, and answers comments.",
+            "coworker": {
+                "name": "Community Manager",
+                "job": "Posts every weekday, answers comments"
+            },
+            "thread": {
+                "trigger": "Every weekday at 9:00",
+                "work": "Read this week’s article and 41 new comments. Drafted a LinkedIn post, a 5-slide carousel for Instagram and replies to 12 comments.",
+                "deliverable": {
+                    "title": "Today’s posts",
+                    "rows": {
+                        "1": "LinkedIn · 9:30 · opens on the 20 tickets everyone repeats",
+                        "2": "Instagram · 12:00 · 5 slides, one idea on each",
+                        "3": "Facebook · 17:00 · the short version, with the link",
+                        "4": "Comments · 12 replies drafted, 2 left for you"
+                    }
+                },
+                "approval": {
+                    "ask": "Publish the 3 posts at those times and send the 12 replies?",
+                    "approve": "Publish and reply",
+                    "done": "All set. Tomorrow morning I read the reactions and tell you which post worked."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "Every weekday at 9:00",
+                    "body": "A routine prepares the day’s posts. It also starts when another Coworker hands it a new article to share."
+                },
+                "2": {
+                    "title": "LinkedIn, Instagram, Facebook",
+                    "body": "It publishes and answers comments through each network’s app, and schedules through Buffer for the others."
+                },
+                "3": {
+                    "title": "A post per network",
+                    "body": "One idea cut for each audience: a post, a carousel, a short version, in the tone kept in your Brain."
+                },
+                "4": {
+                    "title": "You say go",
+                    "body": "Nothing goes out before you approve it, with its text, its visual and its time. Replies to comments wait for you too."
+                }
+            },
+            "templatesTitle": "Templates that run your social media",
+            "faq": {
+                "1": {
+                    "question": "Which networks can it post to?",
+                    "answer": "LinkedIn, Instagram, Facebook Pages and YouTube through their apps, and the others through a scheduler like Buffer. It also reads X and the news to find what is worth posting about."
+                },
+                "2": {
+                    "question": "Does it post without me?",
+                    "answer": "Not unless you tell it to. Each post waits in an approval card with its text, its visual and its time. You can say which replies it may send alone, and it keeps that rule in memory."
+                },
+                "3": {
+                    "question": "Can it answer comments and DMs?",
+                    "answer": "Yes: comments on LinkedIn, Facebook and Instagram, and Instagram DMs. It drafts in your tone and leaves the delicate ones for you."
+                },
+                "4": {
+                    "question": "Where do the ideas come from?",
+                    "answer": "From your articles, launches and customer stories, the Brain, and what your audience reacted to before. Your content Coworker can hand it each new article as soon as it is live."
+                },
+                "5": {
+                    "question": "Do I need LinkedIn Pro to post?",
+                    "answer": "No. Posting and commenting go through the LinkedIn app, at no extra cost. LinkedIn Pro, a paid add-on at {linkedinPrice}/mo per account, is for prospecting: searching profiles, sending invitations and messages."
+                }
+            }
+        },
+        "reply-to-customers": {
+            "crumb": "Reply to customers",
+            "title": "Your Coworker answers customers within minutes.",
+            "lede": "A WhatsApp message or an email comes in: it reads the order, checks your policies and replies in your tone. The tricky ones come to you.",
+            "metaTitle": "An AI Coworker That Answers Your Customers",
+            "metaDescription": "A Rerun Coworker answers customers on WhatsApp and email from your orders and help docs, in your tone, and asks before it refunds or promises anything.",
+            "coworker": {
+                "name": "Customer Support",
+                "job": "Answers WhatsApp and email from your docs"
+            },
+            "thread": {
+                "trigger": "A WhatsApp message arrives",
+                "work": "Read Clara’s message, found order #1042 in Shopify and the return policy in Notion. It is day 12 of 30, so the return is allowed.",
+                "deliverable": {
+                    "title": "Reply drafted",
+                    "rows": {
+                        "1": "Clara Mendes · order #1042 · wants to return a jacket",
+                        "2": "Policy · 30 days, unworn, free return label",
+                        "3": "Reply · return accepted, label attached",
+                        "4": "Refund · $129 once the parcel is scanned"
+                    }
+                },
+                "approval": {
+                    "ask": "Send Clara the reply with the return label, and note the return on the order in Shopify?",
+                    "approve": "Send the reply",
+                    "done": "Sent on WhatsApp. I will let Clara know when her refund goes out."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "A message wakes it",
+                    "body": "With WhatsApp Pro, a new message starts a run right away. For email, a routine goes through the support inbox as often as you set."
+                },
+                "2": {
+                    "title": "Your inbox, orders, docs",
+                    "body": "It reads the conversation, finds the order in Shopify or the customer in Stripe, and checks your help docs in Notion."
+                },
+                "3": {
+                    "title": "A reply in your tone",
+                    "body": "Built from your policies and the answers you sent before, with what it checked shown under the draft."
+                },
+                "4": {
+                    "title": "You approve what goes out",
+                    "body": "It asks before it sends, refunds or promises anything. A dispute or a legal question stays with you."
+                }
+            },
+            "templatesTitle": "Templates that look after your customers",
+            "faq": {
+                "1": {
+                    "question": "Can it answer on WhatsApp?",
+                    "answer": "Yes, with WhatsApp Pro, a paid add-on at {whatsappPrice}/mo per number. It joins your number as a linked device, the way WhatsApp Web does, answers with text, files and voice notes, and never writes to strangers."
+                },
+                "2": {
+                    "question": "Does it work with my support tools?",
+                    "answer": "It answers from Gmail or Outlook and from WhatsApp, and reads your Intercom or Freshdesk conversations through their apps. Orders come from Shopify, customers and payments from Stripe."
+                },
+                "3": {
+                    "question": "Will it make things up?",
+                    "answer": "It answers from your help docs, your policies and what you replied before, and shows what it checked. When the answer is not there, it asks you instead of guessing."
+                },
+                "4": {
+                    "question": "Can it refund a customer?",
+                    "answer": "It can prepare a refund in Stripe or Shopify, but money leaving your account is your call: it asks first, with the amount and the order, and does nothing until you approve."
+                },
+                "5": {
+                    "question": "Does it answer at night?",
+                    "answer": "Yes. It runs on its own machine, so a WhatsApp message at 2am gets a run at 2am. A reply that needs your yes waits in your inbox and on your phone."
+                }
+            }
+        },
+        "triage-inbox": {
+            "crumb": "Triage your inbox",
+            "title": "Your Coworker clears your inbox before you wake.",
+            "lede": "It reads the night’s email, labels each thread, drafts the replies it can and leaves you the few that need your judgment.",
+            "metaTitle": "An AI Coworker That Triages Your Email Inbox",
+            "metaDescription": "A Rerun Coworker reads your Gmail or Outlook every morning, labels each thread, files the invoices and drafts replies. It sends nothing before you approve.",
+            "coworker": {
+                "name": "Executive Assistant",
+                "job": "Sorts your inbox every morning"
+            },
+            "thread": {
+                "trigger": "Every weekday at 7:00",
+                "work": "Read 86 new emails. Labeled 61 newsletters and receipts, filed 9 invoices in Drive and drafted 14 replies from what you said before.",
+                "deliverable": {
+                    "title": "Your inbox this morning",
+                    "rows": {
+                        "1": "Replies · 14 drafted, ready to send",
+                        "2": "Invoices · 9 filed in Drive, Invoices 2026",
+                        "3": "Meeting · Lena Haas asks for Thursday 3:00, free",
+                        "4": "Needs you · contract question from Halden Group"
+                    }
+                },
+                "approval": {
+                    "ask": "Send the 14 drafted replies and accept Lena’s meeting on Thursday at 3:00?",
+                    "approve": "Send 14, accept 1",
+                    "done": "Sent and booked. Halden’s contract question is waiting at the top for you."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "Every weekday at 7:00",
+                    "body": "A routine reads what came in overnight. Add a second run after lunch if your inbox needs one."
+                },
+                "2": {
+                    "title": "Gmail, Calendar, Drive",
+                    "body": "It works in Gmail or Outlook, checks your calendar before it proposes a time, and files attachments in Drive."
+                },
+                "3": {
+                    "title": "Labeled, drafted, filed",
+                    "body": "Every thread gets a label, replies are drafted from your past answers, and receipts go where you keep them."
+                },
+                "4": {
+                    "title": "You send, or skip",
+                    "body": "Drafts stay drafts until you approve them. What needs your judgment comes as a short list, the most urgent first."
+                }
+            },
+            "templatesTitle": "Templates that handle your email",
+            "faq": {
+                "1": {
+                    "question": "Does it work with Gmail and Outlook?",
+                    "answer": "Both, through their apps, and any other mailbox through IMAP and SMTP. It can hold several accounts, each with its own label, and always says which one it acts from."
+                },
+                "2": {
+                    "question": "Will it send emails on its own?",
+                    "answer": "No. It drafts. Sending, accepting a meeting or deleting a thread goes to you in one approval card, each email listed, and you approve them one by one or all together."
+                },
+                "3": {
+                    "question": "How does it learn my rules?",
+                    "answer": "Tell it once, like “receipts go to Drive, newsletters get archived”, and it keeps the rule in memory. A procedure you repeat can become a skill it follows every morning."
+                },
+                "4": {
+                    "question": "Who reads my email?",
+                    "answer": "Your Coworker, on your workspace’s own machine, where the credentials of your mailbox stay. The text goes to the AI you choose: your Claude or ChatGPT plan, your own key, or the Rerun models."
+                },
+                "5": {
+                    "question": "Can I clear it from my phone?",
+                    "answer": "Yes. The approval card reaches your inbox in the iPhone and Android apps, and you approve or skip it there in a tap."
+                }
+            }
+        },
+        "prepare-meetings": {
+            "crumb": "Prepare meetings",
+            "title": "Your Coworker briefs you before every meeting.",
+            "lede": "Each morning it reads your calendar, looks up who you are meeting, their company and your last emails, and writes you a short brief per call.",
+            "metaTitle": "An AI Coworker That Prepares Your Meetings",
+            "metaDescription": "A Rerun Coworker reads your calendar every morning and writes a brief on each person you meet: who they are, what you last said, where the deal stands.",
+            "coworker": {
+                "name": "Sales Assistant",
+                "job": "Writes a brief for each call of the day"
+            },
+            "thread": {
+                "trigger": "Every weekday at 7:30",
+                "work": "Found 4 external meetings today. Read 23 past emails, the 2 open deals in HubSpot and the LinkedIn profiles of 6 attendees.",
+                "deliverable": {
+                    "title": "Brief · Halden Group, 2:00",
+                    "rows": {
+                        "1": "Anna Berg · Head of Ops · joined in March",
+                        "2": "Deal · $84,000 · back to Proposal on Friday",
+                        "3": "Last email · asked for a custom SLA",
+                        "4": "Ask · who else signs off on the budget?"
+                    }
+                },
+                "approval": {
+                    "ask": "Send Anna the agenda and the SLA draft before the call?",
+                    "approve": "Send the agenda",
+                    "done": "Sent. After the call, tell me how it went and I will update the deal in HubSpot."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "Every weekday at 7:30",
+                    "body": "A routine reads the day’s calendar. For a call booked an hour ago, just ask for its brief in the chat."
+                },
+                "2": {
+                    "title": "Calendar, email, CRM, LinkedIn",
+                    "body": "It reads your calendar, past emails with each attendee, the deal in your CRM and their public profile."
+                },
+                "3": {
+                    "title": "One short brief per call",
+                    "body": "Who they are, what you last said, where the deal stands, and the two questions worth asking."
+                },
+                "4": {
+                    "title": "You approve what goes out",
+                    "body": "An agenda, a follow-up or a CRM update after the call: it drafts them and asks before it sends or saves."
+                }
+            },
+            "templatesTitle": "Templates that prepare your calls",
+            "faq": {
+                "1": {
+                    "question": "Where does it find information on people?",
+                    "answer": "In your email, your calendar and your CRM, then in public sources: the company’s website, the news and LinkedIn. LinkedIn profiles come from paid data, or from your own account with LinkedIn Pro."
+                },
+                "2": {
+                    "question": "Can it read my meeting notes?",
+                    "answer": "Yes. Connect Granola, Fathom or Fireflies and it reads the notes of the last call, then drafts the follow-up and the CRM update after the next one."
+                },
+                "3": {
+                    "question": "Which calendars does it work with?",
+                    "answer": "Google Calendar and Outlook through their apps, and Calendly or Cal.com to see what was booked and what the person wrote when booking."
+                },
+                "4": {
+                    "question": "Can I read the brief on my phone?",
+                    "answer": "Yes. The brief lands in the Coworker’s thread, which you open in the iPhone or Android app on your way to the meeting. It can also post it to Slack."
+                },
+                "5": {
+                    "question": "Does a brief cost credits?",
+                    "answer": "Reading your own apps uses no paid data. Looking up a person or a company in paid data is billed in Rerun credits, and it shows the estimated cost before it spends."
+                }
+            }
+        },
+        "track-orders": {
+            "crumb": "Track orders",
+            "title": "Your Coworker spots late orders before customers do.",
+            "lede": "Every morning it goes through your open orders and their tracking, finds the stuck ones and tells your customers before they ask.",
+            "metaTitle": "An AI Coworker That Tracks Your Shopify Orders",
+            "metaDescription": "A Rerun Coworker checks every open Shopify order each morning, spots late parcels and bad addresses, and drafts the message to each customer for your OK.",
+            "coworker": {
+                "name": "Order Manager",
+                "job": "Checks every open order each morning"
+            },
+            "thread": {
+                "trigger": "Every day at 8:00",
+                "work": "Checked 312 open orders in Shopify and their tracking. 9 are late, 3 have a bad address and 2 cash on delivery orders are not confirmed.",
+                "deliverable": {
+                    "title": "Orders that need action",
+                    "rows": {
+                        "1": "#4821 · Lyon · 6 days in transit, parcel stuck",
+                        "2": "#4830 · Berlin · address missing a street number",
+                        "3": "#4836 · Madrid · cash on delivery, not confirmed",
+                        "4": "8 more late · a message drafted for each"
+                    }
+                },
+                "approval": {
+                    "ask": "Send the 9 late customers a short update with their new delivery date?",
+                    "approve": "Send the 9 updates",
+                    "done": "Sent. I check those 9 again tomorrow and tell you which still have not moved."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "Every day at 8:00",
+                    "body": "A routine goes through every open order. Point a Shopify webhook at it and it also checks each new order as it comes in."
+                },
+                "2": {
+                    "title": "Shopify, email, WhatsApp",
+                    "body": "It reads orders and customers in Shopify, opens tracking pages in its own browser, and writes from Gmail or WhatsApp."
+                },
+                "3": {
+                    "title": "The orders that need you",
+                    "body": "Late, stuck, wrong address, unconfirmed: each order with its next step and the customer message ready."
+                },
+                "4": {
+                    "title": "You approve the messages",
+                    "body": "It sends updates, cancels or refunds only once you say yes, with each order listed in the card."
+                }
+            },
+            "templatesTitle": "Templates that keep orders moving",
+            "faq": {
+                "1": {
+                    "question": "Which stores does it work with?",
+                    "answer": "Shopify through its app, and Wix or Square too. For another back office, it signs in once in the browser of its own computer and works there like a person would."
+                },
+                "2": {
+                    "question": "How does it see where a parcel is?",
+                    "answer": "From the tracking numbers on your orders: it opens the carrier’s tracking page in its own browser and notes the last scan in its database, so tomorrow’s run knows what moved."
+                },
+                "3": {
+                    "question": "Can it message customers on WhatsApp?",
+                    "answer": "Yes, with WhatsApp Pro, a paid add-on at {whatsappPrice}/mo per number. It writes from your number with text, files and voice notes, and a customer’s reply wakes it up. Email works without it."
+                },
+                "4": {
+                    "question": "Can it check orders as they come in?",
+                    "answer": "Yes. Add a webhook trigger to the Coworker and paste its URL into Shopify’s webhook settings: each new order or fulfillment update starts a run with the order attached."
+                },
+                "5": {
+                    "question": "Will it cancel or refund orders?",
+                    "answer": "Only once you approve. It prepares the cancellation or the refund with the amount and the reason, and nothing changes in Shopify until you click Approve."
+                }
+            }
+        },
+        "chase-invoices": {
+            "crumb": "Chase invoices",
+            "title": "Your Coworker chases invoices the day they slip.",
+            "lede": "When an invoice goes past due, it writes a polite reminder, follows up on the cadence you set, and matches each payment that comes in.",
+            "metaTitle": "An AI Coworker That Chases Overdue Invoices",
+            "metaDescription": "A Rerun Coworker follows up every overdue invoice in your tone, on your cadence, and matches the payments that come in. Each reminder waits for your yes.",
+            "coworker": {
+                "name": "Invoice Chaser",
+                "job": "Follows up overdue invoices, matches payments"
+            },
+            "thread": {
+                "trigger": "Invoice overdue in Stripe",
+                "work": "Invoice #1057 to Northwind, $2,400, is 7 days late. No payment in Stripe and no answer to the first reminder in Gmail.",
+                "deliverable": {
+                    "title": "Overdue this week",
+                    "rows": {
+                        "1": "Northwind · #1057 · $2,400 · 7 days late",
+                        "2": "Acme · #1042 · $1,150 · card expired",
+                        "3": "Halden Group · #1061 · paid $120 short, bank fee",
+                        "4": "Petra · #1066 · paid today, receipt sent"
+                    }
+                },
+                "approval": {
+                    "ask": "Send Northwind a second reminder with the payment link, copying their accounts team?",
+                    "approve": "Send the reminder",
+                    "done": "Sent. If nothing comes in by Tuesday, I will prepare the third one."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "The day an invoice slips",
+                    "body": "A Stripe webhook wakes it when an invoice goes overdue. For QuickBooks or a sheet, a routine checks every morning."
+                },
+                "2": {
+                    "title": "Stripe, your books, email",
+                    "body": "It reads invoices in Stripe or QuickBooks, payments in your bank app, and the thread with each client in Gmail."
+                },
+                "3": {
+                    "title": "A reminder per invoice",
+                    "body": "Polite first, firmer later, with the amount, the due date and the payment link. Payments that came in are matched."
+                },
+                "4": {
+                    "title": "You approve each reminder",
+                    "body": "Nothing goes to a client without your yes. A dispute or a partial payment comes to you with the facts."
+                }
+            },
+            "templatesTitle": "Templates that get you paid",
+            "faq": {
+                "1": {
+                    "question": "Which invoicing tools does it work with?",
+                    "answer": "Stripe, QuickBooks and PayPal through their apps, or a sheet or Airtable if that is where your invoices live. Payments are matched against Stripe, Mercury, GoCardless or a bank export."
+                },
+                "2": {
+                    "question": "How does it know an invoice is overdue?",
+                    "answer": "Paste the Coworker’s webhook URL into Stripe and an overdue invoice starts a run right away, with the invoice attached. Without a webhook, a routine checks your invoices every morning."
+                },
+                "3": {
+                    "question": "Will it annoy my clients?",
+                    "answer": "It follows the cadence you set, for example 3, 10 and 20 days after the due date, in your tone. Each reminder waits for your approval, and a client who pays or answers drops out of the sequence."
+                },
+                "4": {
+                    "question": "Can it match payments to invoices?",
+                    "answer": "Yes. It reads incoming payments, matches them to open invoices by amount and reference, and flags the ones that do not match, like a transfer $120 short. It marks an invoice paid once you approve."
+                },
+                "5": {
+                    "question": "Where does it keep track of all this?",
+                    "answer": "In its own database, on your workspace’s machine: each invoice, each reminder sent, each payment matched. Export any table as CSV or JSON whenever you need it."
+                }
+            }
+        },
+        "screen-candidates": {
+            "crumb": "Screen candidates",
+            "title": "Your Coworker screens applicants while you work.",
+            "lede": "It reads every application against the criteria of the role, scores each one, and hands you a shortlist with the reason behind each name.",
+            "metaTitle": "An AI Coworker That Screens Job Applicants",
+            "metaDescription": "A Rerun Coworker reads every application against your criteria, scores each CV with the evidence, and hands you a shortlist. You decide who goes on.",
+            "coworker": {
+                "name": "Recruiter",
+                "job": "Reads applications, builds the shortlist"
+            },
+            "thread": {
+                "trigger": "Shortlist the Account Executive role",
+                "work": "Read 64 applications and their CVs in Gmail and Drive, and scored each one on your 5 must-haves. 9 meet all five, 3 stand out.",
+                "deliverable": {
+                    "title": "Shortlist · Account Executive",
+                    "rows": {
+                        "1": "Maya Okafor · 5/5 · 4 years selling SaaS to SMBs",
+                        "2": "Tom Riedel · 5/5 · beat quota 6 quarters running",
+                        "3": "Inès Garnier · 5/5 · sells in French and German",
+                        "4": "61 others · scored, with the reason for each"
+                    }
+                },
+                "approval": {
+                    "ask": "Invite the top 3 to a first call this week, in your free slots on the calendar?",
+                    "approve": "Invite the 3",
+                    "done": "Invites sent. Each call goes in your calendar as soon as they pick a slot."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "When you open a role",
+                    "body": "Ask in the chat, or set a routine every Friday for the week’s applications. A form’s webhook can start it per application."
+                },
+                "2": {
+                    "title": "Your inbox, files, calendar",
+                    "body": "It reads applications in Gmail or your form, CVs in Drive, and your calendar to propose interview slots."
+                },
+                "3": {
+                    "title": "A shortlist with the why",
+                    "body": "Every candidate is scored on the criteria you set, with the evidence from the CV, so you can check the ranking."
+                },
+                "4": {
+                    "title": "You decide who goes on",
+                    "body": "It drafts invitations and rejections and sends nothing until you approve. The final call stays with you."
+                }
+            },
+            "templatesTitle": "Templates that help you hire",
+            "faq": {
+                "1": {
+                    "question": "Where does it read the applications?",
+                    "answer": "In Gmail or Outlook, in a form like Typeform, Tally or Jotform, or in the files you drop in its folder or in Drive. Point a form’s webhook at the Coworker and each new application starts a run."
+                },
+                "2": {
+                    "question": "Does it decide who gets hired?",
+                    "answer": "No. It scores each application on the criteria you wrote and shows the evidence. Invitations, rejections and the final decision all wait for your approval."
+                },
+                "3": {
+                    "question": "How do I keep the screening fair?",
+                    "answer": "Write the criteria of the role as a skill: what is required, what is a plus, what must be ignored. It applies the same rules to every application and logs the reason for each score."
+                },
+                "4": {
+                    "question": "Can it find candidates too?",
+                    "answer": "Yes. With LinkedIn Pro, a paid add-on at {linkedinPrice}/mo per account, it searches profiles and writes to people from your account at a safe daily pace. Work emails come from paid data, in Rerun credits, after your yes."
+                },
+                "5": {
+                    "question": "Where is candidate data kept?",
+                    "answer": "In the Coworker’s own database and folder, on your workspace’s machine in Europe. Delete the rows or the whole table when the role closes."
+                }
+            }
+        }
+    }
+}

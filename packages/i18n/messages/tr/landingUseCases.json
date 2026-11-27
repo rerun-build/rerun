@@ -1,0 +1,889 @@
+{
+    "hub": {
+        "crumb": "Kullanım örnekleri",
+        "title": "Coworker'ların her gün yaptığı işler.",
+        "lede": "Yeni bir çalışana vereceğiniz işi seçin. Her sayfa işin bir çalıştırmasını, geçtiği uygulamaları ve harekete geçmeden önce size neyi sorduğunu gösterir.",
+        "metaTitle": "AI Coworker Kullanım Örnekleri: Her Gün Yaptıkları İşler",
+        "metaDescription": "Adaylar, satış, reklam, içerik, sosyal medya, müşteri yanıtları, gelen kutusu, toplantı, sipariş, fatura ve işe alım: her işin bir çalıştırması, adım adım.",
+        "allTitle": "Tüm kullanım örnekleri",
+        "allLead": "Önce işi getirenler, sonra işletmeyi ayakta tutanlar.",
+        "faq": {
+            "1": {
+                "question": "Tek bir coworker bu işlerin birkaçını yapabilir mi?",
+                "answer": "Evet, ama coworker başına tek iş en iyi sonucu verir: her biri kendi belleğini, skill'lerini ve rutinlerini tutar. Coworker'lar işi birbirine devreder; adayları bulan, onlara yazacak olana aktarabilir."
+            },
+            "2": {
+                "question": "İşim bu listede yoksa ne olur?",
+                "answer": "Chief of Staff'a sade sözlerle anlatın. Bunun için bir coworker önerir ve işin ihtiyaç duyduğu uygulamalar, skill'ler ve rutinlerle onu kurar."
+            },
+            "3": {
+                "question": "Bilgisayarım kapalıyken de çalışır mı?",
+                "answer": "Evet. Her çalışma alanının bulutta kendi makinesi vardır; rutinler ve tetikleyiciler dizüstünüz kapalıyken gece ve hafta sonu da çalışır."
+            },
+            "4": {
+                "question": "Bana sormadan harekete geçer mi?",
+                "answer": "Önemli hiçbir konuda geçmez. Bir coworker göndermeden, ödemeden, silmeden ya da kredi harcamadan önce sorar; siz de web'den, masaüstü uygulamasından veya telefonunuzdan yanıt verirsiniz."
+            }
+        }
+    },
+    "page": {
+        "crumbRoot": "Kullanım örnekleri",
+        "howItRunsTitle": "Nasıl çalışır",
+        "howItRunsLead": "İşin bir çalıştırması, sohbetinizde göründüğü gibi.",
+        "appsTitle": "Çalıştığı uygulamalar",
+        "appsLead": "Kendi hesaplarınızla bir kez bağlanır. Oturum açar ve içlerinde kendi başına çalışır.",
+        "templatesLead": "Kütüphaneden bu işi zaten yapan hazır coworker'lar.",
+        "templatesLink": "Kütüphaneye göz atın",
+        "featuresTitle": "Arkasındaki özellikler",
+        "industriesTitle": "Yaygın olduğu yerler",
+        "industriesLink": "Tüm kullanım örnekleri",
+        "thread": {
+            "scheduledRun": "Zamanlanmış çalıştırma",
+            "webhookReceived": "Webhook alındı",
+            "approvalTitle": "Onay",
+            "approved": "Onaylandı"
+        }
+    },
+    "items": {
+        "find-leads": {
+            "crumb": "Müşteri adayı bulma",
+            "title": "Siz uyurken coworker'ınız müşteri adayı bulur.",
+            "lede": "Her hafta iş ilanlarını, LinkedIn'i ve CRM'inizi okur, en iyi müşterilerinize benzeyen şirketleri ayırır ve listeyi her birinin gerekçesiyle size verir.",
+            "metaTitle": "B2B Müşteri Adayı Bulan Bir AI Coworker",
+            "metaDescription": "Bir Rerun coworker'ı iş ilanlarını, LinkedIn'i ve CRM'inizi okur, teklifinize uyan şirketleri ayırır, kredi harcamadan ya da bir şey yazmadan önce sorar.",
+            "coworker": {
+                "name": "Satış Temsilcisi",
+                "job": "Her pazartesi uygun şirketleri bulur"
+            },
+            "thread": {
+                "trigger": "Her pazartesi 8:00",
+                "work": "LinkedIn'de 120 iş ilanı okudum, HubSpot'ta zaten olan 14 şirketi çıkardım ve en iyi müşterilerinize benzeyen 26 şirketi ayırdım.",
+                "deliverable": {
+                    "title": "Pazartesi adayları",
+                    "rows": {
+                        "1": "Forma · Satış Müdürü · 2 account executive arıyor",
+                        "2": "Northstar · Satış Direktörü · Paris'te yeni ekip",
+                        "3": "Arc Labs · VP Sales · 3 SDR arıyor",
+                        "4": "Kerio Supply · COO · ocakta 4 M€ yatırım aldı"
+                    }
+                },
+                "approval": {
+                    "ask": "26 karar vericinin iş e-postalarını bulmak yaklaşık 80 krediye mal olur. Devam edeyim mi?",
+                    "approve": "80 kredi harca",
+                    "done": "23 iş e-postası bulundu, hiçbiri tahmin değil. 26 aday HubSpot'ta, sahibi siz."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "Her pazartesi 8:00",
+                    "body": "Bir rutin onu kendi makinesinde uyandırır, dizüstünüz kapalı olsun ya da olmasın. Her ismi bir tabloda tutar; böylece gelecek hafta yalnızca yenileri gelir."
+                },
+                "2": {
+                    "title": "LinkedIn, CRM'iniz, bir tablo",
+                    "body": "İş ilanlarını ve profilleri okur, HubSpot veya Pipedrive'da zaten görüştüğünüz şirketleri çıkarır ve tabloyu doldurur."
+                },
+                "3": {
+                    "title": "Gerekçeli, sıralı bir liste",
+                    "body": "Her şirket, yazılacak kişi ve arkasındaki sinyalle gelir: bir işe alım, yeni bir ofis, bir yatırım turu."
+                },
+                "4": {
+                    "title": "Harcamayı siz onaylarsınız",
+                    "body": "İş e-postaları ve telefon numaraları ücretli veridir. Önce tahmini krediyi gösterir, siz evet demeden hiçbir şey harcamaz."
+                }
+            },
+            "templatesTitle": "Sıradaki müşterilerinizi bulan şablonlar",
+            "faq": {
+                "1": {
+                    "question": "Adayları nerede bulur?",
+                    "answer": "İş ilanlarında, şirket sayfalarında, Google sonuçlarında ve LinkedIn'de; sonra bunları kendi CRM'inizle karşılaştırır. En iyi müşterilerinizi bir kez tarif edin ya da kazanılan anlaşmalarınızı okumasına izin verin, o profili belleğinde tutar."
+                },
+                "2": {
+                    "question": "E-posta ve telefon numarası bulmak ek ücretli mi?",
+                    "answer": "Evet. İş e-postaları, telefon numaraları ve şirket verileri ücretli veridir ve Rerun kredisiyle faturalanır (1 $ için {creditsPerUsd} kredi). Coworker harcamadan önce tahmini toplamı gösterir ve Sormadan harca'yı açmadıysanız onayınızı bekler."
+                },
+                "3": {
+                    "question": "LinkedIn Pro gerekir mi?",
+                    "answer": "Hayır, onsuz da aday bulur. Hesap başına ayda {linkedinPrice} olan ücretli eklenti LinkedIn Pro, kredi harcamadan hesabınızdan LinkedIn'de arama ve okuma yapmasını, güvenli bir günlük hızda davet ve mesaj göndermesini ve biri yanıt verdiğinde uyanmasını sağlar."
+                },
+                "4": {
+                    "question": "Adaylara kendi başına yazar mı?",
+                    "answer": "Siz olmadan yazmaz. Her aday için ilk mesajın taslağını hazırlar ve bir e-posta ya da LinkedIn daveti göndermeden önce sorar. Listeyi oradan başka bir coworker alıp takipleri yürütebilir."
+                },
+                "5": {
+                    "question": "Zaten tanıdığımız kişileri atlar mı?",
+                    "answer": "Evet. Birini eklemeden önce HubSpot'u, Pipedrive'ı ya da tablonuzu kontrol eder ve bulduğu her şirketi veritabanında tutar; bir isim asla iki kez gelmez."
+                }
+            }
+        },
+        "track-sales": {
+            "crumb": "Satış takibi",
+            "title": "Coworker'ınız satışlarınızı her sabah takip eder.",
+            "lede": "Stripe'taki geliri toplar, CRM'inizdeki her açık anlaşmayı okur, gelir tablosunu günceller ve yalnızca bir şey değiştiğinde size haber verir.",
+            "metaTitle": "Geliri ve Satış Hattını Takip Eden Bir AI Coworker",
+            "metaDescription": "Bir Rerun coworker'ı her iş günü Stripe'ı ve CRM'inizi okur, gelir tablosunu günceller ve ekibe yazmadan önce hangi anlaşmaların kaydığını size söyler.",
+            "coworker": {
+                "name": "Gelir Analisti",
+                "job": "Her iş günü geliri ve satış hattını okur"
+            },
+            "thread": {
+                "trigger": "Her iş günü 8:00",
+                "work": "Stripe'ta 30 günü topladım: 482 bin $, geçen aya göre %11 artış. HubSpot'ta 54 açık anlaşmayı okudum ve gelir tablosunun 3 sekmesini güncelledim.",
+                "deliverable": {
+                    "title": "Cumadan beri değişenler",
+                    "rows": {
+                        "1": "Halden Group · 84.000 $ · Teklif aşamasına geri döndü",
+                        "2": "Vessel · 61.500 $ · Kapanıştan Pazarlığa",
+                        "3": "Petra · 38.000 $ · Tekliften Kapanışa",
+                        "4": "Kayıp · 2 hesap iptal etti, 1.240 $ MRR"
+                    }
+                },
+                "approval": {
+                    "ask": "En büyük beş anlaşmanızdan ikisi kaydı. Her sahibi için bir sonraki adımla birlikte #sales kanalına yazayım mı?",
+                    "approve": "#sales kanalına yaz",
+                    "done": "Yazıldı. Kapanış tarihi değişmezse Halden'ı perşembe günü yeniden işaretleyeceğim."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "Her iş günü 8:00",
+                    "body": "Bir rutin, siz dizüstünüzü açmadan çalışır. Her günün rakamlarını veritabanında tutar; böylece neyin değiştiğini söyleyebilir."
+                },
+                "2": {
+                    "title": "Stripe, CRM'iniz, tablo",
+                    "body": "Stripe'taki ödemeleri ve abonelikleri, HubSpot veya Pipedrive'daki anlaşmaları okur ve toplamları Sheets'e ya da Airtable'a yazar."
+                },
+                "3": {
+                    "title": "Yalnızca değişenler",
+                    "body": "Geçen aya göre gelir, kayan ya da aşama atlayan anlaşmalar, kaybedilen hesaplar. Sakin bir gün kısa bir mesaj olarak kalır."
+                },
+                "4": {
+                    "title": "Kime gideceğine siz karar verirsiniz",
+                    "body": "Ekip kanalına yazmadan, bir temsilciye yazmadan ya da bir anlaşmayı değiştirmeden önce sorar; neyin gideceğini siz seçersiniz."
+                }
+            },
+            "templatesTitle": "Geliri gözünüzde tutan şablonlar",
+            "faq": {
+                "1": {
+                    "question": "Hangi araçları okuyabilir?",
+                    "answer": "Stripe, HubSpot, Pipedrive, QuickBooks, Google Sheets, Airtable ve {connectors}+ uygulamanın geri kalanı. Uygulaması olmayıp MCP sunucusu olan bir araç da çalışır; ikisi de yoksa onu kendi bilgisayarının tarayıcısında açabilir."
+                },
+                "2": {
+                    "question": "CRM'imde bir şey değiştirir mi?",
+                    "answer": "Yalnızca siz isterseniz. Varsayılan olarak okur. Bir aşamayı taşımasını ya da bir kapanış tarihini düzeltmesini istediğinizde değişiklikleri bir onay kartında listeler ve siz onaylamadan hiçbir şey yazmaz."
+                },
+                "3": {
+                    "question": "Bir rakam yanlış görünürse ne olur?",
+                    "answer": "Her rakam nereden geldiğini söyler: saydığı Stripe ödemeleri ya da anlaşmalar. Bir kez düzeltin, örneğin iadeleri dışarıda bırakmak için; kuralı sonraki çalıştırmalar için belleğinde tutar."
+                },
+                "4": {
+                    "question": "Gece ve hafta sonu da çalışır mı?",
+                    "answer": "Evet. Avrupa'daki kendi makinesinde çalışır; böylece bir rutin dizüstünüz kapalıyken de zamanında başlar. Takvimi sade sözlerle belirlersiniz, örneğin her pazartesi sabah 7'de."
+                },
+                "5": {
+                    "question": "Günlük bir çalıştırma ne kadar tutar?",
+                    "answer": "Seçtiğiniz yapay zeka üzerinde çalışır. Claude veya ChatGPT planınızla ya da kendi API anahtarınızla bir çalıştırma Rerun tarafında hiçbir şeye mal olmaz. Rerun modellerinde kredinizden düşer: Pro ayda {monthlyCredits} kredi içerir."
+                }
+            }
+        },
+        "run-ads": {
+            "crumb": "Reklam yönetimi",
+            "title": "Coworker'ınız reklamlarınızı her sabah kontrol eder.",
+            "lede": "Meta Ads'te dünkü harcamayı ve sonuçları okur, bunları gerçek satışlarınızla yan yana koyar, neyin durdurulacağını ve bütçenin nereye kaydırılacağını önerir.",
+            "metaTitle": "Reklam Harcamanızı Yöneten Bir AI Coworker",
+            "metaDescription": "Bir Rerun coworker'ı reklam harcamanızı her sabah okur, gerçek satışlarla kıyaslar, neyin durup büyüyeceğini önerir. Onayınız olmadan hiçbir şey değişmez.",
+            "coworker": {
+                "name": "Reklam Yöneticisi",
+                "job": "Harcamayı her gün okur, para kaybettireni işaretler"
+            },
+            "thread": {
+                "trigger": "Her gün 7:00",
+                "work": "Meta Ads'te 38 reklam setini ve 142 Shopify siparişini okudum. Dün harcama 1.920 $, getiri 2,4x. Dört reklam seti üç gündür üst üste para kaybettiriyor.",
+                "deliverable": {
+                    "title": "Bugün ele alınacak reklamlar",
+                    "rows": {
+                        "1": "Durdur · Bahar kampanyası, geniş · 312 $ harcandı, 0 satış",
+                        "2": "Durdur · Yeniden hedefleme 30 gün · 0,6x getiri",
+                        "3": "Büyüt · UGC video, benzer kitle · 4,1x getiri",
+                        "4": "Test et · Kazanan için 3 yeni açılış taslağı"
+                    }
+                },
+                "approval": {
+                    "ask": "Zarar eden 4 reklam setini durdurup günde 150 $'ı UGC videoya kaydırayım mı?",
+                    "approve": "4'ü durdur, 150 $ kaydır",
+                    "done": "Meta Ads'te yapıldı. Yeni dağılımı yarın 7:00'de okuyup nasıl gittiğini size söyleyeceğim."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "Her gün 7:00",
+                    "body": "Bir rutin, ilk kahvenizden önce dünü okur, hafta sonları dahil, ve yavaş düşüşleri yakalamak için her günü bir tabloda tutar."
+                },
+                "2": {
+                    "title": "Meta Ads, mağazanız, bir tablo",
+                    "body": "Kampanyaları Meta Ads uygulamasıyla, siparişleri Shopify veya Stripe'ta okur. Diğer reklam yöneticilerini kendi tarayıcısında açar."
+                },
+                "3": {
+                    "title": "Durdur, büyüt ya da test et",
+                    "body": "Her reklam seti arkasındaki rakamlarla bir karar alır; kazananlar da sonraki kreatifler için yeni açılışlar ve brifler alır."
+                },
+                "4": {
+                    "title": "Her değişikliği siz onaylarsınız",
+                    "body": "Bir reklamı durdurmak ya da bütçe kaydırmak sizin kararınızdır. Her değişikliği tutarıyla listeler ve onayınızı bekler."
+                }
+            },
+            "templatesTitle": "Ücretli edinimi yürüten şablonlar",
+            "faq": {
+                "1": {
+                    "question": "Hangi reklam platformlarında çalışır?",
+                    "answer": "Facebook ve Instagram kampanyalarınız için uygulamasıyla Meta Ads. Google, LinkedIn veya TikTok reklamları için kendi bilgisayarının tarayıcısını kullanır: istediğinde bir kez oturum açarsınız, reklam yöneticisinde bir insan gibi çalışır."
+                },
+                "2": {
+                    "question": "Bütçelerimi sormadan değiştirebilir mi?",
+                    "answer": "Hayır. Okur ve önerir. Bir reklam setini durdurmak, bütçe değiştirmek ya da reklam yayınlamak tutarlarıyla birlikte bir onay kartında size gelir ve siz Onayla'ya tıklamadan hiçbir şey değişmez."
+                },
+                "3": {
+                    "question": "Bir reklamın gerçekten para kazandırdığını nasıl bilir?",
+                    "answer": "Shopify veya Stripe'taki siparişlerinizi platformun kendi rakamlarının yanında okur; böylece yalnızca reklam yöneticisinin saydığını değil, harcadığınızı ve gelenleri görürsünüz."
+                },
+                "4": {
+                    "question": "Sonraki reklamları yazabilir mi?",
+                    "answer": "Evet. Zaten işe yarayandan yola çıkarak sonraki kreatifler için açılış, metin ve brif taslakları hazırlar, Brain'inizdeki üslupla. Her taslak bir yere gitmeden önce onayınızı bekler."
+                },
+                "5": {
+                    "question": "Rakiplerimin reklamlarına bakabilir mi?",
+                    "answer": "Brandsearch veya TrendTrack gibi bir araştırma uygulaması bağlayın; rakiplerinizin Meta ve TikTok'ta yayınladığı reklamları okur, sonra test etmeye değer açıları size getirir."
+                }
+            }
+        },
+        "watch-competitors": {
+            "crumb": "Rakip takibi",
+            "title": "Coworker'ınız rakiplerinizi her gün izler.",
+            "lede": "Fiyat sayfalarını, lansmanlarını, paylaşımlarını ve sıralamalarını yeniden kontrol eder; işiniz için önemli bir şey değiştiği gün size haber verir.",
+            "metaTitle": "Rakiplerinizi İzleyen Bir AI Coworker",
+            "metaDescription": "Bir Rerun coworker'ı rakip fiyatlarını, lansmanlarını, paylaşımlarını ve sıralamalarını her gün kontrol eder, önemli bir şey değişince size yazar.",
+            "coworker": {
+                "name": "Pazar Analisti",
+                "job": "3 rakibi izler, yalnızca değişince yazar"
+            },
+            "thread": {
+                "trigger": "Her gün 8:00",
+                "work": "3 fiyat sayfasını yeniden kontrol ettim, LinkedIn ve X'te 18 yeni paylaşım okudum ve 212 anahtar kelime farkını karşılaştırdım. Bir değişiklik zamanınıza değer.",
+                "deliverable": {
+                    "title": "Bu hafta rakipler",
+                    "rows": {
+                        "1": "Northstar · giriş planı 79 $'dan 59 $'a, ücretsiz katman eklendi",
+                        "2": "Cobalt · bir entegrasyon dizini yayınladı",
+                        "3": "Tenley · değişiklik yok, fiyatlar aynı",
+                        "4": "Fark · onların sıralandığı 14 anahtar kelime"
+                    }
+                },
+                "approval": {
+                    "ask": "Northstar artık sizden 20 $ ucuz. Fiyat sayfanız için bir yanıt ve satış ekibi için bir not taslağı hazırlayayım mı?",
+                    "approve": "İkisini de hazırla",
+                    "done": "İki taslak da okumanız için Notion'da. Northstar'ı her gün kontrol etmeye devam ediyorum."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "Her gün 8:00",
+                    "body": "Bir rutin her rakibi yeniden kontrol eder ve gördüğünü geçen sefer tuttuğuyla karşılaştırır; size yalnızca değişiklikler ulaşır."
+                },
+                "2": {
+                    "title": "Siteleri, sosyal medya, arama",
+                    "body": "Web'deki sayfalarını, LinkedIn ve X'teki paylaşımlarını ve SEO verisi ya da Semrush gibi bir uygulama üzerinden sıralamalarını okur."
+                },
+                "3": {
+                    "title": "Yalnızca gerçek değişiklikler",
+                    "body": "Fiyat hareketleri, lansmanlar, yeni sayfalar ve kazandıkları anahtar kelimeler; her biri bağlantısı ve görüldüğü tarihle."
+                },
+                "4": {
+                    "title": "Yanıtı siz seçersiniz",
+                    "body": "Yanıtı, güncellenecek bir sayfayı ya da satış için bir notu önerir; bir şey yayınlamadan veya değiştirmeden önce sorar."
+                }
+            },
+            "templatesTitle": "Pazarınızı gözeten şablonlar",
+            "faq": {
+                "1": {
+                    "question": "Neleri izleyebilir?",
+                    "answer": "Herkese açık sayfalarını (fiyatlar, ürün, değişiklik günlüğü, kariyer), LinkedIn, X, Instagram veya YouTube paylaşımlarını, yorumlarını ve Google'daki sıralamalarını. Onları bir kez adlandırırsınız, listeyi belleğinde tutar."
+                },
+                "2": {
+                    "question": "Neyin değiştiğini nasıl bilir?",
+                    "answer": "Her kontrolde gördüğünü veritabanına kaydeder ve bir sonraki kontrolü onunla karşılaştırır. Her zamanlanmış çalıştırma sıfırdan başlar; hatırlamasını sağlayan o tablodur."
+                },
+                "3": {
+                    "question": "Ücretli veri kullanır mı?",
+                    "answer": "Sıralamalar, arama hacimleri, backlink'ler ve herkese açık sosyal profiller ücretli veridir, Rerun kredisiyle faturalanır ve harcamadan önce tahmini maliyeti gösterir. Web sitelerini okumak ücretli veri gerektirmez."
+                },
+                "4": {
+                    "question": "Bir fiyat değiştiğinde hemen haber verir mi?",
+                    "answer": "Evet. Fiyat sayfalarını saatte bir, gerisini haftada bir kontrol ettirin, her biri kendi rutininde. Yalnızca bir çalıştırma değişiklik bulduğunda size bildirim ya da Slack mesajı gönderir."
+                },
+                "5": {
+                    "question": "Botları engelleyen siteler ne olacak?",
+                    "answer": "Tarayıcısı olan kendi bilgisayarı vardır; bir sayfayı bir insan gibi açar. Sayfa oturum açma ya da captcha istediğinde, o adım için tarayıcısını size devreder."
+                }
+            }
+        },
+        "create-content": {
+            "crumb": "İçerik üretimi",
+            "title": "Coworker'ınız bir sonraki makalenizi salı günü yazar.",
+            "lede": "Search Console'unuzu okur, kazanmaya en yakın olduğunuz sorguyu bulur, sıralanan sayfaları inceler ve yazıyı sizin üslubunuzla taslak olarak hazırlar.",
+            "metaTitle": "SEO İçeriği Yazan Bir AI Coworker",
+            "metaDescription": "Bir Rerun coworker'ı kazanmaya en yakın sorguyu bulur, sıralanan sayfaları inceler ve makaleyi sizin üslubunuzla yazar. Onayınızdan sonra yayınlar.",
+            "coworker": {
+                "name": "İçerik Pazarlamacısı",
+                "job": "Arama verilerinizden haftada bir makale yazar"
+            },
+            "thread": {
+                "trigger": "Her salı 10:00",
+                "work": "Search Console'da 1.204 sorguyu ve en yakın olanın ilk 3 sonucunu okudum. Arkasında sıralanacak yeni bir yazıya başlamak yerine elimizdeki yazıyı yeniden yazdım.",
+                "deliverable": {
+                    "title": "Bu haftanın makalesi",
+                    "rows": {
+                        "1": "Anahtar kelime · agent orchestration · 11. sıra",
+                        "2": "Hacim · ayda 2.400 arama",
+                        "3": "Taslak · ilk sayfanın yanıtladığı 3 soru üzerine 1.850 kelime",
+                        "4": "Bağlantılar · 4 iç bağlantı, 2 kaynak"
+                    }
+                },
+                "approval": {
+                    "ask": "Yeniden yazılan yazı WordPress'te taslak olarak kaydedildi. Aynı URL'de şimdi yayınlayayım mı?",
+                    "approve": "Yeni sürümü yayınla",
+                    "done": "Yayınlandı. Gelecek salı bir sonraki anahtar kelimeyi seçmeden önce sırasını kontrol edeceğim."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "Her salı 10:00",
+                    "body": "Bir rutin haftanın konusunu tahminle değil, arama verilerinizden seçer. Ya da sohbette kendi konunuzda bir yazı isteyin."
+                },
+                "2": {
+                    "title": "Arama verisi, belgeler, CMS'iniz",
+                    "body": "Google Search Console'u okur, sıralanan sayfaları açar, Notion veya Drive'daki notlarınızı kullanır ve WordPress'te taslak hazırlar."
+                },
+                "3": {
+                    "title": "Sizin sesinizle bir taslak",
+                    "body": "Teklifiniz ve üslubunuz Brain'de durur; böylece taslak sizin gibi, kaynakları ve iç bağlantılarıyla birlikte konuşur."
+                },
+                "4": {
+                    "title": "Siz yayınlarsınız",
+                    "body": "Taslak CMS'inizde bekler. Yeni bir yazıyı yayınlar ya da yayındakini günceller, ama yalnızca siz onayladıktan sonra."
+                }
+            },
+            "templatesTitle": "İçeriğinizi yazan ve planlayan şablonlar",
+            "faq": {
+                "1": {
+                    "question": "Konuları nereden bulur?",
+                    "answer": "Google Search Console sorgularınızdan, anahtar kelime verilerinden ve rakiplerinizin yayınladıklarından ya da sizin verdiğiniz konudan. Varsayılan olarak kazanmaya en yakın olduğunuz sorguya yönelir."
+                },
+                "2": {
+                    "question": "Bizim gibi mi konuşur?",
+                    "answer": "Brain'inizden yazar: teklifiniz, pazarınız ve üslubunuz, bir kez yazılır ve her coworker'la paylaşılır. Bir taslağı düzeltin, düzeltmeyi belleğinde tutar ya da onu bir skill'e dönüştürmeyi önerir."
+                },
+                "3": {
+                    "question": "Hangi CMS'lerde yayın yapabilir?",
+                    "answer": "Uygulamaları üzerinden WordPress, Webflow, Contentful, Sanity, Strapi ve Notion. Uygulaması olmayan bir site için editörünüzde kendi bilgisayarının tarayıcısından çalışır."
+                },
+                "4": {
+                    "question": "Anahtar kelime verisi kredi harcar mı?",
+                    "answer": "Kendi Search Console verileriniz bağlandıktan sonra hiçbir şeye mal olmaz. Arama hacimleri, anahtar kelime fikirleri ve backlink'ler ücretli veridir, Rerun kredisiyle faturalanır ve harcamadan önce sorar."
+                },
+                "5": {
+                    "question": "Makaleyi paylaşımlara dönüştürebilir mi?",
+                    "answer": "Evet. Makaleyi sosyal medya coworker'ınıza devreder; o da onu bir LinkedIn paylaşımına ve bir Instagram karuseline dönüştürür, her biri onayınızı bekler."
+                }
+            }
+        },
+        "post-on-social": {
+            "crumb": "Sosyal medya paylaşımı",
+            "title": "Coworker'ınız her sabah sosyal medyada paylaşım yapar.",
+            "lede": "Makalelerinizi, lansmanlarınızı ve haberlerinizi her ağ için bir paylaşıma dönüştürür, onayınızdan sonra yayınlar ve gelen yorumları yanıtlar.",
+            "metaTitle": "Sosyal Medyada Paylaşım Yapan Bir AI Coworker",
+            "metaDescription": "Bir Rerun coworker'ı makalelerinizden her ağa bir paylaşım yazar, onayınızla LinkedIn, Instagram ve Facebook'ta yayınlar ve yorumları yanıtlar.",
+            "coworker": {
+                "name": "Topluluk Yöneticisi",
+                "job": "Her iş günü paylaşır, yorumları yanıtlar"
+            },
+            "thread": {
+                "trigger": "Her iş günü 9:00",
+                "work": "Bu haftanın makalesini ve 41 yeni yorumu okudum. Bir LinkedIn paylaşımı, Instagram için 5 slaytlık bir karusel ve 12 yoruma yanıt taslağı hazırladım.",
+                "deliverable": {
+                    "title": "Bugünün paylaşımları",
+                    "rows": {
+                        "1": "LinkedIn · 9:30 · herkesin tekrarladığı 20 talep ile açılıyor",
+                        "2": "Instagram · 12:00 · 5 slayt, her birinde bir fikir",
+                        "3": "Facebook · 17:00 · kısa sürüm, bağlantısıyla",
+                        "4": "Yorumlar · 12 yanıt hazır, 2'si size kaldı"
+                    }
+                },
+                "approval": {
+                    "ask": "3 paylaşımı bu saatlerde yayınlayıp 12 yanıtı göndereyim mi?",
+                    "approve": "Yayınla ve yanıtla",
+                    "done": "Her şey hazır. Yarın sabah tepkileri okuyup hangi paylaşımın işe yaradığını söyleyeceğim."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "Her iş günü 9:00",
+                    "body": "Bir rutin günün paylaşımlarını hazırlar. Başka bir coworker paylaşılacak yeni bir makale devrettiğinde de başlar."
+                },
+                "2": {
+                    "title": "LinkedIn, Instagram, Facebook",
+                    "body": "Her ağın uygulamasıyla yayınlar ve yorumları yanıtlar, diğerleri için Buffer üzerinden zamanlar."
+                },
+                "3": {
+                    "title": "Her ağa bir paylaşım",
+                    "body": "Her kitle için kesilmiş tek bir fikir: bir paylaşım, bir karusel, kısa bir sürüm, Brain'inizdeki üslupla."
+                },
+                "4": {
+                    "title": "Başlat dersiniz",
+                    "body": "Metni, görseli ve saatiyle siz onaylamadan hiçbir şey çıkmaz. Yorum yanıtları da sizi bekler."
+                }
+            },
+            "templatesTitle": "Sosyal medyanızı yürüten şablonlar",
+            "faq": {
+                "1": {
+                    "question": "Hangi ağlarda paylaşım yapabilir?",
+                    "answer": "Uygulamaları üzerinden LinkedIn, Instagram, Facebook Sayfaları ve YouTube; diğerlerinde Buffer gibi bir zamanlayıcı üzerinden. Neyin paylaşılmaya değer olduğunu bulmak için X'i ve haberleri de okur."
+                },
+                "2": {
+                    "question": "Bensiz paylaşım yapar mı?",
+                    "answer": "Siz söylemedikçe yapmaz. Her paylaşım metni, görseli ve saatiyle bir onay kartında bekler. Hangi yanıtları tek başına gönderebileceğini söyleyebilirsiniz, o kuralı belleğinde tutar."
+                },
+                "3": {
+                    "question": "Yorumlara ve DM'lere yanıt verebilir mi?",
+                    "answer": "Evet: LinkedIn, Facebook ve Instagram'daki yorumlara ve Instagram DM'lerine. Sizin üslubunuzla taslak yazar, hassas olanları size bırakır."
+                },
+                "4": {
+                    "question": "Fikirler nereden gelir?",
+                    "answer": "Makalelerinizden, lansmanlarınızdan ve müşteri hikayelerinizden, Brain'den ve kitlenizin daha önce tepki verdiklerinden. İçerik coworker'ınız her yeni makaleyi yayına girer girmez ona devredebilir."
+                },
+                "5": {
+                    "question": "Paylaşım için LinkedIn Pro gerekir mi?",
+                    "answer": "Hayır. Paylaşım ve yorum, ek ücret olmadan LinkedIn uygulaması üzerinden yapılır. Hesap başına ayda {linkedinPrice} olan ücretli eklenti LinkedIn Pro, müşteri bulma içindir: profil arama, davet ve mesaj gönderme."
+                }
+            }
+        },
+        "reply-to-customers": {
+            "crumb": "Müşterilere yanıt",
+            "title": "Coworker'ınız müşterilere dakikalar içinde yanıt verir.",
+            "lede": "Bir WhatsApp mesajı ya da e-posta gelir: siparişi okur, politikalarınızı kontrol eder ve sizin üslubunuzla yanıtlar. Zor olanlar size gelir.",
+            "metaTitle": "Müşterilerinize Yanıt Veren Bir AI Coworker",
+            "metaDescription": "Bir Rerun coworker'ı siparişlerinizden ve yardım belgelerinizden, sizin üslubunuzla WhatsApp ve e-postada yanıt verir, iade ya da söz vermeden önce sorar.",
+            "coworker": {
+                "name": "Müşteri Desteği",
+                "job": "Belgelerinizden WhatsApp ve e-postaya yanıt verir"
+            },
+            "thread": {
+                "trigger": "Bir WhatsApp mesajı geldi",
+                "work": "Clara'nın mesajını okudum, Shopify'da 1042 numaralı siparişi ve Notion'da iade politikasını buldum. 30 günün 12. günü, yani iade mümkün.",
+                "deliverable": {
+                    "title": "Yanıt taslağı hazır",
+                    "rows": {
+                        "1": "Clara Mendes · sipariş #1042 · bir ceketi iade etmek istiyor",
+                        "2": "Politika · 30 gün, giyilmemiş, ücretsiz iade etiketi",
+                        "3": "Yanıt · iade kabul edildi, etiket ekte",
+                        "4": "İade · kargo okutulunca 129 $"
+                    }
+                },
+                "approval": {
+                    "ask": "Clara'ya iade etiketiyle yanıtı gönderip iadeyi Shopify'daki siparişe not edeyim mi?",
+                    "approve": "Yanıtı gönder",
+                    "done": "WhatsApp'tan gönderildi. Clara'ya iadesi yapıldığında haber vereceğim."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "Bir mesaj onu uyandırır",
+                    "body": "WhatsApp Pro ile yeni bir mesaj hemen bir çalıştırma başlatır. E-posta için bir rutin, destek gelen kutusunu belirlediğiniz sıklıkta tarar."
+                },
+                "2": {
+                    "title": "Gelen kutunuz, siparişler, belgeler",
+                    "body": "Konuşmayı okur, siparişi Shopify'da ya da müşteriyi Stripe'ta bulur ve Notion'daki yardım belgelerinizi kontrol eder."
+                },
+                "3": {
+                    "title": "Sizin üslubunuzla bir yanıt",
+                    "body": "Politikalarınızdan ve daha önce gönderdiğiniz yanıtlardan oluşturulur; neyi kontrol ettiği taslağın altında görünür."
+                },
+                "4": {
+                    "title": "Gidecek olanı siz onaylarsınız",
+                    "body": "Göndermeden, iade yapmadan ya da bir söz vermeden önce sorar. Bir anlaşmazlık ya da hukuki bir soru sizde kalır."
+                }
+            },
+            "templatesTitle": "Müşterilerinizle ilgilenen şablonlar",
+            "faq": {
+                "1": {
+                    "question": "WhatsApp'ta yanıt verebilir mi?",
+                    "answer": "Evet, numara başına ayda {whatsappPrice} olan ücretli eklenti WhatsApp Pro ile. Numaranıza WhatsApp Web gibi bağlı bir cihaz olarak katılır, metin, dosya ve sesli notla yanıt verir ve tanımadığı kişilere asla yazmaz."
+                },
+                "2": {
+                    "question": "Destek araçlarımla çalışır mı?",
+                    "answer": "Gmail veya Outlook'tan ve WhatsApp'tan yanıt verir, Intercom veya Freshdesk konuşmalarınızı uygulamaları üzerinden okur. Siparişler Shopify'dan, müşteriler ve ödemeler Stripe'tan gelir."
+                },
+                "3": {
+                    "question": "Bir şeyler uydurur mu?",
+                    "answer": "Yardım belgelerinizden, politikalarınızdan ve daha önce verdiğiniz yanıtlardan yanıt verir ve neyi kontrol ettiğini gösterir. Yanıt orada yoksa tahmin etmek yerine size sorar."
+                },
+                "4": {
+                    "question": "Bir müşteriye iade yapabilir mi?",
+                    "answer": "Stripe veya Shopify'da bir iade hazırlayabilir, ama hesabınızdan çıkan para sizin kararınızdır: önce tutarı ve siparişiyle sorar, siz onaylamadan hiçbir şey yapmaz."
+                },
+                "5": {
+                    "question": "Gece de yanıt verir mi?",
+                    "answer": "Evet. Kendi makinesinde çalışır; gece 2'de gelen bir WhatsApp mesajı gece 2'de bir çalıştırma başlatır. Onayınızı gerektiren bir yanıt gelen kutunuzda ve telefonunuzda bekler."
+                }
+            }
+        },
+        "triage-inbox": {
+            "crumb": "Gelen kutusu düzeni",
+            "title": "Coworker'ınız siz uyanmadan gelen kutunuzu temizler.",
+            "lede": "Gecenin e-postalarını okur, her konuyu etiketler, yapabildiği yanıtların taslağını hazırlar ve yalnızca kararınızı gerektiren birkaçını size bırakır.",
+            "metaTitle": "E-posta Gelen Kutunuzu Düzenleyen Bir AI Coworker",
+            "metaDescription": "Bir Rerun coworker'ı Gmail veya Outlook'unuzu her sabah okur, konuları etiketler, faturaları dosyalar, yanıt taslağı yazar. Onaysız hiçbir şey göndermez.",
+            "coworker": {
+                "name": "Yönetici Asistanı",
+                "job": "Gelen kutunuzu her sabah düzenler"
+            },
+            "thread": {
+                "trigger": "Her iş günü 7:00",
+                "work": "86 yeni e-posta okudum. 61 bülten ve makbuzu etiketledim, 9 faturayı Drive'a dosyaladım ve daha önce söylediklerinizden 14 yanıt taslağı hazırladım.",
+                "deliverable": {
+                    "title": "Bu sabah gelen kutunuz",
+                    "rows": {
+                        "1": "Yanıtlar · 14 taslak, göndermeye hazır",
+                        "2": "Faturalar · 9'u Drive'da, Faturalar 2026",
+                        "3": "Toplantı · Lena Haas perşembe 15:00 istiyor, müsait",
+                        "4": "Size kalan · Halden Group'tan sözleşme sorusu"
+                    }
+                },
+                "approval": {
+                    "ask": "14 yanıt taslağını gönderip Lena'nın perşembe 15:00 toplantısını kabul edeyim mi?",
+                    "approve": "14'ünü gönder, 1'ini kabul et",
+                    "done": "Gönderildi ve ayarlandı. Halden'ın sözleşme sorusu en üstte sizi bekliyor."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "Her iş günü 7:00",
+                    "body": "Bir rutin gece gelenleri okur. Gelen kutunuz gerektiriyorsa öğleden sonra ikinci bir çalıştırma ekleyin."
+                },
+                "2": {
+                    "title": "Gmail, Takvim, Drive",
+                    "body": "Gmail veya Outlook'ta çalışır, bir saat önermeden önce takviminizi kontrol eder ve ekleri Drive'a dosyalar."
+                },
+                "3": {
+                    "title": "Etiketlendi, yanıtlandı, dosyalandı",
+                    "body": "Her konu bir etiket alır, yanıtlar geçmiş cevaplarınızdan hazırlanır, makbuzlar da sakladığınız yere gider."
+                },
+                "4": {
+                    "title": "Gönderir ya da atlarsınız",
+                    "body": "Taslaklar siz onaylayana kadar taslak kalır. Kararınızı gerektirenler en acil olan başta, kısa bir liste olarak gelir."
+                }
+            },
+            "templatesTitle": "E-postanızla ilgilenen şablonlar",
+            "faq": {
+                "1": {
+                    "question": "Gmail ve Outlook ile çalışır mı?",
+                    "answer": "İkisiyle de, uygulamaları üzerinden; diğer posta kutularıyla da IMAP ve SMTP üzerinden. Her biri kendi etiketiyle birkaç hesabı yönetebilir ve hangisinden işlem yaptığını her zaman söyler."
+                },
+                "2": {
+                    "question": "Kendi başına e-posta gönderir mi?",
+                    "answer": "Hayır. Taslak hazırlar. Gönderme, toplantı kabul etme ya da bir konuyu silme, her e-posta listelenmiş olarak tek bir onay kartında size gelir; tek tek ya da hepsini birden onaylarsınız."
+                },
+                "3": {
+                    "question": "Kurallarımı nasıl öğrenir?",
+                    "answer": "Bir kez söyleyin, örneğin \"makbuzlar Drive'a, bültenler arşive\"; kuralı belleğinde tutar. Tekrarladığınız bir prosedür, her sabah izlediği bir skill'e dönüşebilir."
+                },
+                "4": {
+                    "question": "E-postamı kim okur?",
+                    "answer": "Coworker'ınız, çalışma alanınızın kendi makinesinde; posta kutunuzun kimlik bilgileri de orada kalır. Metin seçtiğiniz yapay zekaya gider: Claude veya ChatGPT planınız, kendi anahtarınız ya da Rerun modelleri."
+                },
+                "5": {
+                    "question": "Telefonumdan temizleyebilir miyim?",
+                    "answer": "Evet. Onay kartı iPhone ve Android uygulamalarındaki gelen kutunuza düşer; orada tek dokunuşla onaylar ya da atlarsınız."
+                }
+            }
+        },
+        "prepare-meetings": {
+            "crumb": "Toplantı hazırlığı",
+            "title": "Coworker'ınız her toplantıdan önce sizi bilgilendirir.",
+            "lede": "Her sabah takviminizi okur, kiminle görüşeceğinizi, şirketini ve son e-postalarınızı araştırır ve her görüşme için size kısa bir brif yazar.",
+            "metaTitle": "Toplantılarınızı Hazırlayan Bir AI Coworker",
+            "metaDescription": "Bir Rerun coworker'ı takviminizi her sabah okur, görüşeceğiniz her kişi için brif yazar: kim olduğu, en son ne konuştuğunuz, anlaşmanın durumu.",
+            "coworker": {
+                "name": "Satış Asistanı",
+                "job": "Günün her görüşmesi için bir brif yazar"
+            },
+            "thread": {
+                "trigger": "Her iş günü 7:30",
+                "work": "Bugün 4 dış toplantı buldum. 23 eski e-postayı, HubSpot'taki 2 açık anlaşmayı ve 6 katılımcının LinkedIn profilini okudum.",
+                "deliverable": {
+                    "title": "Brif · Halden Group, 14:00",
+                    "rows": {
+                        "1": "Anna Berg · Operasyon Müdürü · martta katıldı",
+                        "2": "Anlaşma · 84.000 $ · cuma günü Teklif aşamasına döndü",
+                        "3": "Son e-posta · özel bir SLA istedi",
+                        "4": "Sorulacak · bütçeyi başka kim onaylıyor?"
+                    }
+                },
+                "approval": {
+                    "ask": "Görüşmeden önce Anna'ya gündemi ve SLA taslağını göndereyim mi?",
+                    "approve": "Gündemi gönder",
+                    "done": "Gönderildi. Görüşmeden sonra nasıl geçtiğini anlatın, anlaşmayı HubSpot'ta güncelleyeyim."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "Her iş günü 7:30",
+                    "body": "Bir rutin günün takvimini okur. Bir saat önce ayarlanan bir görüşme için sohbette brifini istemeniz yeter."
+                },
+                "2": {
+                    "title": "Takvim, e-posta, CRM, LinkedIn",
+                    "body": "Takviminizi, her katılımcıyla eski e-postalarınızı, CRM'inizdeki anlaşmayı ve herkese açık profillerini okur."
+                },
+                "3": {
+                    "title": "Görüşme başına kısa bir brif",
+                    "body": "Kim oldukları, en son ne konuştuğunuz, anlaşmanın durumu ve sormaya değer iki soru."
+                },
+                "4": {
+                    "title": "Gidecek olanı siz onaylarsınız",
+                    "body": "Görüşmeden sonra bir gündem, bir takip ya da bir CRM güncellemesi: taslağını hazırlar, göndermeden veya kaydetmeden önce sorar."
+                }
+            },
+            "templatesTitle": "Görüşmelerinizi hazırlayan şablonlar",
+            "faq": {
+                "1": {
+                    "question": "Kişiler hakkında bilgiyi nerede bulur?",
+                    "answer": "E-postanızda, takviminizde ve CRM'inizde, sonra herkese açık kaynaklarda: şirketin web sitesi, haberler ve LinkedIn. LinkedIn profilleri ücretli veriden ya da LinkedIn Pro ile kendi hesabınızdan gelir."
+                },
+                "2": {
+                    "question": "Toplantı notlarımı okuyabilir mi?",
+                    "answer": "Evet. Granola, Fathom veya Fireflies'ı bağlayın; son görüşmenin notlarını okur, sonra bir sonrakinden sonra takibi ve CRM güncellemesini hazırlar."
+                },
+                "3": {
+                    "question": "Hangi takvimlerle çalışır?",
+                    "answer": "Uygulamaları üzerinden Google Calendar ve Outlook; neyin ayarlandığını ve kişinin rezervasyonda ne yazdığını görmek için Calendly veya Cal.com."
+                },
+                "4": {
+                    "question": "Brifi telefonumdan okuyabilir miyim?",
+                    "answer": "Evet. Brif, coworker'ın konuşmasına düşer; toplantıya giderken iPhone veya Android uygulamasında açarsınız. Slack'e de gönderebilir."
+                },
+                "5": {
+                    "question": "Bir brif kredi harcar mı?",
+                    "answer": "Kendi uygulamalarınızı okumak ücretli veri kullanmaz. Bir kişiyi ya da şirketi ücretli veride aramak Rerun kredisiyle faturalanır ve harcamadan önce tahmini maliyeti gösterir."
+                }
+            }
+        },
+        "track-orders": {
+            "crumb": "Sipariş takibi",
+            "title": "Coworker'ınız geciken siparişleri müşterilerden önce fark eder.",
+            "lede": "Her sabah açık siparişlerinizi ve kargo takiplerini gözden geçirir, takılanları bulur ve müşterileriniz sormadan onlara haber verir.",
+            "metaTitle": "Shopify Siparişlerinizi Takip Eden Bir AI Coworker",
+            "metaDescription": "Bir Rerun coworker'ı her sabah açık Shopify siparişlerini kontrol eder, geciken kargoları ve hatalı adresleri bulur, onayınız için müşteriye mesaj yazar.",
+            "coworker": {
+                "name": "Sipariş Yöneticisi",
+                "job": "Her sabah tüm açık siparişleri kontrol eder"
+            },
+            "thread": {
+                "trigger": "Her gün 8:00",
+                "work": "Shopify'da 312 açık siparişi ve kargo takiplerini kontrol ettim. 9'u gecikmiş, 3'ünün adresi hatalı ve kapıda ödemeli 2 sipariş onaylanmamış.",
+                "deliverable": {
+                    "title": "İşlem gereken siparişler",
+                    "rows": {
+                        "1": "#4821 · Lyon · 6 gündür yolda, kargo takıldı",
+                        "2": "#4830 · Berlin · adreste kapı numarası eksik",
+                        "3": "#4836 · Madrid · kapıda ödeme, onaylanmadı",
+                        "4": "8 gecikme daha · her biri için mesaj taslağı"
+                    }
+                },
+                "approval": {
+                    "ask": "Geciken 9 müşteriye yeni teslim tarihleriyle kısa bir bilgi göndereyim mi?",
+                    "approve": "9 bilgilendirmeyi gönder",
+                    "done": "Gönderildi. Bu 9 siparişi yarın yeniden kontrol edip hangilerinin hâlâ ilerlemediğini söyleyeceğim."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "Her gün 8:00",
+                    "body": "Bir rutin tüm açık siparişleri gözden geçirir. Ona bir Shopify webhook'u yönlendirin, her yeni siparişi geldiği anda da kontrol etsin."
+                },
+                "2": {
+                    "title": "Shopify, e-posta, WhatsApp",
+                    "body": "Shopify'daki siparişleri ve müşterileri okur, kargo takip sayfalarını kendi tarayıcısında açar ve Gmail'den ya da WhatsApp'tan yazar."
+                },
+                "3": {
+                    "title": "Size ihtiyaç duyan siparişler",
+                    "body": "Geciken, takılan, adresi hatalı, onaylanmamış: her sipariş bir sonraki adımı ve hazır müşteri mesajıyla."
+                },
+                "4": {
+                    "title": "Mesajları siz onaylarsınız",
+                    "body": "Bilgilendirme, iptal ya da iadeyi yalnızca siz evet dedikten sonra yapar; her sipariş kartta listelenir."
+                }
+            },
+            "templatesTitle": "Siparişleri yürüten şablonlar",
+            "faq": {
+                "1": {
+                    "question": "Hangi mağazalarla çalışır?",
+                    "answer": "Uygulamasıyla Shopify, ayrıca Wix veya Square. Başka bir yönetim paneli için kendi bilgisayarının tarayıcısında bir kez oturum açar ve orada bir insan gibi çalışır."
+                },
+                "2": {
+                    "question": "Bir kargonun nerede olduğunu nasıl görür?",
+                    "answer": "Siparişlerinizdeki takip numaralarından: kargo firmasının takip sayfasını kendi tarayıcısında açar ve son okutmayı veritabanına not eder; böylece yarınki çalıştırma neyin ilerlediğini bilir."
+                },
+                "3": {
+                    "question": "Müşterilere WhatsApp'tan yazabilir mi?",
+                    "answer": "Evet, numara başına ayda {whatsappPrice} olan ücretli eklenti WhatsApp Pro ile. Numaranızdan metin, dosya ve sesli notla yazar; müşterinin yanıtı onu uyandırır. E-posta onsuz da çalışır."
+                },
+                "4": {
+                    "question": "Siparişleri geldiği anda kontrol edebilir mi?",
+                    "answer": "Evet. Coworker'a bir webhook tetikleyicisi ekleyin ve URL'sini Shopify'ın webhook ayarlarına yapıştırın: her yeni sipariş ya da gönderim güncellemesi, siparişi ekli bir çalıştırma başlatır."
+                },
+                "5": {
+                    "question": "Siparişleri iptal eder ya da iade yapar mı?",
+                    "answer": "Yalnızca siz onayladıktan sonra. İptali ya da iadeyi tutarı ve gerekçesiyle hazırlar; siz Onayla'ya tıklamadan Shopify'da hiçbir şey değişmez."
+                }
+            }
+        },
+        "chase-invoices": {
+            "crumb": "Fatura takibi",
+            "title": "Coworker'ınız faturaları geciktikleri gün takip eder.",
+            "lede": "Bir faturanın vadesi geçtiğinde kibar bir hatırlatma yazar, belirlediğiniz sıklıkta takip eder ve gelen her ödemeyi eşleştirir.",
+            "metaTitle": "Geciken Faturaları Takip Eden Bir AI Coworker",
+            "metaDescription": "Bir Rerun coworker'ı vadesi geçen her faturayı sizin üslubunuz ve takviminizle takip eder, gelen ödemeleri eşleştirir. Her hatırlatma onayınızı bekler.",
+            "coworker": {
+                "name": "Fatura Takipçisi",
+                "job": "Geciken faturaları takip eder, ödemeleri eşleştirir"
+            },
+            "thread": {
+                "trigger": "Stripe'ta faturanın vadesi geçti",
+                "work": "Northwind'e kesilen 2.400 $ tutarındaki 1057 numaralı fatura 7 gün gecikmiş. Stripe'ta ödeme yok, Gmail'deki ilk hatırlatmaya da yanıt yok.",
+                "deliverable": {
+                    "title": "Bu hafta vadesi geçenler",
+                    "rows": {
+                        "1": "Northwind · #1057 · 2.400 $ · 7 gün gecikme",
+                        "2": "Acme · #1042 · 1.150 $ · kartın süresi dolmuş",
+                        "3": "Halden Group · #1061 · 120 $ eksik ödendi, banka masrafı",
+                        "4": "Petra · #1066 · bugün ödendi, makbuz gönderildi"
+                    }
+                },
+                "approval": {
+                    "ask": "Northwind'e ödeme bağlantısıyla ikinci bir hatırlatma gönderip muhasebe ekibini de bilgiye ekleyeyim mi?",
+                    "approve": "Hatırlatmayı gönder",
+                    "done": "Gönderildi. Salıya kadar bir şey gelmezse üçüncüsünü hazırlayacağım."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "Bir faturanın geciktiği gün",
+                    "body": "Bir faturanın vadesi geçtiğinde bir Stripe webhook'u onu uyandırır. QuickBooks veya bir tablo için bir rutin her sabah kontrol eder."
+                },
+                "2": {
+                    "title": "Stripe, muhasebeniz, e-posta",
+                    "body": "Faturaları Stripe'ta ya da QuickBooks'ta, ödemeleri banka uygulamanızda ve her müşteriyle yazışmayı Gmail'de okur."
+                },
+                "3": {
+                    "title": "Fatura başına bir hatırlatma",
+                    "body": "Önce kibar, sonra daha kararlı; tutar, vade tarihi ve ödeme bağlantısıyla. Gelen ödemeler eşleştirilir."
+                },
+                "4": {
+                    "title": "Her hatırlatmayı siz onaylarsınız",
+                    "body": "Onayınız olmadan bir müşteriye hiçbir şey gitmez. Bir anlaşmazlık ya da kısmi ödeme, olgularıyla birlikte size gelir."
+                }
+            },
+            "templatesTitle": "Ödemenizi almanızı sağlayan şablonlar",
+            "faq": {
+                "1": {
+                    "question": "Hangi faturalama araçlarıyla çalışır?",
+                    "answer": "Uygulamaları üzerinden Stripe, QuickBooks ve PayPal; faturalarınız oradaysa bir tablo ya da Airtable. Ödemeler Stripe, Mercury, GoCardless ya da bir banka dökümüyle eşleştirilir."
+                },
+                "2": {
+                    "question": "Bir faturanın vadesinin geçtiğini nasıl bilir?",
+                    "answer": "Coworker'ın webhook URL'sini Stripe'a yapıştırın; vadesi geçen bir fatura, fatura ekli olarak hemen bir çalıştırma başlatır. Webhook olmadan bir rutin faturalarınızı her sabah kontrol eder."
+                },
+                "3": {
+                    "question": "Müşterilerimi rahatsız eder mi?",
+                    "answer": "Belirlediğiniz sıklığa uyar, örneğin vade tarihinden 3, 10 ve 20 gün sonra, sizin üslubunuzla. Her hatırlatma onayınızı bekler; ödeyen ya da yanıt veren müşteri sıradan çıkar."
+                },
+                "4": {
+                    "question": "Ödemeleri faturalarla eşleştirebilir mi?",
+                    "answer": "Evet. Gelen ödemeleri okur, tutar ve referansa göre açık faturalarla eşleştirir ve 120 $ eksik bir havale gibi eşleşmeyenleri işaretler. Bir faturayı siz onayladıktan sonra ödendi olarak işaretler."
+                },
+                "5": {
+                    "question": "Tüm bunları nerede tutar?",
+                    "answer": "Çalışma alanınızın makinesindeki kendi veritabanında: her fatura, gönderilen her hatırlatma, eşleşen her ödeme. İstediğiniz tabloyu istediğiniz zaman CSV veya JSON olarak dışa aktarın."
+                }
+            }
+        },
+        "screen-candidates": {
+            "crumb": "Aday eleme",
+            "title": "Siz çalışırken coworker'ınız başvuranları eler.",
+            "lede": "Her başvuruyu pozisyonun kriterlerine göre okur, her birini puanlar ve her ismin gerekçesiyle size bir kısa liste verir.",
+            "metaTitle": "İş Başvurularını Eleyen Bir AI Coworker",
+            "metaDescription": "Bir Rerun coworker'ı her başvuruyu kriterlerinize göre okur, her CV'yi kanıtıyla puanlar ve size kısa liste verir. Kimin devam edeceğini siz seçersiniz.",
+            "coworker": {
+                "name": "İşe Alım Uzmanı",
+                "job": "Başvuruları okur, kısa listeyi çıkarır"
+            },
+            "thread": {
+                "trigger": "Account Executive pozisyonu için kısa liste çıkar",
+                "work": "Gmail ve Drive'da 64 başvuruyu ve CV'lerini okudum, her birini 5 olmazsa olmazınıza göre puanladım. 9'u beşini de karşılıyor, 3'ü öne çıkıyor.",
+                "deliverable": {
+                    "title": "Kısa liste · Account Executive",
+                    "rows": {
+                        "1": "Maya Okafor · 5/5 · KOBİ'lere 4 yıl SaaS satışı",
+                        "2": "Tom Riedel · 5/5 · 6 çeyrek üst üste hedefi aştı",
+                        "3": "Inès Garnier · 5/5 · Fransızca ve Almanca satış yapıyor",
+                        "4": "61 aday daha · puanlandı, her birinin gerekçesiyle"
+                    }
+                },
+                "approval": {
+                    "ask": "İlk 3'ü bu hafta takviminizdeki boş saatlerde bir ilk görüşmeye davet edeyim mi?",
+                    "approve": "3'ünü davet et",
+                    "done": "Davetler gönderildi. Bir saat seçtikleri anda her görüşme takviminize eklenir."
+                }
+            },
+            "steps": {
+                "1": {
+                    "title": "Bir pozisyon açtığınızda",
+                    "body": "Sohbette isteyin ya da haftanın başvuruları için her cuma bir rutin kurun. Bir formun webhook'u onu her başvuruda başlatabilir."
+                },
+                "2": {
+                    "title": "Gelen kutunuz, dosyalar, takvim",
+                    "body": "Başvuruları Gmail'de ya da formunuzda, CV'leri Drive'da okur ve mülakat saatleri önermek için takviminize bakar."
+                },
+                "3": {
+                    "title": "Gerekçeli bir kısa liste",
+                    "body": "Her aday belirlediğiniz kriterlere göre, CV'deki kanıtla puanlanır; böylece sıralamayı kontrol edebilirsiniz."
+                },
+                "4": {
+                    "title": "Devam edecekleri siz seçersiniz",
+                    "body": "Davet ve ret mesajlarının taslağını hazırlar, siz onaylamadan hiçbir şey göndermez. Son karar sizde kalır."
+                }
+            },
+            "templatesTitle": "İşe alımda size yardım eden şablonlar",
+            "faq": {
+                "1": {
+                    "question": "Başvuruları nerede okur?",
+                    "answer": "Gmail veya Outlook'ta, Typeform, Tally ya da Jotform gibi bir formda veya klasörüne ya da Drive'a bıraktığınız dosyalarda. Bir formun webhook'unu coworker'a yönlendirin, her yeni başvuru bir çalıştırma başlatsın."
+                },
+                "2": {
+                    "question": "Kimin işe alınacağına o mu karar verir?",
+                    "answer": "Hayır. Her başvuruyu yazdığınız kriterlere göre puanlar ve kanıtı gösterir. Davetler, retler ve son karar onayınızı bekler."
+                },
+                "3": {
+                    "question": "Elemeyi nasıl adil tutarım?",
+                    "answer": "Pozisyonun kriterlerini bir skill olarak yazın: ne gerekli, ne artı, neyin yok sayılması gerekir. Her başvuruya aynı kuralları uygular ve her puanın gerekçesini kaydeder."
+                },
+                "4": {
+                    "question": "Aday da bulabilir mi?",
+                    "answer": "Evet. Hesap başına ayda {linkedinPrice} olan ücretli eklenti LinkedIn Pro ile profilleri arar ve hesabınızdan güvenli bir günlük hızda kişilere yazar. İş e-postaları onayınızdan sonra, Rerun kredisiyle ücretli veriden gelir."
+                },
+                "5": {
+                    "question": "Aday verileri nerede tutulur?",
+                    "answer": "Coworker'ın kendi veritabanında ve klasöründe, çalışma alanınızın Avrupa'daki makinesinde. Pozisyon kapandığında satırları ya da tüm tabloyu silin."
+                }
+            }
+        }
+    }
+}

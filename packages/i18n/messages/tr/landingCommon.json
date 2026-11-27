@@ -174,7 +174,188 @@
             "brandKit": "Marka kitini görüntüle",
             "copy": "Logoyu kopyala (SVG)",
             "download": "Logoyu indir"
-        }
+        },
+        "featureGroups": {
+            "coworkers": "Coworker'larınız",
+            "how": "Nasıl çalışırlar",
+            "everywhere": "Her yerde",
+            "control": "Kontrol sizde kalır"
+        },
+        "featurePages": {
+            "coworkers": {
+                "label": "Coworker'lar",
+                "description": "Birine bir iş verin, işi bitmiş olarak geri getirsin."
+            },
+            "chief-of-staff": {
+                "label": "Chief of Staff",
+                "description": "Ne istediğinizi söyleyin, işi doğru Coworker'a aktarsın."
+            },
+            "coworkers-work-together": {
+                "label": "Coworker'lar birlikte çalışır",
+                "description": "Biri potansiyel müşterileri bulur, diğeri onlara yazar."
+            },
+            "second-brain": {
+                "label": "İkinci beyin",
+                "description": "Teklifiniz, pazarınız ve üslubunuz tek bir yerde."
+            },
+            "computer-use": {
+                "label": "Bilgisayar kullanımı",
+                "description": "Uygulamalarınızda bir insan gibi çalışır."
+            },
+            "your-computer": {
+                "label": "Kendi bilgisayarınız",
+                "description": "Mac'inizi ya da PC'nizi bağlayın, sohbette # ile çağırın."
+            },
+            "tools": {
+                "label": "{connectors}+ araç",
+                "description": "Gmail, Stripe, LinkedIn, WhatsApp ve her MCP sunucusu."
+            },
+            "lead-data": {
+                "label": "Aday ve SEO verileri",
+                "description": "İstediğiniz an e-postalar, telefonlar ve sıralamalar."
+            },
+            "desktop-app": {
+                "label": "Masaüstü uygulaması",
+                "description": "Her uygulamadan hızlı soru, Coworker'larınız dock'ta."
+            },
+            "mobile-app": {
+                "label": "Mobil uygulama",
+                "description": "iPhone, iPad ve Android, widget'larla."
+            },
+            "runs-24-7": {
+                "label": "7/24 çalışır, Avrupa'da",
+                "description": "Rutinler ve webhook'lar, dizüstünüz kapalıyken bile."
+            },
+            "human-in-the-loop": {
+                "label": "Döngüde insan",
+                "description": "Önemli bir şey yapmadan önce size sorarlar."
+            },
+            "bring-your-own-ai": {
+                "label": "Kendi yapay zekanızı getirin",
+                "description": "Claude ya da ChatGPT planınız veya kendi API anahtarınız."
+            },
+            "security": {
+                "label": "Güvenlik",
+                "description": "Gecelik şifreli yedekler, Avrupa'da sunucular."
+            },
+            "workspaces": {
+                "label": "Çalışma alanları ve ekip",
+                "description": "Her işletme için bir çalışma alanı, tüm ekibiniz ücretsiz."
+            }
+        },
+        "industryPages": {
+            "agencies": {
+                "label": "Ajans",
+                "description": "Yeni iş, teslimat ve müşteri raporları."
+            },
+            "freelancers": {
+                "label": "Serbest çalışan",
+                "description": "Hiç vakit bulamadığınız arka ofis."
+            },
+            "ecommerce": {
+                "label": "E-ticaret",
+                "description": "Siparişler, stok, yorumlar ve rakipler."
+            },
+            "real-estate": {
+                "label": "Gayrimenkul",
+                "description": "Satıcılar, talepler, ilanlar ve kiralamalar."
+            },
+            "startups": {
+                "label": "Girişim",
+                "description": "Yatırım turu, satış hattı ve lansman."
+            },
+            "saas": {
+                "label": "SaaS",
+                "description": "Kayıp, destek, ilk kurulum ve sürümler."
+            },
+            "legal": {
+                "label": "Hukuk ve uyum",
+                "description": "Sözleşmeler, yükümlülükler, son tarihler ve denetimler."
+            },
+            "recruiting": {
+                "label": "İşe alım ve İK",
+                "description": "Ön eleme, mülakatlar ve aday takibi."
+            },
+            "creators": {
+                "label": "İçerik üreticileri ve medya",
+                "description": "Senaryolar, kurgular, sponsorlar ve topluluk."
+            },
+            "consulting": {
+                "label": "Danışmanlık ve koçluk",
+                "description": "Keşif görüşmeleri, teslimatlar ve takipler."
+            },
+            "accounting": {
+                "label": "Muhasebe ve finans",
+                "description": "Alacaklar, borçlar, kapanış ve vergiler."
+            },
+            "marketing": {
+                "label": "Pazarlama ekibi",
+                "description": "Kampanyalar, içerik, SEO ve rakamlar."
+            },
+            "sales": {
+                "label": "Satış ekibi",
+                "description": "Müşteri arama, satış hattı ve hesap takibi."
+            },
+            "hospitality": {
+                "label": "Konaklama ve ağırlama",
+                "description": "Misafirler, yorumlar, personel ve etkinlikler."
+            },
+            "local-business": {
+                "label": "Yerel işletme",
+                "description": "Talepler, yorumlar, faturalar ve defterler."
+            }
+        },
+        "useCasePages": {
+            "find-leads": {
+                "label": "Müşteri adayı bulun",
+                "description": "İş ilanları, çalışan sayısı ve CRM'iniz, karşılaştırılmış."
+            },
+            "track-sales": {
+                "label": "Satışları takip edin",
+                "description": "Gelir, satış hattı ve tablo, her sabah."
+            },
+            "run-ads": {
+                "label": "Reklamlarınızı yönetin",
+                "description": "Harcama her gün okunur, zarar edenler durdurulur."
+            },
+            "watch-competitors": {
+                "label": "Rakipleri izleyin",
+                "description": "Fiyatları, lansmanları, sizin anahtar kelime açıklarınız."
+            },
+            "create-content": {
+                "label": "İçerik üretin",
+                "description": "Düşen sorgudan yeniden yayımlanan yazıya."
+            },
+            "post-on-social": {
+                "label": "Sosyal medyada paylaşın",
+                "description": "Her sabah bir gönderi, yorumlar yanıtlanmış."
+            },
+            "reply-to-customers": {
+                "label": "Müşterilere yanıt verin",
+                "description": "Okunmamış konuşmalar sıralanır ve sizin üslubunuzla yanıtlanır."
+            },
+            "triage-inbox": {
+                "label": "Gelen kutunuzu ayıklayın",
+                "description": "Etiketlenmiş, yanıtlar taslak hazır, size ikisi kalır."
+            },
+            "prepare-meetings": {
+                "label": "Toplantılarınıza hazırlanın",
+                "description": "Her görüşmeden önce kiminle buluşacağınıza dair kısa bir özet."
+            },
+            "track-orders": {
+                "label": "Siparişlerinizi takip edin",
+                "description": "Gecikenler tespit edilir, önce müşterileriniz bilgilendirilir."
+            },
+            "chase-invoices": {
+                "label": "Faturaların peşine düşün",
+                "description": "Gecikenler hatırlatılır, ödemeler eşleştirilir."
+            },
+            "screen-candidates": {
+                "label": "Adayları eleyin",
+                "description": "Başvurular okunur, gerekçeleriyle bir kısa liste."
+            }
+        },
+        "breadcrumb": "Sayfa yolu"
     },
     "github": {
         "star": "Yıldız ver",

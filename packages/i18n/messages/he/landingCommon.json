@@ -174,7 +174,188 @@
             "brandKit": "לצפות בערכת המותג",
             "copy": "להעתיק את הלוגו (SVG)",
             "download": "להוריד את הלוגו"
-        }
+        },
+        "featureGroups": {
+            "coworkers": "העמיתים שלך",
+            "how": "איך הם עובדים",
+            "everywhere": "בכל מקום",
+            "control": "השליטה נשארת אצלך"
+        },
+        "featurePages": {
+            "coworkers": {
+                "label": "עמיתים",
+                "description": "נותנים לו משימה, והוא מחזיר אותה גמורה."
+            },
+            "chief-of-staff": {
+                "label": "ה-Chief of Staff",
+                "description": "אומרים מה צריך, והוא מתדרך את העמית המתאים."
+            },
+            "coworkers-work-together": {
+                "label": "עמיתים עובדים יחד",
+                "description": "אחד מוצא לידים, השני כותב להם."
+            },
+            "second-brain": {
+                "label": "מוח שני",
+                "description": "ההצעה שלך, השוק שלך והטון שלך, במקום אחד."
+            },
+            "computer-use": {
+                "label": "שימוש במחשב",
+                "description": "הוא עובד באפליקציות שלך כמו שאדם היה עובד."
+            },
+            "your-computer": {
+                "label": "המחשב שלך",
+                "description": "לקשר את ה-Mac או ה-PC שלך ולקרוא לו עם # בצ׳אט."
+            },
+            "tools": {
+                "label": "יותר מ-{connectors} כלים",
+                "description": "Gmail, Stripe, LinkedIn, WhatsApp וכל שרת MCP."
+            },
+            "lead-data": {
+                "label": "נתוני לידים ו-SEO",
+                "description": "מיילים, מספרי טלפון ודירוגים לפי דרישה."
+            },
+            "desktop-app": {
+                "label": "אפליקציית מחשב",
+                "description": "שאלה מהירה מכל אפליקציה, העמיתים שלך ב-Dock."
+            },
+            "mobile-app": {
+                "label": "אפליקציית מובייל",
+                "description": "iPhone, iPad ו-Android, עם ווידג׳טים."
+            },
+            "runs-24-7": {
+                "label": "פועל 24/7, באירופה",
+                "description": "שגרות ו-webhooks, גם כשהמחשב הנייד סגור."
+            },
+            "human-in-the-loop": {
+                "label": "אדם בתהליך",
+                "description": "הם שואלים לפני כל פעולה משמעותית."
+            },
+            "bring-your-own-ai": {
+                "label": "להביא AI משלך",
+                "description": "המנוי שלך ל-Claude או ל-ChatGPT, או מפתח API משלך."
+            },
+            "security": {
+                "label": "אבטחה",
+                "description": "גיבויים מוצפנים כל לילה, שרתים באירופה."
+            },
+            "workspaces": {
+                "label": "סביבות עבודה וצוות",
+                "description": "סביבת עבודה לכל עסק, כל הצוות שלך בחינם."
+            }
+        },
+        "industryPages": {
+            "agencies": {
+                "label": "סוכנות",
+                "description": "לקוחות חדשים, ביצוע ודיווח ללקוחות."
+            },
+            "freelancers": {
+                "label": "פרילנס",
+                "description": "המשרד האחורי שאף פעם לא היה לך זמן אליו."
+            },
+            "ecommerce": {
+                "label": "מסחר אלקטרוני",
+                "description": "הזמנות, מלאי, ביקורות והמתחרים."
+            },
+            "real-estate": {
+                "label": "נדל״ן",
+                "description": "מוכרים, פניות, מודעות והשכרות."
+            },
+            "startups": {
+                "label": "סטארטאפ",
+                "description": "גיוס הון, פייפליין וההשקה."
+            },
+            "saas": {
+                "label": "SaaS",
+                "description": "נטישה, תמיכה, קליטה וגרסאות."
+            },
+            "legal": {
+                "label": "משפט ורגולציה",
+                "description": "חוזים, התחייבויות, מועדים וביקורות."
+            },
+            "recruiting": {
+                "label": "גיוס ומשאבי אנוש",
+                "description": "סינון, ראיונות ומעקב אחר מועמדים."
+            },
+            "creators": {
+                "label": "יוצרים ומדיה",
+                "description": "תסריטים, עריכות, ספונסרים והקהילה."
+            },
+            "consulting": {
+                "label": "ייעוץ וקואצ׳ינג",
+                "description": "שיחות היכרות, תוצרים ומעקבים."
+            },
+            "accounting": {
+                "label": "הנהלת חשבונות ופיננסים",
+                "description": "לקוחות, ספקים, סגירת חודש ומיסים."
+            },
+            "marketing": {
+                "label": "צוות שיווק",
+                "description": "קמפיינים, תוכן, SEO והמספרים."
+            },
+            "sales": {
+                "label": "צוות מכירות",
+                "description": "איתור לקוחות, פייפליין ומעקב אחר חשבונות."
+            },
+            "hospitality": {
+                "label": "אירוח",
+                "description": "אורחים, ביקורות, צוות ואירועים."
+            },
+            "local-business": {
+                "label": "עסק מקומי",
+                "description": "פניות, ביקורות, חשבוניות והנהלת חשבונות."
+            }
+        },
+        "useCasePages": {
+            "find-leads": {
+                "label": "למצוא לידים",
+                "description": "מודעות דרושים, מספר עובדים וה-CRM שלך, מוצלבים."
+            },
+            "track-sales": {
+                "label": "לעקוב אחר מכירות",
+                "description": "הכנסות, פייפליין והגיליון, כל בוקר."
+            },
+            "run-ads": {
+                "label": "לנהל את המודעות",
+                "description": "ההוצאה נבדקת כל יום, המפסידות מושהות."
+            },
+            "watch-competitors": {
+                "label": "לעקוב אחר מתחרים",
+                "description": "המחירים שלהם, ההשקות שלהם, הפערים שלך במילות מפתח."
+            },
+            "create-content": {
+                "label": "ליצור תוכן",
+                "description": "מהשאילתה שיורדת ועד הפוסט שמתפרסם מחדש."
+            },
+            "post-on-social": {
+                "label": "לפרסם ברשתות",
+                "description": "פוסט כל בוקר, תגובות שנענות."
+            },
+            "reply-to-customers": {
+                "label": "לענות ללקוחות",
+                "description": "שיחות שלא נקראו ממוינות ונענות בטון שלך."
+            },
+            "triage-inbox": {
+                "label": "למיין את תיבת הדואר",
+                "description": "מתויג, תשובות בטיוטה, שתיים נשארות לך."
+            },
+            "prepare-meetings": {
+                "label": "להכין את הפגישות",
+                "description": "תקציר קצר על מי שאתה פוגש, לפני כל שיחה."
+            },
+            "track-orders": {
+                "label": "לעקוב אחר הזמנות",
+                "description": "המאחרות מזוהות, הלקוחות שלך מעודכנים ראשונים."
+            },
+            "chase-invoices": {
+                "label": "לרדוף אחרי חשבוניות",
+                "description": "מעקב אחר חשבוניות באיחור, תשלומים מותאמים."
+            },
+            "screen-candidates": {
+                "label": "לסנן מועמדים",
+                "description": "קורות חיים נקראים, רשימה קצרה עם הנימוק."
+            }
+        },
+        "breadcrumb": "נתיב ניווט"
     },
     "github": {
         "star": "כוכב",

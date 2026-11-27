@@ -174,7 +174,188 @@
             "brandKit": "檢視品牌素材",
             "copy": "複製標誌 (SVG)",
             "download": "下載標誌"
-        }
+        },
+        "featureGroups": {
+            "coworkers": "您的同事",
+            "how": "運作方式",
+            "everywhere": "隨處可用",
+            "control": "主導權在您手上"
+        },
+        "featurePages": {
+            "coworkers": {
+                "label": "同事",
+                "description": "交代一件工作，它把完成的成果交回給您。"
+            },
+            "chief-of-staff": {
+                "label": "Chief of Staff",
+                "description": "說出您的需求，它會轉告合適的同事。"
+            },
+            "coworkers-work-together": {
+                "label": "同事彼此協作",
+                "description": "一位找出潛在客戶，下一位寫信給他們。"
+            },
+            "second-brain": {
+                "label": "第二大腦",
+                "description": "您的產品、市場和語氣，集中在一處。"
+            },
+            "computer-use": {
+                "label": "電腦操作",
+                "description": "它像真人一樣在您的 App 中工作。"
+            },
+            "your-computer": {
+                "label": "您自己的電腦",
+                "description": "連結您的 Mac 或 PC，在聊天中用 # 呼叫它。"
+            },
+            "tools": {
+                "label": "{connectors}+ 種工具",
+                "description": "Gmail、Stripe、LinkedIn、WhatsApp 和任何 MCP 伺服器。"
+            },
+            "lead-data": {
+                "label": "潛在客戶與 SEO 資料",
+                "description": "隨時取得電子郵件、電話號碼和排名。"
+            },
+            "desktop-app": {
+                "label": "桌面版 App",
+                "description": "在任何 App 中快速提問，同事就在 Dock 裡。"
+            },
+            "mobile-app": {
+                "label": "行動版 App",
+                "description": "iPhone、iPad 和 Android，附小工具。"
+            },
+            "runs-24-7": {
+                "label": "全年無休，在歐洲執行",
+                "description": "例行工作和 Webhook，筆電闔上也照常執行。"
+            },
+            "human-in-the-loop": {
+                "label": "人工把關",
+                "description": "做任何重要決定前都會先問您。"
+            },
+            "bring-your-own-ai": {
+                "label": "使用您自己的 AI",
+                "description": "您的 Claude 或 ChatGPT 方案，或您自己的 API 金鑰。"
+            },
+            "security": {
+                "label": "安全性",
+                "description": "每晚加密備份，伺服器位於歐洲。"
+            },
+            "workspaces": {
+                "label": "工作區與團隊",
+                "description": "每個事業一個工作區，整個團隊免費加入。"
+            }
+        },
+        "industryPages": {
+            "agencies": {
+                "label": "代理商",
+                "description": "開發新業務、交付專案和客戶報告。"
+            },
+            "freelancers": {
+                "label": "自由工作者",
+                "description": "您一直沒空處理的後勤工作。"
+            },
+            "ecommerce": {
+                "label": "電子商務",
+                "description": "訂單、庫存、評價和競爭對手。"
+            },
+            "real-estate": {
+                "label": "房地產",
+                "description": "屋主、詢問、物件刊登和租賃。"
+            },
+            "startups": {
+                "label": "新創公司",
+                "description": "募資、銷售管道和產品發布。"
+            },
+            "saas": {
+                "label": "SaaS",
+                "description": "流失率、客服、新手引導和版本發布。"
+            },
+            "legal": {
+                "label": "法務與合規",
+                "description": "合約、義務、期限和稽核。"
+            },
+            "recruiting": {
+                "label": "招募與人資",
+                "description": "篩選、面試和候選人後續追蹤。"
+            },
+            "creators": {
+                "label": "創作者與媒體",
+                "description": "腳本、剪輯、贊助商和社群。"
+            },
+            "consulting": {
+                "label": "顧問與教練",
+                "description": "初談、交付成果和後續追蹤。"
+            },
+            "accounting": {
+                "label": "會計與財務",
+                "description": "應收帳款、應付帳款、結帳和稅務。"
+            },
+            "marketing": {
+                "label": "行銷團隊",
+                "description": "行銷活動、內容、SEO 和數字。"
+            },
+            "sales": {
+                "label": "業務團隊",
+                "description": "開發客戶、銷售管道和客戶後續追蹤。"
+            },
+            "hospitality": {
+                "label": "餐旅業",
+                "description": "賓客、評價、員工和活動。"
+            },
+            "local-business": {
+                "label": "在地商家",
+                "description": "詢問、評價、發票和帳務。"
+            }
+        },
+        "useCasePages": {
+            "find-leads": {
+                "label": "尋找潛在客戶",
+                "description": "交叉比對職缺、員工人數和您的 CRM。"
+            },
+            "track-sales": {
+                "label": "追蹤銷售",
+                "description": "每天早上更新營收、銷售管道和試算表。"
+            },
+            "run-ads": {
+                "label": "管理您的廣告",
+                "description": "每天檢視支出，暫停虧錢的廣告。"
+            },
+            "watch-competitors": {
+                "label": "關注競爭對手",
+                "description": "他們的價格、新品發布，以及您的關鍵字缺口。"
+            },
+            "create-content": {
+                "label": "製作內容",
+                "description": "從排名下滑的關鍵字到重新發布的文章。"
+            },
+            "post-on-social": {
+                "label": "發布社群貼文",
+                "description": "每天早上一篇貼文，並回覆留言。"
+            },
+            "reply-to-customers": {
+                "label": "回覆客戶",
+                "description": "整理未讀對話，並以您的語氣回覆。"
+            },
+            "triage-inbox": {
+                "label": "整理收件匣",
+                "description": "加上標籤、擬好回覆，只留兩封給您。"
+            },
+            "prepare-meetings": {
+                "label": "準備會議",
+                "description": "每次通話前，提供對方的簡短資料。"
+            },
+            "track-orders": {
+                "label": "追蹤訂單",
+                "description": "找出延遲的訂單，搶先通知您的客戶。"
+            },
+            "chase-invoices": {
+                "label": "催收發票",
+                "description": "追蹤逾期款項，核對每筆付款。"
+            },
+            "screen-candidates": {
+                "label": "篩選候選人",
+                "description": "讀完每份應徵資料，附上理由的短名單。"
+            }
+        },
+        "breadcrumb": "導覽路徑"
     },
     "github": {
         "star": "加星號",

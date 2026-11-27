@@ -173,5 +173,31 @@
                 "answer": "每個工作區都使用您為它選擇的 AI：客戶的 ChatGPT 或 Claude 方案、您自己的 API 金鑰，或是內含的 Rerun 點數。"
             }
         }
+    },
+    "pricing": {
+        "title": "依客戶工作區計價。",
+        "lead": "您經營的客戶越多，每位客戶的費用越低。選好數量，再預約一通簡短通話即可開始。",
+        "costAnswer": "每個客戶工作區每月的價格會隨客戶增加而降低，{min} 個工作區起：{tiers}。每個工作區都依您達到的級距計價。",
+        "tier": "{count} 個起 {price}",
+        "card": {
+            "title": "白牌方案",
+            "line": "以您的品牌使用 Rerun，為每位客戶提供一個工作區。",
+            "workspaces": "客戶工作區",
+            "valueText": "{count, plural, other {# 個客戶工作區}}",
+            "valueTextAtLeast": "{count, plural, other {# 個以上客戶工作區}}",
+            "perWorkspace": "每個客戶工作區",
+            "save": "節省 {percent}",
+            "perMonth": "/月",
+            "total": "每月 <total></total>，共 {count, plural, other {# 個工作區}}",
+            "totalAtLeast": "每月 <total></total>，共 {count, plural, other {# 個工作區}}，每多一個再加 {price}",
+            "start": "立即開始",
+            "included": {
+                "label": "您將獲得",
+                "brand": "<b>您的網址、配色和標誌</b>：客戶永遠不會看到 Rerun",
+                "mobile": "<b>以您名義發行的手機 App</b>",
+                "library": "<b>一個同事資料庫</b>，可放入任何客戶",
+                "clients": "<b>所有客戶</b>集中在同一處管理"
+            }
+        }
     }
 }

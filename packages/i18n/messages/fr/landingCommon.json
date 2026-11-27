@@ -174,7 +174,188 @@
             "brandKit": "Voir le kit de marque",
             "copy": "Copier le logo (SVG)",
             "download": "Télécharger le logo"
-        }
+        },
+        "featureGroups": {
+            "coworkers": "Vos Coworkers",
+            "how": "Leur fonctionnement",
+            "everywhere": "Partout",
+            "control": "Vous gardez la main"
+        },
+        "featurePages": {
+            "coworkers": {
+                "label": "Coworkers",
+                "description": "Confiez-lui une mission, il vous rend le travail fait."
+            },
+            "chief-of-staff": {
+                "label": "Chief of Staff",
+                "description": "Dites ce qu’il vous faut, il briefe le bon Coworker."
+            },
+            "coworkers-work-together": {
+                "label": "Des Coworkers qui collaborent",
+                "description": "L’un trouve les leads, le suivant leur écrit."
+            },
+            "second-brain": {
+                "label": "Second cerveau",
+                "description": "Votre offre, votre marché et votre ton, au même endroit."
+            },
+            "computer-use": {
+                "label": "Utilisation de l’ordinateur",
+                "description": "Il travaille dans vos apps comme le ferait une personne."
+            },
+            "your-computer": {
+                "label": "Votre ordinateur",
+                "description": "Liez votre Mac ou PC, appelez-le avec # dans le chat."
+            },
+            "tools": {
+                "label": "{connectors}+ outils",
+                "description": "Gmail, Stripe, LinkedIn, WhatsApp et tout serveur MCP."
+            },
+            "lead-data": {
+                "label": "Données leads et SEO",
+                "description": "E-mails, numéros et classements à la demande."
+            },
+            "desktop-app": {
+                "label": "App de bureau",
+                "description": "Quick ask depuis n’importe quelle app, vos Coworkers dans le dock."
+            },
+            "mobile-app": {
+                "label": "App mobile",
+                "description": "iPhone, iPad et Android, avec widgets."
+            },
+            "runs-24-7": {
+                "label": "Actif 24 h/24, en Europe",
+                "description": "Routines et webhooks, même ordinateur fermé."
+            },
+            "human-in-the-loop": {
+                "label": "Validation humaine",
+                "description": "Ils demandent avant toute action qui engage."
+            },
+            "bring-your-own-ai": {
+                "label": "Votre propre IA",
+                "description": "Votre offre Claude ou ChatGPT, ou votre propre clé API."
+            },
+            "security": {
+                "label": "Sécurité",
+                "description": "Sauvegardes chiffrées chaque nuit, serveurs en Europe."
+            },
+            "workspaces": {
+                "label": "Workspaces et équipe",
+                "description": "Un workspace par activité, toute l’équipe gratuite."
+            }
+        },
+        "industryPages": {
+            "agencies": {
+                "label": "Agence",
+                "description": "Nouveaux clients, production et reporting client."
+            },
+            "freelancers": {
+                "label": "Freelance",
+                "description": "Le back-office que vous n’avez jamais eu le temps de faire."
+            },
+            "ecommerce": {
+                "label": "E-commerce",
+                "description": "Commandes, stock, avis et concurrence."
+            },
+            "real-estate": {
+                "label": "Immobilier",
+                "description": "Vendeurs, demandes, annonces et locations."
+            },
+            "startups": {
+                "label": "Startup",
+                "description": "Levée de fonds, pipeline et lancement."
+            },
+            "saas": {
+                "label": "SaaS",
+                "description": "Churn, support, onboarding et mises à jour."
+            },
+            "legal": {
+                "label": "Juridique et conformité",
+                "description": "Contrats, obligations, échéances et audits."
+            },
+            "recruiting": {
+                "label": "Recrutement et RH",
+                "description": "Tri des candidats, entretiens et suivi."
+            },
+            "creators": {
+                "label": "Créateurs et médias",
+                "description": "Scripts, montage, sponsors et communauté."
+            },
+            "consulting": {
+                "label": "Conseil et coaching",
+                "description": "Appels découverte, livrables et relances."
+            },
+            "accounting": {
+                "label": "Comptabilité et finance",
+                "description": "Créances, dettes, clôture et impôts."
+            },
+            "marketing": {
+                "label": "Équipe marketing",
+                "description": "Campagnes, contenu, SEO et chiffres."
+            },
+            "sales": {
+                "label": "Équipe commerciale",
+                "description": "Prospection, pipeline et suivi des comptes."
+            },
+            "hospitality": {
+                "label": "Hôtellerie et restauration",
+                "description": "Clients, avis, équipe et événements."
+            },
+            "local-business": {
+                "label": "Commerce local",
+                "description": "Demandes, avis, factures et comptabilité."
+            }
+        },
+        "useCasePages": {
+            "find-leads": {
+                "label": "Trouver des leads",
+                "description": "Offres d’emploi, effectifs et votre CRM, croisés."
+            },
+            "track-sales": {
+                "label": "Suivre les ventes",
+                "description": "CA, pipeline et tableur, chaque matin."
+            },
+            "run-ads": {
+                "label": "Piloter vos pubs",
+                "description": "Dépenses lues chaque jour, les pubs à perte coupées."
+            },
+            "watch-competitors": {
+                "label": "Surveiller la concurrence",
+                "description": "Leurs prix, leurs lancements, vos mots-clés manquants."
+            },
+            "create-content": {
+                "label": "Créer du contenu",
+                "description": "De la requête qui décroche à l’article republié."
+            },
+            "post-on-social": {
+                "label": "Publier sur les réseaux",
+                "description": "Un post chaque matin, les commentaires traités."
+            },
+            "reply-to-customers": {
+                "label": "Répondre aux clients",
+                "description": "Fils non lus triés et traités avec votre ton."
+            },
+            "triage-inbox": {
+                "label": "Trier votre boîte mail",
+                "description": "Libellés posés, réponses rédigées, deux pour vous."
+            },
+            "prepare-meetings": {
+                "label": "Préparer vos rendez-vous",
+                "description": "Un brief court sur votre interlocuteur, avant chaque appel."
+            },
+            "track-orders": {
+                "label": "Suivre vos commandes",
+                "description": "Retards repérés, vos clients prévenus en premier."
+            },
+            "chase-invoices": {
+                "label": "Relancer les factures",
+                "description": "Impayés relancés, paiements rapprochés."
+            },
+            "screen-candidates": {
+                "label": "Trier les candidats",
+                "description": "Candidatures lues, une présélection argumentée."
+            }
+        },
+        "breadcrumb": "Fil d’Ariane"
     },
     "github": {
         "star": "Star",

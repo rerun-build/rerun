@@ -174,7 +174,188 @@
             "brandKit": "View brand kit",
             "copy": "Copy logo (SVG)",
             "download": "Download logo"
-        }
+        },
+        "featureGroups": {
+            "coworkers": "Your Coworkers",
+            "how": "How they work",
+            "everywhere": "Everywhere",
+            "control": "You stay in control"
+        },
+        "featurePages": {
+            "coworkers": {
+                "label": "Coworkers",
+                "description": "Hand one a job, it brings the work back done."
+            },
+            "chief-of-staff": {
+                "label": "Chief of Staff",
+                "description": "Say what you need, it briefs the right Coworker."
+            },
+            "coworkers-work-together": {
+                "label": "Coworkers work together",
+                "description": "One finds the leads, the next writes to them."
+            },
+            "second-brain": {
+                "label": "Second brain",
+                "description": "Your offer, your market and your tone, in one place."
+            },
+            "computer-use": {
+                "label": "Computer use",
+                "description": "It works in your apps the way a person would."
+            },
+            "your-computer": {
+                "label": "Your own computer",
+                "description": "Link your Mac or PC, call it with # in the chat."
+            },
+            "tools": {
+                "label": "{connectors}+ tools",
+                "description": "Gmail, Stripe, LinkedIn, WhatsApp and any MCP server."
+            },
+            "lead-data": {
+                "label": "Lead & SEO data",
+                "description": "Emails, phone numbers and rankings on demand."
+            },
+            "desktop-app": {
+                "label": "Desktop app",
+                "description": "Quick ask from any app, your Coworkers in the dock."
+            },
+            "mobile-app": {
+                "label": "Mobile app",
+                "description": "iPhone, iPad and Android, with widgets."
+            },
+            "runs-24-7": {
+                "label": "Runs 24/7, in Europe",
+                "description": "Routines and webhooks, even with your laptop shut."
+            },
+            "human-in-the-loop": {
+                "label": "Human in the loop",
+                "description": "They ask before anything consequential."
+            },
+            "bring-your-own-ai": {
+                "label": "Bring your own AI",
+                "description": "Your Claude or ChatGPT plan, or your own API key."
+            },
+            "security": {
+                "label": "Security",
+                "description": "Nightly encrypted backups, servers in Europe."
+            },
+            "workspaces": {
+                "label": "Workspaces & team",
+                "description": "A workspace per business, your whole team for free."
+            }
+        },
+        "industryPages": {
+            "agencies": {
+                "label": "Agency",
+                "description": "New business, delivery and client reporting."
+            },
+            "freelancers": {
+                "label": "Freelance",
+                "description": "The back office you never had time for."
+            },
+            "ecommerce": {
+                "label": "E-commerce",
+                "description": "Orders, stock, reviews and the competition."
+            },
+            "real-estate": {
+                "label": "Real estate",
+                "description": "Sellers, enquiries, listings and rentals."
+            },
+            "startups": {
+                "label": "Startup",
+                "description": "Fundraising, pipeline and the launch."
+            },
+            "saas": {
+                "label": "SaaS",
+                "description": "Churn, support, onboarding and releases."
+            },
+            "legal": {
+                "label": "Legal & compliance",
+                "description": "Contracts, obligations, deadlines and audits."
+            },
+            "recruiting": {
+                "label": "Recruiting & HR",
+                "description": "Screening, interviews and candidate follow-up."
+            },
+            "creators": {
+                "label": "Creators & media",
+                "description": "Scripts, edits, sponsors and the community."
+            },
+            "consulting": {
+                "label": "Consulting & coaching",
+                "description": "Discovery calls, deliverables and follow-ups."
+            },
+            "accounting": {
+                "label": "Accounting & finance",
+                "description": "Receivables, payables, close and taxes."
+            },
+            "marketing": {
+                "label": "Marketing team",
+                "description": "Campaigns, content, SEO and the numbers."
+            },
+            "sales": {
+                "label": "Sales team",
+                "description": "Prospecting, pipeline and account follow-up."
+            },
+            "hospitality": {
+                "label": "Hospitality",
+                "description": "Guests, reviews, staff and events."
+            },
+            "local-business": {
+                "label": "Local business",
+                "description": "Enquiries, reviews, invoices and the books."
+            }
+        },
+        "useCasePages": {
+            "find-leads": {
+                "label": "Find leads",
+                "description": "Job posts, headcount and your CRM, crossed."
+            },
+            "track-sales": {
+                "label": "Track sales",
+                "description": "Revenue, pipeline and the sheet, every morning."
+            },
+            "run-ads": {
+                "label": "Run your ads",
+                "description": "Spend read daily, the ones losing money paused."
+            },
+            "watch-competitors": {
+                "label": "Watch competitors",
+                "description": "Their prices, their launches, your keyword gaps."
+            },
+            "create-content": {
+                "label": "Create content",
+                "description": "From the slipping query to the post republished."
+            },
+            "post-on-social": {
+                "label": "Post on social media",
+                "description": "A post every morning, comments answered."
+            },
+            "reply-to-customers": {
+                "label": "Reply to customers",
+                "description": "Unread threads sorted and answered in your tone."
+            },
+            "triage-inbox": {
+                "label": "Triage your inbox",
+                "description": "Labeled, replies drafted, two left for you."
+            },
+            "prepare-meetings": {
+                "label": "Prepare your meetings",
+                "description": "A short brief on who you meet, before each call."
+            },
+            "track-orders": {
+                "label": "Track your orders",
+                "description": "Late ones spotted, your customers told first."
+            },
+            "chase-invoices": {
+                "label": "Chase invoices",
+                "description": "Overdue ones followed up, payments matched."
+            },
+            "screen-candidates": {
+                "label": "Screen candidates",
+                "description": "Applications read, a shortlist with the why."
+            }
+        },
+        "breadcrumb": "Breadcrumb"
     },
     "github": {
         "star": "Star",
@@ -328,7 +509,10 @@
         "app.intel": "Keep it as is.",
         "app.x64": "Keep it as is.",
         "app.arm64": "PCs with an Arm chip, keep the word Arm.",
-        "app.appImage": "A Linux file format, keep the name."
+        "app.appImage": "A Linux file format, keep the name.",
+        "nav.featureGroups": "Titles of the four groups the features menu is split into.",
+        "nav.featurePages.tools.label": "{connectors} is the number of connected apps (3,000).",
+        "nav.breadcrumb": "Accessible name of the breadcrumb at the top of a page, read by screen readers."
     },
     "dialog": {
         "close": "Close"

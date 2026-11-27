@@ -1,0 +1,1118 @@
+{
+    "hub": {
+        "crumb": "Sektörler",
+        "title": "İşinizin yürüdüğü şekle uygun coworker'lar.",
+        "lede": "Her sektörün kendi coworker'ları, çalışma haftası ve uygulamaları var. Sektörünüzü seçin, elle yapmayı neyi bıraktığını görün.",
+        "metaTitle": "Sektörünüze Özel AI Coworker'lar",
+        "metaDescription": "Ajanslar, e-ticaret, gayrimenkul, SaaS, hukuk, işe alım ve daha fazlası: her sektörün önce işe aldığı coworker'lar, bir haftalık işleri ve uygulamalar.",
+        "allTitle": "Tüm sektörler",
+        "allLead": "{count, plural, one {# sektör} other {# sektör}}, her biri önce işe aldığı coworker'larla.",
+        "faq": {
+            "1": {
+                "question": "Sektörüm listede yok. Rerun işime yarar mı?",
+                "answer": "Evet. Coworker'lar bir sektörden değil, bir işten yola çıkarak kurulur: Chief of Staff'a neyin yapılması gerektiğini söyleyin ya da kütüphaneden bir şablon seçip uyarlayın."
+            },
+            "2": {
+                "question": "Bir sektörün şablonları plana dahil mi?",
+                "answer": "Kütüphanedeki şablonların çoğu dahildir. Oluşturanın kendi fiyatını koyduğu bir şablon planınızdan ayrı faturalandırılır ve sayfasında bunu belirtir."
+            },
+            "3": {
+                "question": "Tek hesaptan birden fazla işletme yönetebilir miyim?",
+                "answer": "Evet. Her işletmenin kendi çalışma alanı olur; coworker'ları, belleği ve uygulamaları ayrı tutulur. Aralarında aynı hesaptan geçiş yaparsınız."
+            }
+        }
+    },
+    "page": {
+        "otherIndustries": "Diğer sektörler",
+        "allIndustries": "Tüm sektörler",
+        "moreCoworkers": "Kütüphanede daha fazla coworker",
+        "weekTitle": "Rerun ile bir hafta",
+        "weekLead": "İşletmeyi yönetirken coworker'larınızın hallettikleri. Her gün, ait olduğu işi açar.",
+        "featuresTitle": "Burada en çok işe yarayan özellikler",
+        "appsTitle": "Sektörün uygulamaları",
+        "appsLead": "Bir kez kendi hesaplarınızla bağlanır; MCP ya da bir API ile çok daha fazlası."
+    },
+    "items": {
+        "agencies": {
+            "crumb": "Ajanslar",
+            "title": "Ajanslar için AI coworker'lar.",
+            "lede": "Müşteri bulma, SEO denetimleri, reklam incelemeleri, haftalık müşteri raporu ve geciken fatura: her hesapta tekrarlanan işleri, kendi araçlarınızda çalışan coworker'lar yapar.",
+            "metaTitle": "Ajanslar için AI Ajanları: Satış, Raporlar",
+            "metaDescription": "Ajanslar her hesapta aynı işi tekrarlar. Müşteri bulma, SEO denetimi, reklam, sosyal medya, müşteri raporları ve ödenmemiş faturalar için AI coworker'lar.",
+            "wallTitle": "Ajansların önce işe aldığı coworker'lar",
+            "wallLead": "Her biri kütüphaneden bir şablon. Kurun, müşterinin uygulamalarını bağlayın, takvimine göre çalışsın.",
+            "week": {
+                "Mon": {
+                    "when": "Pazartesi 8:00",
+                    "task": "geçen haftanın reklam harcaması müşteri bazında okundu, israf işaretlendi"
+                },
+                "Tue": {
+                    "when": "Salı 9:00",
+                    "task": "yirmi yeni potansiyel müşteri, her biri için ilk e-posta taslağı"
+                },
+                "Wed": {
+                    "when": "Çarşamba 10:00",
+                    "task": "bir müşterinin sıralamaları iki rakiple karşılaştırıldı"
+                },
+                "Thu": {
+                    "when": "Perşembe 9:00",
+                    "task": "her müşteri için gelecek haftanın paylaşımları, onayınıza hazır"
+                },
+                "Fri": {
+                    "when": "Cuma 16:00",
+                    "task": "30 günü geçen faturalar, sizin sözlerinizle takip edildi"
+                }
+            },
+            "painsTitle": "Bir ajansın artık elle yapmadığı işler",
+            "pains": {
+                "1": {
+                    "title": "Teslimatlar arasında yeni iş",
+                    "body": "Bir proje gecikince ilk aksayan şey müşteri bulmaktır. Bir coworker, hafta sakin olsa da olmasa da listeyi oluşturup yazmaya devam eder."
+                },
+                "2": {
+                    "title": "Aynı rapor, on iki kez",
+                    "body": "Veriler çekilir, yorumlanır ve gönderilir; her hesap için, her ay. İş her seferinde aynı olduğundan bir coworker bunu zamanında yapar."
+                },
+                "3": {
+                    "title": "Kimsenin takip etmeye cesaret edemediği faturalar",
+                    "body": "31. günde gitmesi gereken hatırlatma 60. günde gider. Bir coworker bunu 31. günde, sizin sözlerinizle gönderir ve kimin hâlâ borcu olduğunu listeler."
+                }
+            },
+            "features": {
+                "workspaces": "Müşteri başına bir Box ve kişi bazında erişim ya da sert bir ayrım için ayrı bir çalışma alanı.",
+                "second-brain": "Her müşterinin üslubu, teklifi ve kuralları, herhangi bir coworker yazmadan önce okunur.",
+                "coworkers-work-together": "Biri siteyi denetler, sıradaki brief'i yazar, üçüncüsü paylaşımları hazırlar.",
+                "human-in-the-loop": "Bir bütçe değişikliği ya da müşteriye giden e-posta, istediğinizde onayınızı bekler."
+            },
+            "faq": {
+                "1": {
+                    "question": "Her müşteriyi ayrı tutabilir miyim?",
+                    "answer": "Evet. Her müşteriyi bir Box'a koyun: ücretsizdir ve ekipte kimlerin erişeceğini siz seçersiniz. Tüm Boxes aynı makineyi ve veritabanını paylaşır; sert bir ayrım için müşteriye kendi uygulamaları, Brain'i ve planı olan ayrı bir çalışma alanı verin."
+                },
+                "2": {
+                    "question": "Çıktılar bizim gibi mi, yoksa robot gibi mi konuşur?",
+                    "answer": "Üslubunuz, teklifiniz ve kurallarınız Brain'de durur ve her coworker yazmadan önce bunları okur. Bir müşterinin çalışma alanında bu, müşterinin üslubudur. Bir coworker'ı bir kez düzeltin, düzeltmeyi hatırlar."
+                },
+                "3": {
+                    "question": "Kullanıcı başına mı, müşteri başına mı ödüyoruz?",
+                    "answer": "Pro'da kullanıcılar ücretsiz ve sınırsızdır; böylece tüm ekip, isterseniz müşteri de işi okuyabilir ve bir onaya yanıt verebilir. Boxes da ücretsizdir. Yalnızca ayrı bir çalışma alanı kendi planıyla gelir."
+                },
+                "4": {
+                    "question": "Müşterilerimizin reklam hesaplarında çalışabilir mi?",
+                    "answer": "Google, Meta, LinkedIn ve TikTok reklamlarını inceler, boşa giden harcamayı işaretler; bütçe değişiklikleri, hariç tutmalar ve denenecek sonraki kreatifleri önerir. Neyi değiştirebileceğine, neyin önce size geleceğine talimatlarında siz karar verirsiniz."
+                }
+            }
+        },
+        "freelancers": {
+            "crumb": "Serbest çalışanlar",
+            "title": "Serbest çalışanlar için AI coworker'lar.",
+            "lede": "Teslimat da sizsiniz, satış ekibi de, muhasebe de. Son ikisini, siz bir müşteri projesinde çalışırken çalışan coworker'lara devredin.",
+            "metaTitle": "Serbest Çalışanlar için AI Ajanları: Satış, Fatura",
+            "metaDescription": "Teslimat da sizsiniz, satış ekibi de, muhasebe de. Müşteri bulma, gelen kutusu, faturalar, geciken ödemeler ve vergileriniz için AI coworker'lar.",
+            "wallTitle": "Tek kişilik bir işletmenin önce işe aldığı coworker'lar",
+            "wallLead": "Arka ofisiniz, şablonlar halinde. Birini kurun, postanızı ve faturalamanızı bağlayın; siz müşteriler için çalışırken o çalışsın.",
+            "week": {
+                "Mon": {
+                    "when": "Pazartesi 7:30",
+                    "task": "gelen kutunuz ayrıldı, size üç yanıt bırakıldı"
+                },
+                "Tue": {
+                    "when": "Salı 9:00",
+                    "task": "LinkedIn'de on potansiyel müşteri, her birine kişisel bir not"
+                },
+                "Wed": {
+                    "when": "Çarşamba 18:00",
+                    "task": "yarınki müşteri görüşmesi için bir brief"
+                },
+                "Thu": {
+                    "when": "Perşembe 10:00",
+                    "task": "bu ayın saatleri faturalandı, ödeme bağlantıları gönderildi"
+                },
+                "Fri": {
+                    "when": "Cuma 11:00",
+                    "task": "gelecek haftanın makalesi notlarınızdan taslak halinde"
+                }
+            },
+            "painsTitle": "Tek kişilik bir işletmenin sürekli aksattığı işler",
+            "pains": {
+                "1": {
+                    "title": "Meşgul olduğunuz hafta satış durur",
+                    "body": "Satış hattı tam da proje bittiğinde boşalır, çünkü proje sırasında kimse müşteri aramamıştır. Bir coworker proje sırasında arar."
+                },
+                "2": {
+                    "title": "Takip edilmeyen faturalar",
+                    "body": "Bir müşteriye borcunu hatırlatmak, sürekli yarına attığınız iştir. Bir coworker hatırlatmayı zamanında gönderir."
+                },
+                "3": {
+                    "title": "Günde beş kez baktığınız bir gelen kutusu",
+                    "body": "Gerçekten size ihtiyaç duyan üç mesaj var. Bir coworker hangi üçü olduğunu söyler, gerisi için yanıt taslakları hazırlar."
+                }
+            },
+            "features": {
+                "runs-24-7": "Dizüstü bilgisayarınız kapalıyken ve bir müşterinin yanındayken de çalışır.",
+                "tools": "Kendi LinkedIn hesabınızdan, hesabı güvende tutan bir tempoyla müşteri arayın.",
+                "mobile-app": "Bir hatırlatmayı ya da yanıtı, iki toplantı arasında telefonunuzdan onaylayın.",
+                "bring-your-own-ai": "Coworker'larınızı zaten ödediğiniz Claude ya da ChatGPT planında çalıştırın."
+            },
+            "faq": {
+                "1": {
+                    "question": "Tek kişi için buna değer mi?",
+                    "answer": "Tam olarak bunun için tasarlandı: işe alım mantıklı olsaydı işe alacağınız işler. Bir plan, kurduğunuz kadar coworker çalıştırır; çalıştırma ya da görev başına ücret yoktur."
+                },
+                "2": {
+                    "question": "Dizüstü bilgisayarım kapalıyken çalışır mı?",
+                    "answer": "Evet. Coworker'larınız, Avrupa'da bulutta size ait bir makinede çalışır. Pazartesi çalıştırması, masanızda, bir müşteriyle ya da tatilde olmanızdan bağımsız gerçekleşir."
+                },
+                "3": {
+                    "question": "Sormadan benim adıma bir şey gönderebilir mi?",
+                    "answer": "Yalnızca izin verdiğiniz kadar. Kendi başına mı göndereceğine yoksa size bir taslak mı vereceğine talimatlarında siz karar verirsiniz; sonucu olan her şeyi önce onay olarak size getirir."
+                },
+                "4": {
+                    "question": "LinkedIn'de müşteri aramak ek ücrete tabi mi?",
+                    "answer": "Evet. LinkedIn Pro ücretli bir uygulamadır: bağlı hesap başına ayda {linkedinPrice}, planınızla aynı faturada. Coworker'larınız ardından hesabınızdan mesaj atar ve takip eder; hesabı güvende tutan, önerilen bir günlük tempoyla."
+                },
+                "5": {
+                    "question": "Vergi beyannamelerimi verecek mi?",
+                    "answer": "Hayır. KDV beyannamelerinizi ve vergi dosyalarınızı defterlerinizden hazırlar, her rakamın kaynağıyla birlikte; siz ya da muhasebeciniz kontrol edip gönderirsiniz."
+                }
+            }
+        },
+        "ecommerce": {
+            "crumb": "E-ticaret",
+            "title": "E-ticaret için AI coworker'lar.",
+            "lede": "Mağazanız bu hafta ne yaptı, neyin stoğu bitmek üzere, hangi siparişler gecikti, rakipleriniz az önce neyi değiştirdi: her gün okunur, harekete geçilir ve size raporlanır.",
+            "metaTitle": "E-Ticaret için AI Ajanları: Sipariş, Stok, Sepet",
+            "metaDescription": "Mağazanızı her hafta inceleyen, azalan stoğu erken gören, terk edilen sepeti kurtaran, müşterilere yanıt veren, geciken siparişi yürüten AI coworker'lar.",
+            "wallTitle": "Online mağazaların önce işe aldığı coworker'lar",
+            "wallLead": "Haftalık mağaza incelemesinden iade gereken siparişe kadar. Her biri kurduğunuz, mağazanıza bağladığınız ve açtığınız bir şablon.",
+            "week": {
+                "Mon": {
+                    "when": "Pazartesi 8:00",
+                    "task": "mağazanın haftası okundu, üç düzeltme sıralandı"
+                },
+                "Tue": {
+                    "when": "Salı 7:00",
+                    "task": "bugünün siparişleri ayrıldı, hatalı adresler yakalandı"
+                },
+                "Wed": {
+                    "when": "Çarşamba 9:00",
+                    "task": "rakip fiyatları ve lansmanları karşılaştırıldı"
+                },
+                "Thu": {
+                    "when": "Perşembe 10:00",
+                    "task": "müşteri e-postaları politikalarınıza göre yanıtlandı"
+                },
+                "Fri": {
+                    "when": "Cuma 15:00",
+                    "task": "çok satan bir ürün bitmeden yeniden sipariş önerildi"
+                }
+            },
+            "painsTitle": "Bir mağaza sahibinin çok geç fark ettikleri",
+            "pains": {
+                "1": {
+                    "title": "Biten çok satan ürün",
+                    "body": "Siparişler durana kadar kimse stoğa bakmadı. Bir coworker her gün bakar ve bitmeden önce neyi, ne kadar yeniden sipariş etmeniz gerektiğini söyler."
+                },
+                "2": {
+                    "title": "Geç duyulan bir rakip fiyatı",
+                    "body": "Promosyonları pazartesi başladı, siz perşembe günü bir değerlendirmede duydunuz. Bir coworker onların sayfalarını sizin için her hafta okur."
+                },
+                "3": {
+                    "title": "Terk edilen, hiç takip edilmeyen sepetler",
+                    "body": "Kurmayı düşündüğünüz akış hâlâ bir not. Bir coworker, insanların gerçekte ne aldığına göre segmentler oluşturur ve takip mesajını yazar."
+                }
+            },
+            "features": {
+                "tools": "Shopify, Stripe, e-posta platformunuz ve tablolarınız, ayrıca herhangi bir MCP sunucusu.",
+                "computer-use": "API'si olmayan bir tedarikçi portalına da kendi ekranında ulaşılabilir.",
+                "coworkers-work-together": "Sipariş, stok ve destek coworker'ları aynı paylaşılan tabloları okur.",
+                "human-in-the-loop": "İadeler onayınız için hazırlanır, tahmine dayanarak asla gönderilmez."
+            },
+            "faq": {
+                "1": {
+                    "question": "Shopify'a ve yığınımın geri kalanına bağlanır mı?",
+                    "answer": "Shopify, Stripe, e-posta platformunuz, reklam hesaplarınız, tablolarınız ve {connectors}+ başka araç. API'si olmayan bir arka ofise de ulaşılabilir: coworker onu kendi ekranında açar ve tıklayarak ilerler."
+                },
+                "2": {
+                    "question": "Bir coworker kendi başına iade yapabilir ya da fiyat değiştirebilir mi?",
+                    "answer": "İadeler hazırlanır ve onayınız için size getirilir. Fiyatlar, kampanyalar ve müşteri yanıtları için talimatlarında siz karar verirsiniz: sizin göndermeniz için bir taslak ya da gönderilip raporlanması."
+                },
+                "3": {
+                    "question": "Kataloğumu ne kadar hızlı öğrenir?",
+                    "answer": "İlk çalıştırmada okur ve önemli olanı Brain'de tutar: ürün yelpazeniz, marjlarınız, politikalarınız, üslubunuz. Sonradan işe aldığınız her coworker aynı sayfalardan başlar."
+                },
+                "4": {
+                    "question": "Müşterilere WhatsApp'tan yanıt verebilir mi?",
+                    "answer": "Evet. WhatsApp Pro ücretli bir uygulamadır: bağlı numara başına ayda {whatsappPrice}, planınızla aynı faturada. Yeni bir mesaj coworker'ı uyandırır ve numaranızdan metin, dosya ve sesli notlarla yanıt verir. Tanımadığı kişilere asla yazmaz."
+                }
+            }
+        },
+        "real-estate": {
+            "crumb": "Gayrimenkul",
+            "title": "Gayrimenkul için AI coworker'lar.",
+            "lede": "Satmaya yatkın mal sahipleri, hızla yanıtlanan talepler, gerçek emsallere göre fiyatlanan işler, takip edilen kiralamalar ve onarımlar. Bir danışmanın haftasını dolduran işleri coworker'lar yapar.",
+            "metaTitle": "Gayrimenkul için AI Ajanları: Satıcı, Talep, Kira",
+            "metaDescription": "Satmaya yatkın mal sahiplerini bulan, her talebi yanıtlayan, işleri emsallerle analiz eden, ilan fotoğrafı hazırlayan, kiraları yürüten AI coworker'lar.",
+            "wallTitle": "Gayrimenkul ofislerinin önce işe aldığı coworker'lar",
+            "wallLead": "Piyasa dışı satıcıdan kiracının onarımına kadar. Her biri kütüphaneden bir şablon, postanıza ve tablolarınıza bağlanmaya hazır.",
+            "week": {
+                "Mon": {
+                    "when": "Pazartesi 8:00",
+                    "task": "satmaya yatkın mal sahipleri, her birinin arkasındaki sinyalle"
+                },
+                "Tue": {
+                    "when": "Salı 9:00",
+                    "task": "yeni talepler yanıtlandı, eleme soruları soruldu"
+                },
+                "Wed": {
+                    "when": "Çarşamba 8:30",
+                    "task": "saat 11'de görüşeceğiniz mal sahibi için bir brief"
+                },
+                "Thu": {
+                    "when": "Perşembe 10:00",
+                    "task": "ilan fotoğrafları rötuşlandı ve web için dışa aktarıldı"
+                },
+                "Fri": {
+                    "when": "Cuma 9:00",
+                    "task": "risk altındaki kira işaretlendi, ustalar takip edildi"
+                }
+            },
+            "painsTitle": "Bir ofisin yetkiyi kaybettiği yerler",
+            "pains": {
+                "1": {
+                    "title": "Üç saat geç yanıtlanan bir talep",
+                    "body": "İlk yanıt veren danışman, yer gösterme fırsatını alır. Bir coworker talep gelir gelmez yanıtlar, eleme sorularını sorar ve ciddi olanları size devreder."
+                },
+                "2": {
+                    "title": "Hafızadan savunulan bir fiyat",
+                    "body": "Mal sahibi bir rakam ve bir gerekçe ister. Bir coworker, randevudan önce yakınlarda gerçekten satılanlardan karşılaştırmayı hazırlar."
+                },
+                "3": {
+                    "title": "Hiç aramadığınız mal sahipleri",
+                    "body": "Sinyaller herkese açıktır: süresi dolan ilanlar, miras süreçleri, piyasada uzun kalma. Bir coworker bunları her hafta okur ve kimi arayacağınızı sıralar."
+                }
+            },
+            "features": {
+                "tools": "Alıcılara ve kiracılara kendi numaranızdan WhatsApp'ta yanıt verin.",
+                "lead-data": "Telefon numaraları, şirket verileri ve yerel sonuçlar, sorgu başına ödenir.",
+                "computer-use": "Eski bir portal ya da API'si olmayan bir CRM, kendi ekranında doldurulur.",
+                "mobile-app": "Yer göstermeler arasında telefonunuzdan bir yanıtı onaylayın ya da brief okuyun."
+            },
+            "faq": {
+                "1": {
+                    "question": "CRM'imle çalışır mı?",
+                    "answer": "CRM'inizin bir API'si ya da MCP sunucusu varsa bağlanır. İkisi de olmayan eski bir portalsa, coworker onu kendi ekranında açar ve sizin yapacağınız gibi doldurur."
+                },
+                "2": {
+                    "question": "Talepleri benim adıma yanıtlayabilir mi?",
+                    "answer": "Evet, ne kadar ileri gideceğini siz belirlersiniz: size taslak ya da kendi başına gönderim. Her iki durumda da yazışma okunabilir kalır ve emin olmadığı her şey size gelir."
+                },
+                "3": {
+                    "question": "Piyasa verileri güvenilir mi?",
+                    "answer": "Bir coworker kullandığı kaynağı belirtir. Karşılaştırmayı gerçekten okuduğu ilanlardan ve satışlardan hazırlar; kaynakları, havadan çıkmış bir rakam yerine rakamın yanında görürsünüz."
+                },
+                "4": {
+                    "question": "WhatsApp'ın maliyeti nedir?",
+                    "answer": "WhatsApp Pro ücretli bir uygulamadır: bağlı numara başına ayda {whatsappPrice}, planınızla aynı faturada. Yeni bir mesaj coworker'ı uyandırır, önerilen günlük tempoya uyar ve tanımadığı kişilere asla yazmaz."
+                }
+            }
+        },
+        "startups": {
+            "crumb": "Startup'lar",
+            "title": "Startup'lar için AI coworker'lar.",
+            "lede": "On beş kişinin işini yapan beş kişi. Henüz kadro açamadığınız işler için coworker işe alın: tur modeli, outbound, demo hazırlığı ve lansman.",
+            "metaTitle": "Startup'lar için AI Ajanları: Fon Toplama, Satış",
+            "metaDescription": "Küçük bir ekip her iş için birini işe alamaz. Turunuzun modelini kuran, outbound yürüten, demo hazırlayan ve lansman paketini yazan AI coworker'lar alın.",
+            "wallTitle": "Startup'ın ilk çalışanlarından önce işe aldığı coworker'lar",
+            "wallLead": "Fon toplama, satış hattı ve lansman, her biri bir şablon. Kurun, araçlarınızı bağlayın ve tüm ekibe ücretsiz bir koltuk verin.",
+            "week": {
+                "Mon": {
+                    "when": "Pazartesi 8:00",
+                    "task": "satış hattı ve kayıtlar tek grafikte, standup'tan önce"
+                },
+                "Tue": {
+                    "when": "Salı 9:00",
+                    "task": "uygun otuz potansiyel müşteri, her biri için ilk e-posta"
+                },
+                "Wed": {
+                    "when": "Çarşamba 14:00",
+                    "task": "Perşembe için bir demo planı ve bir rakip kartı"
+                },
+                "Thu": {
+                    "when": "Perşembe 10:00",
+                    "task": "özellik şartnamesinden hazırlanan lansman paketi"
+                },
+                "Fri": {
+                    "when": "Cuma 11:00",
+                    "task": "iki rakibin lansmanları ve fiyat sayfaları karşılaştırıldı"
+                }
+            },
+            "painsTitle": "Küçük bir ekibin yetişemedikleri",
+            "pains": {
+                "1": {
+                    "title": "Henüz kimsenin sahiplenmediği roller",
+                    "body": "Outbound, ortaklıklar, haftalık rakamlar. Herkes önemli olduğunda hemfikir ama kimsenin buna ayıracak günü yok."
+                },
+                "2": {
+                    "title": "Bir gece öncesinden kurulan model",
+                    "body": "Emsaller ve değerleme, ortak toplantısından bir gece önce yapılır. Bir coworker bunları kamuya açık dosyalardan, her girdinin kaynağıyla kurar."
+                },
+                "3": {
+                    "title": "Küçük şeylerde aksayan lansmanlar",
+                    "body": "Mesajlaşma, açılış sayfası, e-postalar, paylaşım. Siz geliştirirken bir coworker hepsinin taslağını şartnameden hazırlar."
+                }
+            },
+            "features": {
+                "chief-of-staff": "Neye ihtiyacınız olduğunu söyleyin, doğru coworker'a brief verir. Kimsenin onları yönetmesi gerekmez.",
+                "workspaces": "Tüm ekip ücretsiz bir koltuk alır ve aynı panodan çalışır.",
+                "lead-data": "İş e-postaları, telefon numaraları ve şirket verileri, kredilerinizden ödenir.",
+                "coworkers": "Satış kılavuzunuz bir kez yazılır, her anlaşmada izlenir."
+            },
+            "faq": {
+                "1": {
+                    "question": "Bir coworker ne kadar sürede işe yarar hale gelir?",
+                    "answer": "Bir şablondan başlarsanız dakikalar içinde: uygulamalarını bağlarsınız, takvimini kontrol edersiniz ve çalışır. Kendi tanımınızdan bir tane kurmak, işi yazıya dökmek kadar sürer."
+                },
+                "2": {
+                    "question": "Tüm ekip kullanabilir mi?",
+                    "answer": "Evet, üstelik ek maliyeti yok: Pro'da koltuklar ücretsiz ve sınırsızdır. Herkes aynı panoyu görür, bir coworker'a iş verebilir ve biri onay istediğinde yanıt verebilir."
+                },
+                "3": {
+                    "question": "Otomasyon araçlarımızın yerini alır mı?",
+                    "answer": "Sürekli onardığınız araçların yerini alır. Bir coworker'a iş anlatılır, akış olarak çizilmez; bu yüzden yeni bir alan ya da adı değişen bir sütun, düğüm grafiği gibi onu bozmaz."
+                },
+                "4": {
+                    "question": "Potansiyel müşterilerin e-postaları nereden geliyor?",
+                    "answer": "CRM'inizden ve web'den, ayrıca iş e-postaları, telefon numaraları ve şirket verisi sorgularından. Bu ücretli bir veridir ve Rerun kredilerinizden düşer; coworker satın almadan önce tahmini maliyeti onaylamanızı ister."
+                },
+                "5": {
+                    "question": "Fatura ekiple birlikte büyür mü?",
+                    "answer": "Hayır. Pro'da coworker, koltuk ve çalıştırma sınırsızdır. Ek ücret getiren, kullanmayı seçtiğiniz şeylerdir: Rerun kredilerinizden ödenen ücretli veri ve bağlı hesap başına LinkedIn Pro ya da WhatsApp Pro."
+                }
+            }
+        },
+        "saas": {
+            "crumb": "SaaS",
+            "title": "SaaS ekipleri için AI coworker'lar.",
+            "lede": "Kayıp riskine kayan hesaplar, SLA'sını aşan talepler, birikip duran hatalar, notsuz sürümler: her gün okunur ve size getirilir.",
+            "metaTitle": "SaaS için AI Ajanları: Kayıp, Destek, Sürümler",
+            "metaDescription": "Kayıp riskli hesapları yakalayan, desteği SLA'ya göre inceleyen, geri bildirimi temalara ayıran, hataları sıralayan ve sürüm notu yazan AI coworker'lar.",
+            "wallTitle": "SaaS ekiplerinin önce işe aldığı coworker'lar",
+            "wallLead": "Kayıp, destek, onboarding ve sürümler. Her biri faturalamanızı, taleplerinizi ve repo'nuzu okuyup size rapor veren bir şablon.",
+            "week": {
+                "Mon": {
+                    "when": "Pazartesi 8:00",
+                    "task": "kayıp riskine kayan hesaplar, her biri için bir kurtarma planı"
+                },
+                "Tue": {
+                    "when": "Salı 9:00",
+                    "task": "SLA'yı aşan talepler, hesaba göre sıralandı"
+                },
+                "Wed": {
+                    "when": "Çarşamba 9:00",
+                    "task": "yeni hata raporları ayıklandı, tekrarlar birleştirildi"
+                },
+                "Thu": {
+                    "when": "Perşembe 16:00",
+                    "task": "birleşenlere göre sürüm notları yazıldı"
+                },
+                "Fri": {
+                    "when": "Cuma 10:00",
+                    "task": "yayınlananlardan sapan dokümantasyon sayfaları listelendi"
+                }
+            },
+            "painsTitle": "Bir SaaS ekibinin çok geç okuduğu sinyaller",
+            "pains": {
+                "1": {
+                    "title": "Yenileme tarihinde görülen kayıp",
+                    "body": "Kullanım sekiz hafta önce düştü ve kimse bakmadı. Bir coworker hesapları izler ve hâlâ vakit varken size söyler."
+                },
+                "2": {
+                    "title": "Araçlara dağılmış geri bildirim",
+                    "body": "Talepler, anketler, iptal nedenleri, topluluk. Bir coworker hepsini okur ve sürekli öne çıkanları alıntılarıyla getirir."
+                },
+                "3": {
+                    "title": "Notsuz yayınlanan sürümler",
+                    "body": "Değişiklikler pull request'lerde durur ve müşteriler bunları hiç duymaz. Bir coworker notları gerçekten yayınlananlardan yazar."
+                }
+            },
+            "features": {
+                "tools": "Stripe, GitHub, Slack ve destek masanız, ayrıca çalıştırdığınız herhangi bir MCP sunucusu.",
+                "runs-24-7": "Yeni bir uyarı ya da talepte, günün her saatinde bir webhook onu uyandırır.",
+                "bring-your-own-ai": "Kendi API anahtarınızda, Claude ya da ChatGPT planınızda veya kendi barındırdığınız bir modelde çalıştırın.",
+                "security": "Avrupa'da kendi makinesi, her gece şifreli yedekler, anahtarlar Vault'ta."
+            },
+            "faq": {
+                "1": {
+                    "question": "Kullanım ve faturalama verilerimizi nereden okuyor?",
+                    "answer": "Zaten kullandığınız araçlardan: Stripe, veritabanınız ya da veri ambarınız, ürün analitiğiniz, destek masanız. Bunları Vault'ta bir kez bağlar, ihtiyacı olan coworker'lar için açarsınız."
+                },
+                "2": {
+                    "question": "Sorun takipçimize yazabilir mi?",
+                    "answer": "Evet. Bir hatayı ayıklamak, tekrarını bulmak, bağlamı eklemek ve ekibinizin gerçekten baktığı yere kaydetmek demektir: Linear, Jira, GitHub ya da Notion."
+                },
+                "3": {
+                    "question": "Kendi başına birleştirebilir ya da dağıtabilir mi?",
+                    "answer": "Yalnızca verdiğiniz erişimle. Okuma erişimiyle başlatın; sonucu olan bir eylemi, harekete geçmeden önce bir onay kartı olarak size getirir. Bağladığınız bir bilgisayardaki komut her zaman onayınızı bekler."
+                },
+                "4": {
+                    "question": "Verilerimiz bir modeli eğitmek için kullanılıyor mu?",
+                    "answer": "Rerun, çalışma alanınızdaki verilerle model eğitmez. Avrupa'da kendi makinesinde çalışır ve modeli siz seçersiniz: kendi API anahtarınız, Claude ya da ChatGPT planınız veya barındırdığınız bir model."
+                }
+            }
+        },
+        "legal": {
+            "crumb": "Hukuk ve uyum",
+            "title": "Hukuk ve uyum için AI coworker'lar.",
+            "lede": "Kendi kurallarınıza göre kontrol edilen sözleşmeler, takip edilen bildirim tarihleri, zamanında yanıtlanan veri talepleri, kapanana kadar izlenen denetim boşlukları. Son söz her zaman bir avukatın.",
+            "metaTitle": "Hukuk ve Uyum için AI Ajanları: Sözleşmeler",
+            "metaDescription": "Sözleşmeleri kurallarınıza göre inceleyen, bildirim tarihlerini izleyen, veri sahibi taleplerini hazırlayan, boşluk analizi yapan AI coworker'lar.",
+            "wallTitle": "Hukuk ekiplerinin önce işe aldığı coworker'lar",
+            "wallLead": "Sözleşmeler, gizlilik, istihdam, fikri mülkiyet ve davalar. Her şablon belgelerinizi bulundukları yerde okur ve her noktanın nereden geldiğini belirtir.",
+            "week": {
+                "Mon": {
+                    "when": "Pazartesi 8:00",
+                    "task": "gelen kutusundaki yeni sözleşmeler kurallarınıza göre kontrol edildi"
+                },
+                "Tue": {
+                    "when": "Salı 9:00",
+                    "task": "bir veri sahibi talebi hazırlandı, yanıt taslağı yazıldı"
+                },
+                "Wed": {
+                    "when": "Çarşamba 14:00",
+                    "task": "yönetim kurulu kararları ve tutanaklar taslak halinde"
+                },
+                "Thu": {
+                    "when": "Perşembe 9:00",
+                    "task": "90 gün içinde dolacak bildirim tarihleri, sözleşme bazında işaretlendi"
+                },
+                "Fri": {
+                    "when": "Cuma 10:00",
+                    "task": "Pazartesi için dava dosyası, her iddia bir kanıta bağlı"
+                }
+            },
+            "painsTitle": "Riskin gerçekte durduğu yer",
+            "pains": {
+                "1": {
+                    "title": "Bir hafta kaçırılan bildirim süresi",
+                    "body": "Madde dokuzuncu sayfadaydı ve tarih kimsenin takviminde yoktu. Bir coworker her bildirim tarihini çıkarır ve süre dolmadan sizi uyarır."
+                },
+                "2": {
+                    "title": "Okunmadan imzalanan sözleşmeler",
+                    "body": "Ticari ekibin dün ihtiyacı vardı. Bir coworker sözleşmeyi kendi kurallarınıza göre okur ve yalnızca zamanınızı hak edeni işaretler."
+                },
+                "3": {
+                    "title": "Belge aramakla geçen bir denetim",
+                    "body": "Kanıtlar var, altı sürücüde ve bir gelen kutusunda. Bir coworker bunları bulur, adlandırır ve her gerekliliğe göre dosyalar."
+                }
+            },
+            "features": {
+                "second-brain": "Pozisyonlarınız, kırmızı çizgileriniz ve yedek ifadeleriniz, her incelemeden önce okunur.",
+                "coworkers": "İnceleme prosedürünüz bir kez öğrenilir, her seferinde aynı şekilde uygulanır.",
+                "security": "Avrupa'da kendi makinesi, her gece şifreli yedekler, açık kaynak.",
+                "human-in-the-loop": "Her çıktı, her noktanın kaynağıyla birlikte bir avukat için taslaktır."
+            },
+            "faq": {
+                "1": {
+                    "question": "Bir coworker hukuki danışmanlık verir mi?",
+                    "answer": "Hayır. Okur, çıkarır ve işaretler; her çıktı yetkili bir kişinin inceleyeceği biçimde yazılır. Her noktanın belgede nereden geldiğini belirtir, böylece saniyeler içinde doğrulayabilirsiniz."
+                },
+                "2": {
+                    "question": "Belgelerimiz nerede duruyor?",
+                    "answer": "Kendi sürücülerinizde ve araçlarınızda; coworker bunları verdiğiniz erişimle okur. Üzerinde çalıştığı şey, çalışma alanınızın Avrupa'daki makinesinde kalır, diğer müşterilerden yalıtılmıştır ve her gece şifreli yedeklenir."
+                },
+                "3": {
+                    "question": "Dosyalarımızı başka kim görüyor?",
+                    "answer": "Çalışma alanınız diğer tüm müşterilerden ayrı, kendi makinesinde çalışır. Seçtiğiniz model, bir görevin ihtiyaç duyduğunu o sağlayıcının koşulları altında okur. Rerun açık kaynaktır; bu yüzden ihtiyacı olan bir büro onu kendi sunucularında çalıştırabilir."
+                },
+                "4": {
+                    "question": "Kendi madde standartlarımızı tanımlayabilir miyiz?",
+                    "answer": "Evet. Pozisyonlarınız, kırmızı çizgileriniz ve yedek ifadeleriniz Brain'e ya da bir skill'e girer; coworker genel bir kontrol listesine göre değil, bunlara göre inceler."
+                },
+                "5": {
+                    "question": "Dosyaları birbirinden ayrı tutabilir miyiz?",
+                    "answer": "Dosya başına bir Box, ekipte kimlerin coworker'larına erişeceğine karar verir. Tüm Boxes aynı makineyi ve veritabanını paylaşır; sert bir ayrım isteyen bir dosya ayrı bir çalışma alanı alır."
+                }
+            }
+        },
+        "recruiting": {
+            "crumb": "İşe alım ve İK",
+            "title": "İşe alım ve İK için AI coworker'lar.",
+            "lede": "Her başvuru role göre aynı şekilde okunur, mülakatlar özgeçmişten hazırlanır, değerlendirmeler karara dönüşür ve yanıtsız kalan aday olmaz.",
+            "metaTitle": "İşe Alım için AI Ajanları: Eleme, Mülakat",
+            "metaDescription": "Her başvuruyu role göre eleyen, mülakat kiti hazırlayan, adayları bilgilendiren, yeni çalışanları işe alıştıran ve bordroyu kontrol eden AI coworker'lar.",
+            "wallTitle": "İşe alım ve İK ekiplerinin önce işe aldığı coworker'lar",
+            "wallLead": "İş ilanından ilk maaş bordrosuna. Her biri gelen kutunuzda, takviminizde ve ATS'nizde çalışan bir şablon.",
+            "week": {
+                "Mon": {
+                    "when": "Pazartesi 9:00",
+                    "task": "hafta sonu başvuruları okundu, gerekçeli bir kısa liste"
+                },
+                "Tue": {
+                    "when": "Salı 8:30",
+                    "task": "bugünkü adayların her biri için bir mülakat kiti"
+                },
+                "Wed": {
+                    "when": "Çarşamba 16:00",
+                    "task": "her aday süreçte nerede olduğunu öğrendi"
+                },
+                "Thu": {
+                    "when": "Perşembe 10:00",
+                    "task": "yeni bir rol için iş ilanı ve kriterleri taslak halinde"
+                },
+                "Fri": {
+                    "when": "Cuma 11:00",
+                    "task": "değerlendirme notları rol başına tek bir karşılaştırmaya dönüştürüldü"
+                }
+            },
+            "painsTitle": "Bir işe alım sürecinin sessizleştiği yerler",
+            "pains": {
+                "1": {
+                    "title": "İki yüz başvuru, bir gün",
+                    "body": "Son elli başvuru otuzar saniye alır. Bir coworker hepsini aynı kriterlere göre okur ve kanıtlarını gösterir."
+                },
+                "2": {
+                    "title": "Hiç haber alamayan adaylar",
+                    "body": "Kabalıktan değil, yoğunluktan. Bir coworker her adayı her aşamada, sizin sözlerinizle bilgilendirir."
+                },
+                "3": {
+                    "title": "Karar vermeyen değerlendirmeler",
+                    "body": "Dört farklı biçimde dört not seti. Bir coworker bunları kanıta, açık sorulara ve role göre bir karşılaştırmaya dönüştürür."
+                }
+            },
+            "features": {
+                "human-in-the-loop": "Kanıtla kısa liste çıkarır. Kimin ilerleyeceği, ekibinizin kararı olarak kalır.",
+                "coworkers": "Skor kartınız bir kez yazılır, her başvuruya aynı şekilde uygulanır.",
+                "security": "Aday verileri, çalışma alanınızın Avrupa'daki kendi makinesinde, her gece yedeklenir.",
+                "tools": "Adayları kendi LinkedIn hesabınızdan bulun ve mesaj atın, ücretli bir uygulamayla."
+            },
+            "faq": {
+                "1": {
+                    "question": "Bir coworker kimin işe alınacağına karar verir mi?",
+                    "answer": "Hayır. Sizin yazdığınız kriterlere göre okur ve doğrulayamadıkları dahil her noktanın arkasındaki kanıtı gösterir. Kısa liste bir okumadır; karar ekibinizde kalır."
+                },
+                "2": {
+                    "question": "Aday verilerini KVKK/GDPR kapsamında nasıl ele alır?",
+                    "answer": "Başvuruları bağladığınız araçlarda okur ve diğer müşterilerden ayrı, çalışma alanınızın Avrupa'daki kendi makinesinde çalışır. Tuttukları veritabanında ve klasöründe durur; orada arayabilir, dışa aktarabilir ve silebilirsiniz."
+                },
+                "3": {
+                    "question": "ATS'mize yazabilir mi?",
+                    "answer": "ATS'nizin bir API'si ya da MCP sunucusu varsa evet. Yoksa coworker onu kendi ekranında açar ve bir insan gibi doldurur."
+                },
+                "4": {
+                    "question": "LinkedIn'de aday bulabilir mi?",
+                    "answer": "Evet, LinkedIn Pro ile. LinkedIn Pro ücretli bir uygulamadır: bağlı hesap başına ayda {linkedinPrice}, planınızla aynı faturada. Hesabınızdan arama yapar, profilleri okur ve hesabı güvende tutan, önerilen bir günlük tempoyla mesaj atar."
+                }
+            }
+        },
+        "creators": {
+            "crumb": "İçerik üreticileri ve medya",
+            "title": "İçerik üreticileri ve medya için AI coworker'lar.",
+            "lede": "Senaryolar, klipler, bülten, Discord ve sponsor teklifi: işin etrafındaki işler coworker'lar tarafından yapılır, siz de bir sonraki parçayı üretirsiniz.",
+            "metaTitle": "İçerik Üreticileri için AI Ajanları: Senaryo, Klip",
+            "metaDescription": "Senaryo yazan, uzun videoları altyazılı kliplere bölen, her hafta paylaşan, Discord'unuzu yöneten ve kitlenize uyan sponsorları bulan AI coworker'lar.",
+            "wallTitle": "İçerik üreticilerinin önce işe aldığı coworker'lar",
+            "wallLead": "Taslaktan sponsorun gelen kutusuna. Her biri kurduğunuz, kanallarınıza bağladığınız ve kendi takviminizde çalıştırdığınız bir şablon.",
+            "week": {
+                "Mon": {
+                    "when": "Pazartesi 9:00",
+                    "task": "geçen haftanın videosu altyazılı beş klibe bölündü"
+                },
+                "Tue": {
+                    "when": "Salı 10:00",
+                    "task": "bir sonraki bölüm için taslak ve senaryo"
+                },
+                "Wed": {
+                    "when": "Çarşamba 8:00",
+                    "task": "Discord soruları yanıtlandı, kural ihlalleri işaretlendi"
+                },
+                "Thu": {
+                    "when": "Perşembe 11:00",
+                    "task": "teklif etmeye değer üç marka, giriş yazısı taslak halinde"
+                },
+                "Fri": {
+                    "when": "Cuma 9:00",
+                    "task": "haftanın videolarından bülten taslağı"
+                }
+            },
+            "painsTitle": "Bir içerik üreticisinin haftasını yiyen şeyler",
+            "pains": {
+                "1": {
+                    "title": "Kurgu haftayı yer",
+                    "body": "Tek bir uzun video, günlerce klip kesmeye, altyazı eklemeye ve başlık yazmaya dönüşür. Siz bir sonrakini çekerken bir coworker klipleri keser ve başlıkları yazar."
+                },
+                "2": {
+                    "title": "Sessizleşen bir topluluk",
+                    "body": "Sorular bir gün bekler ve kanal soğur. Bir coworker yanıtlayabildiklerini yanıtlar, kural ihlallerini işaretler ve her gün bir tartışma başlatır."
+                },
+                "3": {
+                    "title": "Hiç teklif götürülmeyen sponsorlar",
+                    "body": "Kitlenize uyan markalar var ve kimse onlara yazmıyor. Bir coworker listeyi oluşturur, her birinin neden şimdi uyduğunu söyler ve teklifin taslağını yazar."
+                }
+            },
+            "features": {
+                "your-computer": "Ağır render işleri, masaüstü uygulamasından bağlanan kendi Mac'inizde ya da PC'nizde çalışır.",
+                "coworkers": "Kancalarınız, formatlarınız ve kurgu kurallarınız bir kez öğrenilir.",
+                "coworkers-work-together": "Senaryo, klipler ve paylaşımlar bir coworker'dan diğerine geçer.",
+                "mobile-app": "Çekim sırasında telefonunuzdan bir paylaşımı onaylayın ya da bir soruyu yanıtlayın."
+            },
+            "faq": {
+                "1": {
+                    "question": "Hesaplarımda sormadan paylaşım yapar mı?",
+                    "answer": "Yalnızca izin verirseniz. Varsayılan olarak paylaşımlar her ağ için yazılır ve siz \"başla\" dediğinizde yayınlanır. Bir coworker'ı kendi başına yayınlayıp sonradan rapor verecek şekilde değiştirebilirsiniz."
+                },
+                "2": {
+                    "question": "Videolarımı kurgulayabilir mi?",
+                    "answer": "Uzun videoları altyazılı dikey kliplere böler; başlıklarını, açıklamalarını ve bölümlerini yazar. Ağır işler için kendi bilgisayarınızı bağlayın: iş orada çalışır ve her yeni program önce onayınızı ister."
+                },
+                "3": {
+                    "question": "Benim gibi yazar mı?",
+                    "answer": "Sesiniz, formatlarınız ve kitleniz Brain'de durur ve her coworker yazmadan önce bunları okur. Bir senaryoyu bir kez düzeltin, düzeltmeyi hatırlar."
+                },
+                "4": {
+                    "question": "Diğer kanalları okumak ücretli mi?",
+                    "answer": "YouTube, TikTok, Instagram ve X'teki herkese açık profilleri ve paylaşımları okumak kredi harcar. Bu ücretli bir veridir ve Rerun kredilerinizden düşer; coworker satın almadan önce tahmini maliyeti onaylamanızı ister."
+                }
+            }
+        },
+        "consulting": {
+            "crumb": "Danışmanlık ve koçluk",
+            "title": "Danışmanlar ve koçlar için AI coworker'lar.",
+            "lede": "Hazırlanan keşif görüşmeleri, taslağı yazılan çıktılar, gönderilen takipler ve faturalanan saatler: seanslarınızın etrafındaki işleri, yönteminizi bilen coworker'lar yapar.",
+            "metaTitle": "Danışmanlar ve Koçlar için AI Ajanları",
+            "metaDescription": "Her keşif görüşmesini hazırlayan, süreçleri çıkaran, rapor ve atölye taslağı yazan, her seansı takip eden ve saatlerinizi faturalayan AI coworker'lar.",
+            "wallTitle": "Danışmanların ve koçların önce işe aldığı coworker'lar",
+            "wallLead": "Görüşmeden önce, seanstan sonra ve ay sonunda. Her biri yönteminizi bir kez öğrenen bir şablon.",
+            "week": {
+                "Mon": {
+                    "when": "Pazartesi 8:00",
+                    "task": "her keşif görüşmesi için bir brief ve keskin sorular"
+                },
+                "Tue": {
+                    "when": "Salı 9:00",
+                    "task": "gelen kutunuz ayrıldı, müşteri yanıtlarının taslakları hazır"
+                },
+                "Wed": {
+                    "when": "Çarşamba 9:00",
+                    "task": "sessizleşen potansiyel müşteriler bulundu, her biri için takip taslağı"
+                },
+                "Thu": {
+                    "when": "Perşembe 15:00",
+                    "task": "atölye slaytları ve alıştırmalar notlardan taslak halinde"
+                },
+                "Fri": {
+                    "when": "Cuma 16:00",
+                    "task": "haftanın saatleri ödeme bağlantısıyla faturalandı"
+                }
+            },
+            "painsTitle": "Bir danışmanlığın mesai sonrasında yaptıkları",
+            "pains": {
+                "1": {
+                    "title": "Asansörde hazırlanan görüşmeler",
+                    "body": "Müşterinin sitesini bekleme salonunda açarsınız. Bir coworker, herkese açık bilgilerden ve notlarınızdan, bir önceki akşam size bir brief ve keskin sorular gönderir."
+                },
+                "2": {
+                    "title": "Geceleri yazılan rapor",
+                    "body": "Seans iki saat sürdü, rapor dört saat sürüyor. Bir coworker özeti, süreç haritasını ya da slaytları notlarınızdan, sizin yönteminizle hazırlar."
+                },
+                "3": {
+                    "title": "Çalışılan ama hiç faturalanmayan saatler",
+                    "body": "Puantaj, ay bitene kadar bir notta bekler. Bir coworker faturalanabilir saatleri ödeme bağlantılı faturalara dönüştürür ve gelen ödemeleri eşleştirir."
+                }
+            },
+            "features": {
+                "second-brain": "Yönteminiz, çerçeveleriniz ve her müşterinin bağlamı, yazmadan önce okunur.",
+                "coworkers": "Keşif senaryonuz ya da rapor yapınız bir kez yazılır, tekrar tekrar kullanılır.",
+                "workspaces": "Müşteri başına bir Box; böylece her iş kendi coworker'larını korur.",
+                "desktop-app": "Müşteri işinin ortasında, bir kısayolla herhangi bir uygulamadan coworker'a sorun."
+            },
+            "faq": {
+                "1": {
+                    "question": "Müşterilerimin bilgileri gizli tutuluyor mu?",
+                    "answer": "Bilgiler, diğer tüm müşterilerden ayrı olarak çalışma alanınızın Avrupa'daki kendi makinesinde kalır; anahtarlar da modelin hiç okumadığı Vault'ta durur. İki müşteri arasında sert bir ayrım için her birine ayrı bir çalışma alanı verin."
+                },
+                "2": {
+                    "question": "Kendi yöntemimi izleyebilir mi?",
+                    "answer": "Evet. Çerçevelerinizi, rapor yapınızı ve üslubunuzu Brain'e ya da bir skill'e yazın; her coworker bunlardan yola çıkar. Bir taslağı bir kez düzeltin, hatırlar."
+                },
+                "3": {
+                    "question": "Seans notlarımdan çalışabilir mi?",
+                    "answer": "Evet. Notlarınızı ya da bir dökümü klasörüne bırakın, bir mesaja ekleyin veya sesli mesaj kaydedin; bunları bir özete, bir plana ya da slaytlara dönüştürür."
+                },
+                "4": {
+                    "question": "Ödeme yapmayan bir müşteriyi takip edebilir mi?",
+                    "answer": "Faturalanabilir saatlerinizi ödeme bağlantısıyla faturalar, gelen ödemeleri eşleştirir ve geciken her biri için hatırlatma taslağı hazırlar. Göndermesine mi yoksa size taslak vermesine mi siz karar verirsiniz."
+                }
+            }
+        },
+        "accounting": {
+            "crumb": "Muhasebe ve finans",
+            "title": "Muhasebe ve finans için AI coworker'lar.",
+            "lede": "Okunan tedarikçi faturaları, takip edilen alacaklar, mutabık kalınan nakit, kapatılan ay ve hazırlanan KDV dosyası; her rakam kaynağına kadar izlenir ve her ödeme size bırakılır.",
+            "metaTitle": "Muhasebe için AI Ajanları: Fatura, Kapanış, Nakit",
+            "metaDescription": "Tedarikçi faturalarını işleyen, alacakları kovalayan, nakdi izleyen, ayı kapatan, KDV dosyasını hazırlayan, her rakamı kaynağına bağlayan AI coworker'lar.",
+            "wallTitle": "Finans ekiplerinin önce işe aldığı coworker'lar",
+            "wallLead": "Borçlar, alacaklar, nakit, kapanış ve vergi. Her biri defterlerinizi ve bankanızı okuyan, harekete geçmeden önce öneride bulunan bir şablon.",
+            "week": {
+                "Mon": {
+                    "when": "Pazartesi 8:00",
+                    "task": "tüm bankalardaki nakit, önce yapılacak ödemelerle birlikte"
+                },
+                "Tue": {
+                    "when": "Salı 9:00",
+                    "task": "yeni tedarikçi faturaları okundu, tekrarlar yakalandı"
+                },
+                "Wed": {
+                    "when": "Çarşamba 10:00",
+                    "task": "vadesi geçen faturalar takip edildi, ödemeler eşleştirildi"
+                },
+                "Thu": {
+                    "when": "Perşembe 9:00",
+                    "task": "maliyetlerden sonra ürün ve indirim kodu bazında marj"
+                },
+                "Fri": {
+                    "when": "Cuma 11:00",
+                    "task": "kapanış için eksik makbuzlar ve onaylar takip edildi"
+                }
+            },
+            "painsTitle": "Bir finans ekibinin saatlerinin gittiği yerler",
+            "pains": {
+                "1": {
+                    "title": "Elle girilen tedarikçi faturaları",
+                    "body": "Her PDF bir deftere elle yazılır ve tekrar eden fatura gözden kaçar. Bir coworker her faturayı okur, fiyatları ve KDV numaralarını kontrol eder, uymayanı işaretler."
+                },
+                "2": {
+                    "title": "İlk haftayı yiyen bir kapanış",
+                    "body": "Eksik makbuzlar, bekleyen onaylar, açıklanmamış sapmalar. Bir coworker kayıtları önerir, eksik olanı takip eder ve her sapmayı açıklar."
+                },
+                "3": {
+                    "title": "Ancak cuma günü bildiğiniz nakit",
+                    "body": "Birkaç banka, iki ödeme hesabı, elle güncellenen tek bir tablo. Bir coworker hepsini okur ve nakdin defterlerden neden farklı olduğunu söyler."
+                }
+            },
+            "features": {
+                "human-in-the-loop": "Her ödeme turunu önerir ve bir onay kartıyla size getirir.",
+                "computer-use": "API'si olmayan bir banka portalı ya da vergi sitesi, kendi ekranında kullanılır.",
+                "security": "Avrupa'da kendi makinesi, her gece şifreli yedeklerle."
+            },
+            "faq": {
+                "1": {
+                    "question": "Banka ve muhasebe yazılımımıza bağlanabilir mi?",
+                    "answer": "Aracın bir API'si ya da MCP sunucusu varsa bağlanır; Stripe ve {connectors}+ diğeri dahil. İkisi de olmayan bir banka portalını kendi ekranında açar, bir girişte telefonunuz gerekirse ekranı size devreder."
+                },
+                "2": {
+                    "question": "Bir coworker bir tedarikçiye kendi başına ödeme yapabilir mi?",
+                    "answer": "Ödeme turunu, her satırın gerekçesi ve hangisinin önce ödeneceğiyle birlikte önerir ve harekete geçmeden önce bir onay kartıyla size getirir. Havalenin kendisini bankanızda, bir kişinin tıklaması olarak tutabilirsiniz."
+                },
+                "3": {
+                    "question": "KDV beyannamemizi verir mi?",
+                    "answer": "Beyannameyi ve vergi dosyalarını defterlerinizden, her rakamın arkasındaki kanıt ve kaynakla hazırlar; muhasebecinizin kontrol etmesine hazırdır. Göndermek sizde kalır."
+                },
+                "4": {
+                    "question": "Finansal verilerimiz nerede duruyor?",
+                    "answer": "Çalışma alanınızın Avrupa'daki kendi makinesinde, diğer tüm müşterilerden ayrı, her gece yedeklenir ve şifrelenir. Girişler modelin hiç okumadığı Vault'ta kalır. Kendi sunucularınızda ihtiyacınız olursa Rerun açık kaynaktır."
+                },
+                "5": {
+                    "question": "Bir büro her müşterinin defterlerini ayrı tutabilir mi?",
+                    "answer": "Evet. Her müşteriye ayrı bir çalışma alanı verin: kendi coworker'ları, kendi uygulamaları, kendi veritabanı. Bir çalışma alanından diğerine hiçbir şey geçmez; aralarında köşedeki hap şeklindeki düğmeden geçiş yaparsınız."
+                }
+            }
+        },
+        "marketing": {
+            "crumb": "Pazarlama ekipleri",
+            "title": "Pazarlama ekipleri için AI coworker'lar.",
+            "lede": "Editoryal takvim, kampanya metinleri, haftalık rakamlar, basın kancaları ve içerik üreticisi kısa listesi: küçük bir ekibin hiç bitiremediği işleri coworker'lar yapar.",
+            "metaTitle": "Pazarlama Ekipleri için AI Ajanları: İçerik, Reklam",
+            "metaDescription": "Editoryal takvimi planlayan, kampanya metni yazan, her kanalı haftalık okuyan, markayı tutarlı tutan, basın ve içerik üreticilerini bulan AI coworker'lar.",
+            "wallTitle": "Pazarlama ekiplerinin önce işe aldığı coworker'lar",
+            "wallLead": "İçerik, kampanyalar, marka ve rakamlar. Her biri konumlandırmanızı bir kez okuyan ve kanallarınızda çalışan bir şablon.",
+            "week": {
+                "Mon": {
+                    "when": "Pazartesi 8:00",
+                    "task": "her kanalın harcaması ve geliri, yan yana"
+                },
+                "Tue": {
+                    "when": "Salı 9:00",
+                    "task": "rakiplerin yayınladıkları ve çıkardıkları, boşluklarla birlikte"
+                },
+                "Wed": {
+                    "when": "Çarşamba 10:00",
+                    "task": "yeni teklif için bir açılış sayfası ve üç e-posta"
+                },
+                "Thu": {
+                    "when": "Perşembe 11:00",
+                    "task": "haftanın paylaşımları marka kılavuzuna göre kontrol edildi"
+                },
+                "Fri": {
+                    "when": "Cuma 14:00",
+                    "task": "para kaybettiren reklamlar, siz evet deyince durduruldu"
+                }
+            },
+            "painsTitle": "Bir pazarlama ekibinin hiç yetişemedikleri",
+            "pains": {
+                "1": {
+                    "title": "Ayda bir okunan rakamlar",
+                    "body": "Harcama bir araçta, gelir başka birinde, takip yarı bozuk. Bir coworker her kanalı her hafta yan yana koyar ve rakamların neyi desteklediğini söyler."
+                },
+                "2": {
+                    "title": "Kimsenin tutmadığı bir takvim",
+                    "body": "Plan ocakta yapıldı, mart gelmeden dağıldı. Bir coworker ayı, neyin işe yaradığına ve rakiplerin neler yayınladığına göre kurar ve taslakları ilerletir."
+                },
+                "3": {
+                    "title": "Üçüncü kanalda markadan sapma",
+                    "body": "Herkes sesi biraz farklı yazıyor. Bir coworker her sayfayı, sunumu ve e-postayı yayınlanmadan önce marka kılavuzuna göre kontrol eder."
+                }
+            },
+            "features": {
+                "second-brain": "Konumlandırmanız, sesiniz ve alıcılarınız, her taslaktan önce okunur.",
+                "lead-data": "Arama hacimleri, anahtar kelime fikirleri, backlink'ler ve sosyal paylaşımlar, sorgu başına ödenir.",
+                "coworkers-work-together": "Brief, taslak ve çeviri, coworker'lar arasında el değiştirir.",
+                "chief-of-staff": "Bir kampanyayı tek cümleyle isteyin, doğru coworker'lara brief verir."
+            },
+            "faq": {
+                "1": {
+                    "question": "Marka sesimizle yazar mı?",
+                    "answer": "Konumlandırmanız, sesiniz ve görsel kurallarınız Brain'de durur; web sitenizden oluşturulur ve sizinle birlikte güncel tutulur. Her coworker yazmadan önce bunları okur, marka coworker'ı da gerisini bunlara göre kontrol eder."
+                },
+                "2": {
+                    "question": "Reklam bütçelerimizi değiştirebilir mi?",
+                    "answer": "Google, Meta, LinkedIn ve TikTok reklamlarını inceler, boşa giden harcamayı işaretler, bütçe değişiklikleri ve hariç tutmalar önerir. Neyi değiştirebileceğine, neyin onayınızı bekleyeceğine talimatlarında siz karar verirsiniz."
+                },
+                "3": {
+                    "question": "SEO ve sosyal veri ne kadar tutar?",
+                    "answer": "Arama hacimleri, anahtar kelime fikirleri, backlink'ler, Google sonuçları ve herkese açık sosyal paylaşımlar çağrı başına satın alınır. Bu ücretli bir veridir ve Rerun kredilerinizden düşer; coworker satın almadan önce tahmini maliyeti onaylamanızı ister."
+                },
+                "4": {
+                    "question": "Sitemizde ve ağlarımızda yayınlayabilir mi?",
+                    "answer": "Evet, WordPress, LinkedIn ya da Instagram gibi bağladığınız uygulamalar üzerinden. Varsayılan olarak paylaşımı hazırlar ve siz \"başla\" dediğinizde yayınlar."
+                },
+                "5": {
+                    "question": "Kampanyalarımızı çevirebilir mi?",
+                    "answer": "Evet. Belgeleri, e-postaları, sayfaları ve görselleri sattığınız dillere, kendi terimleriniz ve üslubunuzla uyarlar ve her birini incelemeye hazır olarak teslim eder."
+                }
+            }
+        },
+        "sales": {
+            "crumb": "Satış ekipleri",
+            "title": "Satış ekipleri için AI coworker'lar.",
+            "lede": "Bulunan ve yazılan potansiyel müşteriler, hazırlanan her toplantı, temiz tutulan CRM, her hafta okunan tahmin ve sessizleşmeye bırakılmayan hesap yok.",
+            "metaTitle": "Satış Ekipleri için AI Ajanları: Satış Hattı",
+            "metaDescription": "Potansiyel müşteri bulan, ilk e-postayı yazan, her toplantıyı hazırlayan, CRM'i temiz tutan, temsilcilere koçluk yapan ve tahmini okuyan AI coworker'lar.",
+            "wallTitle": "Satış ekiplerinin önce işe aldığı coworker'lar",
+            "wallLead": "İlk temastan yenilemeye. Her biri CRM'inizde, gelen kutunuzda ve takviminizde çalışan bir şablon.",
+            "week": {
+                "Mon": {
+                    "when": "Pazartesi 8:00",
+                    "task": "tahmin, hedefe olan fark ve arkasındaki anlaşmalar"
+                },
+                "Tue": {
+                    "when": "Salı 9:00",
+                    "task": "uygun elli potansiyel müşteri, her biri için ilk e-posta"
+                },
+                "Wed": {
+                    "when": "Çarşamba 8:30",
+                    "task": "her toplantı için bir brief ve keşif soruları"
+                },
+                "Thu": {
+                    "when": "Perşembe 10:00",
+                    "task": "yanıtlar ayrıldı, her biri için sonraki adım taslağı hazır"
+                },
+                "Fri": {
+                    "when": "Cuma 11:00",
+                    "task": "uyan yeni ihaleler, bir gir ya da girme brief'iyle"
+                }
+            },
+            "painsTitle": "Bir satış hattının sızdığı yerler",
+            "pains": {
+                "1": {
+                    "title": "Cumaya bırakılan müşteri arama",
+                    "body": "Toplantılar haftayı doldurur ve hunînin üstü boşalır. Bir coworker her sabah uygun hesapları bulur ve ilk e-postayı yazar."
+                },
+                "2": {
+                    "title": "Kimsenin güvenmediği bir CRM",
+                    "body": "Bir hesapta iki temsilci, kimseye yönlendirilmeyen bir potansiyel müşteri, hiç kaydedilmeyen notlar. Bir coworker her potansiyel müşteriyi yönlendirir ve her toplantıdan sonra notları yazar."
+                },
+                "3": {
+                    "title": "Umuda dayalı bir tahmin",
+                    "body": "Çeyreği belirleyen anlaşmalar, üç haftadır kimsenin dokunmadıklarıdır. Bir coworker satış hattını okur ve bunları her pazartesi adıyla söyler."
+                }
+            },
+            "features": {
+                "tools": "Kendi LinkedIn hesabınızdan güvenli bir günlük tempoyla müşteri arayın. Ücretli bir uygulama.",
+                "lead-data": "İş e-postaları, telefon numaraları ve şirket verileri, kredilerinizden ödenir.",
+                "coworkers-work-together": "Biri hesapları bulur, sıradaki onlara yazar, üçüncüsü yanıtı kaydeder.",
+                "mobile-app": "İki toplantı arasında brief'i okuyun ve bir takibi onaylayın."
+            },
+            "faq": {
+                "1": {
+                    "question": "CRM'imizle çalışır mı?",
+                    "answer": "HubSpot, Salesforce, Pipedrive ve API'si ya da MCP sunucusu olan her CRM bağlanır. İkisi de olmayan birinde coworker kendi ekranında açılır ve bir temsilcinin yapacağı gibi doldurur."
+                },
+                "2": {
+                    "question": "Bir temsilci kontrol etmeden potansiyel müşterilere e-posta atar mı?",
+                    "answer": "Siz karar verirsiniz. Bir temsilcinin onayladığı taslaklarla başlayın; yazdıklarına güvendikten sonra bir coworker'ın ilk e-postayı ve takibi göndermesine izin verin. Her yanıt ayrılır ve sonraki adım için taslak hazırlanır."
+                },
+                "3": {
+                    "question": "LinkedIn'de müşteri aramak ne kadar tutar?",
+                    "answer": "LinkedIn Pro ücretli bir uygulamadır: bağlı hesap başına ayda {linkedinPrice}, planınızla aynı faturada. Coworker'lar o hesaptan profilleri kredi harcamadan okur ve günde 25 davet gibi önerilen bir günlük tempoya uyar."
+                },
+                "4": {
+                    "question": "İletişim bilgileri nereden geliyor?",
+                    "answer": "CRM'inizden, ayrıca iş e-postaları, telefon numaraları ve şirket verisi sorgularından. Bu ücretli bir veridir ve Rerun kredilerinizden düşer; coworker satın almadan önce tahmini maliyeti onaylamanızı ister."
+                },
+                "5": {
+                    "question": "Her temsilcinin kendi coworker'ları olabilir mi?",
+                    "answer": "Evet. Pro'da koltuklar ücretsiz ve sınırsızdır. Her ekibe bir Box verin ve kimlerin erişeceğini seçin. Her temsilcinin LinkedIn hesabı kendi ücretli yuvasını alır."
+                }
+            }
+        },
+        "hospitality": {
+            "crumb": "Konaklama ve ağırlama",
+            "title": "Oteller, kiralamalar ve restoranlar için AI coworker'lar.",
+            "lede": "Gelmeden önce bilgilendirilen misafirler, zamanlanan temizlikler, yanıtlanan değerlendirmeler, kâr için fiyatlanan menü ve kontrol edilen etkinlik listesi. Coworker'lar mutfağın arkasını yönetir.",
+            "metaTitle": "Konaklama için AI Ajanları: Misafir, Yorum, Menü",
+            "metaDescription": "Her misafiri karşılayan, temizliği planlayan, yorumları yanıtlayan, menü maliyetini çıkaran, misafir listesini yöneten, tedarikçi kıyaslayan coworker'lar.",
+            "wallTitle": "Otellerin ve restoranların önce işe aldığı coworker'lar",
+            "wallLead": "Varışlar, değerlendirmeler, menüler ve etkinlikler. Her biri gelen kutunuzda, tablolarınızda ve misafirlerinizin dilinde çalışan bir şablon.",
+            "week": {
+                "Mon": {
+                    "when": "Pazartesi 8:00",
+                    "task": "bu haftanın varışları bilgilendirildi, temizlik slotları belirlendi"
+                },
+                "Tue": {
+                    "when": "Salı 9:00",
+                    "task": "yeni değerlendirmeler okundu, her biri için yanıt taslağı"
+                },
+                "Wed": {
+                    "when": "Çarşamba 10:00",
+                    "task": "tedarikçi teklifleri yan yana karşılaştırıldı"
+                },
+                "Thu": {
+                    "when": "Perşembe 11:00",
+                    "task": "değerlendirmeleriniz yandaki mekânlarla karşılaştırıldı"
+                },
+                "Fri": {
+                    "when": "Cuma 9:00",
+                    "task": "hafta sonunun paylaşımları yazıldı, onayınıza hazır"
+                }
+            },
+            "painsTitle": "İki servis arasında kaçanlar",
+            "pains": {
+                "1": {
+                    "title": "Bir hafta geç yanıtlanan değerlendirmeler",
+                    "body": "Kötü bir değerlendirme, bir sonraki misafir okurken yanıtsız bekler. Bir coworker her yeni değerlendirmeyi okur ve ona uyan bir yanıt taslağı hazırlar."
+                },
+                "2": {
+                    "title": "Tek tek bilgilendirilen varışlar",
+                    "body": "Kodlar, yol tarifleri ve giriş saatleri her misafire elle gönderilir. Bir coworker her misafiri erişim bilgileri ve saatlerle bilgilendirir ve temizliği zamanlar."
+                },
+                "3": {
+                    "title": "Para kaybettiren yemekler",
+                    "body": "Tedarikçi fiyatları arttı, menü artmadı. Bir coworker her tarifi maliyetlendirir ve neyin yeniden fiyatlanacağını, elden geçirileceğini, öne çıkarılacağını ya da kaldırılacağını söyler."
+                }
+            },
+            "features": {
+                "tools": "Misafirlere kendi numaranızdan WhatsApp'ta yanıt verin. Ücretli bir uygulama.",
+                "computer-use": "API'si olmayan bir rezervasyon ekstranet'i, bir insan gibi kendi ekranında kullanılır.",
+                "runs-24-7": "Resepsiyon kapalıyken gece gelen bir mesaj onu uyandırır.",
+                "mobile-app": "İki servis arasında telefonunuzdan bir misafire yanıtı onaylayın."
+            },
+            "faq": {
+                "1": {
+                    "question": "Rezervasyon sistemimle çalışır mı?",
+                    "answer": "Rezervasyon sisteminizin ya da kanal yöneticinizin bir API'si veya MCP sunucusu varsa bağlanır. Yoksa coworker onu kendi ekranında açar ve personelinizin yapacağı gibi okur ya da doldurur."
+                },
+                "2": {
+                    "question": "Misafirlere WhatsApp'ta yanıt verebilir mi?",
+                    "answer": "Evet. WhatsApp Pro ücretli bir uygulamadır: bağlı numara başına ayda {whatsappPrice}, planınızla aynı faturada. Yeni bir mesaj coworker'ı uyandırır, numaranızdan metin, dosya ve sesli notlarla yanıt verir ve tanımadığı kişilere asla yazmaz."
+                },
+                "3": {
+                    "question": "Değerlendirme yanıtlarını kendisi yayınlar mı?",
+                    "answer": "Yanıt gereken her değerlendirme için taslak hazırlar ve misafirlerin sizin hakkınızda söylediklerini çevredeki mekânlarla karşılaştırır. Taslakları okur ve yayınlarsınız ya da toplu olarak onaylarsınız."
+                },
+                "4": {
+                    "question": "Misafirlere kendi dillerinde yazabilir mi?",
+                    "answer": "Evet. Misafir mesajlarınızı, menülerinizi ve sayfalarınızı misafirlerinizin konuştuğu dillere, kendi terimleriniz ve üslubunuzla çevirir; incelemeye hazırdır."
+                },
+                "5": {
+                    "question": "Oda başına mı, işletme başına mı ödüyorum?",
+                    "answer": "İkisi de değil. Bir plan, kurduğunuz kadar coworker çalıştırır ve koltuklar ücretsizdir; böylece tüm ekip bir onaya yanıt verebilir. Her işletmeyi kendi Box'ına koyun."
+                }
+            }
+        },
+        "local-business": {
+            "crumb": "Yerel işletme",
+            "title": "Yerel işletmeler için AI coworker'lar.",
+            "lede": "Yanıtlanan değerlendirmeler, ayrılan müşteri mesajları, yazılan haftalık paylaşımlar, gönderilen faturalar ve muhasebeciniz için hazır defterler; siz karşınızdaki insanlara hizmet ederken.",
+            "metaTitle": "Yerel İşletmeler için AI Ajanları: Yorum, Defter",
+            "metaDescription": "Yorumlarınızı yanıtlayan, müşteri mesajlarını ayıran, her hafta paylaşan, Google sıranızı izleyen, fatura kesen, defterleri düzenli tutan AI coworker'lar.",
+            "wallTitle": "Yerel bir işletmenin önce işe aldığı coworker'lar",
+            "wallLead": "Ön büro, vitrin ve defterler. Her biri kurduğunuz, postanıza bağladığınız ve açtığınız bir şablon.",
+            "week": {
+                "Mon": {
+                    "when": "Pazartesi 8:00",
+                    "task": "hafta sonu değerlendirmeleri okundu, her biri için yanıt taslağı"
+                },
+                "Tue": {
+                    "when": "Salı 9:00",
+                    "task": "müşteri mesajları ayrıldı, ikisi size bırakıldı"
+                },
+                "Wed": {
+                    "when": "Çarşamba 10:00",
+                    "task": "Google'da rakiplerinizin yanında nerede olduğunuz"
+                },
+                "Thu": {
+                    "when": "Perşembe 9:00",
+                    "task": "gelecek haftanın paylaşımları yazıldı, onayınıza hazır"
+                },
+                "Fri": {
+                    "when": "Cuma 16:00",
+                    "task": "haftanın faturaları gönderildi, ödemeler eşleştirildi"
+                }
+            },
+            "painsTitle": "Yoğun bir günün yapılmadan bıraktıkları",
+            "pains": {
+                "1": {
+                    "title": "En üstte bir kötü değerlendirme",
+                    "body": "Müşteriler en yeni değerlendirmeyi önce okur. Bir coworker Google'daki ve başka yerlerdeki her yeni değerlendirmeyi okur ve aynı gün yanıt taslağı hazırlar."
+                },
+                "2": {
+                    "title": "Kapanıştan sonra yanıtlanan mesajlar",
+                    "body": "Siz hizmet verirken sorular gelir ve akşam yanıtlarla geçer. Bir coworker bunları ayırır ve her yanıtı fiyatlarınızdan ve saatlerinizden taslak olarak yazar."
+                },
+                "3": {
+                    "title": "Bir ayakkabı kutusu dolusu makbuz",
+                    "body": "Defterler muhasebeci isteyene kadar bekler. Bir coworker eksik makbuzları her ay takip eder ve KDV dosyasını, her rakamın kaynağıyla hazırlar."
+                }
+            },
+            "features": {
+                "chief-of-staff": "Neye ihtiyacınız olduğunu tek cümleyle söyleyin. Doğru coworker'ı kurar ve ona brief verir.",
+                "second-brain": "Fiyatlarınız, çalışma saatleriniz ve hizmetleriniz, her yanıttan önce okunur.",
+                "tools": "Müşterilere kendi numaranızdan WhatsApp'ta yanıt verin. Ücretli bir uygulama.",
+                "mobile-app": "Tezgâhın arkasından telefonunuzdan bir yanıtı ya da faturayı onaylayın."
+            },
+            "faq": {
+                "1": {
+                    "question": "Teknik biri olmam gerekiyor mu?",
+                    "answer": "Hayır. Chief of Staff web sitenizi okur, öğrendiklerini Brain'e yazar ve ilk coworker'larınızı sizinle birlikte kurar. Siz postanızı bağlar ve önerdiklerini onaylarsınız."
+                },
+                "2": {
+                    "question": "Müşterilere WhatsApp'tan yanıt verebilir mi?",
+                    "answer": "Evet. WhatsApp Pro ücretli bir uygulamadır: bağlı numara başına ayda {whatsappPrice}, planınızla aynı faturada. Yeni bir mesaj coworker'ı uyandırır ve numaranızdan yanıt verir. Önerilen günlük tempoya uyar ve tanımadığı kişilere asla yazmaz."
+                },
+                "3": {
+                    "question": "Google değerlendirmelerime yanıt verebilir mi?",
+                    "answer": "Müşterilerin sizin hakkınızda değerlendirmelerde, aramada ve Reddit'te söylediklerini okur, sizi rakiplerle karşılaştırır ve yanıt gereken her değerlendirme için yayınlamanız üzere taslak hazırlar."
+                },
+                "4": {
+                    "question": "Muhasebemi yapar mı?",
+                    "answer": "Ay sonu kayıtlarını önerir, eksik makbuzları takip eder ve KDV dosyanızı her rakamın arkasındaki kaynakla hazırlar. Muhasebeciniz kontrol eder ve beyanı verir."
+                },
+                "5": {
+                    "question": "Nasıl denerim?",
+                    "answer": "Pro, {trialDays} günlük ücretsiz denemeyle başlar. Bir plan, kurduğunuz kadar coworker'ı kapsar ve koltuklar ücretsizdir; böylece tezgâhın başındaki herkes de bir onaya yanıt verebilir."
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,1561 @@
+{
+    "_context": {
+        "hub.all.lead": "{count} is the number of features listed on the page.",
+        "hub.included.extras": "{packCredits} and {packPrice} are the size and the price of a pack of Rerun credits.",
+        "items.bring-your-own-ai.abilities.backups.line": "{maxBackups} is how many backup models a workspace can list.",
+        "items.bring-your-own-ai.plate.job": "Job of that example Coworker, under its name on the plate.",
+        "items.bring-your-own-ai.plate.name": "Name of the example Coworker on the name plate of the demo.",
+        "items.bring-your-own-ai.steps.1.ui.1": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.bring-your-own-ai.steps.1.ui.2": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.bring-your-own-ai.steps.1.ui.3": "The app's own UI label: the main button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.bring-your-own-ai.steps.1.ui.4": "The app's own UI label: a button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.bring-your-own-ai.steps.2.ui.1": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.bring-your-own-ai.steps.2.ui.2": "The app's own UI label: a button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.bring-your-own-ai.steps.2.ui.3": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.bring-your-own-ai.steps.3.ui.1": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.bring-your-own-ai.steps.3.ui.2": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.bring-your-own-ai.steps.3.ui.3": "The app's own UI label: the main button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.chief-of-staff.plate.job": "Job of that example Coworker, under its name on the plate.",
+        "items.chief-of-staff.plate.name": "Name of the example Coworker on the name plate of the demo.",
+        "items.chief-of-staff.steps.1.ui.1": "The app's own UI label: what a field holds (placeholder or example value), shown in the strip under the step. Use the label the translated app shows.",
+        "items.chief-of-staff.steps.1.ui.2": "The app's own UI label: the main button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.chief-of-staff.steps.2.ui.3": "The app's own UI label: what a field holds (placeholder or example value), shown in the strip under the step. Use the label the translated app shows.",
+        "items.chief-of-staff.steps.3.ui.1": "The app's own UI label: a switch, shown in the strip under the step. Use the label the translated app shows.",
+        "items.chief-of-staff.steps.3.ui.2": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.chief-of-staff.steps.3.ui.3": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.computer-use.plate.job": "Job of that example Coworker, under its name on the plate.",
+        "items.computer-use.plate.name": "Name of the example Coworker on the name plate of the demo.",
+        "items.computer-use.steps.2.ui.1": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.computer-use.steps.2.ui.2": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.computer-use.steps.2.ui.3": "The app's own UI label: the main button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.computer-use.steps.3.ui.1": "The app's own UI label: the main button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.computer-use.steps.3.ui.2": "The app's own UI label: a button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.coworkers-work-together.plate.job": "Job of that example Coworker, under its name on the plate.",
+        "items.coworkers-work-together.plate.name": "Name of the example Coworker on the name plate of the demo.",
+        "items.coworkers-work-together.steps.1.ui.1": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.coworkers-work-together.steps.1.ui.2": "The app's own UI label: the main button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.coworkers-work-together.steps.2.ui.2": "The app's own UI label: a @handle or #computer name typed in the chat (keep the @ or #, the handle may stay as is), shown in the strip under the step. Use the label the translated app shows.",
+        "items.coworkers-work-together.steps.3.ui.1": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.coworkers-work-together.steps.3.ui.2": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.coworkers.plate.job": "Job of that example Coworker, under its name on the plate.",
+        "items.coworkers.plate.name": "Name of the example Coworker on the name plate of the demo.",
+        "items.coworkers.steps.1.ui.2": "The app's own UI label: what a field holds (placeholder or example value), shown in the strip under the step. Use the label the translated app shows.",
+        "items.coworkers.steps.1.ui.3": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.coworkers.steps.2.ui.2": "The app's own UI label: the main button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.coworkers.steps.3.ui.1": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.coworkers.steps.3.ui.2": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.coworkers.steps.3.ui.3": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.desktop-app.plate.job": "Job of that example Coworker, under its name on the plate.",
+        "items.desktop-app.plate.name": "Name of the example Coworker on the name plate of the demo.",
+        "items.desktop-app.steps.1.ui.1": "The app's own UI label: the main button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.desktop-app.steps.1.ui.2": "The app's own UI label: a button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.desktop-app.steps.2.ui.2": "The app's own UI label: what a field holds (placeholder or example value), shown in the strip under the step. Use the label the translated app shows.",
+        "items.desktop-app.steps.3.ui.1": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.desktop-app.steps.3.ui.2": "The app's own UI label: what a field holds (placeholder or example value), shown in the strip under the step. Use the label the translated app shows.",
+        "items.desktop-app.steps.3.ui.3": "The app's own UI label: a button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.human-in-the-loop.plate.job": "Job of that example Coworker, under its name on the plate.",
+        "items.human-in-the-loop.plate.name": "Name of the example Coworker on the name plate of the demo.",
+        "items.human-in-the-loop.steps.1.ui.1": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.human-in-the-loop.steps.1.ui.2": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.human-in-the-loop.steps.2.ui.1": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.human-in-the-loop.steps.2.ui.2": "The app's own UI label: a button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.human-in-the-loop.steps.3.ui.1": "The app's own UI label: the main button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.human-in-the-loop.steps.3.ui.2": "The app's own UI label: a button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.human-in-the-loop.steps.3.ui.3": "The app's own UI label: what a field holds (placeholder or example value), shown in the strip under the step. Use the label the translated app shows.",
+        "items.lead-data.faq.1.answer": "{monthlyCredits} is the credits Pro includes each month; {packCredits} and {packPrice} are the size and the price of a credit pack.",
+        "items.lead-data.plate.job": "Job of that example Coworker, under its name on the plate.",
+        "items.lead-data.plate.name": "Name of the example Coworker on the name plate of the demo.",
+        "items.lead-data.steps.1.ui.1": "The app's own UI label: a @handle or #computer name typed in the chat (keep the @ or #, the handle may stay as is), shown in the strip under the step. Use the label the translated app shows.",
+        "items.lead-data.steps.1.ui.2": "The app's own UI label: what a field holds (placeholder or example value), shown in the strip under the step. Use the label the translated app shows.",
+        "items.lead-data.steps.2.ui.1": "The app's own UI label: the main button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.lead-data.steps.2.ui.2": "The app's own UI label: a button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.lead-data.steps.2.ui.3": "The app's own UI label: a button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.lead-data.steps.3.ui.1": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.mobile-app.plate.job": "Job of that example Coworker, under its name on the plate.",
+        "items.mobile-app.plate.name": "Name of the example Coworker on the name plate of the demo.",
+        "items.mobile-app.steps.1.ui.1": "The app's own UI label: the main button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.mobile-app.steps.1.ui.2": "The app's own UI label: a button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.mobile-app.steps.2.ui.1": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.mobile-app.steps.2.ui.2": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.mobile-app.steps.2.ui.3": "The app's own UI label: a switch, shown in the strip under the step. Use the label the translated app shows.",
+        "items.mobile-app.steps.3.ui.1": "The app's own UI label: the main button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.mobile-app.steps.3.ui.2": "The app's own UI label: a button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.mobile-app.steps.3.ui.3": "The app's own UI label: a button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.mobile-app.steps.3.ui.4": "The app's own UI label: a button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.runs-24-7.plate.job": "Job of that example Coworker, under its name on the plate.",
+        "items.runs-24-7.plate.name": "Name of the example Coworker on the name plate of the demo.",
+        "items.runs-24-7.steps.1.ui.1": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.runs-24-7.steps.1.ui.2": "The app's own UI label: a button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.runs-24-7.steps.1.ui.3": "The app's own UI label: what a field holds (placeholder or example value), shown in the strip under the step. Use the label the translated app shows.",
+        "items.runs-24-7.steps.1.ui.4": "The app's own UI label: the main button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.runs-24-7.steps.2.ui.1": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.runs-24-7.steps.2.ui.2": "The app's own UI label: the main button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.runs-24-7.steps.2.ui.3": "The app's own UI label: what a field holds (placeholder or example value), shown in the strip under the step. Use the label the translated app shows.",
+        "items.runs-24-7.steps.3.ui.1": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.runs-24-7.steps.3.ui.2": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.second-brain.plate.job": "Job of that example Coworker, under its name on the plate.",
+        "items.second-brain.plate.name": "Name of the example Coworker on the name plate of the demo.",
+        "items.second-brain.steps.1.ui.1": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.second-brain.steps.1.ui.2": "The app's own UI label: what a field holds (placeholder or example value), shown in the strip under the step. Use the label the translated app shows.",
+        "items.second-brain.steps.1.ui.3": "The app's own UI label: the main button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.second-brain.steps.2.ui.1": "The app's own UI label: a button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.second-brain.steps.2.ui.2": "The app's own UI label: a button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.second-brain.steps.2.ui.3": "The app's own UI label: the main button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.second-brain.steps.3.ui.1": "The app's own UI label: a button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.second-brain.steps.3.ui.2": "The app's own UI label: the main button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.second-brain.steps.3.ui.3": "The app's own UI label: a button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.security.abilities.secrets.line": "'{NAME}' is literal code, the way a secret is named in a command: keep it as is.",
+        "items.security.plate.job": "Job of that example Coworker, under its name on the plate.",
+        "items.security.plate.name": "Name of the example Coworker on the name plate of the demo.",
+        "items.security.steps.2.ui.1": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.security.steps.2.ui.2": "The app's own UI label: what a field holds (placeholder or example value), shown in the strip under the step. Use the label the translated app shows.",
+        "items.security.steps.2.ui.3": "The app's own UI label: the main button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.tools.abilities.linkedin-whatsapp.line": "{linkedinPrice} is the monthly price of one LinkedIn Pro account, with its currency.",
+        "items.tools.faq.6.answer": "'{VARIABLE_NAME}' is literal code, the way a key is named in a command: keep it as is.",
+        "items.tools.metaTitle": "{connectors} is the number of apps, already written as a number (3,000).",
+        "items.tools.plate.job": "Job of that example Coworker, under its name on the plate.",
+        "items.tools.plate.name": "Name of the example Coworker on the name plate of the demo.",
+        "items.tools.steps.1.ui.1": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.tools.steps.1.ui.2": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.tools.steps.1.ui.3": "The app's own UI label: what a field holds (placeholder or example value), shown in the strip under the step. Use the label the translated app shows.",
+        "items.tools.steps.2.ui.2": "The app's own UI label: the main button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.tools.steps.2.ui.3": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.tools.steps.3.ui.1": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.tools.steps.3.ui.2": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.tools.title": "{connectors} is the number of apps a Coworker reaches, already written as a number (3,000).",
+        "items.workspaces.plate.job": "Job of that example Coworker, under its name on the plate.",
+        "items.workspaces.plate.name": "Name of the example Coworker on the name plate of the demo.",
+        "items.workspaces.steps.1.ui.1": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.workspaces.steps.1.ui.2": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.workspaces.steps.1.ui.3": "The app's own UI label: what a field holds (placeholder or example value), shown in the strip under the step. Use the label the translated app shows.",
+        "items.workspaces.steps.1.ui.4": "The app's own UI label: the main button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.workspaces.steps.2.ui.1": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.workspaces.steps.2.ui.2": "The app's own UI label: what a field holds (placeholder or example value), shown in the strip under the step. Use the label the translated app shows.",
+        "items.workspaces.steps.2.ui.3": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.workspaces.steps.2.ui.4": "The app's own UI label: the main button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.workspaces.steps.3.ui.1": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.workspaces.steps.3.ui.2": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.workspaces.steps.3.ui.3": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.your-computer.abilities.jobs.line": "{remoteMaxJobs} is how many jobs can run at once on a linked computer.",
+        "items.your-computer.plate.job": "Job of that example Coworker, under its name on the plate.",
+        "items.your-computer.plate.name": "Name of the example Coworker on the name plate of the demo.",
+        "items.your-computer.steps.1.ui.1": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.your-computer.steps.1.ui.2": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.your-computer.steps.1.ui.3": "The app's own UI label: a menu entry, tab or section name, shown in the strip under the step. Use the label the translated app shows.",
+        "items.your-computer.steps.1.ui.4": "The app's own UI label: the main button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.your-computer.steps.2.ui.2": "The app's own UI label: a @handle or #computer name typed in the chat (keep the @ or #, the handle may stay as is), shown in the strip under the step. Use the label the translated app shows.",
+        "items.your-computer.steps.3.ui.1": "The app's own UI label: the main button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.your-computer.steps.3.ui.2": "The app's own UI label: a button, shown in the strip under the step. Use the label the translated app shows.",
+        "items.your-computer.steps.3.ui.3": "The app's own UI label: a button, shown in the strip under the step. Use the label the translated app shows.",
+        "mocks.bringYourOwnAi.backupMeta": "The rank of the backup in the list, then the subscription it runs through.",
+        "mocks.bringYourOwnAi.switch": "The line shown in the thread when the conversation moves to the backup model; GPT-6 Sol is the model name, 4:40 PM the time the Claude plan resets.",
+        "mocks.desktopApp.bubble.status": "Shown after the name of a Coworker that waits for an approval, as in \"Inbox Assistant needs your go\".",
+        "mocks.desktopApp.menubarApp": "Name of Apple's spreadsheet app, in the macOS menu bar of the picture. Usually left as is.",
+        "mocks.desktopApp.menubarClock": "The day and time in the macOS menu bar of the picture.",
+        "mocks.desktopApp.menubarItems": "The menus of that spreadsheet app in the macOS menu bar, separated by spaces.",
+        "mocks.desktopApp.quickAsk.hint": "Hint under the Quick ask field of the desktop app: Enter and Esc are keys.",
+        "mocks.desktopApp.quickAsk.holdToTalk": "<key> wraps the name of the key drawn as a keycap (Space).",
+        "mocks.desktopApp.sheetTitle": "Title of a spreadsheet open in the background of the picture.",
+        "mocks.leadData.credits": "After the total number of credits, as in \"~3.12 credits\".",
+        "mocks.leadData.intro": "{people} is a number of people.",
+        "mocks.leadData.title": "{people} is a number of people.",
+        "mocks.mobileApp.faceId": "Apple's name for face recognition, as iOS writes it in the language.",
+        "mocks.mobileApp.now": "Time of the notification on the lock screen, as iOS writes it.",
+        "mocks.mobileApp.pushTitle": "Second line of a push notification: the routine, then its status.",
+        "mocks.security.form.helper": "Where to find the key in the payroll tool, then the variable it is stored as. {key} is a variable name (PAYROLL_API_KEY).",
+        "mocks.yourComputer.alwaysAllow": "{program} is the name of a program (ffmpeg).",
+        "mocks.yourComputer.ask": "<computer> is replaced by the name of a linked computer (#studio-pc).",
+        "mocks.yourComputer.cardTitle": "<computer> is replaced by the name of a linked computer (#studio-pc).",
+        "mocks.yourComputer.folder": "{folder} is a folder path on the computer (~/Movies/Film).",
+        "page.worksWith.leadWithApps": "Lead of the section listing the apps and the other features this feature works with."
+    },
+    "hub": {
+        "crumb": "Features",
+        "title": "Everything a Coworker needs to do the job.",
+        "lede": "Memory, skills, apps and a computer of its own. Here is what each Coworker comes with, and how you stay in control of it.",
+        "metaTitle": "Features: Everything an AI Coworker Comes With",
+        "metaDescription": "Memory, skills, apps and a computer of its own: every feature a Rerun Coworker comes with, from the Chief of Staff to security, and how you keep control.",
+        "all": {
+            "title": "Every feature",
+            "lead": "{count, plural, one {# feature} other {# features}}, in four groups: who your Coworkers are, how they work, where you follow them, and how you keep control."
+        },
+        "included": {
+            "title": "Included in Pro",
+            "lines": {
+                "1": "Unlimited Coworkers",
+                "2": "Unlimited seats",
+                "3": "A private machine in the cloud",
+                "4": "{monthlyCredits} Rerun credits a month",
+                "5": "{connectors}+ apps",
+                "6": "Your own AI at no extra cost"
+            },
+            "extras": "LinkedIn Pro and WhatsApp Pro are paid apps, and more credits come in packs of {packCredits} for {packPrice}.",
+            "cta": "See the plans"
+        },
+        "faq": {
+            "1": {
+                "question": "Are all these features in one plan?",
+                "answer": "Yes. Pro has every feature on this page, with unlimited Coworkers and seats and {monthlyCredits} Rerun credits a month. Only LinkedIn Pro, WhatsApp Pro, extra credits and templates with a price of their own are billed apart."
+            },
+            "2": {
+                "question": "Can I try them before I pay?",
+                "answer": "Yes. The {trialDays}-day trial opens every feature, with {trialAgents} Coworkers running at once and no limit on seats."
+            },
+            "3": {
+                "question": "Do I need to set each feature up?",
+                "answer": "No. The Chief of Staff builds your Coworkers with their apps, skills and routines from what you tell it. You connect your accounts when a Coworker asks for them."
+            },
+            "4": {
+                "question": "Can I run Rerun on my own servers?",
+                "answer": "Yes. Rerun is open source under AGPL-3.0 and runs on your own server with Docker. A self-hosted install has the Coworkers, memory, skills, routines and apps, but not what only a hosted service offers: the included credits, LinkedIn Pro, WhatsApp Pro and paid data."
+            }
+        }
+    },
+    "page": {
+        "more": {
+            "title": "More features",
+            "all": "All features"
+        },
+        "howItWorks": "How it works",
+        "worksWith": {
+            "title": "Works with",
+            "leadWithApps": "The apps it works in, and the features it plays with.",
+            "lead": "The features it plays with."
+        },
+        "templates": {
+            "lead": "Ready-made Coworkers from the library, installed in a minute.",
+            "cta": "Browse the library"
+        }
+    },
+    "items": {
+        "coworkers": {
+            "crumb": "Coworkers",
+            "title": "Hire an AI Coworker, not a workflow.",
+            "lede": "Give it a job in one sentence. It gets its own memory, skills, apps and computer, runs on its own schedule and tells you what it did.",
+            "metaTitle": "AI Coworkers: AI Agents That Hold a Job",
+            "metaDescription": "A Rerun Coworker is an AI agent hired for one job, with its own memory, skills, apps and cloud computer. It runs on a schedule and reports back every time.",
+            "caption": "A Coworker at work on its own screen, then saying what it just did.",
+            "plate": {
+                "name": "Sales Rep",
+                "job": "Finds new leads every morning"
+            },
+            "steps": {
+                "1": {
+                    "title": "Describe the job",
+                    "body": "Tell your Chief of Staff what you need in one sentence, or install a ready-made Coworker from the template library.",
+                    "ui": {
+                        "2": "Build me a new coworker",
+                        "3": "Templates"
+                    }
+                },
+                "2": {
+                    "title": "It sets itself up",
+                    "body": "It writes its soul, its skills and its schedule, then shows a card for each app it needs you to sign in to.",
+                    "ui": {
+                        "2": "Sign in"
+                    }
+                },
+                "3": {
+                    "title": "It works and reports back",
+                    "body": "Each run leaves a thread with what it did. It stops to ask when it needs you, and remembers each correction.",
+                    "ui": {
+                        "1": "Threads",
+                        "2": "Automations",
+                        "3": "Needs you"
+                    }
+                }
+            },
+            "abilitiesTitle": "What every Coworker comes with.",
+            "abilities": {
+                "memory": {
+                    "title": "Its own memory",
+                    "line": "It writes down durable facts and recalls them later. Correct it once and it remembers the correction."
+                },
+                "skills": {
+                    "title": "Its own skills",
+                    "line": "Written procedures it opens only when a task matches, so its prompt stays short as it learns more."
+                },
+                "computer": {
+                    "title": "Its own computer",
+                    "line": "A screen in the cloud with a browser, files and a terminal. Watch it live, or take control."
+                },
+                "routines": {
+                    "title": "Its own routines",
+                    "line": "A schedule in plain words, like every weekday at 8am, or a webhook another service calls."
+                }
+            },
+            "templatesTitle": "Coworkers you can hire today.",
+            "faq": {
+                "1": {
+                    "question": "What is an AI Coworker?",
+                    "answer": "An agent you hire for one job instead of a workflow you draw. It has a name, a soul that says what it owns, its own memory, skills, files and database, the apps it needs and its routines. It does that job run after run and records every step."
+                },
+                "2": {
+                    "question": "Do I need to write prompts or code?",
+                    "answer": "No. Describe the job in plain words and the Coworker writes its own soul, skills and schedule. Everything it set up stays readable and editable on its card: Settings, Skills, Routines and Apps."
+                },
+                "3": {
+                    "question": "How many Coworkers can I have?",
+                    "answer": "As many as you need: Pro has no limit. The {trialDays}-day trial runs {trialAgents} at once, and the others are built and wait, switched off, until Pro starts."
+                },
+                "4": {
+                    "question": "Can I change a Coworker once it is set up?",
+                    "answer": "Yes. Edit its soul in Settings, switch off a capability it has no business using, change its model per conversation, or ask it to rewrite its own instructions. Changes apply on its next run."
+                },
+                "5": {
+                    "question": "Can I copy a Coworker that works well?",
+                    "answer": "Yes. Duplicate copies it into the same workspace with its skills, memories, files, apps and routines. Share creates a link for someone outside the workspace: keys, connected accounts and chat history never travel with it."
+                }
+            },
+            "docsLabel": "Read what a Coworker is"
+        },
+        "chief-of-staff": {
+            "crumb": "Chief of Staff",
+            "title": "A Chief of Staff that runs your AI team.",
+            "lede": "Say what you need and it briefs the right Coworker, or builds one. It checks in on its own, answers your inbox once you say how, and takes the name you give it.",
+            "metaTitle": "Chief of Staff: The Manager of Your AI Team",
+            "metaDescription": "The Rerun Chief of Staff builds your team of AI Coworkers, briefs the right one, checks in daily, answers their questions in your name, by text or voice.",
+            "caption": "Hold Space, say what you need: the Chief of Staff briefs the Coworker that handles it.",
+            "plate": {
+                "name": "Content Writer",
+                "job": "Drafts the posts for Monday"
+            },
+            "steps": {
+                "1": {
+                    "title": "Tell it about your business",
+                    "body": "During onboarding it reads your website, fills the Brain and proposes a starter team for your kind of business.",
+                    "ui": {
+                        "1": "acme.com",
+                        "2": "Continue"
+                    }
+                },
+                "2": {
+                    "title": "Ask in plain words",
+                    "body": "Click its orb, press ⌘K or hold Space. It builds a Coworker, sends a task to the right one and follows the run.",
+                    "ui": {
+                        "3": "What ran last night?"
+                    }
+                },
+                "3": {
+                    "title": "Let it check in",
+                    "body": "It looks at your workspace on its own. When something deserves your time, it opens a thread with one next step.",
+                    "ui": {
+                        "1": "Check in on its own",
+                        "2": "General",
+                        "3": "Needs you"
+                    }
+                }
+            },
+            "abilitiesTitle": "What it does for you.",
+            "abilities": {
+                "team": {
+                    "title": "It builds your team",
+                    "line": "It writes each Coworker’s soul, skills and schedule, places it in a Box, and installs templates from the library."
+                },
+                "voice": {
+                    "title": "Hold Space and talk",
+                    "line": "On the board, hold Space, say what you need and let go. In the desktop app, Quick ask reaches it from any app."
+                },
+                "inbox": {
+                    "title": "It answers your inbox",
+                    "line": "Tell it what to say and it answers your Coworkers’ questions, approvals and skill proposals in your name."
+                },
+                "check-ins": {
+                    "title": "Daily check-ins",
+                    "line": "It reads the runs, the Brain and the shared data, changes nothing, and writes only when something is worth it."
+                }
+            },
+            "templatesTitle": "Give it a team to run.",
+            "faq": {
+                "1": {
+                    "question": "What is the Chief of Staff?",
+                    "answer": "The assistant every workspace comes with. It knows every Coworker, what each one does and what it is working on. It builds new ones, briefs them, explains a failed run, keeps the Brain with you and answers questions about Rerun from the docs."
+                },
+                "2": {
+                    "question": "Is it the same as the Coworker manager?",
+                    "answer": "Yes. The Coworker manager is now called the Chief of Staff, and it does more: it builds your first team, checks in on its own and answers your inbox. Same page, same place in a corner of the board."
+                },
+                "3": {
+                    "question": "Can I give it a name?",
+                    "answer": "Yes. It offers to take one early in a conversation, and an admin can change it on its card. The name belongs to the workspace: every member sees it in the list, the chat and the shortcuts. Empty the field to go back to Chief of Staff."
+                },
+                "4": {
+                    "question": "What happens during a check-in?",
+                    "answer": "Once a day, during your working hours, it reads your Coworkers, their runs, the Brain and the shared data. It changes nothing. If something needs you, it opens a thread with what it saw and one suggested step, and sends it to your phone."
+                },
+                "5": {
+                    "question": "Will it approve things without me?",
+                    "answer": "Only what you told it to answer. It asks for your yes in its chat before approving a spend, and it never types a key, signs in to an app or takes over a browser in your name: those stay with you."
+                }
+            },
+            "docsLabel": "Read the Chief of Staff docs"
+        },
+        "coworkers-work-together": {
+            "crumb": "Working together",
+            "title": "Your Coworkers hand work to each other.",
+            "lede": "One finds the leads, the next writes to them, a third files them in your CRM. They call each other by handle and work from the same tables, files and Brain.",
+            "metaTitle": "AI Coworkers That Hand Work to Each Other",
+            "metaDescription": "Rerun Coworkers call each other by @handle, pass on what they found and share one database, one folder and one Brain. You read the chain in one place.",
+            "caption": "Three Coworkers passing the same job down the line, on one board.",
+            "plate": {
+                "name": "Lead Scout",
+                "job": "Finds leads for the Sales Rep"
+            },
+            "steps": {
+                "1": {
+                    "title": "Give each one its part",
+                    "body": "Hire a Coworker per step, or install a team template. Each soul says what it owns and who it hands work to.",
+                    "ui": {
+                        "1": "Templates",
+                        "2": "Use for free"
+                    }
+                },
+                "2": {
+                    "title": "They call each other",
+                    "body": "A Coworker messages the next one by its @handle with what it found. The one it calls is told who is calling.",
+                    "ui": {
+                        "2": "@sales_rep"
+                    }
+                },
+                "3": {
+                    "title": "Read the chain",
+                    "body": "Each handoff opens a thread on the Coworker it reaches, listed under All, with what was asked and what came back.",
+                    "ui": {
+                        "1": "Threads",
+                        "2": "All"
+                    }
+                }
+            },
+            "abilitiesTitle": "One team, one set of tables.",
+            "abilities": {
+                "handles": {
+                    "title": "Calls by @handle",
+                    "line": "Type @ to mention a Coworker. Rename one and every @handle in the others’ souls, skills and routines follows."
+                },
+                "shared-db": {
+                    "title": "One shared database",
+                    "line": "Every Coworker of the workspace reads and writes the same tables and folder, whichever Box it sits in."
+                },
+                "brain": {
+                    "title": "One Brain",
+                    "line": "They read the same pages about your company, so nothing has to be explained twice."
+                },
+                "team": {
+                    "title": "They see each other",
+                    "line": "A Coworker can read the others’ status, routines and recent runs, without changing any of them."
+                }
+            },
+            "templatesTitle": "Teams where several Coworkers share the job.",
+            "faq": {
+                "1": {
+                    "question": "How does one Coworker hand work to another?",
+                    "answer": "It messages the other by its @handle, the way you would, and passes on what it found. The other works in a thread of its own and answers back. A Coworker woken by the end of a job picks up from there."
+                },
+                "2": {
+                    "question": "Do I have to wire the chain myself?",
+                    "answer": "No. Write in each soul what it owns and who comes next, or ask the Chief of Staff to set the team up. It knows who handles what and briefs the right one."
+                },
+                "3": {
+                    "question": "Where do they keep what they share?",
+                    "answer": "In the shared database and the shared folder, both under Brain, common to every Coworker of the workspace. Each one also keeps a private database and folder that no other Coworker can read."
+                },
+                "4": {
+                    "question": "Can one Coworker split a big task?",
+                    "answer": "Yes. With Delegate on, it hands self-contained subtasks to throwaway sub-coworkers that work in its own folder, on its own files, and it gathers what they bring back."
+                },
+                "5": {
+                    "question": "Is this a multi-agent workflow builder?",
+                    "answer": "It solves the same problem without a canvas. There are no nodes to maintain: you hire Coworkers for jobs, and the work moves between them the way it moves in a team."
+                }
+            },
+            "docsLabel": "Read how Coworkers share data"
+        },
+        "second-brain": {
+            "crumb": "Second brain",
+            "title": "A second brain for your business.",
+            "lede": "What you sell, to whom, at what price and in what voice, written once in pages every Coworker reads before it works. Filled from your website, kept current with you.",
+            "metaTitle": "A Second Brain Your AI Coworkers Read",
+            "metaDescription": "The Rerun Brain holds your offer, market and voice in pages every Coworker reads. Import files and .zip archives, review proposals, restore any version.",
+            "caption": "The Brain open on your company page, with a Coworker’s proposal waiting.",
+            "plate": {
+                "name": "Copywriter",
+                "job": "Writes in your voice"
+            },
+            "steps": {
+                "1": {
+                    "title": "Fill it from your website",
+                    "body": "Enter your site and click Fill from my website. Company, offering, market and voice pages appear in minutes, with sources.",
+                    "ui": {
+                        "1": "Brain",
+                        "2": "acme.com",
+                        "3": "Fill from my website"
+                    }
+                },
+                "2": {
+                    "title": "Import what you have",
+                    "body": "Drop files, a .zip or a whole folder. A .zip is unpacked with its folders, filed under the Box and tags you pick.",
+                    "ui": {
+                        "1": "Import",
+                        "2": "Choose a folder",
+                        "3": "Import 12 files"
+                    }
+                },
+                "3": {
+                    "title": "Review what they propose",
+                    "body": "When a Coworker finds a new fact, it proposes it. Click Review, read the before and after, then Accept or Dismiss.",
+                    "ui": {
+                        "1": "Review",
+                        "2": "Accept",
+                        "3": "Dismiss"
+                    }
+                }
+            },
+            "abilitiesTitle": "Written once, read by every Coworker.",
+            "abilities": {
+                "pages": {
+                    "title": "Pages you edit in place",
+                    "line": "Type / for blocks and [[ to link another page. It saves as you type, and every member can edit."
+                },
+                "import": {
+                    "title": ".zip files and folders",
+                    "line": "An import keeps the tree of a folder or a .zip, and leaves out the files a Mac adds."
+                },
+                "history": {
+                    "title": "Every version kept",
+                    "line": "Version history shows who changed what: a person, a Coworker or the website import. Restore any version."
+                },
+                "boxes": {
+                    "title": "Filed by Box",
+                    "line": "Each team’s pages come first for its Coworkers. Filing hides nothing: everyone can still read everything."
+                }
+            },
+            "templatesTitle": "Coworkers that need to sound like you.",
+            "faq": {
+                "1": {
+                    "question": "What goes into the Brain?",
+                    "answer": "What you would tell a new hire: what you sell and at what price, who buys it, your team, your voice, your tools and your priorities, plus pages for customers, competitors, products and decisions. It also holds the shared folder and the shared database."
+                },
+                "2": {
+                    "question": "Can I import the documents I already have?",
+                    "answer": "Yes. Drop files, a .zip archive or a folder in the Files section or in a Box. A .zip is unpacked into a folder named after it, its own folders kept. You see the list, and can remove a file, before you click Import."
+                },
+                "3": {
+                    "question": "Can a Coworker change a page on its own?",
+                    "answer": "No. A fact it finds itself becomes a proposal you Accept or Dismiss, and a dismissed change is never proposed again. A fact you tell it in the chat is written at once, with Undo."
+                },
+                "4": {
+                    "question": "What if a page gets overwritten?",
+                    "answer": "Every change is kept. Open Version history from the More menu of the page, pick a version and click Restore this version. The current version stays in the history."
+                },
+                "5": {
+                    "question": "How is the Brain different from a Coworker’s memory?",
+                    "answer": "The Brain is what the whole workspace knows about the company. A Coworker’s memory holds facts about its own work, and fades when nothing uses it. What a person wrote or confirmed in the Brain wins over memory."
+                }
+            },
+            "docsLabel": "Read the Brain docs"
+        },
+        "computer-use": {
+            "crumb": "Computer use",
+            "title": "Each Coworker works on its own screen.",
+            "lede": "When an app has no API, your Coworker opens it in a real browser on its own cloud computer and clicks through it. Watch it live, and take control whenever you want.",
+            "metaTitle": "Computer Use: An AI Agent With Its Own Screen",
+            "metaDescription": "Each Rerun Coworker has a cloud computer with a browser and a terminal. It clicks through sites with no API, and types passwords the model never sees.",
+            "caption": "A real browser on the Coworker’s own screen, signed in to your account.",
+            "plate": {
+                "name": "Bid Hunter",
+                "job": "Checks tender portals daily"
+            },
+            "steps": {
+                "1": {
+                    "title": "It opens its browser",
+                    "body": "When a task needs a site with no API, it opens its browser and clicks, types and scrolls the way a person would."
+                },
+                "2": {
+                    "title": "You watch or take over",
+                    "body": "The thumbnail on its card shows its screen live. Click it to open the desktop, then Take control to drive.",
+                    "ui": {
+                        "1": "Its computer",
+                        "2": "Bid Hunter’s desktop",
+                        "3": "Take control"
+                    }
+                },
+                "3": {
+                    "title": "It hands you the hard parts",
+                    "body": "For a sign-in or a captcha it asks you: Open browser, do the step, click Done. It carries on from there.",
+                    "ui": {
+                        "1": "Open browser",
+                        "2": "Done"
+                    }
+                }
+            },
+            "abilitiesTitle": "A computer of its own, in the cloud.",
+            "abilities": {
+                "desktop": {
+                    "title": "A full desktop",
+                    "line": "A browser, a file manager and a terminal, on a screen of its own on your workspace’s machine."
+                },
+                "take-control": {
+                    "title": "Take control",
+                    "line": "Drive its screen yourself at any moment. The Coworker finds afterwards what you did there."
+                },
+                "secrets": {
+                    "title": "Passwords typed unseen",
+                    "line": "It types a stored secret by its variable name: the value goes into the page, never to the model."
+                },
+                "session": {
+                    "title": "Signed in once",
+                    "line": "What you sign in to stays in that Coworker’s browser, ready for its next runs."
+                }
+            },
+            "templatesTitle": "Coworkers that go where no API goes.",
+            "faq": {
+                "1": {
+                    "question": "What is computer use?",
+                    "answer": "A Coworker sees and drives its own screen: it clicks, types and scrolls in its browser, its files and its terminal. It is how it uses a portal with no API, filling forms and reading results the way a person does."
+                },
+                "2": {
+                    "question": "Can I watch what it is doing?",
+                    "answer": "Yes. The thumbnail on its card shows the screen live while it works. Click it to open the desktop in a window, or Take control to drive it yourself, then let it carry on."
+                },
+                "3": {
+                    "question": "How does it sign in to my accounts?",
+                    "answer": "It asks you for a turn on the screen: Open browser opens its browser for you, you sign in or solve the captcha, then click Done. What you signed in to stays in that Coworker’s browser."
+                },
+                "4": {
+                    "question": "Does the AI see the passwords it types?",
+                    "answer": "No. A secret is stored on your workspace’s machine under a variable name. The Coworker types it into a page by that name, and the value never enters the conversation or reaches the model."
+                },
+                "5": {
+                    "question": "Do my Coworkers share one computer?",
+                    "answer": "They share the workspace’s machine, and each one gets its own screen, its own browser with its own sign-ins, its own folder and its own database."
+                }
+            },
+            "docsLabel": "Read about its computer"
+        },
+        "your-computer": {
+            "crumb": "Your computer",
+            "title": "Lend your own computer to your Coworkers.",
+            "lede": "Link your Mac or PC from the desktop app. Name it with # in the chat, and your Coworkers run commands, read files and start long jobs there, with your yes.",
+            "metaTitle": "Link Your Own Computer to Your AI Coworkers",
+            "metaDescription": "Link your Mac, Windows or Linux computer to Rerun. Name it with # in the chat and your Coworkers run commands and long jobs on it, with your yes.",
+            "caption": "Encode the rushes of day 2 on #studio-pc: the command waits for Allow.",
+            "plate": {
+                "name": "Video Editor",
+                "job": "Cuts the rushes on your Mac"
+            },
+            "steps": {
+                "1": {
+                    "title": "Link it from the desktop app",
+                    "body": "Install the desktop app, open your account, then Desktop app. Under This computer, click Link and name it.",
+                    "ui": {
+                        "1": "Account",
+                        "2": "Desktop app",
+                        "3": "This computer",
+                        "4": "Link"
+                    }
+                },
+                "2": {
+                    "title": "Name it with #",
+                    "body": "Type # in the message box and pick the computer: #studio-pc goes in your message, so the Coworker knows the machine.",
+                    "ui": {
+                        "2": "#studio-pc"
+                    }
+                },
+                "3": {
+                    "title": "Approve the command",
+                    "body": "The card shows the command and its folder. Allow it once, Always allow the program, or Deny.",
+                    "ui": {
+                        "1": "Allow",
+                        "2": "Always allow ffmpeg",
+                        "3": "Deny"
+                    }
+                }
+            },
+            "abilitiesTitle": "A pair of hands on your own machine.",
+            "abilities": {
+                "jobs": {
+                    "title": "Long jobs",
+                    "line": "Renders, trainings and big downloads run as jobs, up to {remoteMaxJobs} at once. The Coworker wakes up with the result."
+                },
+                "files": {
+                    "title": "Your files stay put",
+                    "line": "It reads only what it needs, where the file is, and asks first outside your working folder."
+                },
+                "approvals": {
+                    "title": "Three approval modes",
+                    "line": "Ask, then remember (the default), Ask every time, or Full access. Never sudo, never a disk wipe."
+                },
+                "pause": {
+                    "title": "Pause in one click",
+                    "line": "Pause, in the app or its tray icon, stops everything running there and refuses new work until you resume."
+                }
+            },
+            "templatesTitle": "Coworkers that need your machine.",
+            "faq": {
+                "1": {
+                    "question": "Why link my own computer?",
+                    "answer": "For the work that belongs on your machine: video editing, your GPU, local models, files too big to move. The Coworker stays in the cloud, and your computer only runs what it is asked, while the desktop app is running."
+                },
+                "2": {
+                    "question": "What can a Coworker run without asking?",
+                    "answer": "In the default mode, only the programs you clicked Always allow for. Every new program asks, so does a path outside your working folder, and the places where secrets live always ask, even in Full access."
+                },
+                "3": {
+                    "question": "Which computers can I link?",
+                    "answer": "Any computer that runs the desktop app: a Mac on macOS 13 or later, a PC on Windows 10 or later (in beta), or a Linux x64 machine."
+                },
+                "4": {
+                    "question": "What happens when my laptop goes to sleep?",
+                    "answer": "A running job keeps the computer awake, but a closed lid still puts it to sleep: the job goes on when it wakes. Closing the app’s window keeps jobs running; quitting the app stops them, after asking you."
+                },
+                "5": {
+                    "question": "Can my teammates use my computer?",
+                    "answer": "Everyone in the workspace can use a linked computer through their Coworkers, and each new program still asks for a yes. An admin, or the person who linked it, changes its settings or removes it, which stops everything at once."
+                }
+            },
+            "docsLabel": "Read the Computers docs"
+        },
+        "tools": {
+            "crumb": "Tools",
+            "title": "Connected to {connectors}+ tools.",
+            "lede": "Gmail, Slack, Stripe, HubSpot, Notion, Shopify, your LinkedIn and your WhatsApp, and any MCP server you point it at. Sign in once, and every Coworker you pick can use it.",
+            "metaTitle": "{connectors}+ Tools and Integrations, Included",
+            "metaDescription": "Your Coworkers reach Gmail, Slack, Stripe, HubSpot, Shopify and {connectors}+ other tools, plus any MCP server or API. Sign in once, no fee per app.",
+            "caption": "The apps a Coworker can open, and the {connectors}+ it reaches beyond them.",
+            "plate": {
+                "name": "Support Agent",
+                "job": "Answers from Gmail and Shopify"
+            },
+            "steps": {
+                "1": {
+                    "title": "Pick the app",
+                    "body": "Open the Coworker’s Apps screen and search the library, or just name the service in the chat.",
+                    "ui": {
+                        "1": "Apps",
+                        "2": "Library",
+                        "3": "Search apps…"
+                    }
+                },
+                "2": {
+                    "title": "Sign in once",
+                    "body": "Sign in, or paste a key in a masked form. The account goes to the Vault, ready for your other Coworkers.",
+                    "ui": {
+                        "2": "Connect",
+                        "3": "Vault"
+                    }
+                },
+                "3": {
+                    "title": "It uses it on its next run",
+                    "body": "The app brings its tools and a skill on how to use them. A large set of tools loads only when a task needs it.",
+                    "ui": {
+                        "1": "Installed",
+                        "2": "Skills"
+                    }
+                }
+            },
+            "abilitiesTitle": "Your tools, connected once.",
+            "abilities": {
+                "library": {
+                    "title": "A library of apps",
+                    "line": "Ready-made apps for email, calendars, CRMs, payments, stores, drives and ads, each with its own skill."
+                },
+                "mcp": {
+                    "title": "Any MCP server",
+                    "line": "Register a server by HTTP, SSE or a local command, with its headers and variables. Its tools merge in."
+                },
+                "linkedin-whatsapp": {
+                    "title": "LinkedIn & WhatsApp Pro",
+                    "line": "Prospect from your LinkedIn, answer from your WhatsApp number. A reply wakes the Coworker. {linkedinPrice} a month per account."
+                },
+                "included": {
+                    "title": "Included in the plan",
+                    "line": "Every other app of the library, several accounts per app, with no fee per app and no fee per run."
+                }
+            },
+            "templatesTitle": "Coworkers that live in your apps.",
+            "faq": {
+                "1": {
+                    "question": "Which tools are in the {connectors}+?",
+                    "answer": "The library holds the apps a business runs on: Gmail and Outlook, the calendars, Slack, CRMs like HubSpot, Stripe, Shopify, Notion, the drives and the ad platforms. Hosted MCP servers reach the rest."
+                },
+                "2": {
+                    "question": "What if my tool is not in the library?",
+                    "answer": "Register its MCP server yourself from the MCP tab, or click Request an app under the library. If it has no API at all, the Coworker opens it on its own screen and clicks through it."
+                },
+                "3": {
+                    "question": "Do connected apps cost extra?",
+                    "answer": "No. Every app of the library is in the plan, and so is any MCP server or API you wire yourself. Only LinkedIn Pro and WhatsApp Pro are sold apart, per connected account."
+                },
+                "4": {
+                    "question": "How much do LinkedIn Pro and WhatsApp Pro cost?",
+                    "answer": "Each connected account takes one slot: {linkedinPrice} a month for LinkedIn Pro, {whatsappPrice} a month for WhatsApp Pro, on the same invoice as your plan, whatever the number of Coworkers that use it. During the trial, one slot per app costs nothing until Pro starts."
+                },
+                "5": {
+                    "question": "Is my LinkedIn account at risk?",
+                    "answer": "Each account has a recommended daily pace of invitations and profile views. Past it, the Coworker still does what you ask and warns you once. If LinkedIn itself asks the account to slow down, Coworkers stop using it for a day."
+                },
+                "6": {
+                    "question": "Can a Coworker call an API that has no app?",
+                    "answer": "Yes. It asks for the key through a masked form, then calls the API from its machine, naming the key as $'{VARIABLE_NAME}'. The value resolves at run time and never reaches the model."
+                },
+                "7": {
+                    "question": "Does every Coworker get every app?",
+                    "answer": "Only the ones you pick. An app lives in the Vault: switch it on for the Coworkers that need it, or for Every coworker. An app installed from one Coworker is switched on for that Coworker only."
+                }
+            },
+            "docsLabel": "Read the Apps docs"
+        },
+        "lead-data": {
+            "crumb": "Lead & SEO data",
+            "title": "Emails, phone numbers and rankings on demand.",
+            "lede": "Your Coworker finds prospects with their work emails and phone numbers, checks search volumes and backlinks, and pays from your Rerun credits once you approve the cost.",
+            "metaTitle": "Lead Enrichment and SEO Data for AI Agents",
+            "metaDescription": "Rerun Coworkers buy work emails, phone numbers, search volumes and backlinks on your Rerun credits, after you approve the cost. Or bring Apollo or Prospeo.",
+            "caption": "The Estimated total in credits, then Approve once, Always allow or Not now.",
+            "plate": {
+                "name": "Lead Researcher",
+                "job": "Finds decision-makers to call"
+            },
+            "steps": {
+                "1": {
+                    "title": "Ask for the data",
+                    "body": "Tell the Coworker who you want to reach: a role, an industry, a town. Or ask for the keywords a competitor ranks for.",
+                    "ui": {
+                        "1": "@lead_researcher",
+                        "2": "Dentists in Lyon"
+                    }
+                },
+                "2": {
+                    "title": "Approve the cost",
+                    "body": "Before it buys, it shows the Estimated total in credits and what you have left. Approve once, or Always allow.",
+                    "ui": {
+                        "1": "Approve once",
+                        "2": "Always allow",
+                        "3": "Not now"
+                    }
+                },
+                "3": {
+                    "title": "Get the rows",
+                    "body": "It keeps what it bought in its database and shows it as a table in the chat, ready for the next Coworker.",
+                    "ui": {
+                        "1": "Database"
+                    }
+                }
+            },
+            "abilitiesTitle": "Live data, paid by the call.",
+            "abilities": {
+                "leads": {
+                    "title": "Leads with contacts",
+                    "line": "Prospects with their work emails, phone numbers and company data."
+                },
+                "seo": {
+                    "title": "SEO data",
+                    "line": "Search volumes, keyword ideas, backlinks, Google results and local businesses."
+                },
+                "social": {
+                    "title": "Public social data",
+                    "line": "Public profiles and posts on LinkedIn, TikTok, Instagram, X, YouTube, Facebook and Reddit."
+                },
+                "own-accounts": {
+                    "title": "Or your own accounts",
+                    "line": "Connect Apollo, Prospeo or Clay from the library, and the Coworker works on your own plan there."
+                }
+            },
+            "templatesTitle": "Coworkers that run on fresh data.",
+            "faq": {
+                "1": {
+                    "question": "How is paid data billed?",
+                    "answer": "Each call is paid from your Rerun credits. Pro includes {monthlyCredits} credits every month, and a pack of {packCredits} credits costs {packPrice}, never expires and is drawn on once the month’s credits are spent."
+                },
+                "2": {
+                    "question": "Will a Coworker spend credits without asking?",
+                    "answer": "Not by default. It shows the estimated cost and waits for your yes. Always allow, or Spend without asking in its Capabilities, lets scheduled runs buy data while you are away. Turn it back off at any time."
+                },
+                "3": {
+                    "question": "Can I use my own Apollo, Clay or Prospeo account?",
+                    "answer": "Yes. Apollo, Prospeo and Clay are apps of the library: connect your account once and the Coworker works through it, on your plan with that provider, without spending Rerun credits."
+                },
+                "4": {
+                    "question": "Does reading LinkedIn profiles cost credits?",
+                    "answer": "Not with LinkedIn Pro: the Coworker reads LinkedIn with your account first, at no credit. It buys LinkedIn data only for what your account cannot read, or once the account is past its daily pace, and tells you why."
+                },
+                "5": {
+                    "question": "Is paid data on a self-hosted install?",
+                    "answer": "No. A self-hosted Rerun sells no data. Add providers like Apollo or Semrush there as apps or MCP servers, with your own API keys."
+                }
+            },
+            "docsLabel": "Read the paid data docs"
+        },
+        "desktop-app": {
+            "crumb": "Desktop app",
+            "title": "Your Coworkers, one shortcut away.",
+            "lede": "Rerun for macOS, Windows and Linux. Press ⌘⇧Space in any app to ask your Chief of Staff, and keep your Coworkers in a dock on the edge of the screen.",
+            "metaTitle": "Desktop App for Mac, Windows and Linux",
+            "metaDescription": "The Rerun desktop app opens Quick ask from any app with ⌘⇧Space, takes questions by voice, and keeps a dock of your Coworkers on the edge of your screen.",
+            "caption": "Quick ask over another app, and the dock of Coworkers on the edge of the screen.",
+            "plate": {
+                "name": "Inbox Assistant",
+                "job": "Sorts your email every morning"
+            },
+            "steps": {
+                "1": {
+                    "title": "Download and sign in",
+                    "body": "Get Rerun from rerun.build/download, then Sign in with Google or Sign in with Apple. The app updates itself.",
+                    "ui": {
+                        "1": "Sign in with Google",
+                        "2": "Sign in with Apple"
+                    }
+                },
+                "2": {
+                    "title": "Press ⌘⇧Space",
+                    "body": "In any app, type a question for your Chief of Staff and press Enter. Or hold Space in the empty field and talk.",
+                    "ui": {
+                        "2": "Ask your Chief of Staff…"
+                    }
+                },
+                "3": {
+                    "title": "Answer from the dock",
+                    "body": "One buddy per Coworker on the edge of the screen. Answer a question, approve or reply, without leaving your app.",
+                    "ui": {
+                        "1": "All notifications",
+                        "2": "Reply to Inbox Assistant",
+                        "3": "Open in Rerun"
+                    }
+                }
+            },
+            "abilitiesTitle": "What a browser tab cannot do.",
+            "abilities": {
+                "quick-ask": {
+                    "title": "Quick ask",
+                    "line": "⌘⇧Space on a Mac, Ctrl Shift Space on Windows and Linux. Record another shortcut in the settings."
+                },
+                "voice": {
+                    "title": "Voice quick ask",
+                    "line": "⌥⇧Space opens Quick ask listening. Ask out loud, and it is sent as soon as it is written out."
+                },
+                "dock": {
+                    "title": "The Coworker dock",
+                    "line": "Each buddy shows whether its Coworker works, waits, failed or rests, with a count of what it has for you."
+                },
+                "notifications": {
+                    "title": "Native notifications",
+                    "line": "They arrive as soon as you are in another app, with a count on the Dock icon of your Mac."
+                }
+            },
+            "templatesTitle": "Coworkers worth keeping in the dock.",
+            "faq": {
+                "1": {
+                    "question": "Which systems does the desktop app run on?",
+                    "answer": "macOS 13 or later on Apple Silicon or Intel, Windows 10 or later on x64 or Arm (in beta), and Linux x64 as an AppImage, a .deb or a .rpm. It updates itself."
+                },
+                "2": {
+                    "question": "What does Quick ask do?",
+                    "answer": "It opens a field for your Chief of Staff over whatever app you are in. Type and press Enter, or hold Space to talk, and the app opens on the answer."
+                },
+                "3": {
+                    "question": "Can I change the Quick ask shortcut?",
+                    "answer": "Yes. In your account, under Desktop app, click the Quick ask shortcut and press the keys you want. It needs ⌘, ⌥ or ⌃ (Ctrl or Alt on Windows and Linux). Press ⌫ instead to turn Quick ask off."
+                },
+                "4": {
+                    "question": "Is it different from the web app?",
+                    "answer": "It is the same app, updated at the same time, plus what a browser tab cannot do: Quick ask, the Coworker dock, system notifications, several windows, and linking this computer to your workspace."
+                },
+                "5": {
+                    "question": "Does it work with a self-hosted Rerun?",
+                    "answer": "Yes. Click Change Server… in the Rerun menu on a Mac, or the File menu on Windows and Linux, and enter your server’s address. Use Rerun Cloud brings you back."
+                }
+            },
+            "docsLabel": "Read the desktop app docs"
+        },
+        "mobile-app": {
+            "crumb": "Mobile app",
+            "title": "Your Coworkers in your pocket.",
+            "lede": "Rerun for iPhone, iPad and Android. Answer a Coworker from the notification, follow your crew from a widget, and talk to your Chief of Staff on the go.",
+            "metaTitle": "Mobile App for iPhone, iPad and Android",
+            "metaDescription": "The Rerun app for iPhone, iPad and Android: chat with your Coworkers, approve from the notification, and follow them in a widget and a Live Activity.",
+            "caption": "An approval answered from the notification with Face ID, the app still closed.",
+            "plate": {
+                "name": "Order Manager",
+                "job": "Flags late shipments"
+            },
+            "steps": {
+                "1": {
+                    "title": "Sign in with your account",
+                    "body": "Continue with Apple, Google, your phone or your email. Your workspace, Coworkers and conversations are already there.",
+                    "ui": {
+                        "1": "Continue with Apple",
+                        "2": "Continue with Google"
+                    }
+                },
+                "2": {
+                    "title": "Turn on notifications",
+                    "body": "In Preferences > Notifications, pick what reaches you. A Coworker that needs you sends a push.",
+                    "ui": {
+                        "1": "Preferences",
+                        "2": "Notifications",
+                        "3": "Push notifications"
+                    }
+                },
+                "3": {
+                    "title": "Answer from the push",
+                    "body": "Touch and hold it for Approve, Deny, Answer or Reply. On an iPhone, Face ID confirms and the app stays closed.",
+                    "ui": {
+                        "1": "Approve",
+                        "2": "Deny",
+                        "3": "Answer",
+                        "4": "Reply"
+                    }
+                }
+            },
+            "abilitiesTitle": "Built for a small screen.",
+            "abilities": {
+                "widget": {
+                    "title": "The Your crew widget",
+                    "line": "On the home screen or the lock screen: whoever needs you, or your crew at work. On Android too."
+                },
+                "live-activity": {
+                    "title": "Live Activity",
+                    "line": "On iPhone, the lock screen and the Dynamic Island show who is at work and for how long."
+                },
+                "reply": {
+                    "title": "Reply from the notification",
+                    "line": "Approve a spend, answer a question or reply to a finished task straight from the push."
+                },
+                "chat": {
+                    "title": "Messages, photos, voice",
+                    "line": "Send a message, a photo, a file or a voice message, and use @, / and # as on the web."
+                }
+            },
+            "templatesTitle": "Coworkers you check on from your phone.",
+            "faq": {
+                "1": {
+                    "question": "Is there an Android app?",
+                    "answer": "Yes. Rerun is on the App Store for iPhone and iPad, and on Google Play for Android. Both open the same workspace as the web app, and a message sent from one shows up on the other."
+                },
+                "2": {
+                    "question": "Can I approve something without opening the app?",
+                    "answer": "On an iPhone, yes: touch and hold the notification, tap Approve, Deny, Answer or Reply, and Face ID confirms. On Android the buttons unlock the phone and open Rerun. An app to connect or a key always opens the app."
+                },
+                "3": {
+                    "question": "What does the widget show?",
+                    "answer": "On the home screen, whoever needs you (small) or your crew at work (medium). On the lock screen, a line above the clock, three lines under it, or the face of whoever waits. A tap opens the conversation."
+                },
+                "4": {
+                    "question": "What can I not do on my phone?",
+                    "answer": "Settings that need a bigger screen, such as billing, stay in the web app. The rest is there: conversations, approvals, files, apps, routines, the model picker and your notification settings."
+                },
+                "5": {
+                    "question": "Can I start the trial from my phone?",
+                    "answer": "Yes. A trial started from the mobile app needs no card: it runs for {trialDays} days and stops at its end unless you add one."
+                }
+            },
+            "docsLabel": "Read the mobile app docs"
+        },
+        "runs-24-7": {
+            "crumb": "Runs 24/7",
+            "title": "Runs 24/7, on servers in Europe.",
+            "lede": "Your workspace gets its own private machine in the cloud, in Europe. Your Coworkers run on their schedules and on events, whether your laptop is open or not.",
+            "metaTitle": "AI Agents That Run 24/7 on Servers in Europe",
+            "metaDescription": "Each Rerun workspace runs on its own private machine in Europe. Coworkers start on schedules, webhooks and LinkedIn or WhatsApp replies, laptop shut.",
+            "caption": "The same workspace at 7am and at 3am: the run happens either way.",
+            "plate": {
+                "name": "Uptime Monitor",
+                "job": "Checks your sites every hour"
+            },
+            "steps": {
+                "1": {
+                    "title": "Describe the schedule",
+                    "body": "In its Routines, click New and type every weekday at 8am or tomorrow at 3pm. It becomes a schedule in your timezone.",
+                    "ui": {
+                        "1": "Routines",
+                        "2": "New",
+                        "3": "every weekday at 8am",
+                        "4": "Create task"
+                    }
+                },
+                "2": {
+                    "title": "Or give it a webhook",
+                    "body": "Create a trigger, copy its Webhook URL and paste it in Stripe or any service. Each call starts a run with the payload.",
+                    "ui": {
+                        "1": "Triggers",
+                        "2": "Create trigger",
+                        "3": "Webhook URL"
+                    }
+                },
+                "3": {
+                    "title": "Read the run in the morning",
+                    "body": "Each automated run opens its own thread. If it needs you at 3am, it pauses and waits for your answer.",
+                    "ui": {
+                        "1": "Automations",
+                        "2": "Needs you"
+                    }
+                }
+            },
+            "abilitiesTitle": "Always on, without your laptop.",
+            "abilities": {
+                "machine": {
+                    "title": "A machine of its own",
+                    "line": "Isolated from every other account, it holds your Coworkers’ files, databases, sessions and screens."
+                },
+                "europe": {
+                    "title": "Hosted in Europe",
+                    "line": "Your workspace’s machine sits in Europe, and that is where your Coworkers work on your data."
+                },
+                "schedules": {
+                    "title": "Schedules in plain words",
+                    "line": "Recurring or one-off, in the timezone you pick, each with its own model when a nightly job should cost less."
+                },
+                "webhooks": {
+                    "title": "Webhooks and wake-ups",
+                    "line": "A public URL another service calls, or a LinkedIn or WhatsApp reply that wakes the Coworker up."
+                }
+            },
+            "templatesTitle": "Coworkers that work while you sleep.",
+            "faq": {
+                "1": {
+                    "question": "Does my computer need to stay on?",
+                    "answer": "No. Your Coworkers run on your workspace’s machine in the cloud, not on your laptop. Close it, fly somewhere, and the Monday morning run still happens."
+                },
+                "2": {
+                    "question": "Where are the servers?",
+                    "answer": "In Europe. Each workspace has a private machine there, isolated from every other account, and that is where your Coworkers work and keep what they need between runs."
+                },
+                "3": {
+                    "question": "Does a scheduled run remember the last one?",
+                    "answer": "Each run opens a fresh thread. What carries over is the Coworker’s memory and its database, so a task that must know where it left off writes it down there."
+                },
+                "4": {
+                    "question": "Can I test a routine before it goes live?",
+                    "answer": "Yes. Test Run fires the task right away, even while it is switched off, and leaves its schedule alone."
+                },
+                "5": {
+                    "question": "What if a webhook URL leaks?",
+                    "answer": "The URL is the credential, so click Rotate the secret: the old URL stops working at once, and you paste the new one wherever the trigger is called from."
+                }
+            },
+            "docsLabel": "Read the Automations docs"
+        },
+        "human-in-the-loop": {
+            "crumb": "Human in the loop",
+            "title": "Autonomous, until it needs a yes.",
+            "lede": "Your Coworker works alone and stops before anything consequential: a send, a spend, a command. It asks in one card, waits, and anyone on the team can answer.",
+            "metaTitle": "Human in the Loop: Your AI Agent Asks First",
+            "metaDescription": "A Rerun Coworker stops before consequential actions, asks in a single card and waits. Answer from the inbox, the desktop dock or a push on your phone.",
+            "caption": "Approval required: three reminders to send, Approve or Not now on each one.",
+            "plate": {
+                "name": "Invoice Chaser",
+                "job": "Sends payment reminders"
+            },
+            "steps": {
+                "1": {
+                    "title": "It stops and asks",
+                    "body": "Before a consequential step, it shows a card: a question, an approval, a spend or a sign-in. The thread reads Needs you.",
+                    "ui": {
+                        "1": "Approval required",
+                        "2": "Needs you"
+                    }
+                },
+                "2": {
+                    "title": "You answer from anywhere",
+                    "body": "From the chat, the inbox, the desktop dock or a push on your phone. Anyone who can use its Box can answer.",
+                    "ui": {
+                        "1": "Needs you",
+                        "2": "Open conversation"
+                    }
+                },
+                "3": {
+                    "title": "It picks up where it stopped",
+                    "body": "Approve and the run carries on from your answer. Explain declines with a reason the Coworker reads.",
+                    "ui": {
+                        "1": "Approve",
+                        "2": "Explain",
+                        "3": "Why not? (optional)"
+                    }
+                }
+            },
+            "abilitiesTitle": "The ways it hands a decision back.",
+            "abilities": {
+                "approvals": {
+                    "title": "Approvals per item",
+                    "line": "Each action with the detail behind it: the target, the command or the diff. Approve or Not now on each."
+                },
+                "questions": {
+                    "title": "Questions with answers",
+                    "line": "Suggested answers as buttons, Something else to type your own, a voice answer or files attached."
+                },
+                "inbox": {
+                    "title": "One inbox",
+                    "line": "Everything waiting on you, from every Coworker, answered without opening the conversation."
+                },
+                "spend": {
+                    "title": "Spend waits for you",
+                    "line": "Paid data waits for your yes on the estimated cost, and Allow spending in Billing stops all credit spend."
+                }
+            },
+            "templatesTitle": "Coworkers you want to keep on a leash.",
+            "faq": {
+                "1": {
+                    "question": "What does a Coworker stop for?",
+                    "answer": "Spending credits waits for an approval unless you allow it. For the rest, its soul says what counts as consequential, like sending to a customer, deleting records or publishing, so you decide how much rope it has."
+                },
+                "2": {
+                    "question": "Who can answer a request?",
+                    "answer": "Anyone who can use the Coworker’s Box. Seats cost nothing, so the person who should decide can be the one who decides."
+                },
+                "3": {
+                    "question": "What happens if nobody answers?",
+                    "answer": "The run waits, and the thread keeps its Needs you badge. A run started at 3am pauses the same way and resumes from your answer whenever you give it. Nothing is skipped because nobody was watching."
+                },
+                "4": {
+                    "question": "Can the Chief of Staff answer for me?",
+                    "answer": "Yes, once you tell it what to say. It answers questions, approvals and skill proposals in your name, the way the inbox does, and asks you first before approving a spend."
+                },
+                "5": {
+                    "question": "Can I turn a kind of pause off?",
+                    "answer": "Yes. Each pause comes from a capability, like Ask you questions or Request approval. Switch it off in the Coworker’s Capabilities and it can no longer pause that way."
+                }
+            },
+            "docsLabel": "Read the Human in the loop docs"
+        },
+        "bring-your-own-ai": {
+            "crumb": "Bring your own AI",
+            "title": "Run your Coworkers on the AI you pay for.",
+            "lede": "Plug in your Claude or ChatGPT plan, an API key or your own model. Or run on the Rerun model, paid from the credits of your plan. Switch without rewriting a Coworker.",
+            "metaTitle": "Bring Your Own AI: Claude, ChatGPT or a Key",
+            "metaDescription": "Run Rerun Coworkers on your Claude or ChatGPT plan, an Anthropic, OpenAI, Google or OpenRouter key, or your own model, with backups when a plan runs out.",
+            "caption": "Claude limit reached: the Coworker carries on with its backup, same conversation.",
+            "plate": {
+                "name": "Developer",
+                "job": "Turns tickets into pull requests"
+            },
+            "steps": {
+                "1": {
+                    "title": "Open AI providers",
+                    "body": "From the workspace pill, click AI providers. Add subscription signs in to Claude or ChatGPT once; Add API key takes a key.",
+                    "ui": {
+                        "1": "Acme",
+                        "2": "AI providers",
+                        "3": "Add subscription",
+                        "4": "Add API key"
+                    }
+                },
+                "2": {
+                    "title": "Pick the model",
+                    "body": "Set the workspace default, or click the model pill in any chat. The star saves it as that Coworker’s default.",
+                    "ui": {
+                        "1": "Default model",
+                        "2": "Change",
+                        "3": "Opus 5.5"
+                    }
+                },
+                "3": {
+                    "title": "Add a backup",
+                    "body": "Under Backups, add the plans to fall back on when one hits its limit. The Coworker carries on in the same chat.",
+                    "ui": {
+                        "1": "AI providers",
+                        "2": "Backups",
+                        "3": "Add backup"
+                    }
+                }
+            },
+            "abilitiesTitle": "Your models, your bill.",
+            "abilities": {
+                "subscriptions": {
+                    "title": "Your subscription",
+                    "line": "Claude Pro or Max, ChatGPT Plus or Pro. The model then costs nothing on the Rerun side."
+                },
+                "keys": {
+                    "title": "Your API keys",
+                    "line": "Anthropic, OpenAI, Google or OpenRouter, or a custom endpoint that speaks the OpenAI chat format."
+                },
+                "backups": {
+                    "title": "Backup models",
+                    "line": "Up to {maxBackups} backups, tried in order when a plan hits its limit, until the plan resets."
+                },
+                "reasoning": {
+                    "title": "Reasoning effort",
+                    "line": "Default, Low, Medium or High for each model, saved with it as a Coworker’s default."
+                }
+            },
+            "templatesTitle": "Coworkers that do the heavy thinking.",
+            "faq": {
+                "1": {
+                    "question": "Can I use my Claude or ChatGPT subscription?",
+                    "answer": "Yes. Under AI providers, click Add subscription and sign in to Claude Pro or Max, or ChatGPT Plus or Pro. Coworkers on it spend no Rerun credits. Connecting one needs an active plan or a running trial."
+                },
+                "2": {
+                    "question": "Can I run an open-source or self-hosted model?",
+                    "answer": "Yes, through a Custom endpoint: any server that speaks the OpenAI chat format, at an address your workspace’s machine can reach. OpenRouter also carries open models on your own key."
+                },
+                "3": {
+                    "question": "What happens when my plan hits its limit?",
+                    "answer": "The Coworker carries on with the first backup in your list, in the same conversation, and a line says which model took over. Once the plan resets, it goes back. Rerun credit as last resort stays off unless you turn it on."
+                },
+                "4": {
+                    "question": "What is reasoning effort?",
+                    "answer": "How long a model thinks before it answers: Default, Low, Medium or High, from the settings icon on its row in the picker. It is there for Claude, OpenAI and Google models; the Rerun model runs at the level its provider picks."
+                },
+                "5": {
+                    "question": "What do Rerun credits pay for?",
+                    "answer": "The Rerun model and paid data. Pro includes {monthlyCredits} credits every month. A Coworker on your own key or subscription costs nothing on the Rerun side."
+                }
+            },
+            "docsLabel": "Read the model docs"
+        },
+        "security": {
+            "crumb": "Security",
+            "title": "Your data, backed up and kept apart.",
+            "lede": "Each workspace runs on a private machine in Europe, backed up and encrypted every night. Keys never reach the model, spending has a switch, and the code is open source.",
+            "metaTitle": "Security: Backups, Secrets and Open Source",
+            "metaDescription": "Rerun backs up each paid workspace nightly, encrypted, away from its private machine in Europe. Secrets never reach the model, and the code is AGPL-3.0.",
+            "caption": "A masked form: the key goes to the machine, the Coworker only learns its name.",
+            "plate": {
+                "name": "Payroll Clerk",
+                "job": "Checks payroll before cut-off"
+            },
+            "steps": {
+                "1": {
+                    "title": "A machine of your own",
+                    "body": "Your workspace runs on a private machine in Europe, isolated from every other account. Nothing crosses workspaces."
+                },
+                "2": {
+                    "title": "Keys in masked forms",
+                    "body": "When a Coworker needs a key, it opens a masked form. The value goes to the machine and never enters the chat.",
+                    "ui": {
+                        "1": "Credential needed",
+                        "2": "Paste the value",
+                        "3": "Save"
+                    }
+                },
+                "3": {
+                    "title": "Backed up every night",
+                    "body": "Each night the machine of a paid workspace is backed up, encrypted and stored away from it. We restore on request."
+                }
+            },
+            "abilitiesTitle": "What keeps your workspace safe.",
+            "abilities": {
+                "backups": {
+                    "title": "Nightly encrypted backups",
+                    "line": "Coworkers, memories, skills, files, databases and the Vault, taken during the night of your time zone."
+                },
+                "secrets": {
+                    "title": "Secrets the model never sees",
+                    "line": "The Coworker gets a variable name and uses $'{NAME}': the value resolves on the machine at run time."
+                },
+                "spending": {
+                    "title": "Allow spending",
+                    "line": "One switch in Billing stops all spending of Rerun credits. Coworkers on your own AI keep working."
+                },
+                "open-source": {
+                    "title": "Open source, AGPL-3.0",
+                    "line": "Read the code Rerun Cloud runs, or host it yourself on your own server with Docker."
+                }
+            },
+            "templatesTitle": "Coworkers that handle sensitive work.",
+            "faq": {
+                "1": {
+                    "question": "Where is my data stored?",
+                    "answer": "On your workspace’s private machine, in Europe, isolated from every other account. Credentials stay on that machine: Rerun’s database keeps only the name of each variable, never the value."
+                },
+                "2": {
+                    "question": "How are backups handled?",
+                    "answer": "Each night of your time zone, Rerun backs up the machine of every paid workspace, encrypted and stored away from it. A Coworker in the middle of a run is never cut off. If something goes wrong, write to help@rerun.build and we restore it."
+                },
+                "3": {
+                    "question": "Is a key I give a Coworker sent to the model?",
+                    "answer": "No. It goes through a masked form straight to the machine, and the Coworker only learns which variable was filled. Never paste a secret in the chat itself: the conversation is stored and sent to the model."
+                },
+                "4": {
+                    "question": "Can a Coworker spend money on its own?",
+                    "answer": "Paid data waits for your yes on an estimated cost, unless you allow a Coworker to spend without asking. The Allow spending switch in Billing stops every credit spend at once, for the Rerun model and for paid data."
+                },
+                "5": {
+                    "question": "Can I read the code or host it myself?",
+                    "answer": "Yes. Rerun is open source under AGPL-3.0: the same product Rerun Cloud runs, for you to host on your own server, with no plan, no credit and no limit on Coworkers or seats."
+                }
+            },
+            "docsLabel": "Read about backups"
+        },
+        "workspaces": {
+            "crumb": "Workspaces & team",
+            "title": "A workspace per business, your team for free.",
+            "lede": "Each business, client or brand gets its own workspace: its own Coworkers, apps, Brain and machine. Invite your whole team at no extra cost, and choose who reaches each Box.",
+            "metaTitle": "Workspaces and Free Team Seats",
+            "metaDescription": "One Rerun account holds a workspace per business, each with its own Coworkers, apps and Brain. Invite your team for free and set who reaches each Box.",
+            "caption": "The workspace switcher, and the whole team on the same board.",
+            "plate": {
+                "name": "Client Reporter",
+                "job": "Sends each client a weekly report"
+            },
+            "steps": {
+                "1": {
+                    "title": "Create a workspace",
+                    "body": "Open the pill in the top left corner and create one. It opens on its own onboarding, with a machine of its own.",
+                    "ui": {
+                        "1": "Acme",
+                        "2": "New workspace",
+                        "3": "e.g. Acme Inc.",
+                        "4": "Create workspace"
+                    }
+                },
+                "2": {
+                    "title": "Invite your team",
+                    "body": "In Members, type an email and pick the Boxes they reach: All Boxes, or None, assign later. Then click Invite.",
+                    "ui": {
+                        "1": "Members",
+                        "2": "teammate@rerun.build",
+                        "3": "All Boxes",
+                        "4": "Invite"
+                    }
+                },
+                "3": {
+                    "title": "Set access by Box",
+                    "body": "Right-click a Box, then Manage access: everyone, or only selected people, each with Can use or Can manage.",
+                    "ui": {
+                        "1": "Manage access",
+                        "2": "Only selected people",
+                        "3": "Can manage"
+                    }
+                }
+            },
+            "abilitiesTitle": "Kept apart, shared by the team.",
+            "abilities": {
+                "boundary": {
+                    "title": "A hard boundary",
+                    "line": "Nothing crosses workspaces: not a Coworker, not the shared database, not an API key."
+                },
+                "boxes": {
+                    "title": "Boxes inside each one",
+                    "line": "Group Coworkers by team, client or project. A Box is free, and moving a Coworker keeps everything it has."
+                },
+                "seats": {
+                    "title": "Seats at no cost",
+                    "line": "Neither Pro nor the trial limits seats. Adding a colleague does not change the bill."
+                },
+                "roles": {
+                    "title": "Admins and members",
+                    "line": "Admins run billing, members and AI providers. Members use the Coworkers of the Boxes they reach."
+                }
+            },
+            "templatesTitle": "Coworkers the whole team leans on.",
+            "faq": {
+                "1": {
+                    "question": "How much does an extra seat cost?",
+                    "answer": "Nothing. Neither Pro nor the trial limits seats, so invite the whole team, including the people who only answer a question once a week."
+                },
+                "2": {
+                    "question": "When should I use several workspaces?",
+                    "answer": "When the businesses share nothing: an agency with one per client, a founder with a company and a side project. For one business with several teams, use Boxes inside one workspace instead."
+                },
+                "3": {
+                    "question": "Does each workspace need its own plan?",
+                    "answer": "Yes. A workspace is one plan, one machine and one set of members, which is what keeps it apart from the others. Switch between them from the pill in the top left corner."
+                },
+                "4": {
+                    "question": "Can I keep a Box private?",
+                    "answer": "Yes. Right-click it, pick Manage access, then Only selected people. Can use chats with its Coworkers and sees their work; Can manage also edits, moves and deletes them. Admins always reach every Box."
+                },
+                "5": {
+                    "question": "Can a colleague talk to a Coworker I hired?",
+                    "answer": "Yes, if they can use its Box. A Coworker belongs to the workspace, not to the person who created it: anyone with access can give it work, read what it did and answer its questions."
+                }
+            },
+            "docsLabel": "Read the Teams and workspaces docs"
+        }
+    },
+    "mocks": {
+        "bringYourOwnAi": {
+            "ask": "Turn ticket 214 into a pull request",
+            "readIssue": "GitHub · Read issue #214",
+            "createBranch": "GitHub · Create branch",
+            "switch": "Claude limit reached · GPT-6 Sol until 4:40 PM",
+            "openPullRequest": "GitHub · Open pull request",
+            "pullRequest": "#215 Fix the rounding of VAT on credit notes",
+            "reply": "Picked up where I was: pull request #215 is open, and the tests are green.",
+            "providers": {
+                "title": "AI providers",
+                "description": "The plans and API keys your coworkers run on."
+            },
+            "defaultModel": "Default model",
+            "defaultModelDescription": "Via Claude. Coworkers with no model of their own run on it.",
+            "change": "Change",
+            "backups": "Backups",
+            "addBackup": "Add backup",
+            "backupMeta": "1st · via ChatGPT",
+            "lastResort": "Rerun credit as last resort",
+            "lastResortDescription": "Only when every plan is out"
+        },
+        "desktopApp": {
+            "menubarApp": "Numbers",
+            "menubarItems": "File Edit Insert Table Format",
+            "menubarClock": "Tue 9:41",
+            "sheetTitle": "Q3 plan",
+            "quickAsk": {
+                "placeholder": "Ask your Chief of Staff…",
+                "hint": "Enter to send, Esc to close",
+                "holdToTalk": "Hold <key>Space</key> to talk",
+                "send": "Send"
+            },
+            "bubble": {
+                "status": "needs your go",
+                "message": "Marc asks for slots next week. Send him the three I picked?"
+            }
+        },
+        "leadData": {
+            "intro": "I found {people, plural, one {# decision-maker} other {# decision-makers}} at the companies on your list. Their work emails and phone numbers are paid data, so I need your go first.",
+            "title": "Work emails and phone numbers of {people, plural, one {# decision-maker} other {# decision-makers}}",
+            "lines": {
+                "1": "Finding emails",
+                "2": "Finding phone numbers"
+            },
+            "total": "Estimated total",
+            "credits": "{count, plural, one {credit} other {credits}}",
+            "notNow": "Not now",
+            "alwaysAllow": "Always allow",
+            "approveOnce": "Approve once"
+        },
+        "mobileApp": {
+            "now": "now",
+            "pushTitle": "Late shipments · Needs approval",
+            "pushBody": "3 orders will ship 2 days late. Email the 3 customers with the new date before they ask?",
+            "actions": {
+                "1": "Approve",
+                "2": "Deny",
+                "3": "Open"
+            },
+            "faceId": "Face ID"
+        },
+        "security": {
+            "ask": "To check the March payroll before the cut-off, I need to read the export in your payroll tool.",
+            "form": {
+                "title": "Credential needed",
+                "description": "I only read the payroll export, nothing is changed.",
+                "label": "Payroll API key",
+                "helper": "Settings > Developers > API keys · Stored as {key}",
+                "whereToFind": "Where to find it",
+                "note": "Stored on your engine as a coworker variable. Never sent to the model.",
+                "skip": "Skip",
+                "save": "Save"
+            },
+            "receipt": {
+                "title": "Keys",
+                "meta": "1 of 1 stored",
+                "label": "Payroll API key",
+                "stored": "Stored",
+                "note": "Stored on the Box. The coworker only sees the names."
+            },
+            "runCommand": "Run a command",
+            "reply": "Read the March export: 42 payslips, 2 changed since February."
+        },
+        "yourComputer": {
+            "ask": "<computer></computer> encode the rushes of day 2 for the editor",
+            "reply": "46 clips in day-2. I start with the first one to check the settings, then run the others as a job.",
+            "cardTitle": "Run a command on <computer></computer>",
+            "purpose": "Encode the first clip of day 2 as a ProRes proxy for the editor.",
+            "folder": "In {folder}",
+            "deny": "Deny",
+            "alwaysAllow": "Always allow {program}",
+            "allow": "Allow"
+        }
+    }
+}

@@ -174,7 +174,188 @@
             "brandKit": "查看品牌素材",
             "copy": "复制标志（SVG）",
             "download": "下载标志"
-        }
+        },
+        "featureGroups": {
+            "coworkers": "您的同事",
+            "how": "工作方式",
+            "everywhere": "随处可用",
+            "control": "一切由您掌控"
+        },
+        "featurePages": {
+            "coworkers": {
+                "label": "同事",
+                "description": "交给它一项工作，它把完成的成果交回来。"
+            },
+            "chief-of-staff": {
+                "label": "Chief of Staff",
+                "description": "说出您的需求，它会给合适的同事布置任务。"
+            },
+            "coworkers-work-together": {
+                "label": "同事协同工作",
+                "description": "一个寻找潜在客户，下一个给他们写信。"
+            },
+            "second-brain": {
+                "label": "第二大脑",
+                "description": "您的产品、市场和语气，集中在一处。"
+            },
+            "computer-use": {
+                "label": "电脑操作",
+                "description": "它像真人一样在您的应用里工作。"
+            },
+            "your-computer": {
+                "label": "您自己的电脑",
+                "description": "连接您的 Mac 或 PC，在聊天中用 # 调用它。"
+            },
+            "tools": {
+                "label": "{connectors}+ 种工具",
+                "description": "Gmail、Stripe、LinkedIn、WhatsApp 以及任何 MCP 服务器。"
+            },
+            "lead-data": {
+                "label": "潜在客户与 SEO 数据",
+                "description": "按需获取邮箱、电话号码和排名。"
+            },
+            "desktop-app": {
+                "label": "桌面应用",
+                "description": "在任意应用中快速提问，同事就在程序坞里。"
+            },
+            "mobile-app": {
+                "label": "移动应用",
+                "description": "iPhone、iPad 和 Android，支持小组件。"
+            },
+            "runs-24-7": {
+                "label": "全天候运行，位于欧洲",
+                "description": "定时任务和 Webhook，合上电脑也照样运行。"
+            },
+            "human-in-the-loop": {
+                "label": "人工把关",
+                "description": "做任何重要的事之前，他们都会先问您。"
+            },
+            "bring-your-own-ai": {
+                "label": "自带 AI",
+                "description": "您的 Claude 或 ChatGPT 套餐，或您自己的 API 密钥。"
+            },
+            "security": {
+                "label": "安全",
+                "description": "每晚加密备份，服务器位于欧洲。"
+            },
+            "workspaces": {
+                "label": "工作区与团队",
+                "description": "每项业务一个工作区，整个团队免费加入。"
+            }
+        },
+        "industryPages": {
+            "agencies": {
+                "label": "代理机构",
+                "description": "新业务、交付和客户报告。"
+            },
+            "freelancers": {
+                "label": "自由职业",
+                "description": "您一直没时间处理的后台事务。"
+            },
+            "ecommerce": {
+                "label": "电商",
+                "description": "订单、库存、评价和竞争对手。"
+            },
+            "real-estate": {
+                "label": "房地产",
+                "description": "卖家、咨询、房源和租赁。"
+            },
+            "startups": {
+                "label": "创业公司",
+                "description": "融资、销售管道和产品发布。"
+            },
+            "saas": {
+                "label": "SaaS",
+                "description": "流失、支持、新用户引导和版本发布。"
+            },
+            "legal": {
+                "label": "法务与合规",
+                "description": "合同、义务、截止日期和审计。"
+            },
+            "recruiting": {
+                "label": "招聘与人力资源",
+                "description": "简历筛选、面试和候选人跟进。"
+            },
+            "creators": {
+                "label": "创作者与媒体",
+                "description": "脚本、剪辑、赞助商和社群。"
+            },
+            "consulting": {
+                "label": "咨询与教练",
+                "description": "需求沟通、交付成果和后续跟进。"
+            },
+            "accounting": {
+                "label": "会计与财务",
+                "description": "应收、应付、结账和税务。"
+            },
+            "marketing": {
+                "label": "营销团队",
+                "description": "推广活动、内容、SEO 和数据。"
+            },
+            "sales": {
+                "label": "销售团队",
+                "description": "开发客户、销售管道和客户跟进。"
+            },
+            "hospitality": {
+                "label": "酒店餐饮",
+                "description": "客人、评价、员工和活动。"
+            },
+            "local-business": {
+                "label": "本地商家",
+                "description": "咨询、评价、发票和账目。"
+            }
+        },
+        "useCasePages": {
+            "find-leads": {
+                "label": "寻找潜在客户",
+                "description": "招聘信息、员工人数和您的 CRM，交叉比对。"
+            },
+            "track-sales": {
+                "label": "跟踪销售",
+                "description": "营收、销售管道和表格，每天早上更新。"
+            },
+            "run-ads": {
+                "label": "投放广告",
+                "description": "每天查看花费，亏钱的广告自动暂停。"
+            },
+            "watch-competitors": {
+                "label": "监控竞争对手",
+                "description": "他们的价格、他们的发布、您的关键词缺口。"
+            },
+            "create-content": {
+                "label": "创作内容",
+                "description": "从排名下滑的搜索词到重新发布的文章。"
+            },
+            "post-on-social": {
+                "label": "发布社交媒体",
+                "description": "每天早上一篇帖子，评论都有回复。"
+            },
+            "reply-to-customers": {
+                "label": "回复客户",
+                "description": "未读邮件已分类，并用您的语气回复。"
+            },
+            "triage-inbox": {
+                "label": "整理收件箱",
+                "description": "已加标签，回复已起草，只留两封给您。"
+            },
+            "prepare-meetings": {
+                "label": "准备会议",
+                "description": "每次通话前，一份关于对方的简短介绍。"
+            },
+            "track-orders": {
+                "label": "跟踪订单",
+                "description": "及时发现延误订单，先通知您的客户。"
+            },
+            "chase-invoices": {
+                "label": "催收发票",
+                "description": "逾期发票已跟进，付款已对账。"
+            },
+            "screen-candidates": {
+                "label": "筛选候选人",
+                "description": "申请已阅读，附理由的候选名单。"
+            }
+        },
+        "breadcrumb": "面包屑导航"
     },
     "github": {
         "star": "加星",

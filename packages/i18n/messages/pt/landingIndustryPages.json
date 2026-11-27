@@ -1,0 +1,1118 @@
+{
+    "hub": {
+        "crumb": "Setores",
+        "title": "Coworkers para o jeito como o seu negócio funciona.",
+        "lede": "Cada setor tem os seus Coworkers, a sua semana de trabalho e os seus apps. Escolha o seu para ver o que ele deixa de fazer à mão.",
+        "metaTitle": "Coworkers de IA para o seu setor",
+        "metaDescription": "Agências, e-commerce, imobiliárias, SaaS, jurídico, recrutamento e mais: os Coworkers que cada ramo contrata primeiro, uma semana de trabalho e os apps.",
+        "allTitle": "Todos os setores",
+        "allLead": "{count, plural, one {# ramo} other {# ramos}}, cada um com os Coworkers que contrata primeiro.",
+        "faq": {
+            "1": {
+                "question": "Meu ramo não está na lista. O Rerun funciona para ele?",
+                "answer": "Sim. Os Coworkers são montados a partir de um trabalho, não de um ramo: diga ao Chief of Staff o que você precisa que seja feito, ou escolha um template da biblioteca e adapte."
+            },
+            "2": {
+                "question": "Os templates de um setor estão incluídos no plano?",
+                "answer": "A maioria dos templates da biblioteca está incluída. Um template com preço próprio, definido pelo criador, é cobrado à parte do seu plano e avisa isso na página dele."
+            },
+            "3": {
+                "question": "Posso gerenciar vários negócios com uma conta?",
+                "answer": "Sim. Cada negócio ganha um workspace próprio, com os seus Coworkers, a sua memória e os seus apps separados, e você alterna entre eles na mesma conta."
+            }
+        }
+    },
+    "page": {
+        "otherIndustries": "Outros setores",
+        "allIndustries": "Todos os setores",
+        "moreCoworkers": "Mais Coworkers na biblioteca",
+        "weekTitle": "Uma semana com o Rerun",
+        "weekLead": "O que os seus Coworkers fazem enquanto você toca o negócio. Cada dia abre o trabalho a que pertence.",
+        "featuresTitle": "Os recursos que mais importam aqui",
+        "appsTitle": "Os apps do ramo",
+        "appsLead": "Conectados uma vez com as suas próprias contas, e muitos outros via MCP ou API."
+    },
+    "items": {
+        "agencies": {
+            "crumb": "Agências",
+            "title": "Coworkers de IA para agências.",
+            "lede": "Prospecção, auditorias de SEO, revisão de anúncios, o relatório semanal do cliente e a fatura atrasada: o trabalho que se repete em cada conta, feito por Coworkers nas suas próprias ferramentas.",
+            "metaTitle": "Agentes de IA para agências: prospecção, relatórios",
+            "metaDescription": "Agências repetem o mesmo trabalho em cada conta. Contrate Coworkers de IA para prospecção, SEO, anúncios, posts, relatórios e faturas em atraso.",
+            "wallTitle": "Os Coworkers que agências contratam primeiro",
+            "wallLead": "Cada um é um template da biblioteca. Instale, conecte os apps do cliente e ele roda no horário dele.",
+            "week": {
+                "Mon": {
+                    "when": "Segunda, 8:00",
+                    "task": "gasto com anúncios da semana lido por cliente, desperdício apontado"
+                },
+                "Tue": {
+                    "when": "Terça, 9:00",
+                    "task": "vinte novos prospects, um primeiro e-mail redigido para cada"
+                },
+                "Wed": {
+                    "when": "Quarta, 10:00",
+                    "task": "rankings de um cliente comparados com dois concorrentes"
+                },
+                "Thu": {
+                    "when": "Quinta, 9:00",
+                    "task": "posts da próxima semana de cada cliente, prontos para um sim"
+                },
+                "Fri": {
+                    "when": "Sexta, 16:00",
+                    "task": "faturas com mais de 30 dias cobradas, com as suas palavras"
+                }
+            },
+            "painsTitle": "O que uma agência para de fazer à mão",
+            "pains": {
+                "1": {
+                    "title": "Novos negócios entre duas entregas",
+                    "body": "A prospecção é a primeira coisa a ficar para trás quando um projeto atrasa. Um Coworker continua montando a lista e escrevendo para ela, com a semana calma ou não."
+                },
+                "2": {
+                    "title": "O mesmo relatório, vezes doze",
+                    "body": "Números puxados, comentados e enviados, um por conta, todo mês. O trabalho é idêntico toda vez, então um Coworker faz no horário."
+                },
+                "3": {
+                    "title": "Faturas que ninguém ousa cobrar",
+                    "body": "O lembrete que deveria sair no dia 31 sai no dia 60. Um Coworker envia no dia 31, com as suas palavras, e lista quem ainda deve."
+                }
+            },
+            "features": {
+                "workspaces": "Uma Box por cliente com acesso por pessoa, ou um workspace próprio para uma separação total.",
+                "second-brain": "O tom, a oferta e as regras de cada cliente, lidos antes de qualquer Coworker escrever.",
+                "coworkers-work-together": "Um audita o site, o próximo escreve o briefing, um terceiro redige os posts.",
+                "human-in-the-loop": "Uma mudança de orçamento ou um e-mail ao cliente espera o seu sim quando você quiser."
+            },
+            "faq": {
+                "1": {
+                    "question": "Posso manter cada cliente separado?",
+                    "answer": "Sim. Coloque cada cliente em uma Box: é grátis, e você escolhe quem da equipe tem acesso. As Boxes compartilham uma máquina e um banco de dados, então para uma separação total dê ao cliente um workspace próprio, com os seus apps, o seu Brain e o seu plano."
+                },
+                "2": {
+                    "question": "O trabalho vai soar como a gente ou como um robô?",
+                    "answer": "O seu tom, a sua oferta e as suas regras ficam no Brain, e todo Coworker lê isso antes de escrever. No workspace de um cliente, esse é o tom do cliente. Corrija um Coworker uma vez e ele se lembra da correção."
+                },
+                "3": {
+                    "question": "Pagamos por usuário ou por cliente?",
+                    "answer": "Os usuários são grátis e ilimitados no Pro, então toda a equipe, e o cliente se você quiser, pode ler o trabalho e responder uma aprovação. As Boxes também são grátis. Só um workspace separado vem com um plano próprio."
+                },
+                "4": {
+                    "question": "Ele trabalha nas contas de anúncios dos clientes?",
+                    "answer": "Ele revisa anúncios no Google, Meta, LinkedIn e TikTok, aponta gasto desperdiçado e propõe mudanças de orçamento, exclusões e os próximos criativos a testar. Você decide nas instruções dele o que ele pode mudar e o que passa por você antes."
+                }
+            }
+        },
+        "freelancers": {
+            "crumb": "Freelancers",
+            "title": "Coworkers de IA para freelancers.",
+            "lede": "Você é a entrega, a equipe de vendas e o financeiro. Passe os dois últimos para Coworkers que trabalham enquanto você está em um projeto de cliente.",
+            "metaTitle": "Agentes de IA para freelancers: vendas, faturas, e-mail",
+            "metaDescription": "Você é a entrega, a equipe de vendas e o financeiro. Contrate Coworkers de IA para prospecção, e-mail, faturas, pagamentos atrasados e impostos.",
+            "wallTitle": "Os Coworkers que um negócio de uma pessoa só contrata primeiro",
+            "wallLead": "O seu back office, em templates. Instale um, conecte o seu e-mail e o seu faturamento, e ele roda enquanto você trabalha para os clientes.",
+            "week": {
+                "Mon": {
+                    "when": "Segunda, 7:30",
+                    "task": "caixa de entrada organizada, três respostas deixadas para você"
+                },
+                "Tue": {
+                    "when": "Terça, 9:00",
+                    "task": "dez prospects no LinkedIn, uma nota pessoal para cada"
+                },
+                "Wed": {
+                    "when": "Quarta, 18:00",
+                    "task": "um resumo da chamada de amanhã"
+                },
+                "Thu": {
+                    "when": "Quinta, 10:00",
+                    "task": "horas do mês faturadas, links de pagamento enviados"
+                },
+                "Fri": {
+                    "when": "Sexta, 11:00",
+                    "task": "artigo da próxima semana redigido a partir das suas notas"
+                }
+            },
+            "painsTitle": "O que um negócio de uma pessoa só vive deixando cair",
+            "pains": {
+                "1": {
+                    "title": "As vendas param quando você está ocupado",
+                    "body": "O pipeline esvazia bem quando o projeto acaba, porque ninguém prospectou durante ele. Um Coworker prospecta durante ele."
+                },
+                "2": {
+                    "title": "Faturas que ninguém cobra",
+                    "body": "Lembrar um cliente de que ele te deve dinheiro é a tarefa que você sempre empurra para amanhã. Um Coworker envia o lembrete na hora certa."
+                },
+                "3": {
+                    "title": "Uma caixa de entrada lida cinco vezes por dia",
+                    "body": "Três mensagens precisam mesmo de você. Um Coworker diz quais são as três e redige as respostas para o resto."
+                }
+            },
+            "features": {
+                "runs-24-7": "Ele trabalha com o seu notebook fechado enquanto você está com um cliente.",
+                "tools": "Prospecte pela sua própria conta do LinkedIn, em um ritmo que a mantém segura.",
+                "mobile-app": "Aprove um lembrete ou uma resposta pelo celular, entre duas reuniões.",
+                "bring-your-own-ai": "Rode seus Coworkers no plano do Claude ou do ChatGPT que você já paga."
+            },
+            "faq": {
+                "1": {
+                    "question": "Vale a pena para uma pessoa só?",
+                    "answer": "É exatamente o caso para o qual ele foi feito: os trabalhos para os quais você contrataria alguém se contratar fizesse sentido. Um plano roda quantos Coworkers você montar, sem taxa por execução ou por tarefa."
+                },
+                "2": {
+                    "question": "Funciona com o meu notebook fechado?",
+                    "answer": "Sim. Seus Coworkers rodam em uma máquina só sua na nuvem, na Europa. A execução de segunda acontece com você na mesa, com um cliente ou de férias."
+                },
+                "3": {
+                    "question": "Ele pode enviar coisas em meu nome sem perguntar?",
+                    "answer": "Só até onde você deixar. Você decide nas instruções dele se ele envia ou entrega um rascunho, e qualquer coisa importante chega antes para você como uma aprovação."
+                },
+                "4": {
+                    "question": "Prospectar no LinkedIn custa mais?",
+                    "answer": "Sim. O LinkedIn Pro é um app pago: {linkedinPrice} por mês por conta conectada, na mesma fatura do seu plano. Seus Coworkers então enviam mensagens e fazem follow-up pela sua conta, em um ritmo diário recomendado que a mantém segura."
+                },
+                "5": {
+                    "question": "Ele vai declarar os meus impostos?",
+                    "answer": "Não. Ele prepara suas declarações de IVA e seus arquivos fiscais a partir da sua contabilidade, com a fonte de cada número, prontos para você ou o seu contador conferir e enviar."
+                }
+            }
+        },
+        "ecommerce": {
+            "crumb": "E-commerce",
+            "title": "Coworkers de IA para e-commerce.",
+            "lede": "O que a sua loja fez nesta semana, o que está para acabar, quais pedidos estão atrasados e o que os seus concorrentes acabaram de mudar: lido todo dia, resolvido e reportado para você.",
+            "metaTitle": "Agentes de IA para e-commerce: pedidos, estoque, carrinhos",
+            "metaDescription": "Contrate Coworkers de IA que revisam sua loja toda semana, pegam o estoque baixo cedo, recuperam carrinhos, respondem clientes e destravam pedidos.",
+            "wallTitle": "Os Coworkers que as lojas online contratam primeiro",
+            "wallLead": "Da revisão semanal da loja à devolução que pede um reembolso. Cada um é um template que você instala, conecta à sua loja e liga.",
+            "week": {
+                "Mon": {
+                    "when": "Segunda, 8:00",
+                    "task": "semana da loja lida, três correções priorizadas"
+                },
+                "Tue": {
+                    "when": "Terça, 7:00",
+                    "task": "pedidos de hoje organizados, endereços errados pegos"
+                },
+                "Wed": {
+                    "when": "Quarta, 9:00",
+                    "task": "preços e lançamentos dos concorrentes comparados"
+                },
+                "Thu": {
+                    "when": "Quinta, 10:00",
+                    "task": "e-mails de clientes respondidos com base nas suas políticas"
+                },
+                "Fri": {
+                    "when": "Sexta, 15:00",
+                    "task": "reposições propostas antes de um campeão de vendas acabar"
+                }
+            },
+            "painsTitle": "O que o dono de uma loja descobre tarde demais",
+            "pains": {
+                "1": {
+                    "title": "O campeão de vendas que acabou",
+                    "body": "Ninguém olhou o estoque até os pedidos pararem. Um Coworker olha todo dia e diz o que repor, e quanto, antes de acabar."
+                },
+                "2": {
+                    "title": "O preço de um concorrente, descoberto tarde",
+                    "body": "A promoção deles entrou no ar na segunda e você soube na quinta, por uma avaliação. Um Coworker lê as páginas deles para você toda semana."
+                },
+                "3": {
+                    "title": "Carrinhos abandonados, nunca recuperados",
+                    "body": "A sequência que você queria montar ainda é uma anotação. Um Coworker segmenta pelo que as pessoas compraram de fato e escreve o follow-up."
+                }
+            },
+            "features": {
+                "tools": "Shopify, Stripe, sua plataforma de e-mail e suas planilhas, mais qualquer servidor MCP.",
+                "computer-use": "Um portal de fornecedor sem API continua acessível, na tela dele.",
+                "coworkers-work-together": "Os Coworkers de pedidos, estoque e suporte leem as mesmas tabelas compartilhadas.",
+                "human-in-the-loop": "Os reembolsos são preparados para a sua aprovação, nunca enviados no chute."
+            },
+            "faq": {
+                "1": {
+                    "question": "Ele se conecta à Shopify e ao resto das minhas ferramentas?",
+                    "answer": "Shopify, Stripe, sua plataforma de e-mail, suas contas de anúncios, suas planilhas e mais de {connectors} outras ferramentas. Um back office sem API continua acessível: o Coworker o abre na própria tela e clica por ele."
+                },
+                "2": {
+                    "question": "Um Coworker pode reembolsar ou mudar preços sozinho?",
+                    "answer": "Os reembolsos são preparados e levados até você para aprovação. Para preços, campanhas e respostas a clientes, você decide nas instruções dele: um rascunho para você enviar, ou enviado e reportado."
+                },
+                "3": {
+                    "question": "Em quanto tempo ele vai conhecer o meu catálogo?",
+                    "answer": "Ele o lê na primeira execução e guarda o que importa no Brain: a sua linha, as suas margens, as suas políticas, o seu tom. Todo Coworker que você contratar depois parte das mesmas páginas."
+                },
+                "4": {
+                    "question": "Ele pode responder clientes no WhatsApp?",
+                    "answer": "Sim. O WhatsApp Pro é um app pago: {whatsappPrice} por mês por número conectado, na mesma fatura do seu plano. Uma mensagem nova acorda o Coworker, e ele responde do seu número com texto, arquivos e áudios. Ele nunca escreve para desconhecidos."
+                }
+            }
+        },
+        "real-estate": {
+            "crumb": "Imobiliárias",
+            "title": "Coworkers de IA para imobiliárias.",
+            "lede": "Proprietários com chance de vender, contatos respondidos rápido, negócios avaliados com comparáveis reais, aluguéis e reparos acompanhados. O trabalho que enche a semana de um corretor, feito por Coworkers.",
+            "metaTitle": "Agentes de IA para imobiliárias: vendedores, leads, aluguéis",
+            "metaDescription": "Contrate Coworkers de IA que acham proprietários prestes a vender, respondem cada contato, avaliam negócios com comparáveis e cuidam dos seus aluguéis.",
+            "wallTitle": "Os Coworkers que as imobiliárias contratam primeiro",
+            "wallLead": "Do vendedor fora do mercado ao reparo do inquilino. Cada um é um template da biblioteca, pronto para conectar ao seu e-mail e às suas planilhas.",
+            "week": {
+                "Mon": {
+                    "when": "Segunda, 8:00",
+                    "task": "proprietários com chance de vender, cada um com o sinal por trás"
+                },
+                "Tue": {
+                    "when": "Terça, 9:00",
+                    "task": "novos contatos respondidos, perguntas de qualificação feitas"
+                },
+                "Wed": {
+                    "when": "Quarta, 8:30",
+                    "task": "um resumo do proprietário das 11h"
+                },
+                "Thu": {
+                    "when": "Quinta, 10:00",
+                    "task": "fotos do anúncio retocadas e exportadas para a web"
+                },
+                "Fri": {
+                    "when": "Sexta, 9:00",
+                    "task": "aluguéis em risco apontados, prestadores cobrados"
+                }
+            },
+            "painsTitle": "Onde uma imobiliária perde o contrato",
+            "pains": {
+                "1": {
+                    "title": "Um contato respondido três horas depois",
+                    "body": "O primeiro corretor a responder ganha a visita. Um Coworker responde assim que o contato chega, faz as perguntas de qualificação e passa para você os sérios."
+                },
+                "2": {
+                    "title": "Um preço defendido de memória",
+                    "body": "O proprietário quer um número e um motivo. Um Coworker monta a comparação com o que de fato foi vendido por perto, antes da reunião."
+                },
+                "3": {
+                    "title": "Proprietários que você nunca procurou",
+                    "body": "Os sinais são públicos: anúncios expirados, inventários, muito tempo no mercado. Um Coworker lê esses sinais toda semana e ordena para quem ligar."
+                }
+            },
+            "features": {
+                "tools": "Responda compradores e inquilinos no WhatsApp, do seu próprio número.",
+                "lead-data": "Telefones, dados de empresas e resultados locais, pagos por consulta.",
+                "computer-use": "Um portal antigo ou um CRM sem API, preenchido na tela dele.",
+                "mobile-app": "Aprove uma resposta ou leia um resumo pelo celular, entre duas visitas."
+            },
+            "faq": {
+                "1": {
+                    "question": "Funciona com o meu CRM?",
+                    "answer": "Se o seu CRM tem uma API ou um servidor MCP, ele se conecta. Se é um portal antigo sem nenhum dos dois, o Coworker o abre na própria tela e preenche do jeito que você faria."
+                },
+                "2": {
+                    "question": "Ele pode responder leads em meu nome?",
+                    "answer": "Sim, e você define até onde ele vai: um rascunho para você, ou enviado sozinho. De qualquer forma a conversa continua legível, e tudo sobre o que ele teve dúvida chega até você."
+                },
+                "3": {
+                    "question": "Os dados de mercado são confiáveis?",
+                    "answer": "Um Coworker cita o que usou. Ele monta a comparação com os anúncios e as vendas que de fato leu, e você vê as fontes ao lado do número em vez de um valor tirado do nada."
+                },
+                "4": {
+                    "question": "Quanto custa o WhatsApp?",
+                    "answer": "O WhatsApp Pro é um app pago: {whatsappPrice} por mês por número conectado, na mesma fatura do seu plano. Uma mensagem nova acorda o Coworker, ele mantém um ritmo diário recomendado e nunca escreve para desconhecidos."
+                }
+            }
+        },
+        "startups": {
+            "crumb": "Startups",
+            "title": "Coworkers de IA para startups.",
+            "lede": "Cinco pessoas fazendo o trabalho de quinze. Contrate Coworkers para os trabalhos que você ainda não consegue preencher: o modelo para a rodada, o outbound, a preparação da demo e o lançamento.",
+            "metaTitle": "Agentes de IA para startups: captação, pipeline",
+            "metaDescription": "Um time pequeno não contrata para cada função. Contrate Coworkers de IA que montam o modelo da rodada, fazem outbound, preparam demos e o lançamento.",
+            "wallTitle": "Os Coworkers que uma startup contrata antes das primeiras contratações",
+            "wallLead": "Captação, pipeline e lançamento, cada um como um template. Instale, conecte as suas ferramentas e dê acesso ao time inteiro, de graça.",
+            "week": {
+                "Mon": {
+                    "when": "Segunda, 8:00",
+                    "task": "pipeline e cadastros em um só gráfico, antes da daily"
+                },
+                "Tue": {
+                    "when": "Terça, 9:00",
+                    "task": "trinta prospects que se encaixam, um primeiro e-mail para cada"
+                },
+                "Wed": {
+                    "when": "Quarta, 14:00",
+                    "task": "um roteiro de demo e um battle card para quinta"
+                },
+                "Thu": {
+                    "when": "Quinta, 10:00",
+                    "task": "o kit de lançamento redigido a partir da especificação"
+                },
+                "Fri": {
+                    "when": "Sexta, 11:00",
+                    "task": "lançamentos e páginas de preço de dois concorrentes comparados"
+                }
+            },
+            "painsTitle": "O que um time pequeno não consegue fazer",
+            "pains": {
+                "1": {
+                    "title": "Funções que ainda não têm dono",
+                    "body": "Outbound, parcerias, os números da semana. Todo mundo concorda que importam e ninguém tem o dia livre para eles."
+                },
+                "2": {
+                    "title": "Um modelo montado na véspera",
+                    "body": "Os comparáveis e o valuation são feitos na noite antes da reunião com o investidor. Um Coworker os monta a partir de documentos públicos, com a fonte de cada dado."
+                },
+                "3": {
+                    "title": "Lançamentos que atrasam por detalhes",
+                    "body": "A mensagem, a landing page, os e-mails, o post. Um Coworker redige tudo a partir da especificação enquanto você constrói."
+                }
+            },
+            "features": {
+                "chief-of-staff": "Diga do que precisa, ele passa o briefing ao Coworker certo. Ninguém precisa gerenciá-los.",
+                "workspaces": "O time inteiro tem acesso de graça e trabalha no mesmo quadro.",
+                "lead-data": "E-mails corporativos, telefones e dados de empresas, pagos com os seus créditos.",
+                "coworkers": "O seu playbook de vendas escrito uma vez, seguido em cada negócio."
+            },
+            "faq": {
+                "1": {
+                    "question": "Quanto tempo até um Coworker ser útil?",
+                    "answer": "Minutos, se você começar por um template: você conecta os apps, confere o horário e ele roda. Montar um a partir da sua própria descrição leva mais ou menos o tempo de escrever o trabalho."
+                },
+                "2": {
+                    "question": "O time inteiro pode usar?",
+                    "answer": "Sim, e sem custo extra: os usuários são grátis e ilimitados no Pro. Todo mundo vê o mesmo quadro, pode dar trabalho a um Coworker e pode responder quando um pede um sim."
+                },
+                "3": {
+                    "question": "Ele substitui as nossas ferramentas de automação?",
+                    "answer": "Substitui aquelas que você vive consertando. Um Coworker recebe o trabalho, não um fluxo desenhado, então um campo novo ou uma coluna renomeada não o quebra como quebra um grafo de nós."
+                },
+                "4": {
+                    "question": "De onde vêm os e-mails dos prospects?",
+                    "answer": "Do seu CRM e da web, e de consultas de e-mails corporativos, telefones e dados de empresas. São dados pagos, descontados dos seus créditos Rerun, e o Coworker pede que você aprove o custo estimado antes de comprar."
+                },
+                "5": {
+                    "question": "A conta cresce com o time?",
+                    "answer": "Não. Coworkers, usuários e execuções são ilimitados no Pro. O que custa a mais é o que você escolhe usar: dados pagos com os seus créditos Rerun, e LinkedIn Pro ou WhatsApp Pro por conta conectada."
+                }
+            }
+        },
+        "saas": {
+            "crumb": "SaaS",
+            "title": "Coworkers de IA para times de SaaS.",
+            "lede": "Contas indo para o churn, tickets esperando além do SLA, bugs se acumulando, releases sem notas: lidos todo dia por Coworkers que trazem tudo até você.",
+            "metaTitle": "Agentes de IA para SaaS: churn, suporte, releases",
+            "metaDescription": "Contrate Coworkers de IA que pegam contas em risco de churn, revisam o suporte contra o SLA, agrupam feedback, triam bugs e escrevem release notes.",
+            "wallTitle": "Os Coworkers que times de SaaS contratam primeiro",
+            "wallLead": "Churn, suporte, onboarding e releases. Cada um é um template que lê o seu faturamento, os seus tickets e o seu repositório, e reporta de volta.",
+            "week": {
+                "Mon": {
+                    "when": "Segunda, 8:00",
+                    "task": "contas indo para o churn, um plano de retenção para cada"
+                },
+                "Tue": {
+                    "when": "Terça, 9:00",
+                    "task": "tickets esperando além do SLA, ordenados por conta"
+                },
+                "Wed": {
+                    "when": "Quarta, 9:00",
+                    "task": "novos bugs triados, duplicados mesclados"
+                },
+                "Thu": {
+                    "when": "Quinta, 16:00",
+                    "task": "release notes escritas a partir do que foi mesclado"
+                },
+                "Fri": {
+                    "when": "Sexta, 10:00",
+                    "task": "páginas da doc que divergem do que saiu, listadas"
+                }
+            },
+            "painsTitle": "Os sinais que um time de SaaS lê tarde demais",
+            "pains": {
+                "1": {
+                    "title": "Churn que você vê na data de renovação",
+                    "body": "O uso caiu oito semanas atrás e ninguém olhou. Um Coworker acompanha as contas e avisa enquanto ainda há tempo."
+                },
+                "2": {
+                    "title": "Feedback espalhado em várias ferramentas",
+                    "body": "Tickets, pesquisas, motivos de cancelamento, a comunidade. Um Coworker lê tudo e traz de volta o que sempre aparece, com as citações."
+                },
+                "3": {
+                    "title": "Releases publicadas sem notas",
+                    "body": "As mudanças estão nos pull requests e os clientes nunca ficam sabendo. Um Coworker escreve as notas a partir do que de fato saiu."
+                }
+            },
+            "features": {
+                "tools": "Stripe, GitHub, Slack e a sua central de suporte, mais qualquer servidor MCP que você rode.",
+                "runs-24-7": "Um webhook o acorda com um novo alerta ou um novo ticket, a qualquer hora.",
+                "bring-your-own-ai": "Rode na sua chave de API, no seu plano do Claude ou do ChatGPT, ou no seu modelo.",
+                "security": "Máquina própria na Europa, backups criptografados toda noite, chaves no Vault."
+            },
+            "faq": {
+                "1": {
+                    "question": "De onde ele lê os nossos dados de uso e de faturamento?",
+                    "answer": "Das ferramentas que você já usa: Stripe, o seu banco de dados ou data warehouse, o seu product analytics, a sua central de suporte. Você as conecta uma vez no Vault e as libera para os Coworkers que precisam delas."
+                },
+                "2": {
+                    "question": "Ele pode escrever no nosso issue tracker?",
+                    "answer": "Sim. Fazer a triagem de um bug significa tirar duplicados, adicionar o contexto e registrá-lo onde o seu time realmente olha: Linear, Jira, GitHub ou Notion."
+                },
+                "3": {
+                    "question": "Ele pode fazer merge ou deploy sozinho?",
+                    "answer": "Só com o acesso que você der. Comece com acesso de leitura, e ele leva uma ação importante até você como um cartão de aprovação antes de agir. Um comando em um computador que você conectou sempre espera o seu sim."
+                },
+                "4": {
+                    "question": "Nossos dados treinam algum modelo?",
+                    "answer": "O Rerun não treina modelos com o seu workspace. Ele roda na própria máquina na Europa, e você escolhe o modelo: a sua própria chave de API, o seu plano do Claude ou do ChatGPT, ou um modelo que você hospeda."
+                }
+            }
+        },
+        "legal": {
+            "crumb": "Jurídico e compliance",
+            "title": "Coworkers de IA para jurídico e compliance.",
+            "lede": "Contratos conferidos com as suas próprias regras, prazos de aviso acompanhados, pedidos de dados respondidos a tempo, falhas de auditoria seguidas até fechar. Sempre para um advogado aprovar.",
+            "metaTitle": "Agentes de IA para jurídico e compliance: contratos",
+            "metaDescription": "Contrate Coworkers de IA que revisam contratos com as suas regras, acompanham prazos, preparam pedidos de titulares, avaliam lacunas e montam processos.",
+            "wallTitle": "Os Coworkers que times jurídicos contratam primeiro",
+            "wallLead": "Contratos, privacidade, trabalhista, propriedade intelectual e contencioso. Cada template lê os seus documentos onde eles estão e cita de onde veio cada ponto.",
+            "week": {
+                "Mon": {
+                    "when": "Segunda, 8:00",
+                    "task": "novos contratos da caixa de entrada conferidos com as suas regras"
+                },
+                "Tue": {
+                    "when": "Terça, 9:00",
+                    "task": "um pedido de titular de dados preparado, a resposta redigida"
+                },
+                "Wed": {
+                    "when": "Quarta, 14:00",
+                    "task": "deliberações e atas do conselho redigidas"
+                },
+                "Thu": {
+                    "when": "Quinta, 9:00",
+                    "task": "prazos de aviso em 90 dias, apontados por contrato"
+                },
+                "Fri": {
+                    "when": "Sexta, 10:00",
+                    "task": "o dossiê de segunda, cada alegação ligada a uma prova"
+                }
+            },
+            "painsTitle": "Onde o risco realmente está",
+            "pains": {
+                "1": {
+                    "title": "Um prazo de aviso perdido por uma semana",
+                    "body": "A cláusula estava na página nove e a data não estava na agenda de ninguém. Um Coworker extrai cada prazo de aviso e avisa você antes da janela."
+                },
+                "2": {
+                    "title": "Contratos assinados sem leitura",
+                    "body": "O time comercial precisava disso para ontem. Um Coworker lê com base nas suas próprias regras e aponta só o que merece o seu tempo."
+                },
+                "3": {
+                    "title": "Uma auditoria gasta caçando documentos",
+                    "body": "As provas existem, em seis drives e uma caixa de entrada. Um Coworker as encontra, nomeia e arquiva em cada requisito."
+                }
+            },
+            "features": {
+                "second-brain": "As suas posições, linhas vermelhas e redações alternativas, lidas antes de cada revisão.",
+                "coworkers": "O seu procedimento de revisão, aprendido uma vez e seguido do mesmo jeito toda vez.",
+                "security": "Máquina própria na Europa, backups criptografados toda noite, open source.",
+                "human-in-the-loop": "Todo resultado é um rascunho para um advogado, com a fonte de cada ponto."
+            },
+            "faq": {
+                "1": {
+                    "question": "Um Coworker dá parecer jurídico?",
+                    "answer": "Não. Ele lê, extrai e aponta, e todo resultado é escrito para uma pessoa qualificada revisar. Ele diz de onde no documento veio cada ponto, para você conferir em segundos."
+                },
+                "2": {
+                    "question": "Onde ficam os nossos documentos?",
+                    "answer": "Nos seus próprios drives e ferramentas, que o Coworker lê com o acesso que você der. O que ele trabalha fica na máquina do seu workspace na Europa, isolada dos outros clientes e com backup criptografado toda noite."
+                },
+                "3": {
+                    "question": "Quem mais vê os nossos arquivos?",
+                    "answer": "O seu workspace roda em uma máquina própria, separada de todos os outros clientes. O modelo que você escolher lê o que uma tarefa precisa, sob os termos desse provedor. O Rerun é open source, então um escritório que precise pode rodá-lo nos próprios servidores."
+                },
+                "4": {
+                    "question": "Podemos definir os nossos padrões de cláusulas?",
+                    "answer": "Sim. As suas posições, linhas vermelhas e redações alternativas vão no Brain ou em uma skill, e o Coworker revisa com base nelas, não em uma checklist genérica."
+                },
+                "5": {
+                    "question": "Podemos manter os casos separados?",
+                    "answer": "Uma Box por caso decide quem do time tem acesso aos Coworkers dela. As Boxes compartilham uma máquina e um banco de dados, então um caso que precise de separação total ganha um workspace próprio."
+                }
+            }
+        },
+        "recruiting": {
+            "crumb": "Recrutamento e RH",
+            "title": "Coworkers de IA para recrutamento e RH.",
+            "lede": "Cada candidatura lida com base na vaga do mesmo jeito, entrevistas preparadas a partir do currículo, debriefs transformados em decisão, e nenhum candidato sem resposta.",
+            "metaTitle": "Agentes de IA para recrutamento: triagem, entrevistas",
+            "metaDescription": "Contrate Coworkers de IA que triam cada candidatura pela vaga, preparam kits de entrevista, atualizam candidatos, fazem o onboarding e conferem a folha.",
+            "wallTitle": "Os Coworkers que times de recrutamento e RH contratam primeiro",
+            "wallLead": "Do anúncio da vaga ao primeiro holerite. Cada um é um template que trabalha na sua caixa de entrada, na sua agenda e no seu ATS.",
+            "week": {
+                "Mon": {
+                    "when": "Segunda, 9:00",
+                    "task": "candidaturas do fim de semana lidas, uma shortlist com o porquê"
+                },
+                "Tue": {
+                    "when": "Terça, 8:30",
+                    "task": "um kit de entrevista para cada candidato do dia"
+                },
+                "Wed": {
+                    "when": "Quarta, 16:00",
+                    "task": "cada candidato sabendo em que pé está"
+                },
+                "Thu": {
+                    "when": "Quinta, 10:00",
+                    "task": "o anúncio e os critérios de uma nova vaga redigidos"
+                },
+                "Fri": {
+                    "when": "Sexta, 11:00",
+                    "task": "notas de debrief viram uma comparação por vaga"
+                }
+            },
+            "painsTitle": "Onde um processo seletivo fica em silêncio",
+            "pains": {
+                "1": {
+                    "title": "Duzentas candidaturas, um dia",
+                    "body": "As últimas cinquenta ganham trinta segundos cada. Um Coworker lê todas com os mesmos critérios e mostra as evidências."
+                },
+                "2": {
+                    "title": "Candidatos que nunca têm retorno",
+                    "body": "Não por falta de educação, mas por volume. Um Coworker mantém cada candidato atualizado em cada etapa, com as suas palavras."
+                },
+                "3": {
+                    "title": "Debriefs que nunca decidem",
+                    "body": "Quatro conjuntos de notas em quatro formatos. Um Coworker os transforma em evidências, perguntas em aberto e uma comparação com a vaga."
+                }
+            },
+            "features": {
+                "human-in-the-loop": "Ele monta a shortlist com evidências. Quem segue continua sendo decisão do seu time.",
+                "coworkers": "O seu scorecard escrito uma vez, aplicado a cada candidatura do mesmo jeito.",
+                "security": "Dados dos candidatos na máquina do seu workspace na Europa, com backup toda noite.",
+                "tools": "Encontre candidatos e mande mensagens pelo seu próprio LinkedIn, como app pago."
+            },
+            "faq": {
+                "1": {
+                    "question": "Um Coworker decide quem é contratado?",
+                    "answer": "Não. Ele lê com base nos critérios que você escreveu e mostra as evidências de cada ponto, inclusive o que não conseguiu verificar. A shortlist é uma leitura, e a decisão fica com o seu time."
+                },
+                "2": {
+                    "question": "Como ele trata os dados dos candidatos pela GDPR?",
+                    "answer": "Ele lê as candidaturas nas ferramentas que você conecta e trabalha na máquina do seu workspace na Europa, separada dos outros clientes. O que ele guarda fica no banco de dados e na pasta dele, onde você pode buscar, exportar e apagar."
+                },
+                "3": {
+                    "question": "Ele pode escrever no nosso ATS?",
+                    "answer": "Se o seu ATS tem uma API ou um servidor MCP, sim. Se não tem, o Coworker o abre na própria tela e preenche do jeito que uma pessoa faria."
+                },
+                "4": {
+                    "question": "Ele pode buscar candidatos no LinkedIn?",
+                    "answer": "Sim, com o LinkedIn Pro. O LinkedIn Pro é um app pago: {linkedinPrice} por mês por conta conectada, na mesma fatura do seu plano. Ele busca e lê perfis pela sua conta e envia mensagens em um ritmo diário recomendado que mantém a conta segura."
+                }
+            }
+        },
+        "creators": {
+            "crumb": "Criadores e mídia",
+            "title": "Coworkers de IA para criadores e mídia.",
+            "lede": "Roteiros, cortes, a newsletter, o Discord e a proposta para patrocinadores: o trabalho em volta do trabalho, feito por Coworkers para você criar o próximo conteúdo.",
+            "metaTitle": "Agentes de IA para criadores: roteiros, cortes, comunidade",
+            "metaDescription": "Contrate Coworkers de IA que escrevem roteiros, transformam vídeos longos em cortes legendados, postam toda semana, cuidam do Discord e acham patrocínios.",
+            "wallTitle": "Os Coworkers que criadores contratam primeiro",
+            "wallLead": "Do roteiro à caixa de entrada do patrocinador. Cada um é um template que você instala, conecta aos seus canais e roda no seu horário.",
+            "week": {
+                "Mon": {
+                    "when": "Segunda, 9:00",
+                    "task": "vídeo da semana passada em cinco cortes legendados"
+                },
+                "Tue": {
+                    "when": "Terça, 10:00",
+                    "task": "uma estrutura e um roteiro para o próximo episódio"
+                },
+                "Wed": {
+                    "when": "Quarta, 8:00",
+                    "task": "perguntas do Discord respondidas, quebras de regra apontadas"
+                },
+                "Thu": {
+                    "when": "Quinta, 11:00",
+                    "task": "três marcas que valem uma proposta, a apresentação redigida"
+                },
+                "Fri": {
+                    "when": "Sexta, 9:00",
+                    "task": "a newsletter redigida a partir dos vídeos da semana"
+                }
+            },
+            "painsTitle": "O que consome a semana de um criador",
+            "pains": {
+                "1": {
+                    "title": "A edição consome a semana",
+                    "body": "Um vídeo longo vira dias de cortes, legendas e títulos. Um Coworker faz os cortes e escreve os títulos enquanto você grava o próximo."
+                },
+                "2": {
+                    "title": "Uma comunidade que esfria",
+                    "body": "As perguntas esperam um dia e o canal esfria. Um Coworker responde o que pode, aponta quebras de regra e posta um assunto para conversa todo dia."
+                },
+                "3": {
+                    "title": "Patrocinadores que você nunca abordou",
+                    "body": "As marcas que combinam com o seu público existem, e ninguém escreve para elas. Um Coworker monta a lista, diz por que cada uma combina agora e redige a proposta."
+                }
+            },
+            "features": {
+                "your-computer": "Renderizações pesadas rodam no seu próprio Mac ou PC, conectado pelo app de desktop.",
+                "coworkers": "Os seus ganchos, os seus formatos e as suas regras de edição, aprendidos uma vez.",
+                "coworkers-work-together": "O roteiro, os cortes e os posts, passados de um Coworker para o próximo.",
+                "mobile-app": "Aprove um post ou responda uma pergunta pelo celular, durante uma gravação."
+            },
+            "faq": {
+                "1": {
+                    "question": "Ele posta nas minhas contas sem perguntar?",
+                    "answer": "Só se você deixar. Por padrão, os posts são escritos para cada rede e publicados quando você dá o sinal verde. Você pode mudar um Coworker para publicar sozinho e reportar depois."
+                },
+                "2": {
+                    "question": "Ele pode editar os meus vídeos?",
+                    "answer": "Ele transforma vídeos longos em cortes verticais legendados e escreve os títulos, as descrições e os capítulos. Para trabalho pesado, conecte o seu próprio computador: ele roda a tarefa lá, e cada programa novo pede a sua aprovação antes."
+                },
+                "3": {
+                    "question": "Vai soar como eu?",
+                    "answer": "A sua voz, os seus formatos e o seu público ficam no Brain, e todo Coworker lê isso antes de escrever. Corrija um roteiro uma vez e ele se lembra da correção."
+                },
+                "4": {
+                    "question": "Ler outros canais custa alguma coisa?",
+                    "answer": "Ler perfis e posts públicos no YouTube, TikTok, Instagram e X custa créditos. São dados pagos, descontados dos seus créditos Rerun, e o Coworker pede que você aprove o custo estimado antes de comprar."
+                }
+            }
+        },
+        "consulting": {
+            "crumb": "Consultoria e coaching",
+            "title": "Coworkers de IA para consultores e coaches.",
+            "lede": "Chamadas de diagnóstico preparadas, entregáveis redigidos, follow-ups enviados e horas faturadas: o trabalho em volta das suas sessões, feito por Coworkers que conhecem o seu método.",
+            "metaTitle": "Agentes de IA para consultores e coaches",
+            "metaDescription": "Contrate Coworkers de IA que preparam cada diagnóstico, mapeiam processos, redigem relatórios e workshops, acompanham as sessões e faturam suas horas.",
+            "wallTitle": "Os Coworkers que consultores e coaches contratam primeiro",
+            "wallLead": "Antes da chamada, depois da sessão e no fim do mês. Cada um é um template que aprende o seu método uma vez.",
+            "week": {
+                "Mon": {
+                    "when": "Segunda, 8:00",
+                    "task": "um resumo e perguntas certeiras para cada diagnóstico"
+                },
+                "Tue": {
+                    "when": "Terça, 9:00",
+                    "task": "caixa de entrada organizada, respostas redigidas"
+                },
+                "Wed": {
+                    "when": "Quarta, 9:00",
+                    "task": "prospects sumidos encontrados, um follow-up para cada"
+                },
+                "Thu": {
+                    "when": "Quinta, 15:00",
+                    "task": "slides e exercícios do workshop redigidos das notas"
+                },
+                "Fri": {
+                    "when": "Sexta, 16:00",
+                    "task": "horas da semana faturadas com link de pagamento"
+                }
+            },
+            "painsTitle": "O que uma consultoria faz fora do horário",
+            "pains": {
+                "1": {
+                    "title": "Chamadas preparadas no elevador",
+                    "body": "Você abre o site do cliente na sala de espera. Um Coworker envia na noite anterior um resumo e perguntas certeiras, a partir do que é público e das suas notas."
+                },
+                "2": {
+                    "title": "O relatório feito de madrugada",
+                    "body": "A sessão levou duas horas e o relatório leva quatro. Um Coworker redige o resumo, o mapa de processos ou os slides a partir das suas notas, no seu método."
+                },
+                "3": {
+                    "title": "Horas trabalhadas, nunca cobradas",
+                    "body": "A planilha de horas fica em uma anotação até o mês acabar. Um Coworker transforma as horas faturáveis em faturas com link de pagamento e concilia o que entra."
+                }
+            },
+            "features": {
+                "second-brain": "O seu método, os seus frameworks e o contexto de cada cliente, lidos antes de escrever.",
+                "coworkers": "O seu roteiro de diagnóstico ou a estrutura do relatório, escritos uma vez e reutilizados.",
+                "workspaces": "Uma Box por cliente, para cada projeto manter os próprios Coworkers.",
+                "desktop-app": "Chame um Coworker de qualquer app com um atalho, no meio do trabalho com o cliente."
+            },
+            "faq": {
+                "1": {
+                    "question": "As informações dos meus clientes ficam confidenciais?",
+                    "answer": "Elas ficam na máquina do seu workspace na Europa, separada de todos os outros clientes, e as chaves ficam no Vault, que o modelo nunca lê. Para uma separação total entre dois clientes, dê a cada um o seu próprio workspace."
+                },
+                "2": {
+                    "question": "Ele pode seguir o meu próprio método?",
+                    "answer": "Sim. Escreva os seus frameworks, a estrutura do relatório e o seu tom no Brain ou em uma skill, e todo Coworker trabalha a partir deles. Corrija um rascunho uma vez e ele se lembra."
+                },
+                "3": {
+                    "question": "Ele trabalha com as notas das sessões?",
+                    "answer": "Sim. Coloque as suas notas ou uma transcrição na pasta dele, anexe a uma mensagem ou grave um áudio, e ele transforma tudo em um resumo, um plano ou slides."
+                },
+                "4": {
+                    "question": "Ele pode cobrar um cliente que não pagou?",
+                    "answer": "Ele fatura as suas horas faturáveis com um link de pagamento, concilia os pagamentos que entram e redige o lembrete para cada atraso. Você decide se ele envia ou entrega o rascunho."
+                }
+            }
+        },
+        "accounting": {
+            "crumb": "Contabilidade e finanças",
+            "title": "Coworkers de IA para contabilidade e finanças.",
+            "lede": "Faturas de fornecedores lidas, contas a receber cobradas, caixa conciliado, mês fechado e arquivo de IVA preparado, com cada número ligado à fonte e cada pagamento deixado com você.",
+            "metaTitle": "Agentes de IA para contabilidade: faturas, fechamento, caixa",
+            "metaDescription": "Contrate Coworkers de IA que processam faturas, cobram recebíveis, acompanham o caixa, fecham o mês e preparam o IVA, cada número ligado à fonte.",
+            "wallTitle": "Os Coworkers que times de finanças contratam primeiro",
+            "wallLead": "Contas a pagar, contas a receber, caixa, fechamento e impostos. Cada um é um template que lê a sua contabilidade e o seu banco, e propõe antes de agir.",
+            "week": {
+                "Mon": {
+                    "when": "Segunda, 8:00",
+                    "task": "caixa de todos os bancos, com os pagamentos prioritários"
+                },
+                "Tue": {
+                    "when": "Terça, 9:00",
+                    "task": "novas faturas de fornecedores lidas, duplicadas pegas"
+                },
+                "Wed": {
+                    "when": "Quarta, 10:00",
+                    "task": "faturas atrasadas cobradas, pagamentos conciliados"
+                },
+                "Thu": {
+                    "when": "Quinta, 9:00",
+                    "task": "margem por produto e cupom, depois dos custos"
+                },
+                "Fri": {
+                    "when": "Sexta, 11:00",
+                    "task": "recibos e aprovações faltando cobrados para o fechamento"
+                }
+            },
+            "painsTitle": "Para onde vão as horas de um time de finanças",
+            "pains": {
+                "1": {
+                    "title": "Faturas de fornecedores digitadas à mão",
+                    "body": "Cada PDF digitado em um registro, e a duplicada passa. Um Coworker lê cada fatura, confere preços e números de IVA e aponta o que não bate."
+                },
+                "2": {
+                    "title": "Um fechamento que consome a primeira semana",
+                    "body": "Recibos faltando, aprovações pendentes, variações sem explicação. Um Coworker propõe os lançamentos, cobra o que falta e explica cada variação."
+                },
+                "3": {
+                    "title": "Um caixa que você só conhece na sexta",
+                    "body": "Vários bancos, duas contas de pagamento, uma planilha atualizada à mão. Um Coworker lê tudo e diz por que o caixa difere da contabilidade."
+                }
+            },
+            "features": {
+                "human-in-the-loop": "Ele propõe cada lote de pagamentos e o leva até você em um cartão de aprovação.",
+                "computer-use": "Um portal bancário ou um site de impostos sem API, usado na tela dele.",
+                "security": "Máquina própria na Europa, com backups criptografados toda noite."
+            },
+            "faq": {
+                "1": {
+                    "question": "Ele se conecta ao nosso banco e ao nosso software contábil?",
+                    "answer": "Se a ferramenta tem uma API ou um servidor MCP, ele se conecta, Stripe e mais de {connectors} outras incluídas. Um portal bancário sem nenhum dos dois ele abre na própria tela, e quando um login precisa do seu celular, ele passa a tela para você."
+                },
+                "2": {
+                    "question": "Um Coworker pode pagar um fornecedor sozinho?",
+                    "answer": "Ele propõe o lote de pagamentos, com o motivo de cada linha e quais pagar primeiro, e leva até você como um cartão de aprovação antes de agir. Você pode manter a transferência em si no seu banco, como o clique de uma pessoa."
+                },
+                "3": {
+                    "question": "Ele entrega a nossa declaração de IVA?",
+                    "answer": "Ele prepara a declaração e os arquivos fiscais a partir da sua contabilidade, com as provas e a fonte de cada número, prontos para o seu contador conferir. O envio fica com você."
+                },
+                "4": {
+                    "question": "Onde ficam os nossos dados financeiros?",
+                    "answer": "Na máquina do seu workspace na Europa, separada de todos os outros clientes, com backup criptografado toda noite. Os logins ficam no Vault, que o modelo nunca lê. O Rerun é open source se você precisar dele nos seus próprios servidores."
+                },
+                "5": {
+                    "question": "Um escritório pode separar cada cliente?",
+                    "answer": "Sim. Dê a cada cliente o seu próprio workspace: os seus Coworkers, os seus apps, o seu banco de dados. Nada passa de um workspace para outro, e você alterna entre eles pela pílula no canto."
+                }
+            }
+        },
+        "marketing": {
+            "crumb": "Times de marketing",
+            "title": "Coworkers de IA para times de marketing.",
+            "lede": "O calendário editorial, os textos da campanha, os números da semana, as pautas para a imprensa e a lista de criadores: o trabalho que um time pequeno nunca termina, feito por Coworkers.",
+            "metaTitle": "Agentes de IA para marketing: conteúdo, anúncios",
+            "metaDescription": "Contrate Coworkers de IA que planejam o calendário editorial, escrevem campanhas, leem cada canal, mantêm a marca consistente e acham imprensa e criadores.",
+            "wallTitle": "Os Coworkers que times de marketing contratam primeiro",
+            "wallLead": "Conteúdo, campanhas, marca e números. Cada um é um template que lê o seu posicionamento uma vez e trabalha nos seus canais.",
+            "week": {
+                "Mon": {
+                    "when": "Segunda, 8:00",
+                    "task": "gasto e receita de cada canal, lado a lado"
+                },
+                "Tue": {
+                    "when": "Terça, 9:00",
+                    "task": "o que os concorrentes publicaram e lançaram, com as lacunas"
+                },
+                "Wed": {
+                    "when": "Quarta, 10:00",
+                    "task": "uma landing page e três e-mails para a nova oferta"
+                },
+                "Thu": {
+                    "when": "Quinta, 11:00",
+                    "task": "posts da semana conferidos com o guia da marca"
+                },
+                "Fri": {
+                    "when": "Sexta, 14:00",
+                    "task": "anúncios no prejuízo pausados depois do seu sim"
+                }
+            },
+            "painsTitle": "O que um time de marketing nunca consegue fazer",
+            "pains": {
+                "1": {
+                    "title": "Números lidos uma vez por mês",
+                    "body": "Gasto em uma ferramenta, receita em outra, rastreamento meio quebrado. Um Coworker coloca cada canal lado a lado toda semana e diz o que os números sustentam."
+                },
+                "2": {
+                    "title": "Um calendário que ninguém segue",
+                    "body": "O plano foi feito em janeiro e já tinha desandado em março. Um Coworker monta o mês com o que performa e o que os concorrentes publicam, e mantém os rascunhos andando."
+                },
+                "3": {
+                    "title": "Fora da marca no terceiro canal",
+                    "body": "Cada pessoa escreve a voz da marca de um jeito um pouco diferente. Um Coworker confere cada página, apresentação e e-mail com o guia da marca antes de sair."
+                }
+            },
+            "features": {
+                "second-brain": "O seu posicionamento, a sua voz e os seus compradores, lidos antes de cada rascunho.",
+                "lead-data": "Volumes de busca, ideias de palavras-chave, backlinks e posts sociais, pagos por consulta.",
+                "coworkers-work-together": "O briefing, o rascunho e a tradução, passados entre Coworkers.",
+                "chief-of-staff": "Peça uma campanha em uma frase, ele passa o briefing aos Coworkers certos."
+            },
+            "faq": {
+                "1": {
+                    "question": "Ele vai escrever na voz da nossa marca?",
+                    "answer": "O seu posicionamento, a sua voz e as suas regras visuais ficam no Brain, montado a partir do seu site e mantido em dia com você. Todo Coworker lê isso antes de escrever, e o Coworker de marca confere o resto com base nisso."
+                },
+                "2": {
+                    "question": "Ele pode mudar nossos orçamentos de anúncios?",
+                    "answer": "Ele revisa anúncios no Google, Meta, LinkedIn e TikTok, aponta gasto desperdiçado e propõe mudanças de orçamento e exclusões. Você decide nas instruções dele o que ele pode mudar e o que espera o seu sim."
+                },
+                "3": {
+                    "question": "Quanto custam os dados de SEO e de redes sociais?",
+                    "answer": "Volumes de busca, ideias de palavras-chave, backlinks, resultados do Google e posts sociais públicos são comprados por chamada. São dados pagos, descontados dos seus créditos Rerun, e o Coworker pede que você aprove o custo estimado antes de comprar."
+                },
+                "4": {
+                    "question": "Ele pode publicar no nosso site e nas nossas redes?",
+                    "answer": "Sim, pelos apps que você conecta, como WordPress, LinkedIn ou Instagram. Por padrão, ele prepara o post e publica quando você dá o sinal verde."
+                },
+                "5": {
+                    "question": "Ele pode traduzir as nossas campanhas?",
+                    "answer": "Sim. Ele localiza documentos, e-mails, páginas e visuais para os idiomas em que você vende, com os seus próprios termos e tom, e devolve cada um pronto para revisão."
+                }
+            }
+        },
+        "sales": {
+            "crumb": "Times de vendas",
+            "title": "Coworkers de IA para times de vendas.",
+            "lede": "Prospects encontrados e abordados, cada reunião preparada, o CRM mantido limpo, o forecast lido toda semana e nenhuma conta deixada esfriar.",
+            "metaTitle": "Agentes de IA para vendas: prospecção, pipeline",
+            "metaDescription": "Contrate Coworkers de IA que acham prospects, escrevem o primeiro e-mail, preparam reuniões, limpam o CRM, orientam vendedores e leem o forecast.",
+            "wallTitle": "Os Coworkers que times de vendas contratam primeiro",
+            "wallLead": "Do primeiro contato à renovação. Cada um é um template que trabalha no seu CRM, na sua caixa de entrada e na sua agenda.",
+            "week": {
+                "Mon": {
+                    "when": "Segunda, 8:00",
+                    "task": "o forecast, a distância da meta e os negócios por trás"
+                },
+                "Tue": {
+                    "when": "Terça, 9:00",
+                    "task": "cinquenta prospects que se encaixam, um primeiro e-mail para cada"
+                },
+                "Wed": {
+                    "when": "Quarta, 8:30",
+                    "task": "um resumo e perguntas de descoberta para cada reunião"
+                },
+                "Thu": {
+                    "when": "Quinta, 10:00",
+                    "task": "respostas organizadas, o próximo passo redigido para cada"
+                },
+                "Fri": {
+                    "when": "Sexta, 11:00",
+                    "task": "novas licitações certas, com parecer de seguir ou não"
+                }
+            },
+            "painsTitle": "Onde um pipeline vaza",
+            "pains": {
+                "1": {
+                    "title": "Prospecção deixada para sexta",
+                    "body": "As reuniões enchem a semana e o topo do funil esvazia. Um Coworker encontra as contas que se encaixam e escreve o primeiro e-mail toda manhã."
+                },
+                "2": {
+                    "title": "Um CRM em que ninguém confia",
+                    "body": "Dois vendedores na mesma conta, um lead que não foi para ninguém, notas nunca registradas. Um Coworker distribui cada lead e escreve as notas depois de cada reunião."
+                },
+                "3": {
+                    "title": "Um forecast feito de esperança",
+                    "body": "Os negócios que decidem o trimestre são os que ninguém tocou em três semanas. Um Coworker lê o pipeline e diz quais são toda segunda."
+                }
+            },
+            "features": {
+                "tools": "Prospecte pela sua própria conta do LinkedIn em um ritmo diário seguro. Um app pago.",
+                "lead-data": "E-mails corporativos, telefones e dados de empresas, pagos com os seus créditos.",
+                "coworkers-work-together": "Um encontra as contas, o próximo escreve para elas, um terceiro registra a resposta.",
+                "mobile-app": "Leia o resumo e aprove um follow-up entre duas reuniões."
+            },
+            "faq": {
+                "1": {
+                    "question": "Funciona com o nosso CRM?",
+                    "answer": "HubSpot, Salesforce, Pipedrive e qualquer CRM com uma API ou um servidor MCP se conectam. Um sem nenhum dos dois o Coworker abre na própria tela e preenche do jeito que um vendedor faria."
+                },
+                "2": {
+                    "question": "Ele vai mandar e-mail para prospects sem um vendedor conferir?",
+                    "answer": "Você decide. Comece com rascunhos que um vendedor aprova, depois deixe um Coworker enviar o primeiro e-mail e o follow-up quando confiarem na escrita dele. Cada resposta é organizada, com o próximo passo redigido."
+                },
+                "3": {
+                    "question": "Quanto custa prospectar no LinkedIn?",
+                    "answer": "O LinkedIn Pro é um app pago: {linkedinPrice} por mês por conta conectada, na mesma fatura do seu plano. Os Coworkers leem perfis por essa conta sem gastar créditos e mantêm um ritmo diário recomendado, como 25 convites por dia."
+                },
+                "4": {
+                    "question": "De onde vêm os dados de contato?",
+                    "answer": "Do seu CRM e de consultas de e-mails corporativos, telefones e dados de empresas. São dados pagos, descontados dos seus créditos Rerun, e o Coworker pede que você aprove o custo estimado antes de comprar."
+                },
+                "5": {
+                    "question": "Cada vendedor pode ter os próprios Coworkers?",
+                    "answer": "Sim. Os usuários são grátis e ilimitados no Pro. Dê a cada time uma Box e escolha quem tem acesso. A conta do LinkedIn de cada vendedor ocupa uma vaga paga própria."
+                }
+            }
+        },
+        "hospitality": {
+            "crumb": "Hotelaria",
+            "title": "Coworkers de IA para hotéis, aluguéis de temporada e restaurantes.",
+            "lede": "Hóspedes informados antes de chegar, limpezas agendadas, avaliações respondidas, o cardápio precificado para dar lucro e a lista do evento conferida. Os Coworkers cuidam dos bastidores.",
+            "metaTitle": "Agentes de IA para hotelaria: hóspedes, avaliações, cardápio",
+            "metaDescription": "Contrate Coworkers de IA que informam cada hóspede, agendam a limpeza entre estadias, respondem avaliações, calculam o cardápio e comparam fornecedores.",
+            "wallTitle": "Os Coworkers que hotéis e restaurantes contratam primeiro",
+            "wallLead": "Chegadas, avaliações, cardápios e eventos. Cada um é um template que trabalha na sua caixa de entrada, nas suas planilhas e no idioma dos seus hóspedes.",
+            "week": {
+                "Mon": {
+                    "when": "Segunda, 8:00",
+                    "task": "chegadas da semana informadas, horários de limpeza definidos"
+                },
+                "Tue": {
+                    "when": "Terça, 9:00",
+                    "task": "novas avaliações lidas, uma resposta redigida para cada"
+                },
+                "Wed": {
+                    "when": "Quarta, 10:00",
+                    "task": "orçamentos de fornecedores comparados lado a lado"
+                },
+                "Thu": {
+                    "when": "Quinta, 11:00",
+                    "task": "suas avaliações comparadas com as dos vizinhos"
+                },
+                "Fri": {
+                    "when": "Sexta, 9:00",
+                    "task": "posts do fim de semana escritos, prontos para um sim"
+                }
+            },
+            "painsTitle": "O que escapa entre dois serviços",
+            "pains": {
+                "1": {
+                    "title": "Avaliações respondidas uma semana depois",
+                    "body": "Uma avaliação ruim fica sem resposta enquanto o próximo hóspede a lê. Um Coworker lê cada avaliação nova e redige uma resposta que combina com ela."
+                },
+                "2": {
+                    "title": "Chegadas informadas uma por uma",
+                    "body": "Códigos, instruções e horários de check-in, enviados à mão para cada hóspede. Um Coworker informa cada hóspede com os dados de acesso e agenda a limpeza."
+                },
+                "3": {
+                    "title": "Pratos que dão prejuízo",
+                    "body": "Os preços dos fornecedores subiram e o cardápio não. Um Coworker calcula o custo de cada receita e diz o que reprecificar, refazer, promover ou tirar."
+                }
+            },
+            "features": {
+                "tools": "Responda hóspedes no WhatsApp do seu próprio número. Um app pago.",
+                "computer-use": "Uma extranet de reservas sem API, usada na tela dele como uma pessoa faria.",
+                "runs-24-7": "Uma mensagem à noite o acorda enquanto a recepção está fechada.",
+                "mobile-app": "Aprove uma resposta a um hóspede pelo celular, entre dois serviços."
+            },
+            "faq": {
+                "1": {
+                    "question": "Funciona com o meu sistema de reservas?",
+                    "answer": "Se o seu sistema de reservas ou channel manager tem uma API ou um servidor MCP, ele se conecta. Se não, o Coworker o abre na própria tela e lê ou preenche do jeito que a sua equipe faria."
+                },
+                "2": {
+                    "question": "Ele pode responder hóspedes no WhatsApp?",
+                    "answer": "Sim. O WhatsApp Pro é um app pago: {whatsappPrice} por mês por número conectado, na mesma fatura do seu plano. Uma mensagem nova acorda o Coworker, ele responde do seu número com texto, arquivos e áudios, e nunca escreve para desconhecidos."
+                },
+                "3": {
+                    "question": "Ele mesmo publica as respostas às avaliações?",
+                    "answer": "Ele redige uma resposta para cada avaliação que precisa de uma e compara o que os hóspedes dizem de você com os lugares por perto. Você lê os rascunhos e publica, ou aprova em lote."
+                },
+                "4": {
+                    "question": "Ele pode escrever para os hóspedes no idioma deles?",
+                    "answer": "Sim. Ele traduz as suas mensagens aos hóspedes, cardápios e páginas para os idiomas que os seus hóspedes falam, com os seus próprios termos e tom, prontos para revisão."
+                },
+                "5": {
+                    "question": "Pago por quarto ou por propriedade?",
+                    "answer": "Nenhum dos dois. Um plano roda quantos Coworkers você montar, e os usuários são grátis, então toda a equipe pode responder uma aprovação. Coloque cada propriedade em uma Box própria."
+                }
+            }
+        },
+        "local-business": {
+            "crumb": "Negócios locais",
+            "title": "Coworkers de IA para negócios locais.",
+            "lede": "Avaliações respondidas, mensagens de clientes organizadas, posts da semana escritos, faturas enviadas e a contabilidade pronta para o seu contador, enquanto você atende quem está na sua frente.",
+            "metaTitle": "Agentes de IA para negócios locais: avaliações, contas",
+            "metaDescription": "Contrate Coworkers de IA que respondem avaliações, organizam mensagens, postam toda semana, veem sua posição no Google, enviam faturas e cuidam das contas.",
+            "wallTitle": "Os Coworkers que um negócio local contrata primeiro",
+            "wallLead": "O balcão, a vitrine e a contabilidade. Cada um é um template que você instala, conecta ao seu e-mail e liga.",
+            "week": {
+                "Mon": {
+                    "when": "Segunda, 8:00",
+                    "task": "avaliações do fim de semana lidas, uma resposta para cada"
+                },
+                "Tue": {
+                    "when": "Terça, 9:00",
+                    "task": "mensagens de clientes organizadas, duas deixadas para você"
+                },
+                "Wed": {
+                    "when": "Quarta, 10:00",
+                    "task": "sua posição no Google ao lado dos concorrentes"
+                },
+                "Thu": {
+                    "when": "Quinta, 9:00",
+                    "task": "posts da próxima semana escritos, prontos para o seu ok"
+                },
+                "Fri": {
+                    "when": "Sexta, 16:00",
+                    "task": "faturas da semana enviadas, pagamentos conciliados"
+                }
+            },
+            "painsTitle": "O que um dia corrido deixa por fazer",
+            "pains": {
+                "1": {
+                    "title": "Uma avaliação ruim no topo",
+                    "body": "Os clientes leem primeiro a avaliação mais recente. Um Coworker lê cada uma nova, no Google e em outros lugares, e redige uma resposta no mesmo dia."
+                },
+                "2": {
+                    "title": "Mensagens respondidas depois de fechar",
+                    "body": "As perguntas chegam enquanto você atende, e a noite vai embora nas respostas. Um Coworker as organiza e redige cada resposta com base nos seus preços e horários."
+                },
+                "3": {
+                    "title": "Uma caixa cheia de recibos",
+                    "body": "A contabilidade espera até o contador pedir. Um Coworker cobra os recibos que faltam todo mês e prepara o arquivo de IVA, com uma fonte para cada número."
+                }
+            },
+            "features": {
+                "chief-of-staff": "Diga do que precisa em uma frase. Ele monta o Coworker certo e passa o briefing.",
+                "second-brain": "Os seus preços, horários de funcionamento e serviços, lidos antes de cada resposta.",
+                "tools": "Responda clientes no WhatsApp do seu próprio número. Um app pago.",
+                "mobile-app": "Aprove uma resposta ou uma fatura pelo celular, atrás do balcão."
+            },
+            "faq": {
+                "1": {
+                    "question": "Preciso entender de tecnologia?",
+                    "answer": "Não. O Chief of Staff lê o seu site, escreve o que aprende no Brain e monta os seus primeiros Coworkers com você. Você conecta o seu e-mail e aprova o que eles propõem."
+                },
+                "2": {
+                    "question": "Ele pode responder clientes no WhatsApp?",
+                    "answer": "Sim. O WhatsApp Pro é um app pago: {whatsappPrice} por mês por número conectado, na mesma fatura do seu plano. Uma mensagem nova acorda o Coworker e ele responde do seu número. Ele mantém um ritmo diário recomendado e nunca escreve para desconhecidos."
+                },
+                "3": {
+                    "question": "Ele responde minhas avaliações do Google?",
+                    "answer": "Ele lê o que os clientes dizem de você em avaliações, buscas e no Reddit, compara você com a concorrência e redige uma resposta para cada avaliação que precisa de uma, para você publicar."
+                },
+                "4": {
+                    "question": "Ele faz minha contabilidade?",
+                    "answer": "Ele propõe os lançamentos de fim de mês, cobra os recibos que faltam e prepara o seu arquivo de IVA com a fonte de cada número. O seu contador confere e entrega."
+                },
+                "5": {
+                    "question": "Como eu testo?",
+                    "answer": "O Pro começa com um teste grátis de {trialDays} dias. Um plano cobre quantos Coworkers você montar, e os usuários são grátis, então quem estiver no balcão também pode responder uma aprovação."
+                }
+            }
+        }
+    }
+}

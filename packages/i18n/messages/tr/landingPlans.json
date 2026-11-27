@@ -1,0 +1,127 @@
+{
+    "hero": {
+        "crumb": "Fiyatlandırma",
+        "title": "Ayda {price}. Tüm coworker'lar dahil.",
+        "lede": "Sınırsız coworker ve kullanıcı, bulutta size özel bir makine ve her ay Rerun kredisi içeren tek bir plan. {trialDays} gün ücretsiz deneyin."
+    },
+    "faqSub": "Faturayla ilgili herkesin sorduğu her şey. Sorunuz burada yoksa kurucular hemen aşağıda.",
+    "plans": {
+        "billingPeriod": "Faturalandırma dönemi",
+        "monthly": "Aylık",
+        "yearly": "Yıllık",
+        "discount": "-{percent}",
+        "save": "{percent} tasarruf",
+        "recommended": "Önerilen",
+        "included": "Dahil",
+        "rowIncluded": "Dahil",
+        "rowNotIncluded": "Dahil değil",
+        "names": {
+            "trial": "Ücretsiz deneme",
+            "pro": "Pro",
+            "enterprise": "Kurumsal"
+        },
+        "lines": {
+            "trial": "İlk coworker'larınızı işe koyun ve neler yaptıklarını görün.",
+            "pro": "İşletmenizin ihtiyaç duyduğu tüm coworker'lar, her gün çalışır.",
+            "enterprise": "Kendine özgü gereksinimleri olan kuruluşlar için."
+        },
+        "rows": {
+            "coworkers": {
+                "trial": "Aynı anda {trialAgents} coworker",
+                "pro": "Sınırsız coworker",
+                "enterprise": "Sınırsız coworker"
+            },
+            "team": "Tüm ekibinizi ücretsiz davet edin",
+            "own-ai": "Kendi yapay zekanızı getirin",
+            "devices": "Masaüstü ve mobil uygulama",
+            "apps": "{connectors}+ uygulama, MCP ve API",
+            "sso": "SSO",
+            "sla": "SLA"
+        },
+        "trial": {
+            "priceNote": "{trialDays} gün, ardından Pro",
+            "cta": "Ücretsiz denemeyi başlatın"
+        },
+        "pro": {
+            "monthlyNote": "aylık, her ay faturalandırılır",
+            "yearlyNote": "aylık, yıllık {total} faturalandırılır",
+            "cta": "Başlayın"
+        },
+        "enterprise": {
+            "perks": {
+                "1": "Pro'daki her şey",
+                "2": "Özel altyapı",
+                "3": "Özel destek",
+                "4": "SSO",
+                "5": "SLA"
+            },
+            "cta": "Satışla görüşün"
+        }
+    },
+    "credits": {
+        "title": "Rerun kredisi nedir?",
+        "lead": "Normalde ayrı bir araca ödeyeceğiniz veriler, Rerun'a yerleşik ve kullandıkça ödenir. Her birine ayrı abonelik yok: coworker'ınız işin gerektirdiğini arar ve yalnızca onun için öder.",
+        "items": {
+            "leads": {
+                "title": "Müşteri adayları",
+                "body": "İş e-postaları, telefon numaraları ve şirket verileriyle potansiyel müşteriler.",
+                "insteadOf": "FullEnrich, Clay"
+            },
+            "seo": {
+                "title": "SEO",
+                "body": "Arama hacimleri, anahtar kelime fikirleri ve backlink'ler, Google sonuçları ve yerel işletmeler.",
+                "insteadOf": "Semrush, Ahrefs"
+            },
+            "social": {
+                "title": "Sosyal medya",
+                "body": "LinkedIn, TikTok, Instagram, X, YouTube, Facebook ve Reddit'teki herkese açık profiller ve paylaşımlar.",
+                "insteadOf": "bir veri kazıma aracı"
+            }
+        },
+        "instead": "<name>{tools}</name> yerine",
+        "sources": "Kaynaklar: {sources}",
+        "note": "Pro ayda {monthlyCredits} kredi içerir; {packCredits} kredi daha {packPrice}. Coworker'ınız maliyeti gösterir ve harcamadan önce sorar."
+    },
+    "faq": {
+        "1": {
+            "question": "Rerun'ı kullanmak için kredi öder miyim?",
+            "answer": "Hayır. Plan Rerun'ın kendisini kapsar: coworker'larınız, uygulamaları, belleği, skill'leri, rutinleri ve her çalıştırma. Krediler yalnızca Rerun modelleri ve ücretli veri içindir. Kendi Claude veya ChatGPT planınızla ya da API anahtarınızla çalışan bir coworker hiç kredi harcamaz."
+        },
+        "2": {
+            "question": "Kredim biterse ne olur?",
+            "answer": "Kendi yapay zekanızla çalışan coworker'lar çalışmaya devam eder. Rerun modellerindekiler ve ücretli veri, bir sonraki ayın {monthlyCredits} kredisini ya da süresi hiç dolmayan, {packPrice} fiyatlı {packCredits} kredilik bir paketi bekler."
+        },
+        "3": {
+            "question": "Krediler sonraki aya devreder mi?",
+            "answer": "Pro'nun aylık kredileri her ay sıfırlanır; kalanlar devretmez. Paket kredilerinin süresi hiç dolmaz, deneme kredilerinin de: kalanları Pro başladığında devreder."
+        },
+        "4": {
+            "question": "Coworker başına mı, kullanıcı başına mı öderim?",
+            "answer": "Hayır. Pro'da sınırsız coworker ve sınırsız kullanıcı vardır. Yalnızca deneme sürümü aynı anda sınırlı sayıda coworker çalıştırır."
+        },
+        "5": {
+            "question": "Ücretsiz deneme var mı?",
+            "answer": "Evet, aynı anda çalışan {trialAgents} coworker ve {trialCredits} krediyle {trialDays} gün. Deneme bir kartla başlar ve bugün {free} tahsil edilir. {trialDays}. günden önce iptal ederseniz hiçbir şey ödemezsiniz."
+        },
+        "6": {
+            "question": "LinkedIn ve WhatsApp dahil mi?",
+            "answer": "Bunlar ücretli uygulamalardır: hesap başına ayda {linkedinPrice} ile LinkedIn Pro ve numara başına ayda {whatsappPrice} ile WhatsApp Pro, planınızla aynı faturada. Kütüphanedeki diğer tüm uygulamalar dahildir."
+        },
+        "7": {
+            "question": "Şablonlar dahil mi?",
+            "answer": "Kütüphanedeki şablonlar dahildir; yalnızca oluşturanın fiyat koyduğu şablonlar planınızdan ayrı faturalandırılır ve sayfalarında bu belirtilir."
+        },
+        "8": {
+            "question": "Görev ya da çalıştırma başına ücret alıyor musunuz?",
+            "answer": "Hayır. Coworker'larınız aynı fiyata her gün her saat çalışabilir. Çalıştırmalar asla sayılmaz."
+        },
+        "9": {
+            "question": "İstediğim zaman iptal edebilir miyim?",
+            "answer": "Evet, Faturalandırma'dan. Coworker'larınız ödediğiniz dönemin sonuna kadar çalışmaya devam eder, ardından geri dönmeniz ihtimaline karşı çalışma alanı 90 gün saklanır."
+        },
+        "10": {
+            "question": "Vergiler fiyata dahil mi?",
+            "answer": "Fiyatlar vergi hariç gösterilir. Ülkenize uygulanıyorsa KDV ya da satış vergisi ödeme sırasında eklenir. Faturalarınız için KDV numaranızı veya vergi kimlik numaranızı Faturalandırma'ya ekleyin."
+        }
+    }
+}

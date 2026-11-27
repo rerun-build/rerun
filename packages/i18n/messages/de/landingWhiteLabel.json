@@ -173,5 +173,31 @@
                 "answer": "Jeder Workspace läuft mit der KI, die du dafür wählst: das ChatGPT- oder Claude-Abo des Kunden, deine eigenen API-Schlüssel oder das inklusive Rerun Guthaben."
             }
         }
+    },
+    "pricing": {
+        "title": "Ein Preis pro Kunden-Workspace.",
+        "lead": "Je mehr Kunden du darauf betreust, desto weniger kostet jeder einzelne. Wähle deine Anzahl und buche ein kurzes Gespräch zum Start.",
+        "costAnswer": "Ein Preis pro Kunden-Workspace und Monat, der mit jedem weiteren Kunden sinkt, ab {min} Workspaces: {tiers}. Jeder Workspace wird zum Preis der Stufe abgerechnet, die du erreichst.",
+        "tier": "{price} ab {count}",
+        "card": {
+            "title": "White Label",
+            "line": "Rerun unter deiner Marke, ein Workspace für jeden deiner Kunden.",
+            "workspaces": "Kunden-Workspaces",
+            "valueText": "{count, plural, one {# Kunden-Workspace} other {# Kunden-Workspaces}}",
+            "valueTextAtLeast": "{count, plural, one {Ab # Kunden-Workspace} other {Ab # Kunden-Workspaces}}",
+            "perWorkspace": "Pro Kunden-Workspace",
+            "save": "{percent} sparen",
+            "perMonth": "/Monat",
+            "total": "<total></total> im Monat für {count, plural, one {# Workspace} other {# Workspaces}}",
+            "totalAtLeast": "<total></total> im Monat für {count, plural, one {# Workspace} other {# Workspaces}}, dann {price} für jeden weiteren",
+            "start": "Jetzt starten",
+            "included": {
+                "label": "Das bekommst du",
+                "brand": "<b>Deine URL, Farben und dein Logo</b>: Deine Kunden sehen nie Rerun",
+                "mobile": "Eine <b>Mobile-App unter deinem Namen</b>",
+                "library": "<b>Eine Bibliothek mit Coworkern</b>, in jeden Kunden-Workspace übernehmbar",
+                "clients": "<b>Jeder Kunde</b> an einem Ort verwaltet"
+            }
+        }
     }
 }

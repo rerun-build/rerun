@@ -203,7 +203,7 @@ export function metaLengthNote(id) {
 // The short function words may stay lowercase ("Agents for Agencies", "Reports with AI"), unless
 // they open the title or follow a colon; a phrasal particle takes its capital ("Clean Up").
 const MINOR_WORDS = new Set(['a', 'an', 'the', 'and', 'but', 'or', 'nor', 'for', 'so', 'yet', 'as', 'at', 'by', 'in', 'of', 'off', 'on', 'per', 'to', 'up', 'via', 'vs', 'with', 'from', 'into', 'onto', 'over', 'than'])
-const LOWERCASE_NAMES = new Set(['n8n', 'iOS', 'macOS'])
+const LOWERCASE_NAMES = new Set(['n8n', 'iOS', 'macOS', 'iPhone', 'iPad'])
 
 // The words of an English page title left in sentence case, empty when it is in headline case. A
 // hyphenated word is judged by its first part, so "E-commerce" and "Step-by-Step" both pass.

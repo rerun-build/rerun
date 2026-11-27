@@ -1,0 +1,127 @@
+{
+    "hero": {
+        "crumb": "價格",
+        "title": "每月 {price}。所有同事都包含。",
+        "lede": "一個方案，同事與席次不限，附贈您專屬的雲端機器，每月還有 Rerun 點數。免費試用 {trialDays} 天。"
+    },
+    "faqSub": "大家對帳單的所有疑問都在這裡。找不到您的問題，創辦人就在下方。",
+    "plans": {
+        "billingPeriod": "計費週期",
+        "monthly": "月繳",
+        "yearly": "年繳",
+        "discount": "-{percent}",
+        "save": "節省 {percent}",
+        "recommended": "推薦",
+        "included": "包含",
+        "rowIncluded": "包含",
+        "rowNotIncluded": "不包含",
+        "names": {
+            "trial": "免費試用",
+            "pro": "Pro",
+            "enterprise": "Enterprise"
+        },
+        "lines": {
+            "trial": "讓您的第一批同事開始工作，看看他們能做什麼。",
+            "pro": "您的業務需要的每位同事，每天都在工作。",
+            "enterprise": "適合有特殊需求的組織。"
+        },
+        "rows": {
+            "coworkers": {
+                "trial": "同時 {trialAgents} 位同事",
+                "pro": "不限數量的同事",
+                "enterprise": "不限數量的同事"
+            },
+            "team": "免費邀請您的整個團隊",
+            "own-ai": "使用您自己的 AI",
+            "devices": "桌面與手機 App",
+            "apps": "{connectors}+ 個 App、MCP 與 API",
+            "sso": "SSO",
+            "sla": "SLA"
+        },
+        "trial": {
+            "priceNote": "{trialDays} 天，之後轉為 Pro",
+            "cta": "開始免費試用"
+        },
+        "pro": {
+            "monthlyNote": "每月，按月計費",
+            "yearlyNote": "每月，按年計費 {total}",
+            "cta": "立即開始"
+        },
+        "enterprise": {
+            "perks": {
+                "1": "包含 Pro 的所有功能",
+                "2": "客製化基礎架構",
+                "3": "專屬支援",
+                "4": "SSO",
+                "5": "SLA"
+            },
+            "cta": "聯絡業務"
+        }
+    },
+    "credits": {
+        "title": "什麼是 Rerun 點數？",
+        "lead": "您原本要另外付費給專用工具的資料，現在內建在 Rerun 中，用多少付多少。不必再訂閱每一項：您的同事會查詢工作所需的資料，只為此付費。",
+        "items": {
+            "leads": {
+                "title": "潛在客戶",
+                "body": "附有工作電子郵件、電話號碼和公司資料的潛在客戶。",
+                "insteadOf": "FullEnrich、Clay"
+            },
+            "seo": {
+                "title": "SEO",
+                "body": "搜尋量、關鍵字建議和反向連結、Google 搜尋結果和在地商家。",
+                "insteadOf": "Semrush、Ahrefs"
+            },
+            "social": {
+                "title": "社群",
+                "body": "LinkedIn、TikTok、Instagram、X、YouTube、Facebook 和 Reddit 上的公開檔案與貼文。",
+                "insteadOf": "爬蟲工具"
+            }
+        },
+        "instead": "取代 <name>{tools}</name>",
+        "sources": "資料來源：{sources}",
+        "note": "Pro 每月包含 {monthlyCredits} 點，另外加購 {packCredits} 點為 {packPrice}。您的同事會顯示費用，並在花費前先詢問。"
+    },
+    "faq": {
+        "1": {
+            "question": "使用 Rerun 需要付點數嗎？",
+            "answer": "不用。方案涵蓋 Rerun 本身：您的同事、他們的 App、記憶、技能、例行工作和每一次執行。點數只用於 Rerun 模型和付費資料。使用您自己的 Claude 或 ChatGPT 方案或 API 金鑰的同事不會花費任何點數。"
+        },
+        "2": {
+            "question": "點數用完會怎樣？",
+            "answer": "使用您自己 AI 的同事會繼續工作。使用 Rerun 模型和付費資料的同事則會等到下個月的 {monthlyCredits} 點，或購買 {packCredits} 點加購包 {packPrice}（永不過期）。"
+        },
+        "3": {
+            "question": "點數會累積到下個月嗎？",
+            "answer": "Pro 的每月點數會在每月重置，剩下的不會累積。加購包的點數永不過期，試用點數也一樣：剩下的會在 Pro 開始時保留。"
+        },
+        "4": {
+            "question": "是依同事還是依席次收費？",
+            "answer": "都不是。Pro 的同事和席次皆不限。只有試用期會限制同時執行的同事數量。"
+        },
+        "5": {
+            "question": "有免費試用嗎？",
+            "answer": "有，{trialDays} 天，可同時執行 {trialAgents} 位同事，並附 {trialCredits} 點。以信用卡開始試用，今天不會收取費用（{free}）。在第 {trialDays} 天前取消就不用付費。"
+        },
+        "6": {
+            "question": "LinkedIn 和 WhatsApp 有包含嗎？",
+            "answer": "它們是付費 App：LinkedIn Pro 每個帳號每月 {linkedinPrice}，WhatsApp Pro 每個號碼每月 {whatsappPrice}，與您的方案列在同一張帳單上。資料庫中的其他 App 都已包含。"
+        },
+        "7": {
+            "question": "範本有包含嗎？",
+            "answer": "資料庫中的範本都已包含，但創作者標價的除外：這些範本與您的方案分開計費，其頁面會註明。"
+        },
+        "8": {
+            "question": "是依任務或依執行次數收費嗎？",
+            "answer": "不是。您的同事每天每小時都能執行，價格不變。執行次數不會被計算。"
+        },
+        "9": {
+            "question": "可以隨時取消嗎？",
+            "answer": "可以，在「帳務」中取消。您的同事會繼續執行到已付費期間結束，之後工作區會保存 90 天，方便您回來。"
+        },
+        "10": {
+            "question": "價格含稅嗎？",
+            "answer": "價格不含稅。適用於您所在國家的加值稅（VAT）或銷售稅會在結帳時加上。請在「帳務」中填寫您的 VAT 號碼或稅籍編號，以便開立發票。"
+        }
+    }
+}
