@@ -128,6 +128,10 @@ describe('sqlite ladders', () => {
               10,
               "script-run-result",
             ],
+            [
+              11,
+              "member-instructions",
+            ],
           ]
         `)
         expect(SHARED_DB_MIGRATIONS.map(s => [s.version, s.id])).toMatchInlineSnapshot(`
@@ -301,7 +305,7 @@ describe('system.db v5 to v6', () => {
         expect(await sqliteVersion(client)).toBe(SYSTEM_DB_VERSION)
         await SYSTEM_DB_MIGRATIONS[5].up(client)
         await client.execute("INSERT INTO members (id, timezone, first_seen_at, last_seen_at) VALUES ('u1', 'Europe/Paris', '2026-11-19T00:00:00.000Z', '2026-11-19T00:00:00.000Z')")
-        expect(await columns(client, 'members')).toEqual(['id', 'name', 'timezone', 'first_seen_at', 'last_seen_at'])
+        expect((await columns(client, 'members')).slice(0, 5)).toEqual(['id', 'name', 'timezone', 'first_seen_at', 'last_seen_at'])
         expect((await client.execute('SELECT count(*) AS n FROM remote_jobs')).rows[0].n).toBe(1)
     })
 })
@@ -356,6 +360,19 @@ describe('system.db v9 to v10', () => {
         await SYSTEM_DB_MIGRATIONS[9].up(client)
         expect((await client.execute('SELECT id, exit_code, script_output FROM runs')).rows.map(row => ({ ...row }))).toEqual([{ id: 'r1', exit_code: null, script_output: null }])
         expect(await columns(client, 'remote_jobs')).toContain('run_id')
+    })
+})
+
+describe('system.db v10 to v11', () => {
+    it('adds the instructions of a member, leaves the members already there without any, and replays without harm', async () => {
+        const client = freshFile('v10-system')
+        await migrateSqlite(client, SYSTEM_DB_MIGRATIONS.slice(0, 10), 'v10-system.db')
+        expect(await columns(client, 'members')).not.toContain('instructions')
+        await client.execute("INSERT INTO members (id, name, first_seen_at, last_seen_at) VALUES ('u1', 'Ana', '2026-11-26T00:00:00.000Z', '2026-11-26T00:00:00.000Z')")
+        await migrateSystemDb(client, 'v10-system.db')
+        expect(await sqliteVersion(client)).toBe(SYSTEM_DB_VERSION)
+        await SYSTEM_DB_MIGRATIONS[10].up(client)
+        expect((await client.execute('SELECT id, name, instructions, instructions_updated_at FROM members')).rows.map(row => ({ ...row }))).toEqual([{ id: 'u1', name: 'Ana', instructions: null, instructions_updated_at: null }])
     })
 })
 

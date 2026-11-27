@@ -27,6 +27,7 @@ import { cardTools } from './builtin/cards.js'
 import { askUserTool, offersTakeover, requestApprovalTool, requestFeatureTool, requestSecretTool, requestTakeoverTool, suggestServiceTool } from './builtin/hitl.js'
 import { installTools } from './builtin/install.js'
 import { foremanTools } from './builtin/foreman.js'
+import { memberInstructionsTools } from './builtin/member-instructions.js'
 import { reportToMemberTool } from './builtin/checkin.js'
 import { agentFilesTools } from './builtin/agent-files.js'
 import { hasPendingSetup } from '../agents/setup.js'
@@ -113,6 +114,7 @@ export async function buildTools(ctx: RunContext): Promise<{ tools: ToolSet; hel
     const accountTools = ctx.agent.config.kind === 'foreman' ? foremanTools(ctx) : {}
     // Called by a coworker it reaches no other coworker's files: only its own, like a coworker.
     Object.assign(tools, accountTools, ctx.agent.config.kind === 'foreman' && !ctx.called ? agentFilesTools() : {})
+    Object.assign(tools, memberInstructionsTools(ctx))
     if (cfg.filesystem) Object.assign(tools, filesystemTools(ctx))
     if (cfg.shared) Object.assign(tools, sharedTools(ctx))
     if (cfg.shell) Object.assign(tools, shellTools(ctx))

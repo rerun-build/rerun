@@ -32,7 +32,8 @@ function reportLine(report: CheckinEntry, members: Member[], now: Date): string 
 function memberLine(member: Member, now: Date): string {
     const name = member.name ?? 'A member'
     const where = member.timezone ? `it is ${localTime(member.timezone, now)} where they are (${member.timezone})` : 'their time zone is not known'
-    return `- ${name} (id ${member.id}): ${where}, ${lastWrote(member, now)}`
+    const line = `- ${name} (id ${member.id}): ${where}, ${lastWrote(member, now)}`
+    return member.instructions ? `${line}. Their own instructions to you, for whatever you write to them, over the first name and everything else about them:\n  """\n  ${member.instructions.split('\n').join('\n  ')}\n  """` : line
 }
 
 // The turn a check-in opens on, wrapped as a scheduled run so a chat draws it as a marker line and

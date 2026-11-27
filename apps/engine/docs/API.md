@@ -76,7 +76,7 @@ version the folder is at against the one this build takes it to.
   the conversations holding a run (the two should move together, apart from the script of a routine,
   which is a run in flight with no conversation), `desktopViewers` the open screen connections.
 - `capabilities`: `files.stream` (`PUT .../files/raw`), `foreman.files` (the Chief of Staff's file
-  routes), `foreman.coworker` (its memories, skills, routines and connectors, and the routes for them), `foreman.checkins` (its check-ins and their settings, see [Check-ins](#check-ins)), `schedules.rename` (a schedule `PATCH` takes `name`), `schedules.script` (a schedule can be a script, `kind: "script"`, see [Script tasks](#script-tasks)), `update.artifact` (`POST /update`
+  routes), `foreman.coworker` (its memories, skills, routines and connectors, and the routes for them), `foreman.checkins` (its check-ins and their settings, see [Check-ins](#check-ins)), `foreman.instructions` (each member's instructions to it, see [Member instructions](#member-instructions)), `schedules.rename` (a schedule `PATCH` takes `name`), `schedules.script` (a schedule can be a script, `kind: "script"`, see [Script tasks](#script-tasks)), `update.artifact` (`POST /update`
   takes a prebuilt artifact), `connections.opencode`, `connections.custom`, `connections.grok`, `vault`, `vault.rename` (a
   Vault item takes `customLabel`), `vault.instance` (`POST /vault/:id/instance`), `foreman.vault`, `foreman.agent` (the Chief of
   Staff answers every coworker route but what its kind does not do, see above), `messages.edit`
@@ -1686,6 +1686,28 @@ answers `404`.
 
 Starts a check-in now. `202 { "runId", "sessionId" }`, the one already running when there is one.
 `403` (`checkins_disabled`) when they are switched off. Any other agent answers `404`.
+
+### Member instructions
+
+What one member asked the Chief of Staff to keep doing in every one of their conversations (how to
+address them, how to work with them), kept in its `system.db` beside the member (`members.instructions`).
+On a chat turn a person wrote, the engine reads that person's into the `<member_instructions>` section
+of its prompt, and gives it `save_instructions`, which rewrites them whole for the author of the turn.
+A check-in lists each member's under their line. Not on a turn a coworker started, nor on a message the
+Chief of Staff relayed for someone.
+
+#### `GET /agents/foreman/members/:memberId/instructions`
+
+`{ "instructions": "Don't call me by my first name." }`, `null` for a member who wrote none (or whom
+the engine never saw). `:memberId` is the id the app sends as the `author` of that member's messages.
+Any other agent answers `404`.
+
+#### `PUT /agents/foreman/members/:memberId/instructions`
+
+Body `{ "instructions": "…" }`, the whole text; an empty text or `null` clears them. The text is
+trimmed, its line breaks unified and its blank lines collapsed to one, then answered as saved:
+`{ "instructions": … }`. `400` over 2,000 characters (`FOREMAN_INSTRUCTIONS_MAX` in the contracts) or
+for anything that is not a text. A member the engine never saw is recorded.
 
 ---
 

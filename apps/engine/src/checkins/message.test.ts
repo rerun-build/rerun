@@ -18,15 +18,31 @@ describe('buildCheckinMessage', () => {
             reason: 'manual',
             now,
             members: [
-                { id: 'u-ana', name: 'Ana', timezone: 'Europe/Paris', firstSeenAt: '2026-11-01T00:00:00.000Z', lastSeenAt: '2026-11-19T07:00:00.000Z' },
-                { id: 'u-bo', name: null, timezone: null, firstSeenAt: '2026-11-01T00:00:00.000Z', lastSeenAt: '2026-11-18T07:00:00.000Z' },
-                { id: 'u-cy', name: 'Cy', timezone: 'Asia/Tokyo', firstSeenAt: '2026-11-01T00:00:00.000Z', lastSeenAt: '2026-11-12T07:00:00.000Z' },
+                { id: 'u-ana', name: 'Ana', timezone: 'Europe/Paris', instructions: null, firstSeenAt: '2026-11-01T00:00:00.000Z', lastSeenAt: '2026-11-19T07:00:00.000Z' },
+                { id: 'u-bo', name: null, timezone: null, instructions: null, firstSeenAt: '2026-11-01T00:00:00.000Z', lastSeenAt: '2026-11-18T07:00:00.000Z' },
+                { id: 'u-cy', name: 'Cy', timezone: 'Asia/Tokyo', instructions: null, firstSeenAt: '2026-11-01T00:00:00.000Z', lastSeenAt: '2026-11-12T07:00:00.000Z' },
             ],
         })
         expect(message).toContain('someone asked you to check in now')
         expect(message).toContain('- Ana (id u-ana): it is Thursday 09:30 where they are (Europe/Paris), wrote today')
         expect(message).toContain('- A member (id u-bo): their time zone is not known, last wrote yesterday')
         expect(message).toContain('- Cy (id u-cy): it is Thursday 17:30 where they are (Asia/Tokyo), last wrote 7 days ago')
+    })
+
+    it("carries each member's own instructions under their line, and nothing for one who wrote none", () => {
+        const message = buildCheckinMessage({
+            slug: 'checkin',
+            name: 'Check-in',
+            reason: 'manual',
+            now,
+            members: [
+                { id: 'u-ana', name: 'Ana', timezone: 'Europe/Paris', instructions: "Don't call me by my first name.\nBe brief.", firstSeenAt: '2026-11-01T00:00:00.000Z', lastSeenAt: '2026-11-19T07:00:00.000Z' },
+                { id: 'u-bo', name: 'Bo', timezone: null, instructions: null, firstSeenAt: '2026-11-01T00:00:00.000Z', lastSeenAt: '2026-11-18T07:00:00.000Z' },
+            ],
+        })
+        expect(message).toContain('wrote today. Their own instructions to you, for whatever you write to them, over the first name and everything else about them:\n  """\n  Don\'t call me by my first name.\n  Be brief.\n  """')
+        expect(message).toContain('- Bo (id u-bo): their time zone is not known, last wrote yesterday')
+        expect(message).not.toContain('last wrote yesterday. Their own instructions')
     })
 
     it('carries what a promise said it would come back to', () => {
@@ -41,7 +57,7 @@ describe('buildCheckinMessage', () => {
             name: 'Check-in',
             reason: 'pulse',
             now,
-            members: [{ id: 'u-ana', name: 'Ana', timezone: 'Europe/Paris', firstSeenAt: '2026-11-01T00:00:00.000Z', lastSeenAt: '2026-11-19T07:00:00.000Z' }],
+            members: [{ id: 'u-ana', name: 'Ana', timezone: 'Europe/Paris', instructions: null, firstSeenAt: '2026-11-01T00:00:00.000Z', lastSeenAt: '2026-11-19T07:00:00.000Z' }],
             reports: [
                 { runId: 'r2', sessionId: 's2', status: 'done', startedAt: '2026-11-18T08:00:00.000Z', reason: 'pulse', title: 'Stripe needs to be signed in again', reportedTo: 'u-ana' },
                 { runId: 'r1', sessionId: 's1', status: 'done', startedAt: '2026-11-16T08:00:00.000Z', reason: 'pulse', title: 'Invoices keep failing' },

@@ -270,6 +270,10 @@ const RUN_SCRIPT_COLUMNS = ['exit_code INTEGER', 'script_output TEXT']
 // The run of a script routine a job on a linked computer is: that run has no conversation to find it by.
 const REMOTE_JOB_RUN_COLUMNS = ['run_id TEXT']
 
+// What a member asked the Chief of Staff to keep doing in every one of their conversations, and when
+// it last changed. Null for a member who never wrote any.
+const MEMBER_INSTRUCTIONS_COLUMNS = ['instructions TEXT', 'instructions_updated_at TEXT']
+
 // A schema change is a new step at the end, never an edit to a shipped one: see `db/ladder.ts`.
 export const SYSTEM_DB_MIGRATIONS: SqliteMigration[] = [
     {
@@ -345,6 +349,13 @@ export const SYSTEM_DB_MIGRATIONS: SqliteMigration[] = [
         up: async client => {
             await ensureColumns(client, 'runs', RUN_SCRIPT_COLUMNS)
             await ensureColumns(client, 'remote_jobs', REMOTE_JOB_RUN_COLUMNS)
+        },
+    },
+    {
+        version: 11,
+        id: 'member-instructions',
+        up: async client => {
+            await ensureColumns(client, 'members', MEMBER_INSTRUCTIONS_COLUMNS)
         },
     },
 ]
