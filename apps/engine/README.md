@@ -52,6 +52,8 @@ brain/<slug>.md             pages of the company brain, the source of truth
 brain-db/brain.db           brain index: chunks and embeddings, links, proposals, revisions
 brain-skills/<slug>/        skills of the Brain every coworker uses, beside .brain-skills.json (author, date)
 mcp-packages/               MCP servers declared as `npx <package>`, installed once
+mcp-credentials/            files a `${file:VAR}` of an MCP server points at (0600), per coworker
+                            (agents/<id>/) and per Vault item (vault/<id>/), written again at each launch
 ```
 
 One coworker:

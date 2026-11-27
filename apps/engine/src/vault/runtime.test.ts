@@ -18,10 +18,10 @@ vi.mock('../runtime/notify.js', async importOriginal => ({
     },
 }))
 
-const { readFile, rm, writeFile, mkdir } = await import('node:fs/promises')
+const { readFile, rm, stat, writeFile, mkdir } = await import('node:fs/promises')
 const { createServer } = await import('../http/server.js')
 const { migrate } = await import('../db/migrate.js')
-const { vaultDir, vaultTokenPath, skillDir, skillsDir, workspaceDir, configPath } = await import('../config/paths.js')
+const { vaultDir, vaultItemPath, vaultMcpCredentialsDir, vaultTokenPath, skillDir, skillsDir, workspaceDir, configPath } = await import('../config/paths.js')
 const { forgetVaultCache, getVaultItem } = await import('./store.js')
 const { agentMcpServers, vaultEnvFor } = await import('./runtime.js')
 const { prepareMcpServer } = await import('../tools/mcp.js')
@@ -195,6 +195,32 @@ describe('preparing a Vault server', () => {
         const prepared = await prepareMcpServer(agent.id, docs, agentProcessEnv(agent).env)
         expect(prepared.headers).toEqual({ Authorization: 'Bearer docs-value', 'x-other': '', 'x-own': '' })
         expect(prepared).not.toHaveProperty('vaultItemId')
+    })
+
+    it('writes a ${file:VAR} of an item to a file of its own, closed to anyone but the engine, and drops it with the item', async () => {
+        const a = await createAgent('Firebase')
+        const credential = '{"type":"service_account","private_key":"-----BEGIN KEY-----\\nabc\\n-----END KEY-----\\n"}'
+        const id = await createItem({
+            kind: 'mcp',
+            name: 'Firebase',
+            env: { FIREBASE_SA: credential },
+            agentIds: [a],
+            mcpServers: [{ name: 'firebase', command: 'npx', args: ['-y', 'firebase-tools@latest', 'mcp'], env: { GOOGLE_APPLICATION_CREDENTIALS: '${file:FIREBASE_SA}' } }],
+        })
+        const agent = await loaded(a)
+        const firebase = agentMcpServers(agent).find(s => s.name === 'firebase')!
+        const prepared = await prepareMcpServer(agent.id, firebase, agentProcessEnv(agent).env)
+        const path = prepared.env.GOOGLE_APPLICATION_CREDENTIALS
+        expect(path.startsWith(vaultMcpCredentialsDir(id))).toBe(true)
+        expect(await readFile(path, 'utf8')).toBe(credential)
+        expect((await stat(path)).mode & 0o777).toBe(0o600)
+        expect(await readFile(vaultItemPath(id), 'utf8')).not.toContain('service_account')
+        expect(prepared.env).not.toHaveProperty('FIREBASE_SA')
+        expect(JSON.stringify(prepared)).not.toContain('service_account')
+        expect((await send('PATCH', `/vault/${id}/env`, { remove: ['FIREBASE_SA'] })).status).toBe(200)
+        expect(existsSync(path)).toBe(false)
+        await send('DELETE', `/vault/${id}`)
+        expect(existsSync(vaultMcpCredentialsDir(id))).toBe(false)
     })
 
     it('hands each account of one app its own key once the later one took an instance', async () => {

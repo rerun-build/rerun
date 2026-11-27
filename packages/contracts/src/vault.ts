@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { MCP_SERVER_NAME_RE, mcpServerNameSchema, mcpServerSchema, strictMcpServerSchema } from './agent.js'
+import { isMcpPlaceholder } from './mcp-placeholder.js'
 import { SERVICE_INSTANCE_ID_RE } from './service.js'
 
 // The workspace's Vault: an account signed in once (or a key typed once) on the box, then attached
@@ -181,7 +182,7 @@ export type VaultConflict = z.infer<typeof vaultConflictSchema>
 export const VAULT_REDACTED = '•••'
 
 export function redactVaultValue(value: string): string {
-    return value === '' || /^\$\{[A-Za-z_][A-Za-z0-9_]*\}$/.test(value) || /^Bearer \$\{[A-Za-z_][A-Za-z0-9_]*\}$/.test(value) ? value : VAULT_REDACTED
+    return value === '' || isMcpPlaceholder(value) ? value : VAULT_REDACTED
 }
 
 export const isVaultItemId = (value: string): boolean => VAULT_ITEM_ID_RE.test(value)

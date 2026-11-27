@@ -6,6 +6,7 @@ import { createAgentSchema, duplicateAgentSchema, mcpTokenSchema, updateAgentKey
 import { clearToken, saveToken } from '../../tools/mcp-auth.js'
 import { probeMcpStatuses } from '../../tools/mcp-status.js'
 import { agentMcpSpawn } from '../../tools/mcp-pool.js'
+import { pruneCredentialFiles } from '../../tools/mcp-file-secrets.js'
 import { createAgent } from '../../agents/factory.js'
 import { agentConfigSchema, BRIDGE_SERVER_NAME, MCP_SERVER_NAME_RE } from '../../agents/types.js'
 import { readAgentEnv, writeAgentEnv } from '../../agents/env.js'
@@ -24,7 +25,7 @@ import { closeSystemDb } from '../../db/systemDb.js'
 import { closeAgentDb } from '../../db/agentDb.js'
 import { stopDesktop } from '../../desktop/session.js'
 import { finishTakeover } from '../../desktop/takeover.js'
-import { agentDir, configPath, installPath, soulPath } from '../../config/paths.js'
+import { agentDir, agentMcpCredentialsDir, configPath, installPath, soulPath } from '../../config/paths.js'
 import { agentToolCatalog } from '../../tools/catalog.js'
 import { refreshBrand } from '../../brand/brand.js'
 import type { RunModel } from '../../agents/availability.js'
@@ -229,6 +230,7 @@ agentRoutes.patch('/:id/keys', async c => {
         for (const key of remove) delete next[key]
         for (const [key, value] of Object.entries(set)) next[key] = value
         await writeAgentEnv(id, next)
+        await pruneCredentialFiles(agentMcpCredentialsDir(id), next)
         await reloadAgent(id)
         return Object.keys(next).sort()
     })
@@ -248,5 +250,6 @@ agentRoutes.delete('/:id', async c => {
     await forgetVaultAgent(id)
     await deleteAgentIndex(id)
     await rm(agentDir(id), { recursive: true, force: true })
+    await rm(agentMcpCredentialsDir(id), { recursive: true, force: true })
     return c.json({ deleted: id })
 })

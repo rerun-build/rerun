@@ -88,6 +88,10 @@ export const ENGINE_CAPABILITY_REMOTE_COMPUTERS = 'remote.computers'
 // answers: a message of a conversation can be edited, a reply asked again, a message deleted.
 export const ENGINE_CAPABILITY_MESSAGE_EDIT = 'messages.edit'
 
+// An MCP server may read a variable as `${file:VAR}`: the engine writes it to a file of its own and
+// hands the server its path. A box without it would pass the placeholder to the server as it is.
+export const ENGINE_CAPABILITY_MCP_FILE_SECRETS = 'mcp.file-secrets'
+
 // What the last `rerun update` on a box did, as `/health` reports it.
 export const engineLastUpdateSchema = z.object({
     status: z.enum(['running', 'error', 'restarting', 'success']),

@@ -9,7 +9,7 @@ const { beforeEach, describe, expect, it } = await import('vitest')
 const { chmod, mkdir, readFile, readdir, rm, stat, symlink, writeFile } = await import('node:fs/promises')
 const { existsSync } = await import('node:fs')
 const { RERUN_CONNECTION_ID } = await import('@rerun/contracts')
-const { agentEnvPath, agentDir, agentsDir, boxBrandPath, boxPlanPath, brainSkillsDir, configPath, connectionsDir, connectionsMigratedPath, dataVersionPath, mcpDir, mcpPackagesDir, mcpPendingPath, mcpTokenPath, remoteComputersPath, remoteDir, vaultDir } = await import('../config/paths.js')
+const { agentEnvPath, agentDir, agentsDir, boxBrandPath, boxPlanPath, brainSkillsDir, configPath, connectionsDir, connectionsMigratedPath, dataVersionPath, mcpCredentialsDir, mcpDir, mcpPackagesDir, mcpPendingPath, mcpTokenPath, remoteComputersPath, remoteDir, vaultDir } = await import('../config/paths.js')
 const { writeEnvFile, readEnvFile } = await import('../lib/env-file.js')
 const { raw } = await import('../db/client.js')
 const { buildCommit } = await import('../runtime/build-info.js')
@@ -375,6 +375,33 @@ describe('v9 to v10: box-brand', () => {
     })
 })
 
+describe('v10 to v11: mcp-credentials', () => {
+    const step = DATA_DIR_MIGRATIONS.find(s => s.id === 'mcp-credentials')!
+    const mode = async (path: string) => (await stat(path)).mode & 0o777
+
+    beforeEach(async () => {
+        await rm(mcpCredentialsDir(), { recursive: true, force: true })
+    })
+
+    it('creates the empty folder of credential files only the engine reads, from v10', async () => {
+        await writeDataVersion(10)
+        await migrateDataDir()
+        expect(readDataVersion()).toBe(DATA_DIR_VERSION)
+        expect(await readdir(mcpCredentialsDir())).toEqual([])
+        expect(await mode(mcpCredentialsDir())).toBe(0o700)
+    })
+
+    it('keeps the files already there, closes a folder left open, and replays without harm', async () => {
+        await mkdir(resolve(mcpCredentialsDir(), 'agents', 'a1'), { recursive: true })
+        await chmod(mcpCredentialsDir(), 0o755)
+        await writeFile(resolve(mcpCredentialsDir(), 'agents', 'a1', 'KEY-abc.json'), '{}', 'utf8')
+        await step.up()
+        await step.up()
+        expect(await readFile(resolve(mcpCredentialsDir(), 'agents', 'a1', 'KEY-abc.json'), 'utf8')).toBe('{}')
+        expect(await mode(mcpCredentialsDir())).toBe(0o700)
+    })
+})
+
 // Append-only: a shipped step is never removed nor renamed, because a data-dir archived before it
 // still needs it. Updating this snapshot is the change to look at twice.
 describe('data-dir ladder', () => {
@@ -425,6 +452,10 @@ describe('data-dir ladder', () => {
             [
               10,
               "box-brand",
+            ],
+            [
+              11,
+              "mcp-credentials",
             ],
           ]
         `)

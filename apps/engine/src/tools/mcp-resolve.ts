@@ -1,7 +1,6 @@
+import { MCP_PLACEHOLDER } from '@rerun/contracts'
 import type { McpServer } from '../agents/types.js'
 import { logger } from '../lib/logger.js'
-
-const PLACEHOLDER = /\$\{([A-Za-z_][A-Za-z0-9_]*)\}/g
 
 // Only the agent's own env answers a placeholder. The engine's process env holds RERUN_API_KEY, and
 // a server config travels inside template archives: `${RERUN_API_KEY}` in a header pointed at the
@@ -11,7 +10,8 @@ const PLACEHOLDER = /\$\{([A-Za-z_][A-Za-z0-9_]*)\}/g
 const ENGINE_ENV_PLACEHOLDERS = new Set(['RERUN_HUB_BASE_URL'])
 
 function resolveValue(value: string, env: Record<string, string>, serverName: string): string {
-    return value.replace(PLACEHOLDER, (_, name: string) => {
+    return value.replace(MCP_PLACEHOLDER, (whole, file: string | undefined, name: string) => {
+        if (file) return whole
         const resolved = env[name] ?? (ENGINE_ENV_PLACEHOLDERS.has(name) ? process.env[name] : undefined)
         if (resolved === undefined) {
             logger.warn({ server: serverName, var: name }, 'mcp: unresolved placeholder')

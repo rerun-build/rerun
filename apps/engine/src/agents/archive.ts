@@ -6,6 +6,7 @@ import type { Readable } from 'node:stream'
 import { create } from 'tar'
 import {
     CONNECTION_ENV_KEYS,
+    mcpPlaceholderNames,
     parseServiceRegistryKey,
     scanPathForSecrets,
     scanTextForSecrets,
@@ -195,7 +196,7 @@ function placeholdersIn(config: AgentConfig): string[] {
     for (const server of config.mcpServers) {
         values.push(server.command ?? '', server.url ?? '', ...server.args, ...Object.values(server.env), ...Object.values(server.headers))
     }
-    return values.flatMap(value => [...value.matchAll(/\$\{([A-Za-z_][A-Za-z0-9_]*)\}/g)].map(match => match[1]))
+    return values.flatMap(mcpPlaceholderNames)
 }
 
 export function requiredEnvKeys(agent: LoadedAgent): string[] {

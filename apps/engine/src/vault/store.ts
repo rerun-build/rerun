@@ -4,6 +4,7 @@ import {
     MCP_SERVER_NAME_RE,
     VAULT_REDACTED,
     redactVaultValue,
+    renameMcpPlaceholders,
     vaultItemConfigSchema,
     type CreateVaultItemInput,
     type InstanceVaultItemInput,
@@ -16,7 +17,7 @@ import {
     updateVaultItemEnvSchema,
     updateVaultItemSchema,
 } from '@rerun/contracts'
-import { vaultDir, vaultItemDir, vaultItemEnvPath, vaultItemPath, isPathSegment } from '../config/paths.js'
+import { vaultDir, vaultItemDir, vaultItemEnvPath, vaultItemPath, vaultMcpCredentialsDir, isPathSegment } from '../config/paths.js'
 import { parseEnvFile, serializeEnv, writeEnvFile } from '../lib/env-file.js'
 import { writeFileAtomic } from '../lib/atomic-write.js'
 import { badRequest, notFound } from '../lib/errors.js'
@@ -27,6 +28,7 @@ import { agentExists, listAgentIdsOnDisk } from '../agents/loader.js'
 import { BRIDGE_SERVER_NAME } from '../agents/types.js'
 import { findVaultConflicts, VaultConflictError } from './conflicts.js'
 import { clearVaultToken, copyVaultTokens, listVaultTokenServers } from './tokens.js'
+import { pruneCredentialFiles } from '../tools/mcp-file-secrets.js'
 import type { LoadedVaultItem } from './types.js'
 import { productName } from '../brand/brand.js'
 
@@ -174,7 +176,7 @@ export async function createVaultItem(input: CreateVaultItemInput, id = newId())
         await mkdir(vaultItemDir(id), { recursive: true, mode: 0o700 })
         // The secrets first and `item.json` last: a folder without it is never listed, so a crash in
         // between leaves nothing half made on screen.
-        await writeEnvFile(vaultItemEnvPath(id), env)
+        await writeItemEnv(id,env)
         await writeItemConfig(id, config)
         return reload(id)
     })
@@ -202,6 +204,11 @@ export async function updateVaultItem(id: string, patch: UpdateVaultItemInput): 
     })
 }
 
+async function writeItemEnv(id: string, env: Record<string, string>): Promise<void> {
+    await writeEnvFile(vaultItemEnvPath(id), env)
+    await pruneCredentialFiles(vaultMcpCredentialsDir(id), env)
+}
+
 export async function updateVaultItemEnv(id: string, input: UpdateVaultItemEnvInput): Promise<LoadedVaultItem> {
     const { set, remove } = updateVaultItemEnvSchema.parse(input)
     return withVaultLock(async () => {
@@ -211,16 +218,14 @@ export async function updateVaultItemEnv(id: string, input: UpdateVaultItemEnvIn
         Object.assign(env, set)
         serializeEnv(env)
         await assertNoConflicts({ id, config: current.config, env })
-        await writeEnvFile(vaultItemEnvPath(id), env)
+        await writeItemEnv(id,env)
         await writeItemConfig(id, { ...current.config, updatedAt: nowIso() })
         return reload(id)
     })
 }
 
-const PLACEHOLDER = /\$\{([A-Za-z_][A-Za-z0-9_]*)\}/g
-
 function renamedServers(config: VaultItemConfig, servers: Record<string, string>, env: Record<string, string>): VaultItemConfig['mcpServers'] {
-    const swap = (value: string) => value.replace(PLACEHOLDER, (whole, name: string) => (env[name] ? `\${${env[name]}}` : whole))
+    const swap = (value: string) => renameMcpPlaceholders(value, name => env[name])
     const swapRecord = (record: Record<string, string>) => Object.fromEntries(Object.entries(record).map(([key, value]) => [key, swap(value)]))
     return config.mcpServers.map(server => ({
         ...server,
@@ -251,7 +256,7 @@ export async function instanceVaultItem(id: string, input: InstanceVaultItemInpu
             for (const [from, to] of Object.entries(serverRenames)) if (ownServers.has(to) && !ownServers.has(from)) await clearVaultToken(id, from)
             const leftovers = Object.keys(env).filter(from => env[from] in current.env)
             if (leftovers.length === 0) return current
-            await writeEnvFile(vaultItemEnvPath(id), Object.fromEntries(Object.entries(current.env).filter(([key]) => !leftovers.includes(key))))
+            await writeItemEnv(id,Object.fromEntries(Object.entries(current.env).filter(([key]) => !leftovers.includes(key))))
             return reload(id)
         }
         if (current.config.instanceId) throw badRequest(`Vault item ${id} already has an instance`)
@@ -277,10 +282,10 @@ export async function instanceVaultItem(id: string, input: InstanceVaultItemInpu
         if (new Set(config.mcpServers.map(server => server.name)).size !== config.mcpServers.length) throw badRequest('Two servers of one item cannot share a name')
         await assertNoConflicts({ id, config, env: nextEnv })
 
-        await writeEnvFile(vaultItemEnvPath(id), { ...current.env, ...nextEnv })
+        await writeItemEnv(id,{ ...current.env, ...nextEnv })
         await copyVaultTokens(id, servers)
         await writeItemConfig(id, config)
-        await writeEnvFile(vaultItemEnvPath(id), nextEnv)
+        await writeItemEnv(id,nextEnv)
         const renamed = new Set(config.mcpServers.map(server => server.name))
         for (const from of Object.keys(servers)) if (!renamed.has(from)) await clearVaultToken(id, from)
         return reload(id)
@@ -314,6 +319,7 @@ export async function deleteVaultItem(id: string): Promise<{ detached: string[] 
         const detached = await vaultItemUsage(current)
         cache.delete(id)
         await rm(vaultItemDir(id), { recursive: true, force: true })
+        await rm(vaultMcpCredentialsDir(id), { recursive: true, force: true })
         return { detached }
     })
 }

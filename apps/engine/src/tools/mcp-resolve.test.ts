@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { McpServer } from '@rerun/contracts'
+import { isMcpPlaceholder, mcpPlaceholderNames, redactVaultValue, renameMcpPlaceholders, type McpServer } from '@rerun/contracts'
 import { resolveServerSecrets } from './mcp-resolve.js'
 
 function server(partial: Partial<McpServer> & { name: string }): McpServer {
@@ -22,6 +22,11 @@ describe('resolveServerSecrets', () => {
         expect(resolved.url).toBe('https://example.com/mcp')
         expect(resolved.env).toEqual({ API_KEY: 'sk_live' })
         expect(resolved.headers).toEqual({ Authorization: 'Bearer sk_live' })
+    })
+
+    it('leaves a ${file:VAR} to the step that writes its file', () => {
+        const resolved = resolveServerSecrets(server({ name: 'x', env: { CREDS: '${file:SA}', KEY: '${SA}' } }), { SA: '{"k":1}' })
+        expect(resolved.env).toEqual({ CREDS: '${file:SA}', KEY: '{"k":1}' })
     })
 
     it('falls back to the engine env for the hub base URL only', () => {
@@ -69,5 +74,18 @@ describe('resolveServerSecrets', () => {
         const once = resolveServerSecrets(server({ name: 'x', env: { K: '${TOKEN}' } }), { TOKEN: 'v' })
         const twice = resolveServerSecrets(once, { TOKEN: 'v' })
         expect(twice).toEqual(once)
+    })
+})
+
+describe('the placeholders of a server value', () => {
+    it('names the variables of both forms and renames them keeping the form', () => {
+        expect(mcpPlaceholderNames('${file:SA} and Bearer ${TOKEN}')).toEqual(['SA', 'TOKEN'])
+        expect(renameMcpPlaceholders('${file:SA}|${SA}|${OTHER}', name => (name === 'SA' ? 'SA_2' : undefined))).toBe('${file:SA_2}|${SA_2}|${OTHER}')
+    })
+
+    it('shows a file placeholder of a Vault item as it is, like a plain one', () => {
+        expect(isMcpPlaceholder('${file:SA}')).toBe(true)
+        expect(redactVaultValue('${file:SA}')).toBe('${file:SA}')
+        expect(redactVaultValue('{"private_key":"x"}')).not.toContain('private_key')
     })
 })

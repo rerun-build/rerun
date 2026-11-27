@@ -62,7 +62,7 @@ version the folder is at against the one this build takes it to.
   "activeRuns": 1,
   "claimedSessions": 1,
   "desktopViewers": 0,
-  "capabilities": ["files.stream", "foreman.files", "foreman.coworker", "schedules.rename", "schedules.script", "update.artifact", "connections.opencode", "connections.custom", "connections.grok", "vault", "vault.rename", "vault.instance", "foreman.vault", "foreman.agent", "messages.edit", "desktop"],
+  "capabilities": ["files.stream", "foreman.files", "foreman.coworker", "schedules.rename", "schedules.script", "update.artifact", "connections.opencode", "connections.custom", "connections.grok", "vault", "vault.rename", "vault.instance", "foreman.vault", "foreman.agent", "messages.edit", "mcp.file-secrets", "desktop"],
   "commit": "e70322d",
   "startedAt": "2026-11-16T09:12:03.512Z",
   "layout": "release",
@@ -80,7 +80,8 @@ version the folder is at against the one this build takes it to.
   takes a prebuilt artifact), `connections.opencode`, `connections.custom`, `connections.grok`, `vault`, `vault.rename` (a
   Vault item takes `customLabel`), `vault.instance` (`POST /vault/:id/instance`), `foreman.vault`, `foreman.agent` (the Chief of
   Staff answers every coworker route but what its kind does not do, see above), `messages.edit`
-  (`replaceFrom` on a chat message and `DELETE .../sessions/:sid/messages/:mid`), and `desktop`
+  (`replaceFrom` on a chat message and `DELETE .../sessions/:sid/messages/:mid`), `mcp.file-secrets`
+  (an MCP server may read a variable as `${file:VAR}`, the path of a file holding it), and `desktop`
   only when the desktop packages are installed.
 - `commit` is the short commit of the build, `null` when unknown. `layout` is `release`,
   `monorepo` or `image`. `lastUpdate` is what the last `rerun update` did (`status` `running`,

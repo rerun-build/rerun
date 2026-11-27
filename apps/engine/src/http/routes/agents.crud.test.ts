@@ -9,7 +9,8 @@ process.env.RERUN_HUB_BASE_URL = ''
 const { describe, expect, it, beforeAll } = await import('vitest')
 const { createServer } = await import('../server.js')
 const { migrate } = await import('../../db/migrate.js')
-const { agentDir } = await import('../../config/paths.js')
+const { agentDir, agentMcpCredentialsDir } = await import('../../config/paths.js')
+const { materializeFileSecrets } = await import('../../tools/mcp-file-secrets.js')
 const { listAgentIndex } = await import('../../db/repos/agents.js')
 const { loadToken } = await import('../../tools/mcp-auth.js')
 const { readAgentEnv } = await import('../../agents/env.js')
@@ -161,5 +162,15 @@ describe('PATCH /agents/:id/keys', () => {
         expect(res.status).toBe(200)
         expect(await res.json()).toEqual({ keys: ['BOTH', 'KEEP'] })
         expect(await readAgentEnv(id)).toEqual({ BOTH: 'new', KEEP: 'y' })
+    })
+
+    it('takes the credential file of a removed key with it', async () => {
+        const id = await createAgent('Firebase')
+        const server = { name: 'firebase', command: 'npx', args: [], env: { GOOGLE_APPLICATION_CREDENTIALS: '${file:FIREBASE_SA}' }, headers: {} }
+        await send('PATCH', `/agents/${id}/keys`, { set: { FIREBASE_SA: '{"type":"service_account"}' } })
+        const path = (await materializeFileSecrets(server, await readAgentEnv(id), agentMcpCredentialsDir(id))).env.GOOGLE_APPLICATION_CREDENTIALS
+        expect(existsSync(path)).toBe(true)
+        expect((await send('PATCH', `/agents/${id}/keys`, { remove: ['FIREBASE_SA'] })).status).toBe(200)
+        expect(existsSync(path)).toBe(false)
     })
 })

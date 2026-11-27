@@ -8,10 +8,11 @@ import type { Transport } from '@modelcontextprotocol/sdk/shared/transport.js'
 import { CallToolResultSchema } from '@modelcontextprotocol/sdk/types.js'
 import type { Provider } from '@rerun/contracts'
 import { CLI_PROVIDERS, type LoadedAgent, type McpServer } from '../agents/types.js'
-import { workspaceDir } from '../config/paths.js'
+import { agentMcpCredentialsDir, vaultMcpCredentialsDir, workspaceDir } from '../config/paths.js'
 import { withAuth } from './mcp-auth.js'
 import { withHubHeaders } from './mcp-hub-headers.js'
 import { withInstalledPackage } from './mcp-packages.js'
+import { fileVariables, materializeFileSecrets } from './mcp-file-secrets.js'
 import { resolveServerSecrets } from './mcp-resolve.js'
 import { findVaultItem } from '../vault/store.js'
 import type { AgentMcpServer } from '../vault/runtime.js'
@@ -119,7 +120,7 @@ export function mcpToolSet(serverName: string, tools: McpTool[], call: McpCall):
 }
 
 // The only way to turn a stored server into a dialable one, and the order is forced: the OAuth
-// bearer first, then the agent's ${VAR}s — the url has to be resolved before it can be recognised
+// bearer first, then the `${file:VAR}`s written to their files, then the agent's ${VAR}s — the url has to be resolved before it can be recognised
 // as ours — then the hub identity headers last, so they are literal and final. An `npx` launch is
 // swapped for the package installed once, when it is. `${RERUN_WORKSPACE}` names the agent's own
 // workspace, for a server that needs an absolute folder (the mail server's attachment root).
@@ -136,11 +137,16 @@ export async function prepareMcpServer(agentId: string, server: AgentMcpServer, 
         const { vaultItemId: _tag, ...authed } = (await withAuth(agentId, server)) as AgentMcpServer
         // A command the item starts reads its secrets from its environment, as a package installed
         // with an API key expects to: the item's own, which the spawn of the coworker no longer carries.
-        const withItemEnv = authed.command ? { ...authed, env: { ...(item?.env ?? {}), ...authed.env } } : authed
-        return withInstalledPackage(withHubHeaders(resolveServerSecrets(withItemEnv, resolvable), hubAgentId, vaultItemId))
+        // A variable the server reads as a file reaches it as a path only, never as its value.
+        const asFiles = fileVariables(authed)
+        const itemEnv = Object.fromEntries(Object.entries(item?.env ?? {}).filter(([key]) => !asFiles.has(key)))
+        const withItemEnv = authed.command ? { ...authed, env: { ...itemEnv, ...authed.env } } : authed
+        const withFiles = await materializeFileSecrets(withItemEnv, resolvable, vaultMcpCredentialsDir(vaultItemId))
+        return withInstalledPackage(withHubHeaders(resolveServerSecrets(withFiles, resolvable), hubAgentId, vaultItemId))
     }
     const resolvable = { ...env, RERUN_WORKSPACE: workspaceDir(agentId) }
-    return withInstalledPackage(withHubHeaders(resolveServerSecrets(await withAuth(agentId, plain), resolvable), hubAgentId))
+    const withFiles = await materializeFileSecrets(await withAuth(agentId, plain), resolvable, agentMcpCredentialsDir(agentId))
+    return withInstalledPackage(withHubHeaders(resolveServerSecrets(withFiles, resolvable), hubAgentId))
 }
 
 export class McpProbeTimeoutError extends Error {

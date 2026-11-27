@@ -4,7 +4,7 @@ import { resolve } from 'node:path'
 import { migrate } from '../db/migrate.js'
 import { latestVersion } from '../db/ladder.js'
 import { foldAgentKeysIntoConnections, switchOnModels } from '../connections/migrate.js'
-import { agentsDir, boxBrandPath, boxPlanPath, brainSkillsDir, configPath, isPathSegment, mcpDir, mcpPackagesDir, remoteComputersPath, remoteDir, vaultDir } from '../config/paths.js'
+import { agentsDir, boxBrandPath, boxPlanPath, brainSkillsDir, configPath, isPathSegment, mcpCredentialsDir, mcpDir, mcpPackagesDir, remoteComputersPath, remoteDir, vaultDir } from '../config/paths.js'
 import { logger } from '../lib/logger.js'
 import { adoptConnectors } from '../vault/adopt.js'
 
@@ -170,6 +170,16 @@ export const DATA_DIR_MIGRATIONS: DataDirMigration[] = [
             const tmp = `${target}.tmp`
             await writeFile(tmp, `${JSON.stringify({ name: 'Rerun', whiteLabel: false, supportEmail: null }, null, 4)}\n`, 'utf8')
             await rename(tmp, target)
+        },
+    },
+    {
+        // The credential files of the MCP servers that read a variable as `${file:VAR}`, created
+        // empty and closed to anyone but the engine. An engine from before this step never reads it.
+        version: 11,
+        id: 'mcp-credentials',
+        up: async () => {
+            await mkdir(mcpCredentialsDir(), { recursive: true, mode: 0o700 })
+            await chmodRegular(mcpCredentialsDir(), 0o700, 'dir')
         },
     },
 ]

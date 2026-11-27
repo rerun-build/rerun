@@ -98,6 +98,15 @@ export const boxBrandPath = () => resolve(dataDir(), 'brand.json')
 // The MCP servers an agent declares as `npx <package>`, installed once so a run does not fetch them again.
 export const mcpPackagesDir = () => resolve(dataDir(), 'mcp-packages')
 
+// The files a `${file:VAR}` of an MCP server points at, one folder per coworker and per Vault item,
+// written again from its `.env` at each launch. A sibling of `agents/` and `vault/`: no archive, no
+// template and no copy of a coworker carries them, and no file route reaches them.
+export const mcpCredentialsDir = () => resolve(dataDir(), 'mcp-credentials')
+
+export const agentMcpCredentialsDir = (id: string) => resolve(mcpCredentialsDir(), 'agents', pathSegment(id, 'agent id'))
+
+export const vaultMcpCredentialsDir = (id: string) => resolve(mcpCredentialsDir(), 'vault', pathSegment(id, 'vault item id'))
+
 export const soulPath = (id: string) => resolve(agentDir(id), 'SOUL.md')
 
 export const configPath = (id: string) => resolve(agentDir(id), 'config.json')
