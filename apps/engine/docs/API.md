@@ -1065,6 +1065,14 @@ A proposal already past `proposed` or `failed` is returned as it is, `200`. The 
 adds nothing to the conversation; the proposal ends `applied` (with `appliedSlug`) or `failed`
 (with `error`, and can be accepted again).
 
+Optional body: `{ "connectionId": "...", "model": "..." }`, the model the conversation is set to when
+the row is clicked. The skill is written on the pair the proposing conversation ran on. When that
+subscription is out of its usage window, it is written on the first of these that is usable and not out:
+the pair of the body, the agent's own pair (never the keyless Rerun connection it only follows as the
+box default), the first free backup (`PUT /connections/backups`). The body's pair may be the Rerun
+connection unless its budget is spent. A job that is the first to hit the limit latches the
+subscription and moves on once, in the same order.
+
 ### `POST /agents/:id/skill-proposals/:pid/dismiss`
 
 `{ "proposal": { ... "status": "dismissed" } }`. Both routes answer `404` for an unknown proposal.

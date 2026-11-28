@@ -95,7 +95,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
         return useUnseenRunsStore.getState().view(sessionId)
     }, [chatOnScreen, sessionId])
     // Its skill proposals, as a coworker's chat reads them, once its engine keeps skills of its own.
-    const skillProposals = useSkillProposals(hasCard && backend === 'engine' ? sessionId : null, status)
+    const skillProposals = useSkillProposals(FOREMAN_AGENT_ID, hasCard && backend === 'engine' ? sessionId : null, status)
     // Like a coworker's chat, the column is handed the waiting proposals with the conversation it opens.
     const seedProposals = skillProposals.seed
     useEffect(() => {

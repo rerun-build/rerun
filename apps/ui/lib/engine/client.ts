@@ -114,6 +114,7 @@ import {
     type EngineSkillSummary,
     type EngineSkillFilePayload,
     type EngineSkillProposal,
+    type EngineModelPick,
     type EngineToolFamily,
     type EngineHealth,
     type EngineUpdateResult,
@@ -918,8 +919,8 @@ export async function listSkillProposals(conn: EngineConnection, agentId: string
 
 // The engine answers before the writing job is done, so the caller reads the outcome by listing
 // again rather than from this response.
-export async function decideSkillProposal(conn: EngineConnection, agentId: string, proposalId: string, decision: 'accept' | 'dismiss'): Promise<EngineSkillProposal> {
-    return request(conn, `/agents/${encodeURIComponent(agentId)}/skill-proposals/${encodeURIComponent(proposalId)}/${decision}`, { method: 'POST' }, d => engineSkillProposalSchema.parse((d as { proposal: unknown }).proposal))
+export async function decideSkillProposal(conn: EngineConnection, agentId: string, proposalId: string, decision: 'accept' | 'dismiss', model?: EngineModelPick): Promise<EngineSkillProposal> {
+    return request(conn, `/agents/${encodeURIComponent(agentId)}/skill-proposals/${encodeURIComponent(proposalId)}/${decision}`, { method: 'POST', ...(model ? { body: JSON.stringify(model) } : {}) }, d => engineSkillProposalSchema.parse((d as { proposal: unknown }).proposal))
 }
 
 // --- Schedules (cron / one-shot) ---

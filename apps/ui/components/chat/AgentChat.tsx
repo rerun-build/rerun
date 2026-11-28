@@ -410,7 +410,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
 
     // Raised by the agent mid-turn, decided here without a message and without a run: accepting
     // starts the writing on the engine and this row reports it when it lands.
-    const skillProposals = useSkillProposals(sessionId ?? null, status)
+    const skillProposals = useSkillProposals(agentId, sessionId ?? null, status)
 
     // An accepted proposal is written in the background and lands after the turn that raised it,
     // so the `/` menu learns about the new skill here rather than from the end of a run.

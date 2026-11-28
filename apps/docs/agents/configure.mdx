@@ -102,6 +102,7 @@ When the Claude, ChatGPT or Grok plan a coworker runs on hits its usage limit (t
 
 - Backups are tried in their order. One on the plan that ran out, one at its own limit, one that is not connected or one whose provider turned its key or sign-in away is skipped.
 - They apply to every coworker, whether it follows the default model or has one of its own, and to scheduled runs: a schedule fires on a backup instead of waiting for the reset.
+- They also write a skill you accepted with **Remember** when the plan the conversation ran on is out, unless you picked another model in the chat or moved the coworker to one since: that model writes it. A coworker that follows a **Rerun** workspace default does not spend the credit for it.
 - You can add up to 5 backups.
 - **Rerun credit as last resort** is off by default. Switched on, the coworker moves to Rerun only once every plan in the list is out, and the credit is never spent otherwise.
 - With no backup, the run stops on the limit and the chat offers **Switch**. Pick a model there and the coworker carries on from where it stopped, without you sending anything.

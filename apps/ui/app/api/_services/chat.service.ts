@@ -5,7 +5,7 @@ import type { SessionStatus } from '@/lib/board/types'
 import { seedSessionTitle } from '@/lib/chat/session-title'
 import { parseTriggerTarget } from '@/lib/triggers/trigger-path'
 import { decideSkillProposal, getRunSteps, listRuns } from '@/lib/engine/client'
-import type { EngineConnection, EngineRun, EngineSkillProposal, SessionSource } from '@/lib/engine/types'
+import type { EngineConnection, EngineModelPick, EngineRun, EngineSkillProposal, SessionSource } from '@/lib/engine/types'
 import { FOREMAN_AGENT_ID, agentKindPolicy, type AgentKind, type SessionKind, type Usage } from '@rerun/contracts'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany, selectManyWithJoins, selectMaybeSingle, selectMaybeSingleWithJoins } from '@/supabase/supabase-helpers'
@@ -253,9 +253,9 @@ export async function clearSkillProposalAttention(sessionId: string, agentId: st
 
 // Remembering a rule, or not, from a coworker's conversation: `manage` on its Box, then the wait the
 // proposal raised is cleared. A decision the engine refuses leaves the conversation as it was.
-export async function decideCoworkerSkillProposal(target: SessionEngineContext, sessionId: string, proposalId: string, decision: 'accept' | 'dismiss', actor?: Actor): Promise<EngineSkillProposal> {
+export async function decideCoworkerSkillProposal(target: SessionEngineContext, sessionId: string, proposalId: string, decision: 'accept' | 'dismiss', actor?: Actor, model?: EngineModelPick): Promise<EngineSkillProposal> {
     await resolveAgentTarget(target.agentId, 'manage', actor)
-    const proposal = await decideSkillProposal(target.conn, target.engineAgentId, proposalId, decision)
+    const proposal = await decideSkillProposal(target.conn, target.engineAgentId, proposalId, decision, model)
     await clearSkillProposalAttention(sessionId, target.agentId, target.engineSessionId).catch(() => {})
     return proposal
 }
