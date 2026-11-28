@@ -71,14 +71,15 @@ A few services sign in through an OAuth app that Rerun Cloud registered with the
 | GitHub | **Sign in with GitHub** | `NEXT_PUBLIC_APP_URL/api/mcp/oauth/callback` | `RERUN_GITHUB_MCP_CLIENT_ID`, `RERUN_GITHUB_MCP_CLIENT_SECRET` |
 | Asana | **Sign in with Asana** | `NEXT_PUBLIC_APP_URL/api/mcp/oauth/callback` | `RERUN_ASANA_MCP_CLIENT_ID`, `RERUN_ASANA_MCP_CLIENT_SECRET` |
 | WordPress.com | **Connect WordPress.com** | `NEXT_PUBLIC_APP_URL/api/mcp/oauth/callback` | `RERUN_WORDPRESS_MCP_CLIENT_ID`, `RERUN_WORDPRESS_MCP_CLIENT_SECRET` |
+| Dropbox | **Connect Dropbox** | `NEXT_PUBLIC_APP_URL/api/mcp/oauth/callback` | `RERUN_DROPBOX_MCP_CLIENT_ID`, `RERUN_DROPBOX_MCP_CLIENT_SECRET` |
 | Facebook | **Connect with Facebook** | `NEXT_PUBLIC_APP_URL/api/oauth/managed/facebook/callback` | `RERUN_FACEBOOK_CLIENT_ID`, `RERUN_FACEBOOK_CLIENT_SECRET` |
 | Typeform | **Connect with Typeform** | `NEXT_PUBLIC_APP_URL/api/oauth/managed/typeform/callback` | `RERUN_TYPEFORM_CLIENT_ID`, `RERUN_TYPEFORM_CLIENT_SECRET` |
 
-1. Create the OAuth app with the service, with the redirect URL of the table. On WordPress.com, at [developer.wordpress.com/apps](https://developer.wordpress.com/apps/new/), its type is **Web**.
+1. Create the OAuth app with the service, with the redirect URL of the table. On WordPress.com, at [developer.wordpress.com/apps](https://developer.wordpress.com/apps/new/), its type is **Web**. On Dropbox, at [dropbox.com/developers/apps](https://www.dropbox.com/developers/apps), it is **Scoped access** with **Full Dropbox**, and its permissions are `account_info.read`, `files.metadata.read`, `files.metadata.write`, `files.content.read`, `files.content.write`, `sharing.read`, `sharing.write`, `file_requests.read` and `file_requests.write`; the app key is the client id and the app secret the secret.
 2. Put its client id and secret in `.env`.
 3. Run `docker compose up -d`.
 
-Without them, GitHub and Asana still connect with a personal access token, their other sign-in method. Facebook and Typeform have no other one, so they do not connect. WordPress.com registers Rerun on its own at the first sign-in, except from the address of a rented server: an install hosted there needs the app.
+Without them, GitHub and Asana still connect with a personal access token, their other sign-in method. Facebook and Typeform have no other one, so they do not connect. WordPress.com registers Rerun on its own at the first sign-in, except from the address of a rented server: an install hosted there needs the app. Dropbox registers on its own only the clients of its partners, so it does not connect without the app.
 
 The other OAuth services of the catalog register Rerun with the service on their own, at the first sign-in, and need nothing more than `MOBILE_OAUTH_TICKET_SECRET`.
 

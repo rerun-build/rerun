@@ -7,6 +7,18 @@ const AUTH_META = { authorization_endpoint: 'https://auth.example/authorize', to
 // What a server publishes about itself, with no protected-resource document naming another issuer.
 const SELF_META = { authorization_endpoint: 'https://mcp.example/authorize', token_endpoint: 'https://mcp.example/token' }
 const FIRECRAWL_META = { authorization_endpoint: 'https://www.firecrawl.dev/authorize', token_endpoint: 'https://www.firecrawl.dev/token' }
+const DROPBOX_MCP = 'https://mcp.dropbox.com/mcp'
+// What www.dropbox.com publishes: its token endpoint lives on another registrable domain.
+const DROPBOX_META = {
+    issuer: 'https://www.dropbox.com',
+    authorization_endpoint: 'https://www.dropbox.com/oauth2/authorize',
+    token_endpoint: 'https://api.dropboxapi.com/oauth2/token',
+    registration_endpoint: 'https://www.dropbox.com/oauth2/register',
+}
+const DROPBOX_DOCUMENTS = {
+    'https://mcp.dropbox.com/.well-known/oauth-protected-resource/mcp': { resource: DROPBOX_MCP, authorization_servers: ['https://www.dropbox.com'], scopes_supported: ['files.content.read'] },
+    'https://www.dropbox.com/.well-known/oauth-authorization-server': DROPBOX_META,
+}
 
 function stubFetch(documents: Record<string, unknown>) {
     const requested: string[] = []
@@ -127,6 +139,19 @@ describe('discoverAuthServer', () => {
 
         stubFetch({ 'https://mcp.linear.app/.well-known/oauth-authorization-server': { authorization_endpoint: 'https://linear.app/oauth/authorize', token_endpoint: 'https://api.linear.app/oauth/token' } })
         await expect(discoverAuthServer('https://mcp.linear.app/mcp')).resolves.toMatchObject({ tokenEndpoint: 'https://api.linear.app/oauth/token' })
+    })
+
+    it("accepts Dropbox's token endpoint on api.dropboxapi.com, which Rerun names itself for mcp.dropbox.com", async () => {
+        stubFetch(DROPBOX_DOCUMENTS)
+        await expect(discoverAuthServer(DROPBOX_MCP)).resolves.toMatchObject({
+            authorizationEndpoint: 'https://www.dropbox.com/oauth2/authorize',
+            tokenEndpoint: 'https://api.dropboxapi.com/oauth2/token',
+        })
+    })
+
+    it('still refuses another server whose token endpoint points at api.dropboxapi.com', async () => {
+        stubFetch({ 'https://mcp.other.example/.well-known/oauth-authorization-server': { ...DROPBOX_META, authorization_endpoint: 'https://mcp.other.example/authorize' } })
+        await expect(discoverAuthServer('https://mcp.other.example/mcp')).rejects.toThrow('token endpoint of this server points away from it (api.dropboxapi.com)')
     })
 
     describe('the resource indicator', () => {
@@ -325,6 +350,13 @@ describe('buildAuthorizeUrl', () => {
         })
         expect(new URL(buildAuthorizeUrl({ ...meta, scopesSupported: ['read', 'write'] }, CTX, 'c', 's')).searchParams.get('scope')).toBe('read write')
     })
+
+    it('adds the parameters a sign-in asks for, such as the offline access Dropbox needs to hand out a refresh token', () => {
+        const meta = { authorizationEndpoint: 'https://www.dropbox.com/oauth2/authorize', tokenEndpoint: 'https://api.dropboxapi.com/oauth2/token', authorizeParams: { token_access_type: 'offline' } }
+        const url = new URL(buildAuthorizeUrl(meta, CTX, 'chal', 'st'))
+        expect(url.searchParams.get('token_access_type')).toBe('offline')
+        expect(url.searchParams.get('code_challenge')).toBe('chal')
+    })
 })
 
 describe('registerClient', () => {
@@ -365,6 +397,21 @@ describe('resolveClient', () => {
     it('finds no client for GitHub when the app is not configured on this server', async () => {
         vi.stubEnv('RERUN_GITHUB_MCP_CLIENT_ID', '')
         await expect(resolveClient(NO_REGISTRATION, GITHUB_MCP, request)).resolves.toBeNull()
+    })
+
+    it("signs in to Dropbox through Rerun's own app, since its registration only serves Dropbox's partners", async () => {
+        vi.stubEnv('RERUN_DROPBOX_MCP_CLIENT_ID', 'dropbox-key')
+        vi.stubEnv('RERUN_DROPBOX_MCP_CLIENT_SECRET', 'dropbox-secret')
+        const fetchMock = vi.fn().mockResolvedValue(Response.json({ error: 'registration_not_supported' }, { status: 403 }))
+        vi.stubGlobal('fetch', fetchMock)
+        const discovered = { authorizationEndpoint: DROPBOX_META.authorization_endpoint, tokenEndpoint: DROPBOX_META.token_endpoint, registrationEndpoint: DROPBOX_META.registration_endpoint }
+        const client = await resolveClient(discovered, DROPBOX_MCP, request)
+        expect(client).toMatchObject({
+            clientId: 'dropbox-key',
+            signIn: { authorizationEndpoint: 'https://www.dropbox.com/oauth2/authorize', tokenEndpoint: 'https://api.dropboxapi.com/oauth2/token', authorizeParams: { token_access_type: 'offline' } },
+        })
+        expect(client).not.toHaveProperty('clientSecret')
+        expect(fetchMock).not.toHaveBeenCalled()
     })
 
     it('falls back to a Client ID Metadata Document when DCR is refused', async () => {
@@ -484,6 +531,13 @@ describe('engineClientSecret', () => {
     it('never hands the Asana secret to another client id or another MCP server', () => {
         expect(engineClientSecret({ ...ASANA, clientId: 'someone-else' })).toBeUndefined()
         expect(engineClientSecret({ ...ASANA, mcpUrl: 'https://mcp.evil.example/mcp' })).toBeUndefined()
+    })
+
+    it('hands the engine the Dropbox secret, whose short-lived tokens it refreshes on its own, and to no other client id', () => {
+        vi.stubEnv('RERUN_DROPBOX_MCP_CLIENT_ID', 'dropbox-key')
+        vi.stubEnv('RERUN_DROPBOX_MCP_CLIENT_SECRET', 'dropbox-secret')
+        expect(engineClientSecret({ mcpUrl: DROPBOX_MCP, clientId: 'dropbox-key' })).toBe('dropbox-secret')
+        expect(engineClientSecret({ mcpUrl: DROPBOX_MCP, clientId: 'someone-else' })).toBeUndefined()
     })
 
     it('passes a dynamically registered secret through', () => {
