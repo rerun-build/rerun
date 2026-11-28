@@ -311,6 +311,21 @@ describe('withAuth', () => {
         expect(await auth.loadToken(id, 'linear')).toEqual({ accessToken: 'new', refreshToken: 'r1', expiresAt: NOW + 3_600_000, obtainedAt: NOW, tokenEndpoint: 'https://a.x/token', clientId: 'cid', clientSecret: 'sec' })
     })
 
+    // BrowserAct (RER-401) matches the RFC 8707 resource on every token request, refreshes included.
+    it('refreshes with the resource the sign-in named, and keeps it on the new token', async () => {
+        frozenClock()
+        const id = freshAgent()
+        const resource = 'https://mcp.example.com/mcp'
+        await auth.saveToken(id, 'linear', { accessToken: 'old', refreshToken: 'r1', tokenEndpoint: 'https://a.x/token', clientId: 'cid', resource, expiresAt: NOW, obtainedAt: 1 })
+        mockFetch(() => {
+            const sent = new URLSearchParams(String(calls.at(-1)?.init?.body)).get('resource')
+            return sent === resource ? json({ access_token: 'new', expires_in: 300 }) : json({ error: 'invalid_target' }, 400)
+        })
+
+        expect((await auth.withAuth(id, server())).headers.Authorization).toBe('Bearer new')
+        expect((await auth.loadToken(id, 'linear'))?.resource).toBe(resource)
+    })
+
     it('leaves the client fields out of the form when the token has none', async () => {
         frozenClock()
         const id = freshAgent()

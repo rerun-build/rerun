@@ -715,10 +715,12 @@ Store the OAuth token of one of the agent's own MCP servers, in `mcp/<name>.json
 Both answer `{ "ok": true }`.
 
 ```json
-{ "accessToken": "...", "refreshToken": "...", "expiresAt": 1763290000000, "scope": "read", "tokenEndpoint": "https://.../token", "clientId": "...", "clientSecret": "..." }
+{ "accessToken": "...", "refreshToken": "...", "expiresAt": 1763290000000, "scope": "read", "tokenEndpoint": "https://.../token", "clientId": "...", "clientSecret": "...", "resource": "https://.../mcp" }
 ```
 
-Only `accessToken` is required; `obtainedAt` defaults to now.
+Only `accessToken` is required; `obtainedAt` defaults to now. `resource` is the RFC 8707 resource
+indicator the sign-in sent: the engine sends it again on every refresh, and a server that matches it
+(BrowserAct) refuses a refresh without it with `invalid_target`.
 
 ### `POST /agents/:id/automations/activate`
 
