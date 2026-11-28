@@ -33,8 +33,9 @@ function inAYear(locale: string): string {
 
 // How the plan is billed, and the way from the trial to Pro. A switch to yearly is charged today, the
 // unused part of the month taken off; a switch back to monthly waits for the end of the paid year.
-export function PlanPanel({ state, data, onDone }: PanelProps) {
+export function PlanPanel({ state, data, go, onDone }: PanelProps) {
     const t = useTranslations('billing.tiles.plan')
+    const tHome = useTranslations('billing.tiles.home')
     const tInvoice = useTranslations('billing.tiles.invoice')
     const tSize = useTranslations('billing.machine.sizes')
     const locale = useLocale()
@@ -164,6 +165,11 @@ export function PlanPanel({ state, data, onDone }: PanelProps) {
                         </div>
                     )}
                     {!lockedReason && !state.pendingSwitch && state.interval === 'monthly' && yearlySaving > 0 && <Note>{t('yearlySaves', { amount: usd(yearlySaving) })}</Note>}
+                    {state.cancelPhase && !state.cancelAtPeriodEnd && (
+                        <Button variant="outline" className="mt-auto w-full sm:w-fit sm:self-center" onClick={() => go('cancel')}>
+                            {tHome('cancelPlan')}
+                        </Button>
+                    )}
                 </>
             )}
         </Panel>
