@@ -56,6 +56,13 @@ export async function agentConnections(supabase: Client, agentId: string, slug: 
     return bindings.flatMap(binding => rows?.find(row => row.id === binding.connection_id) ?? [])
 }
 
+// The coworker holds accounts and none of them can act until the user reconnects it. An account bound
+// to a coworker is only `connecting` while it is reconnected, which can be left halfway for an hour. A
+// paused account is not signed out: it comes back on its own or with its slot.
+export function heldAccountsSignedOut(accounts: Pick<AgentConnection, 'status'>[]): boolean {
+    return accounts.length > 0 && accounts.every(account => account.status === 'needs_reconnect' || account.status === 'connecting')
+}
+
 // What a call names an account by: its label, which two LinkedIn profiles can share, the provider's
 // own id of the person or the number, or ours.
 function namesAccount(account: AgentConnection, asked: string): boolean {

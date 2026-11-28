@@ -1,6 +1,6 @@
 import type { AccessLevel, Actor } from '@/app/api/_auth/access'
 import { resolveAgentTarget } from '@/app/api/_services/chat.service'
-import { installedFromRegistry } from '@/app/api/_services/services.service'
+import { installedFromRegistry, withHeldAccountsStatus } from '@/app/api/_services/services.service'
 import { deleteMcpToken, getAgent, getMcpServerStatuses, patchMcpServers } from '@/lib/engine/client'
 import type { EngineConnection, EngineMcpServer } from '@/lib/engine/types'
 import { brandLabel, mcpIconDomain, mcpServerHost, toCustomMcpServer, unclaimedMcpServers } from '@/lib/services/custom-mcp'
@@ -50,7 +50,7 @@ function targetOf(agentId: string, actor: Actor | undefined, access: AccessLevel
 export async function listAgentConnectors(agentId: string, actor?: Actor): Promise<{ services: InstalledService[]; custom: CustomMcpServer[] }> {
     const { conn, engineAgentId } = await targetOf(agentId, actor)
     const reg = await readRegistry(conn, engineAgentId)
-    const [services, custom] = await Promise.all([installedFromRegistry(reg), customMcpServersOf(conn, engineAgentId, reg).catch(() => [])])
+    const [services, custom] = await Promise.all([installedFromRegistry(reg).then(installed => withHeldAccountsStatus(agentId, installed, actor)), customMcpServersOf(conn, engineAgentId, reg).catch(() => [])])
     return { services, custom }
 }
 

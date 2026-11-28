@@ -6,6 +6,7 @@ import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { syncAppConnector, unbindAgent } from '@rerun/cloud/apps.server'
 import { isAppSlug } from '@rerun/cloud/apps'
 import { arePaidAppsOffered, isOrganizationPlan } from '@/ee/lib/billing/plans'
+import { agentConnections, heldAccountsSignedOut } from '@/lib/apps/connections'
 import { deleteConnectedAccount } from '@/lib/composio/client'
 import { getVaultItem, patchVaultItem, createVaultItem, deleteVaultItem, detachVaultItem, updateVaultItemEnv } from '@/lib/engine/vault-client'
 import { deleteConnectorToken } from '@/lib/vault/tokens'
@@ -105,7 +106,10 @@ async function installedStatuses(agentId: string, actor?: Actor): Promise<Map<st
         const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'use', actor)
         const reg = await readRegistry(conn, engineAgentId)
         const slugs = new Set(Object.keys(reg.services).map(key => parseServiceRegistryKey(key).slug))
-        return new Map([...slugs].map(slug => [slug, primaryStatusOfSlug(reg, slug) as AgentServiceStatus]))
+        const statuses = new Map([...slugs].map(slug => [slug, primaryStatusOfSlug(reg, slug) as AgentServiceStatus]))
+        const signedOut = await signedOutApps(agentId, Object.values(reg.services), actor)
+        for (const [key, entry] of Object.entries(reg.services)) if (entry.app && signedOut.has(entry.app.appSlug)) statuses.set(parseServiceRegistryKey(key).slug, 'needs_auth')
+        return statuses
     } catch (err) {
         // An unreachable engine legitimately degrades to "nothing installed". An authorization
         // failure does not: it would tell the agent its working connectors are missing, so it
@@ -405,6 +409,7 @@ export async function getServiceDetails(agentId: string, slugOrKey: string, acto
             return { key, status: other.status, ...(otherLabel ? { label: otherLabel } : {}) }
         })
         installStatus = entry?.status ?? null
+        if (entry?.app && (await signedOutApps(agentId, [entry], actor)).has(entry.app.appSlug)) installStatus = 'needs_auth'
         installedMethodId = entry?.authMethodId
         oauth = entry?.oauth
         managed = liveManaged(entry?.managed)
@@ -660,7 +665,30 @@ export async function resetServiceConnection(agentId: string, key: string, actor
 
 export async function listInstalledServices(agentId: string, actor?: Actor): Promise<{ services: InstalledService[] }> {
     const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'use', actor)
-    return { services: await installedFromRegistry(await readRegistry(conn, engineAgentId)) }
+    return { services: await withHeldAccountsStatus(agentId, await installedFromRegistry(await readRegistry(conn, engineAgentId)), actor) }
+}
+
+// The status a paid app's entry carries is the one written when the coworker last picked its accounts:
+// an account the provider, a pause or a move of the machine signed out since leaves it active. The
+// accounts are read live instead, as the proxy reads them before every call. Answers the app slugs
+// (`linkedin`) whose accounts are all signed out.
+async function signedOutApps(agentId: string, entries: Array<{ app?: { appSlug: string } }>, actor?: Actor): Promise<Set<string>> {
+    const signedOut = new Set<string>()
+    const paidSlugs = [...new Set(entries.flatMap(entry => (entry.app && isAppSlug(entry.app.appSlug) ? [entry.app.appSlug] : [])))]
+    if (paidSlugs.length === 0) return signedOut
+    try {
+        const holderId = (await appHolderOf(agentId, actor))?.id ?? agentId
+        const supabase = createServiceRoleClient()
+        for (const slug of paidSlugs) if (isAppSlug(slug) && heldAccountsSignedOut(await agentConnections(supabase, holderId, slug))) signedOut.add(slug)
+    } catch (err) {
+        console.warn(`[apps] accounts of agent ${agentId} left unread:`, err instanceof Error ? err.message : err)
+    }
+    return signedOut
+}
+
+export async function withHeldAccountsStatus(agentId: string, services: InstalledService[], actor?: Actor): Promise<InstalledService[]> {
+    const signedOut = await signedOutApps(agentId, services, actor)
+    return services.map(service => (service.app && signedOut.has(service.app.appSlug) ? { ...service, status: 'needs_auth' } : service))
 }
 
 // One row per account, every account of an app grouped under it, the base one first.
