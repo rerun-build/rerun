@@ -271,4 +271,49 @@ describe('POST /api/mcp/oauth/start for a Vault entry', () => {
             expect(fetchMock.mock.calls.map(([url]) => String(url))).not.toContain(WPCOM_REGISTER)
         })
     })
+
+    describe('for Dropbox, whose token endpoint is on api.dropboxapi.com and whose registration only serves its partners', () => {
+        const DROPBOX_MCP = 'https://mcp.dropbox.com/mcp'
+        const DROPBOX_REGISTER = 'https://www.dropbox.com/oauth2/register'
+        const DROPBOX_SCOPES = ['account_info.read', 'file_requests.read', 'file_requests.write', 'files.content.read', 'files.content.write', 'files.metadata.read', 'files.metadata.write', 'sharing.read', 'sharing.write']
+
+        beforeEach(() => {
+            vi.mocked(getVaultItem).mockResolvedValue({ ...entry, slug: 'dropbox', oauth: { serverName: 'dropbox', url: DROPBOX_MCP } } as never)
+            documents = {
+                'https://mcp.dropbox.com/.well-known/oauth-protected-resource/mcp': { resource: DROPBOX_MCP, authorization_servers: ['https://www.dropbox.com'], scopes_supported: DROPBOX_SCOPES },
+                'https://www.dropbox.com/.well-known/oauth-authorization-server': {
+                    issuer: 'https://www.dropbox.com',
+                    authorization_endpoint: 'https://www.dropbox.com/oauth2/authorize',
+                    token_endpoint: 'https://api.dropboxapi.com/oauth2/token',
+                    registration_endpoint: DROPBOX_REGISTER,
+                },
+                [DROPBOX_REGISTER]: Response.json({ error: 'registration_not_supported', error_description: 'Dynamic client registration is not supported. Only pre-registered MCP trusted partners are allowed.' }, { status: 403 }),
+            }
+        })
+
+        it('gets past the discovery and fails at the registration without an app of its own', async () => {
+            const res = await start({ agentId: undefined, vaultItemId: 'item-1', serverName: 'dropbox' })
+
+            expect(res.status).toBe(400)
+            expect(((await res.json()) as { error: string }).error).toBe('client registration failed (403)')
+        })
+
+        it("signs in through Rerun's own Dropbox app, asking for offline access so the engine gets a refresh token", async () => {
+            vi.stubEnv('RERUN_DROPBOX_MCP_CLIENT_ID', 'dropbox-key')
+            vi.stubEnv('RERUN_DROPBOX_MCP_CLIENT_SECRET', 'dropbox-secret')
+
+            const res = await start({ agentId: undefined, vaultItemId: 'item-1', serverName: 'dropbox' })
+
+            expect(res.status).toBe(200)
+            const authorize = new URL(((await res.json()) as { authorizationUrl: string }).authorizationUrl)
+            expect(authorize.origin + authorize.pathname).toBe('https://www.dropbox.com/oauth2/authorize')
+            expect(authorize.searchParams.get('client_id')).toBe('dropbox-key')
+            expect(authorize.searchParams.get('token_access_type')).toBe('offline')
+            expect(authorize.searchParams.get('scope')).toBe(DROPBOX_SCOPES.join(' '))
+            const context = decodeContext(res.cookies.getAll()[0].value)
+            expect(context).toMatchObject({ clientId: 'dropbox-key', tokenEndpoint: 'https://api.dropboxapi.com/oauth2/token', mcpUrl: DROPBOX_MCP })
+            expect(context.clientSecret).toBeUndefined()
+            expect(fetchMock.mock.calls.map(([url]) => String(url))).not.toContain(DROPBOX_REGISTER)
+        })
+    })
 })

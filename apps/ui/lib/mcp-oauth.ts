@@ -64,7 +64,7 @@ export type DiscoveredMetadata = {
     resource?: string
 }
 
-export type SignInEndpoints = Pick<DiscoveredMetadata, 'authorizationEndpoint' | 'tokenEndpoint' | 'scopesSupported'>
+export type SignInEndpoints = Pick<DiscoveredMetadata, 'authorizationEndpoint' | 'tokenEndpoint' | 'scopesSupported'> & { authorizeParams?: Record<string, string> }
 
 // `signIn` replaces the discovered endpoints for a client the authorization server does not serve.
 export type ClientInfo = { clientId: string; clientSecret?: string; signIn?: SignInEndpoints }
@@ -203,7 +203,7 @@ export async function discoverAuthServer(mcpUrl: string): Promise<DiscoveredMeta
     if (!meta || !foundAt) {
         throw new Error('this server does not advertise an OAuth authorization server')
     }
-    const sites = [url, new URL(foundAt)]
+    const sites = [url, new URL(foundAt), ...signInSites(origin)]
     return {
         authorizationEndpoint: await endpointOnSite(meta.authorization_endpoint, 'authorization endpoint', sites),
         tokenEndpoint: await endpointOnSite(meta.token_endpoint, 'token endpoint', sites),
@@ -279,7 +279,28 @@ const PRE_REGISTERED_CLIENTS: PreRegisteredClient[] = [
             scopesSupported: ['global'],
         },
     },
+    // Dropbox registers clients for its partners only, and keeps its token endpoint on api.dropboxapi.com.
+    // Its access tokens last a few hours: `offline` is what makes it hand out a refresh token.
+    {
+        mcpOrigin: 'https://mcp.dropbox.com',
+        clientIdEnv: 'RERUN_DROPBOX_MCP_CLIENT_ID',
+        clientSecretEnv: 'RERUN_DROPBOX_MCP_CLIENT_SECRET',
+        engineRefreshes: true,
+        signIn: {
+            authorizationEndpoint: 'https://www.dropbox.com/oauth2/authorize',
+            tokenEndpoint: 'https://api.dropboxapi.com/oauth2/token',
+            scopesSupported: ['account_info.read', 'file_requests.read', 'file_requests.write', 'files.content.read', 'files.content.write', 'files.metadata.read', 'files.metadata.write', 'sharing.read', 'sharing.write'],
+            authorizeParams: { token_access_type: 'offline' },
+        },
+    },
 ]
+
+// The endpoints Rerun itself wrote for this MCP origin may sit on another domain than the server,
+// whatever env the install has: they come from this file, never from a document the server publishes.
+function signInSites(mcpOrigin: string): URL[] {
+    const signIn = PRE_REGISTERED_CLIENTS.find(client => client.mcpOrigin === mcpOrigin)?.signIn
+    return signIn ? [new URL(signIn.authorizationEndpoint), new URL(signIn.tokenEndpoint)] : []
+}
 
 // Their registration endpoint answers every caller with one shared client and keeps its own
 // redirect URIs, echoing ours back without registering it: HeyGen hands out "HeyGen MCP Default".
@@ -345,8 +366,9 @@ export function createPkce(): { verifier: string; challenge: string; state: stri
     return { verifier, challenge, state }
 }
 
-export function buildAuthorizeUrl(metadata: DiscoveredMetadata, ctx: OAuthContext, challenge: string, state: string): string {
+export function buildAuthorizeUrl(metadata: DiscoveredMetadata & Pick<SignInEndpoints, 'authorizeParams'>, ctx: OAuthContext, challenge: string, state: string): string {
     const params = new URLSearchParams({
+        ...metadata.authorizeParams,
         response_type: 'code',
         client_id: ctx.clientId,
         redirect_uri: ctx.redirectUri,
