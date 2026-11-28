@@ -1,3 +1,4 @@
+import type { CoworkerLook } from './coworker-look.js'
 import type { QuickAskShortcutKind } from './desktop-shell-shortcut.js'
 
 // The contract between the Rerun desktop app (`apps/desktop-app`, an Electron shell that loads the web
@@ -136,8 +137,9 @@ export const COWORKER_DOCK_MOODS = ['idle', 'working', 'error', 'waiting', 'asle
 export type CoworkerDockMood = (typeof COWORKER_DOCK_MOODS)[number]
 
 // `pending` counts what the coworker has for the person (an unread answer, a question, an approval),
-// the same items the badge of the app icon adds up.
-export type CoworkerDockCoworker = { id: string; name: string; mood: CoworkerDockMood; pending: number }
+// the same items the badge of the app icon adds up. `look`: the one the person gave it, left out when
+// its buddy keeps the one hashed from its id; a shell that predates it drops it.
+export type CoworkerDockCoworker = { id: string; name: string; mood: CoworkerDockMood; pending: number; look?: CoworkerLook }
 
 // The Chief of Staff's entry among the coworkers, first unless the person moved it. A shell without
 // `coworkerDockArrange` shows it like any other, and its click comes back through `onOpen`.

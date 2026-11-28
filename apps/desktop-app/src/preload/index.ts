@@ -93,7 +93,7 @@ if (bootstrap?.audience === 'app') {
                     IPC.coworkerDockPublish,
                     state
                         ? {
-                              coworkers: state.coworkers.map((coworker) => ({ id: String(coworker.id), name: String(coworker.name), mood: String(coworker.mood), pending: Number(coworker.pending) || 0 })),
+                              coworkers: state.coworkers.map((coworker) => ({ id: String(coworker.id), name: String(coworker.name), mood: String(coworker.mood), pending: Number(coworker.pending) || 0, ...(coworker.look ? { look: { ...coworker.look } } : {}) })),
                               createBlockedReason: typeof state.createBlockedReason === 'string' ? state.createBlockedReason : null,
                               workspaceKey: typeof state.workspaceKey === 'string' ? state.workspaceKey : undefined,
                               notes: Array.isArray(state.notes) ? state.notes.map((note) => ({ ...note })) : undefined,

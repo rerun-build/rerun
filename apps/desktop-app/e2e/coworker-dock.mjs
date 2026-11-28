@@ -90,10 +90,14 @@ async function clickDockMenuItem(app, labels) {
 
 const LEAD_SCOUT = COWORKERS.leadScout
 const LEAD_SCOUT_SESSION = 'demo-session-lead-scout'
+// Graphite and fur: a colour and a material no buddy is hashed to.
+const LEAD_SCOUT_LOOK = { eyes: 'heart', mouth: 'cat', color: '#5d6778', material: 'fluffy' }
 
 export default async function coworkerDockScenario({ app, page, step, base, admin, workspaceId, account, shell }) {
     const { data: pool } = await admin.from('engine_pool').select('engine_api_key').eq('claimed_by_workspace_id', workspaceId).single()
     await seedDemoWorkspace({ admin, workspaceId, userId: account.userId, email: account.email, apiKey: pool.engine_api_key, dataDir: join(REPO_ROOT, '.context/verify/engine-data') })
+    const { data: dressedRows, error: dressError } = await admin.from('agents').update({ look: LEAD_SCOUT_LOOK }).eq('id', LEAD_SCOUT.id).select('look')
+    check(!dressError && dressedRows?.[0]?.look?.color === LEAD_SCOUT_LOOK.color, `${LEAD_SCOUT.name} is given a look (${dressError?.message ?? JSON.stringify(dressedRows)})`)
     // A cold `next dev` compiles the home on this first visit, past the default 30 seconds.
     await page.goto(base, { timeout: 180_000 })
     await page.waitForSelector('[data-foreman-split]', { timeout: 60_000 })
@@ -112,6 +116,15 @@ export default async function coworkerDockScenario({ app, page, step, base, admi
     check(strip === '0px', 'the dock has no title strip')
     for (const coworker of Object.values(COWORKERS)) await dock.getByRole('button', { name: coworker.name, exact: true }).waitFor()
     check(true, 'one buddy per coworker')
+    const shownLook = await waitUntil(() => dock.evaluate((id) => window.rerunShell.coworkerDock.get().then((view) => view?.state?.coworkers.find((coworker) => coworker.id === id)?.look ?? null), LEAD_SCOUT.id), (look) => look !== null, 'the shell hands the dock the look of the coworker')
+    check(shownLook.color === LEAD_SCOUT_LOOK.color && shownLook.material === LEAD_SCOUT_LOOK.material, `the look the dock is handed is the one given (${JSON.stringify(shownLook)})`)
+    const buddyArt = (name) => dock.getByRole('button', { name, exact: true }).locator('svg').first().innerHTML()
+    // Chromium writes a colour of a style back as `rgb(…)`.
+    const wears = (art) => art.includes(LEAD_SCOUT_LOOK.color) || art.includes('rgb(93, 103, 120)')
+    const dressed = await waitUntil(() => buddyArt(LEAD_SCOUT.name), wears, 'the buddy wears the look its coworker was given, as on the board')
+    check(dressed.includes('feTurbulence'), 'and its material')
+    const plain = Object.values(COWORKERS).find((coworker) => coworker.id !== LEAD_SCOUT.id)
+    check(!wears(await buddyArt(plain.name)), 'a coworker nobody dressed keeps the look hashed from its id')
     await step('dock', { target: dock })
 
     // A coworker starts working: its buddy moves.

@@ -1,7 +1,8 @@
 'use client'
 
-import { COWORKER_DOCK_MIN_HEIGHT, type CoworkerDockNote, type CoworkerDockRect, type CoworkerDockView } from '@rerun/contracts'
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
+import { COWORKER_DOCK_MIN_HEIGHT, parseCoworkerLook, type CoworkerDockCoworker, type CoworkerDockNote, type CoworkerDockRect, type CoworkerDockView, type CoworkerLook } from '@rerun/contracts'
+import { BuddyLooksProvider } from '@rerun/ui/iso-grid'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 
 import { DockLayer, type DockAnchors } from '@/components/desktop-shell/coworker-dock/DockLayer'
 import { DOCK_RESIZE_HANDLE_OUTSET, DockResizeEdge } from '@/components/desktop-shell/coworker-dock/DockParts'
@@ -44,6 +45,17 @@ function inOrder<C extends { id: string }>(coworkers: C[], order: string[] | nul
     if (!order) return coworkers
     const rank = new Map(order.map((id, index) => [id, index]))
     return [...coworkers].sort((a, b) => (rank.get(a.id) ?? order.length) - (rank.get(b.id) ?? order.length))
+}
+
+// The dock's window has no board: the looks its buddies wear come with the coworkers the main window
+// publishes. The shell only bounds them, so one this page cannot draw keeps the hashed look.
+function looksOf(coworkers: readonly CoworkerDockCoworker[] | undefined): ReadonlyMap<string, CoworkerLook> {
+    return new Map(
+        (coworkers ?? []).flatMap(coworker => {
+            const look = parseCoworkerLook(coworker.look)
+            return look ? [[coworker.id, look] as const] : []
+        })
+    )
 }
 
 const contains = (rect: CoworkerDockRect, point: { x: number; y: number }) => point.x >= rect.x && point.x < rect.x + rect.width && point.y >= rect.y && point.y < rect.y + rect.height
@@ -213,6 +225,7 @@ export function CoworkerDock() {
         [closePanel, dock.notes, view]
     )
     const markRead = useCallback((note: CoworkerDockNote) => dockApi()?.markRead?.(note.id), [])
+    const looks = useMemo(() => looksOf(view?.state?.coworkers), [view])
 
     // The grip stays under the pointer: the rail moves by as much as the pointer does, within the edge.
     const grab = useCallback(
@@ -319,60 +332,62 @@ export function CoworkerDock() {
     }
     return (
         <main ref={mainRef} data-coworker-dock className="relative h-dvh overflow-hidden select-none">
-            <div className={cn('pointer-events-none absolute top-4 bottom-4', edge === 'right' ? 'right-0' : 'left-0')}>
-                <div
-                    ref={railRef}
-                    className={cn('pointer-events-auto absolute flex max-h-full flex-col', edge === 'right' ? 'right-0' : 'left-0', dragY !== null && 'opacity-90')}
-                    style={{ ...position, maxHeight: maxHeight === null ? undefined : `min(${maxHeight}px, 100%)` }}
-                    onPointerEnter={() => {
-                        hovering.current = true
-                        report()
-                    }}
-                    onPointerMove={event => {
-                        const box = event.currentTarget.getBoundingClientRect()
-                        const half = event.clientY < box.top + box.height / 2 ? 'top' : 'bottom'
-                        if (half !== hoveredHalf) setHoveredHalf(half)
-                    }}
-                    onPointerLeave={() => {
-                        setHoveredHalf(null)
-                        hovering.current = false
-                        report()
-                    }}
-                    onContextMenu={event => {
-                        event.preventDefault()
-                        dockApi()?.showMenu()
-                    }}
-                >
-                    <RailDock
-                        coworkers={inOrder(view.state.coworkers, droppedOrder)}
-                        edge={edge}
-                        collapsed={collapsed}
-                        createBlockedReason={view.state.createBlockedReason}
-                        onOpen={coworker => (withNotes && !isForemanDockEntry(coworker) ? dock.togglePanel(coworker.id) : dockApi()?.open(coworker.id))}
-                        onMenu={coworker => dockApi()?.showMenu(coworker.id)}
-                        onReorder={
-                            reorder
-                                ? agentIds => {
-                                      setDroppedOrder(agentIds)
-                                      reorder(agentIds)
-                                  }
-                                : undefined
-                        }
-                        onDraggingChange={draggingBuddy}
-                        inbox={withNotes ? { active: dock.panel?.filter ?? null, onOpen: () => dock.togglePanel('all') } : undefined}
-                        onCreate={() => dockApi()?.create()}
-                        onToggleCollapsed={() => dockApi()?.setCollapsed(!collapsed)}
-                        onGrab={grab}
-                    />
-                    {!collapsed && (
-                        <>
-                            <DockResizeEdge side="top" visible={hoveredHalf === 'top'} dragging={edgeDrag?.side === 'top'} onResizeStart={startResize} onResizeMove={moveResize} onResizeEnd={finishResize} onReset={resetSize} />
-                            <DockResizeEdge side="bottom" visible={hoveredHalf === 'bottom'} dragging={edgeDrag?.side === 'bottom'} onResizeStart={startResize} onResizeMove={moveResize} onResizeEnd={finishResize} onReset={resetSize} />
-                        </>
-                    )}
+            <BuddyLooksProvider looks={looks}>
+                <div className={cn('pointer-events-none absolute top-4 bottom-4', edge === 'right' ? 'right-0' : 'left-0')}>
+                    <div
+                        ref={railRef}
+                        className={cn('pointer-events-auto absolute flex max-h-full flex-col', edge === 'right' ? 'right-0' : 'left-0', dragY !== null && 'opacity-90')}
+                        style={{ ...position, maxHeight: maxHeight === null ? undefined : `min(${maxHeight}px, 100%)` }}
+                        onPointerEnter={() => {
+                            hovering.current = true
+                            report()
+                        }}
+                        onPointerMove={event => {
+                            const box = event.currentTarget.getBoundingClientRect()
+                            const half = event.clientY < box.top + box.height / 2 ? 'top' : 'bottom'
+                            if (half !== hoveredHalf) setHoveredHalf(half)
+                        }}
+                        onPointerLeave={() => {
+                            setHoveredHalf(null)
+                            hovering.current = false
+                            report()
+                        }}
+                        onContextMenu={event => {
+                            event.preventDefault()
+                            dockApi()?.showMenu()
+                        }}
+                    >
+                        <RailDock
+                            coworkers={inOrder(view.state.coworkers, droppedOrder)}
+                            edge={edge}
+                            collapsed={collapsed}
+                            createBlockedReason={view.state.createBlockedReason}
+                            onOpen={coworker => (withNotes && !isForemanDockEntry(coworker) ? dock.togglePanel(coworker.id) : dockApi()?.open(coworker.id))}
+                            onMenu={coworker => dockApi()?.showMenu(coworker.id)}
+                            onReorder={
+                                reorder
+                                    ? agentIds => {
+                                          setDroppedOrder(agentIds)
+                                          reorder(agentIds)
+                                      }
+                                    : undefined
+                            }
+                            onDraggingChange={draggingBuddy}
+                            inbox={withNotes ? { active: dock.panel?.filter ?? null, onOpen: () => dock.togglePanel('all') } : undefined}
+                            onCreate={() => dockApi()?.create()}
+                            onToggleCollapsed={() => dockApi()?.setCollapsed(!collapsed)}
+                            onGrab={grab}
+                        />
+                        {!collapsed && (
+                            <>
+                                <DockResizeEdge side="top" visible={hoveredHalf === 'top'} dragging={edgeDrag?.side === 'top'} onResizeStart={startResize} onResizeMove={moveResize} onResizeEnd={finishResize} onReset={resetSize} />
+                                <DockResizeEdge side="bottom" visible={hoveredHalf === 'bottom'} dragging={edgeDrag?.side === 'bottom'} onResizeStart={startResize} onResizeMove={moveResize} onResizeEnd={finishResize} onReset={resetSize} />
+                            </>
+                        )}
+                    </div>
                 </div>
-            </div>
-            {withNotes && !collapsed && layer && <DockLayer layer={{ edge, ...layer }} dock={dock} nameOf={nameOf} onOpenNote={openNote} onOpenFilter={openFilter} onMarkRead={markRead} onSettled={report} />}
+                {withNotes && !collapsed && layer && <DockLayer layer={{ edge, ...layer }} dock={dock} nameOf={nameOf} onOpenNote={openNote} onOpenFilter={openFilter} onMarkRead={markRead} onSettled={report} />}
+            </BuddyLooksProvider>
         </main>
     )
 }
