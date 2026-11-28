@@ -1,3 +1,4 @@
+import { modelContextWindow, type ContextOccupancy } from '@rerun/contracts'
 import type { LanguageModelMiddleware } from 'ai'
 import { canonicalBridgeName } from '../tools/builtin/hitl.js'
 
@@ -110,4 +111,42 @@ export const codexMcpCompatibilityMiddleware: LanguageModelMiddleware = {
         const result = await doGenerate()
         return { ...result, content: result.content.map(normalizeCodexGeneratePart) }
     },
+}
+
+export type CodexContextCapture = { middleware: LanguageModelMiddleware; read: () => ContextOccupancy | undefined }
+
+// A Codex turn is one step to the loop, and its usage adds up every model call the turn made, which
+// is what it costs (see the provider patch). How full the window is lives in `usage.raw`, the latest
+// of those calls: the turn's sum over a tool-heavy turn reads as several times the window.
+export function codexContextCapture(model: string): CodexContextCapture {
+    let snapshot: ContextOccupancy | undefined
+    const maxTokens = modelContextWindow(model, 'codex')
+
+    const capture = (part: StreamPart): void => {
+        if (part.type !== 'finish' || !maxTokens) return
+        const latestCall = record(part.usage.raw)
+        if (typeof latestCall?.inputTokens !== 'number' || typeof latestCall.outputTokens !== 'number') return
+        snapshot = { usedTokens: latestCall.inputTokens + latestCall.outputTokens, maxTokens }
+    }
+
+    return {
+        read: () => snapshot,
+        middleware: {
+            specificationVersion: 'v3',
+            async wrapStream({ doStream }) {
+                const result = await doStream()
+                return {
+                    ...result,
+                    stream: result.stream.pipeThrough(
+                        new TransformStream<StreamPart, StreamPart>({
+                            transform(part, controller) {
+                                capture(part)
+                                controller.enqueue(part)
+                            },
+                        }),
+                    ),
+                }
+            },
+        },
+    }
 }

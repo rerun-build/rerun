@@ -302,8 +302,8 @@ export type SessionUsageSeed = { usage: Usage; provider: string | null }
 // context gauge when a conversation is reopened (history messages carry no usage).
 // The last step's input tokens already include the whole conversation sent to the
 // model, so it reflects how full the context window is; runs.usageJson is the
-// cumulative sum across steps and would over-count a multi-step run. For claude
-// runs the whole CLI loop is one step whose numbers are that same cumulative sum,
+// cumulative sum across steps and would over-count a multi-step run. For claude and
+// codex runs the whole CLI turn is one step whose numbers are that same cumulative sum,
 // so the real occupancy lives in usageJson's `context` block, grafted on here.
 export async function readUsageSeed(conn: EngineConnection, engineAgentId: string, lastDone: EngineRun): Promise<SessionUsageSeed | null> {
     const fromJson = lastDone.usageJson ? (JSON.parse(lastDone.usageJson) as Usage | null) : null

@@ -10,8 +10,24 @@ describe('contextStatsOf', () => {
         expect(stats).toMatchObject({ used: 40, max: 200, model: 'opus', provider: 'claude' })
     })
 
+    // A Codex turn's usage adds up every call of the turn: 953k on a 272k window read as 351% (RER-443).
+    it("reads a Codex turn's occupancy rather than the sum of its calls", () => {
+        const usage = { inputTokens: 953_111, outputTokens: 959, totalTokens: 954_070, context: { usedTokens: 101_959, maxTokens: 272_000 } }
+        const stats = contextStatsOf([assistant({ provider: 'codex', model: 'gpt-6.2-sol', usage })], null, undefined)
+        expect(stats).toMatchObject({ used: 101_959, max: 272_000, provider: 'codex' })
+    })
+
     it('hides the gauge for a claude run with no captured occupancy', () => {
         expect(contextStatsOf([assistant({ provider: 'claude', usage: { inputTokens: 900 } })], null, undefined)).toBeNull()
+    })
+
+    it('hides the gauge for a codex run with no captured occupancy', () => {
+        const usage = { inputTokens: 953_111, outputTokens: 959, totalTokens: 954_070 }
+        expect(contextStatsOf([assistant({ provider: 'codex', usage })], null, undefined)).toBeNull()
+    })
+
+    it('hides the gauge of a reopened codex conversation whose last run an older engine finished', () => {
+        expect(contextStatsOf([assistant()], { usage: { totalTokens: 954_070 }, provider: 'codex' }, 'gpt-6.2-sol')).toBeNull()
     })
 
     it('approximates from the tokens of an API provider and falls back on the picked model', () => {

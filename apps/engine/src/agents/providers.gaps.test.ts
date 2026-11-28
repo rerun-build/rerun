@@ -358,7 +358,7 @@ describe('resolveModel on the codex subscription', () => {
         expect(settings.configOverrides).not.toHaveProperty('instructions')
         expect(settings.configOverrides).toMatchObject({ ...CODEX_HARNESS_OVERRIDES, web_search: 'live', prefix_mcp_tool_names: true, 'mcp_servers.rerun.tool_timeout_sec': 3600, model_reasoning_summary: 'auto' })
         expect(Object.keys(settings.mcpServers)).toEqual(['rerun'])
-        expect(resolved.contextUsage).toBeUndefined()
+        expect(resolved.contextUsage).toBeTypeOf('function')
         await expect(resolved.close()).resolves.toBeUndefined()
     })
 

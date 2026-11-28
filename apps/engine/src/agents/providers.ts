@@ -25,7 +25,7 @@ import { relayMcpServer, type RunMcpServer } from '../tools/mcp-relay.js'
 import { MCP_TOOL_CALL_OPTIONS, MCP_TOOL_TIMEOUT_MS } from '../tools/mcp-pool.js'
 import { claudeContextCapture, type ClaudeCompaction, type ClaudeContextCapture } from './claude-context.js'
 import { claudeScreenshotMiddleware } from './claude-stream.js'
-import { codexMcpCompatibilityMiddleware } from './codex-stream.js'
+import { codexContextCapture, codexMcpCompatibilityMiddleware } from './codex-stream.js'
 import { createCodexImageMiddleware } from './codex-images.js'
 import { googleToolSchemaMiddleware } from './google-tool-schema.js'
 import { createQuickRepliesCapture, type QuickRepliesCapture } from './quick-replies-stream.js'
@@ -475,8 +475,9 @@ export function modelFor(agent: LoadedAgent, override?: ModelOverride, tools?: T
 
 // A model plus whatever has to be torn down once the run is over. Only the Codex app-server holds a
 // process; every other provider closes to a no-op. `contextUsage` reads the context window occupancy
-// a claude run captured via its Stop hook — the cumulative usage the provider reports at finish
-// counts cache reads once per internal turn and says nothing about how full the window is.
+// of the CLI providers, whose whole turn is one step: claude's comes from its Stop hook, codex's from
+// the latest model call of the turn. The usage either reports at finish adds up every call of the
+// turn and says nothing about how full the window is.
 // `quickReplies` reads the block the model closed its message with, cut out of the text on its way.
 export type ResolvedModel = { model: ReturnType<typeof wrapLanguageModel>; close: () => Promise<void>; contextUsage?: () => ContextOccupancy | undefined; quickReplies: () => QuickRepliesCapture | undefined }
 
@@ -492,7 +493,8 @@ export function resolveModel(agent: LoadedAgent, override?: ModelOverride, tools
     const guard = createFakeToolCallGuard(agent.id)
     if (provider === 'codex') {
         const codex = codexAppServerProvider(agent, tools, mcpServers, { system, readOnly })
-        return { model: wrapLanguageModel({ model: codex(model), middleware: [codexMcpCompatibilityMiddleware, createCodexImageMiddleware(agent.id), replies.middleware, cardTags, guard] }), close: () => codex.close(), quickReplies: replies.read }
+        const context = codexContextCapture(model)
+        return { model: wrapLanguageModel({ model: codex(model), middleware: [codexMcpCompatibilityMiddleware, createCodexImageMiddleware(agent.id), replies.middleware, cardTags, guard, context.middleware] }), close: () => codex.close(), contextUsage: context.read, quickReplies: replies.read }
     }
     if (provider === 'claude') {
         const capture = claudeContextCapture(agent.resolved.connection?.id, onClaudeCompaction)
