@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+import path from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { agentViewSchema, boardAgentSchema, COWORKER_COLORS, coworkerLookSchema, prependQuote, QUOTE_FROM_USER, type AgentModels, type AgentView, type AiConnectionsView, type BoardAgent, type ConversationMessage } from '@rerun/contracts'
 import { z } from 'zod'
@@ -169,6 +171,50 @@ describe('responses for a build from before Grok', () => {
         vi.stubEnv('MOBILE_ANDROID_GROK_BUILD', '25')
         expect(aiConnectionsForClient(request('ios/1.6.0 (60)'), grokView)).toBe(grokView)
         expect(aiConnectionsForClient(request('android/1.6.0 (25)'), grokView)).toBe(grokView)
+    })
+})
+
+// The App Store builds parse OpenCode from build 30: a hub that names no first build hid it from every
+// iPhone, the machine's default included (RER-396). Leaves with iOS 29, whose snapshot it reads.
+describe('the first iOS build of OpenCode', () => {
+    const FIRST_IOS_BUILD = '30'
+    const shippedIos = (build: number) => readFileSync(path.resolve(import.meta.dirname, `../../../../../mobile/api-contract/shipped/ios-${build}.json`), 'utf8')
+    const goWindows = [
+        { name: '5 hours', usedPercent: 0, reset: null },
+        { name: 'Week', usedPercent: 100, reset: 'Mon' },
+        { name: 'Month', usedPercent: 50, reset: 'Dec 24' },
+    ]
+    const workspace: AiConnectionsView = {
+        ...view,
+        connections: [
+            view.connections[0],
+            { ...view.connections[1], name: 'OpenCode Go', planWindows: goWindows },
+            { id: 'cnx-codex', name: 'ChatGPT', provider: 'codex', kind: 'plan', status: 'connected', credentialOnFile: true, summary: '', isDefault: false, models: [], baseUrl: '', extraModels: [], planWindows: [] },
+            { id: 'cnx-custom', name: 'Ollama', provider: 'custom', kind: 'key', status: 'connected', credentialOnFile: true, summary: '', isDefault: false, models: [], baseUrl: 'http://ollama.local/v1', extraModels: [], planWindows: [] },
+            { id: 'cnx-grok', name: 'Grok', provider: 'grok', kind: 'plan', status: 'connected', credentialOnFile: true, summary: '', isDefault: false, models: [], baseUrl: '', extraModels: [], planWindows: [] },
+        ],
+    }
+    const iphone = request('ios/1.0.3 (45)')
+
+    it('is the first build whose providers name it', () => {
+        expect(shippedIos(29)).not.toMatch(/"opencode"/)
+        expect(shippedIos(30)).toMatch(/"opencode"/)
+    })
+
+    it('hides it from an iPhone while the hub names no first build', () => {
+        vi.stubEnv('MOBILE_IOS_GROK_BUILD', '54')
+        expect(aiConnectionsForClient(iphone, workspace).connections.map(c => c.id)).toEqual(['rerun', 'cnx-codex'])
+    })
+
+    it('hands it to an iPhone once the hub names it, with the plan usage of OpenCode Go, and keeps custom endpoints out', () => {
+        vi.stubEnv('MOBILE_IOS_GROK_BUILD', '54')
+        vi.stubEnv('MOBILE_IOS_OPENCODE_BUILD', FIRST_IOS_BUILD)
+        const answer = aiConnectionsForClient(iphone, workspace)
+        expect(answer.connections.map(c => c.id)).toEqual(['rerun', 'cnx-oc', 'cnx-codex'])
+        expect(answer.connections.find(c => c.id === answer.default.connectionId)).toMatchObject({ provider: 'opencode', kind: 'plan', planWindows: goWindows })
+        expect(agentModelsForClient(iphone, models)).toEqual(models)
+        expect(agentViewForClient(iphone, agentView)).toEqual(agentView)
+        expect(aiConnectionsForClient(request('ios/1.0.0 (29)'), workspace).connections.map(c => c.id)).toEqual(['rerun', 'cnx-codex'])
     })
 })
 

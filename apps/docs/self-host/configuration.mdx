@@ -173,8 +173,8 @@ Coworkers can publish a file or a folder and share its link.
 | `DESKTOP_MIN_SHELL_VERSION` | Optional | empty | The oldest [desktop app](/self-host/desktop) version (`x.y.z`) this install still serves. Older apps update before they load anything. Empty: every version works. |
 | `MOBILE_IOS_MIN_BUILD` | Optional | empty | The oldest build of the iPhone app that may still talk to this install. An older one is sent to the App Store to update. Empty: every build is let through. |
 | `MOBILE_ANDROID_MIN_BUILD` | Optional | empty | The same for the Android build of the app. |
-| `MOBILE_IOS_CUSTOM_BUILD` | Optional | empty | The first iPhone app build that knows **Custom endpoint** connections. Older builds, and every build while it is empty, do not list those connections. |
-| `MOBILE_IOS_OPENCODE_BUILD` | Optional | empty | The same for OpenCode connections. |
+| `MOBILE_IOS_CUSTOM_BUILD` | Optional | empty | The first iPhone app build that knows **Custom endpoint** connections. Older builds, and every build while it is empty, do not list those connections. Leave it empty with the App Store app: it cannot add one yet. |
+| `MOBILE_IOS_OPENCODE_BUILD` | Optional | empty | The first iPhone app build that knows OpenCode connections, `30` for the App Store app. Older builds, and every build while it is empty, do not list them. |
 | `MOBILE_IOS_GROK_BUILD` | Optional | empty | The same for Grok connections. |
 | `MOBILE_ANDROID_GROK_BUILD` | Optional | empty | The first Android app build that knows Grok connections. Older builds, and every build while it is empty, do not list them. |
 | `MOBILE_IOS_FOREMAN_RUNS_BUILD` | Optional | empty | The first iPhone app build that marks a conversation with the Chief of Staff read as it shows it. Older builds, and every build while it is empty, are not sent the runs it finished in their notifications. |
