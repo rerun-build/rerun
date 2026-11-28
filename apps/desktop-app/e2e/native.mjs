@@ -61,6 +61,15 @@ export default async function nativeScenario({ app, page, step, base }) {
         await waitUntil(() => app.evaluate(({ app: electronApp }) => electronApp.getBadgeCount()), (count) => count === 0, 'the Dock badge clears')
     }
 
+    // The tray and taskbar icons load where the packaged app looks for them, inside app.asar (RER-398).
+    // Run from the sources, the app path is apps/desktop-app, where the icons are always there.
+    const icons = await app.evaluate(({ app: electronApp, nativeImage }) => ({
+        packaged: electronApp.isPackaged,
+        blank: ['tray.png', 'trayTemplate.png', 'trayTemplate@2x.png', 'badge.png'].filter((file) => nativeImage.createFromPath(`${electronApp.getAppPath()}/resources/tray/${file}`).isEmpty()),
+    }))
+    if (icons.packaged) check(icons.blank.length === 0, `the tray icons are in the app (blank: ${icons.blank.join(', ') || 'none'})`)
+    else console.log('[e2e] skipped: the tray icons are only checked in the packaged app (--packaged)')
+
     // 3. The desktop settings persist in the shell.
     const before = await page.evaluate(() => window.rerunShell.settings.get())
     check(before.closeToTray === true && before.openAtLogin === false, `the defaults: close to the tray, not at login (${JSON.stringify(before)})`)
