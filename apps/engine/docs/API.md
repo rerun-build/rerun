@@ -1760,7 +1760,7 @@ Events (`src/runtime/notify.ts`):
 - `agent.session.created`: a session was opened by a schedule, a trigger or another coworker.
 - `agent.notification`: the agent needs the user: it called `notify_user`, a human-in-the-loop tool paused the run, or it proposed a skill.
 - `agent.schedule.created` · `agent.trigger.created`: an automation now exists, whoever made it.
-- `box.connection.connected`: a connection got its credential.
+- `box.connection.connected`: a connection got its credential. `message` is its provider (`claude`, `openai`…): the app takes the conversations a refusal of that provider stopped out of **To handle**.
 - `box.vault.signed_out`: a Vault item lost its sign-in: its token was refused or expired with nothing to refresh it.
 
 Payload (`content-type: application/json`):

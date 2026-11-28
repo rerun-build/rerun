@@ -7,8 +7,10 @@ export type NotificationKind = 'info' | 'question' | 'approval' | 'connector' | 
 
 // `agent.schedule.created`, `agent.trigger.created` and `box.connection.connected` carry no message
 // for anyone: they tell the hub an automation now exists, or a step of the workspace's
-// getting-started checklist just happened on the box. `box.vault.signed_out` tells it a Vault item's
-// token can no longer be refreshed, so the Vault shows the item to reconnect.
+// getting-started checklist just happened on the box. `box.connection.connected` puts the provider
+// of the account in `message`: the hub releases the conversations a refusal of that provider
+// stopped. `box.vault.signed_out` tells it a Vault item's token can no longer be refreshed, so the
+// Vault shows the item to reconnect.
 export type NotificationEvent =
     | 'agent.notification'
     | 'agent.message.completed'

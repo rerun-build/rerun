@@ -1,10 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getAgent, getConnectionUsage, listConnections } from '@/lib/engine/client'
+import { copyToShippedForemanRow } from '@/lib/foreman/conversation'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase, tableResolver, writeMethodOf, type FakeSupabase } from '@/test/supabase-fake'
 
-import { alertSignedOutAccounts, closeReconnectedAccounts } from './ai-account-alert.service'
+import { alertSignedOutAccounts, closeReconnectedAccounts, releaseSignedOutSessions } from './ai-account-alert.service'
 import { sendAccountSignedOutEmail } from './email.service'
 import { loadPresence } from './presence.service'
 import { findWorkspaceEngine } from './workspace-engine.service'
@@ -14,6 +15,7 @@ vi.mock('@/lib/engine/client', () => ({ getAgent: vi.fn(), getConnectionUsage: v
 vi.mock('./workspace-engine.service', () => ({ findWorkspaceEngine: vi.fn() }))
 vi.mock('./presence.service', () => ({ loadPresence: vi.fn() }))
 vi.mock('./email.service', () => ({ sendAccountSignedOutEmail: vi.fn() }))
+vi.mock('@/lib/foreman/conversation', () => ({ copyToShippedForemanRow: vi.fn() }))
 vi.mock('@/lib/email/board-banner', () => ({ BANNER_WARM_BACKGROUND_MS: 0, alertBanner: vi.fn(async () => undefined) }))
 
 const WORKSPACE_ID = 7
@@ -48,6 +50,10 @@ function database(): FakeSupabase {
         if (table === 'notification_incidents' && writeMethodOf(calls) === 'delete') {
             const eq = (column: string) => calls.find(call => call.method === 'eq' && call.args[0] === column)?.args[1]
             incidents = incidents.filter(incident => !(incident.user_id === eq('user_id') && incident.source_key === eq('source_key')))
+        }
+        if (table === 'sessions' && writeMethodOf(calls) === 'update') {
+            const ids = calls.find(call => call.method === 'in')?.args[1] as string[]
+            return { data: (tables.sessions ?? []).filter(row => ids.includes((row as { id: string }).id) && (row as { status: string }).status === 'error').map(row => ({ id: (row as { id: string }).id })) }
         }
         if (table === 'notification_incidents' && writeMethodOf(calls) === 'update') {
             const before = calls.find(call => call.method === 'lt')?.args[1] as string
@@ -243,5 +249,110 @@ describe('closeReconnectedAccounts', () => {
     it('asks the machine nothing when no alert is open', async () => {
         await closeReconnectedAccounts(WORKSPACE_ID)
         expect(listConnections).not.toHaveBeenCalled()
+    })
+})
+
+describe('releaseSignedOutSessions', () => {
+    const session = (id: string, agent_id: string, status = 'error') => ({ id, agent_id, engine_session_id: `engine-${id}`, status })
+    const said = (sessionId: string, agent_id: string, created_at: string, kind: string, metadata: object | null) => ({ agent_id, engine_session_id: `engine-${sessionId}`, created_at, kind, metadata })
+    const refused = (provider: string) => ({ errorCode: 'provider_unauthorized', provider })
+    const released = () => db.writes('sessions').map(write => ({ payload: write.payload, filters: write.filters.filter(call => call.method !== 'select').map(call => [call.method, ...call.args]) }))
+
+    beforeEach(() => connected(connection('conn-claude', 'claude', false), connection('conn-openai', 'openai', false)))
+
+    it('takes a conversation the refused account stopped out of « To handle » once it is connected again', async () => {
+        tables.sessions = [session('s1', 'a1')]
+        tables.notifications = [said('s1', 'a1', '2026-11-27T06:30:12Z', 'error', refused('claude'))]
+
+        await releaseSignedOutSessions(WORKSPACE_ID, 'claude')
+
+        expect(released()).toEqual([{ payload: { status: 'idle' }, filters: [['in', 'id', ['s1']], ['eq', 'status', 'error']] }])
+    })
+
+    it('leaves an error of another kind, a refusal of another provider and a later failure waiting on the user', async () => {
+        tables.sessions = [session('limit', 'a1'), session('openai', 'a2'), session('later', 'a3'), session('claude', 'a3')]
+        tables.notifications = [
+            said('limit', 'a1', '2026-11-27T06:30:00Z', 'error', { errorCode: 'usage_limit', provider: 'claude' }),
+            said('openai', 'a2', '2026-11-27T06:30:00Z', 'error', refused('openai')),
+            said('later', 'a3', '2026-11-27T06:30:00Z', 'error', refused('claude')),
+            said('later', 'a3', '2026-11-27T07:00:00Z', 'error', { errorCode: 'model_not_in_plan', provider: 'claude' }),
+            said('claude', 'a3', '2026-11-27T06:30:00Z', 'error', refused('claude')),
+        ]
+
+        await releaseSignedOutSessions(WORKSPACE_ID, 'claude')
+
+        expect(released()).toEqual([expect.objectContaining({ filters: [['in', 'id', ['claude']], ['eq', 'status', 'error']] })])
+    })
+
+    it('takes a refusal on any provider when the engine names none', async () => {
+        tables.sessions = [session('s1', 'a2')]
+        tables.notifications = [said('s1', 'a2', '2026-11-27T06:30:00Z', 'error', refused('openai'))]
+
+        await releaseSignedOutSessions(WORKSPACE_ID, null)
+
+        expect(released()).toEqual([expect.objectContaining({ filters: [['in', 'id', ['s1']], ['eq', 'status', 'error']] })])
+    })
+
+    it('writes nothing when no conversation is in error', async () => {
+        tables.sessions = [session('s1', 'a1', 'idle')]
+        tables.notifications = [said('s1', 'a1', '2026-11-27T06:30:00Z', 'error', refused('claude'))]
+
+        await releaseSignedOutSessions(WORKSPACE_ID, 'claude')
+
+        expect(released()).toEqual([])
+    })
+
+    it('releases nothing while another account of that provider is still turned away', async () => {
+        connected(connection('conn-claude', 'claude', false), connection('conn-claude-2', 'claude', true))
+        tables.sessions = [session('s1', 'a1')]
+        tables.notifications = [said('s1', 'a1', '2026-11-27T06:30:00Z', 'error', refused('claude'))]
+
+        await releaseSignedOutSessions(WORKSPACE_ID, 'claude')
+
+        expect(released()).toEqual([])
+    })
+
+    it('still releases when the account turned away is of another provider', async () => {
+        connected(connection('conn-claude', 'claude', false), connection('conn-openai', 'openai', true))
+        tables.sessions = [session('s1', 'a1')]
+        tables.notifications = [said('s1', 'a1', '2026-11-27T06:30:00Z', 'error', refused('claude'))]
+
+        await releaseSignedOutSessions(WORKSPACE_ID, 'claude')
+
+        expect(released()).toHaveLength(1)
+    })
+
+    it('copies a conversation of the Chief of Staff it released to the table the shipped apps listen to', async () => {
+        tables.agents.push({ id: 'chief', name: 'Chief of Staff', engine_agent_id: 'foreman', workspace_id: WORKSPACE_ID, kind: 'foreman', disabled_at: null, created_at: '0' })
+        tables.sessions = [session('thread', 'chief'), session('s1', 'a1')]
+        tables.notifications = [said('thread', 'chief', '2026-11-27T06:30:00Z', 'error', refused('claude')), said('s1', 'a1', '2026-11-27T06:30:00Z', 'error', refused('claude'))]
+
+        await releaseSignedOutSessions(WORKSPACE_ID, 'claude')
+
+        expect(vi.mocked(copyToShippedForemanRow).mock.calls).toEqual([['thread']])
+    })
+
+    it('releases hundreds of conversations a few at a time, every one of them', async () => {
+        const ids = Array.from({ length: 150 }, (_, index) => `s${index}`)
+        tables.sessions = ids.map(id => session(id, 'a1'))
+        tables.notifications = ids.map(id => said(id, 'a1', '2026-11-27T06:30:00Z', 'error', refused('claude')))
+
+        await releaseSignedOutSessions(WORKSPACE_ID, 'claude')
+
+        const batches = released().map(write => write.filters[0][2] as string[])
+        expect(batches.map(batch => batch.length)).toEqual([100, 50])
+        expect(batches.flat()).toEqual(ids)
+    })
+
+    it('writes nothing and says so when a read fails', async () => {
+        const error = vi.spyOn(console, 'error').mockImplementation(() => {})
+        const failing = fakeSupabase((table, calls) => (table === 'sessions' && !writeMethodOf(calls) ? { data: null, error: { message: 'boom' } } : tableResolver(tables)(table, calls)))
+        vi.mocked(createServiceRoleClient).mockReturnValue(failing.client)
+        tables.sessions = [session('s1', 'a1')]
+
+        await releaseSignedOutSessions(WORKSPACE_ID, 'claude')
+
+        expect(failing.writes('sessions')).toEqual([])
+        expect(error).toHaveBeenCalledWith(expect.stringContaining('read the conversations in error'), WORKSPACE_ID, { message: 'boom' })
     })
 })

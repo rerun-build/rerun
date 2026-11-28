@@ -303,6 +303,8 @@ export const GETTING_STARTED_EVENT_STEP: Partial<Record<EngineCreatedEvent['even
 export const engineCreatedEventSchema = z.object({
     event: z.enum(['agent.schedule.created', 'agent.trigger.created', 'box.connection.connected']),
     agentId: z.string().nullable().optional(),
+    // The provider of the account `box.connection.connected` names.
+    message: z.string().nullable().optional(),
     metadata: z.record(z.string(), z.unknown()).nullable().optional(),
 })
 export type EngineCreatedEvent = z.infer<typeof engineCreatedEventSchema>
