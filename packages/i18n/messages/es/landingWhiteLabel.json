@@ -179,7 +179,7 @@
     "pricing": {
         "title": "Precio por workspace de cliente.",
         "lead": "Cuantos más clientes gestionas, menos cuesta cada uno. Elige tu número y reserva una llamada corta para empezar.",
-        "costAnswer": "Un precio por workspace de cliente y por mes que baja a medida que añades clientes, desde {min} workspaces: {tiers}. Cada precio se aplica a los workspaces de su tramo.",
+        "costAnswer": "Un precio por workspace de cliente y por mes que baja con cada cliente que añades, desde {min} workspaces: {tiers}. Cada workspace paga el precio de la cantidad alcanzada.",
         "tier": "{price} desde {count}",
         "card": {
             "title": "Marca blanca",
@@ -187,7 +187,7 @@
             "workspaces": "Workspaces de clientes",
             "valueText": "{count, plural, one {# workspace de cliente} other {# workspaces de clientes}}",
             "valueTextAtLeast": "{count, plural, one {#+ workspace de cliente} other {#+ workspaces de clientes}}",
-            "perWorkspace": "Media por workspace de cliente",
+            "perWorkspace": "Por workspace de cliente",
             "save": "Ahorra {percent}",
             "perMonth": "/mes",
             "total": "<total></total> al mes por {count, plural, one {# workspace} other {# workspaces}}",
