@@ -151,6 +151,13 @@ export async function checkOrganizationDomains(supabase: Client, dns: DnsResolve
     return sweep
 }
 
+// The domains Traefik hands to the edge, the same ones `isServedHostname` says yes to.
+export async function servedDomainHostnames(supabase: Client): Promise<string[]> {
+    const { data, error } = await selectAll(supabase, 'organization_domains', ['hostname'] as const, { status: 'active' }, { column: 'hostname', ascending: true })
+    if (error) throw new Error(error.message)
+    return data.map(row => row.hostname)
+}
+
 // The names the edge may get a certificate for: the default address of every organization, and the
 // domains they proved. A suspended organization keeps its certificate, for the page that says so.
 export async function isServedHostname(hostname: string): Promise<boolean> {

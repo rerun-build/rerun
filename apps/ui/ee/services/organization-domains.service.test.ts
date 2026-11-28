@@ -9,7 +9,7 @@ vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: () => mocks.
 vi.mock('@/lib/app-url', () => ({ APP_URL: 'https://app.rerun.build' }))
 vi.mock('@rerun/cloud/organizations', () => ({ ORGANIZATIONS_ENABLED: true }))
 
-const { addOrganizationDomain, checkOrganizationDomain, checkOrganizationDomains, isServedHostname, listOrganizationDomains, MAX_DOMAINS, removeOrganizationDomain } = await import('./organization-domains.service')
+const { addOrganizationDomain, checkOrganizationDomain, checkOrganizationDomains, isServedHostname, listOrganizationDomains, MAX_DOMAINS, removeOrganizationDomain, servedDomainHostnames } = await import('./organization-domains.service')
 const { forgetOrganizationBrands, organizationOfHost } = await import('./organization-brand.service')
 
 const EDGE = 'edge.rerun.work'
@@ -253,5 +253,22 @@ describe('the names the edge may get a certificate for', () => {
         mocks.client = world.client
         for (const name of ['nordlys.rerun.work', 'havre.rerun.work', HOST]) expect(await isServedHostname(name), name).toBe(true)
         for (const name of ['nobody.rerun.work', 'rerun.work', 'edge.rerun.work', 'a.nordlys.rerun.work', 'old.acme.com', 'acme.com', 'app.rerun.build', 'localhost', '10.0.0.1', '', 'App.Acme.com', 'app.acme.com.', 'app.acme.com:443', 'x'.repeat(500)]) expect(await isServedHostname(name), name).toBe(false)
+    })
+})
+
+describe('the domains Traefik hands to the edge', () => {
+    it('are the active ones, one still answered for a day included, and every one gets its certificate', async () => {
+        world = organizationWorld({
+            organization_domains: [
+                { id: 'd', organization_id: NORDLYS, hostname: HOST, status: 'active', created_at: '1' },
+                { id: 'f', organization_id: HAVRE, hostname: 'portal.havre.io', status: 'active', failing_since: '2026-01-01T00:00:00Z', created_at: '2' },
+                { id: 'e', organization_id: NORDLYS, hostname: 'old.acme.com', status: 'error', created_at: '3' },
+                { id: 'p', organization_id: NORDLYS, hostname: 'next.acme.com', status: 'pending', created_at: '4' },
+            ],
+        })
+        mocks.client = world.client
+        const served = await servedDomainHostnames(world.client)
+        expect(served).toEqual([HOST, 'portal.havre.io'])
+        for (const name of served) expect(await isServedHostname(name), name).toBe(true)
     })
 })
