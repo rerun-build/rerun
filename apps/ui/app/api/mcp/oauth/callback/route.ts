@@ -1,7 +1,7 @@
 import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { putConnectorToken } from '@/lib/vault/tokens'
 import { oauthPopupResponse, popupFailureLabel, popupSuccessLabel } from '@/lib/oauth/popup-result'
-import { OAUTH_COOKIE_PATH, OAUTH_COOKIE_PREFIX, type ExchangedToken, type OAuthContext, decodeContext, engineClientSecret, exchangeCode } from '@/lib/mcp-oauth'
+import { OAUTH_COOKIE_PATH, OAUTH_COOKIE_PREFIX, type ExchangedToken, type OAuthContext, decodeContext, engineClientSecret, exchangeCode, oauthResource } from '@/lib/mcp-oauth'
 import type { McpTokenBundle } from '@/lib/engine/client'
 import { appReturnUrl } from '@/lib/oauth/app-return'
 import { callbackGrant } from '@/lib/oauth/mobile-ticket'
@@ -37,6 +37,7 @@ function tokenBundle(ctx: OAuthContext, token: ExchangedToken): McpTokenBundle {
         tokenEndpoint: ctx.tokenEndpoint,
         clientId: ctx.clientId,
         clientSecret: ctx.clientSecret,
+        resource: oauthResource(ctx),
         obtainedAt: Date.now(),
     }
 }

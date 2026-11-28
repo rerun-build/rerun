@@ -359,6 +359,7 @@ export type McpTokenBundle = {
     tokenEndpoint?: string
     clientId?: string
     clientSecret?: string
+    resource?: string
     obtainedAt?: number
 }
 

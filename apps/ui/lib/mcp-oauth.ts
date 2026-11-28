@@ -49,6 +49,12 @@ export type OAuthContext = {
     host?: HostReturn
 }
 
+// The RFC 8707 resource named on the authorize URL, the code exchange and every refresh: a strict
+// authorization server refuses a refresh that names another one.
+export function oauthResource(ctx: Pick<OAuthContext, 'resource' | 'mcpUrl'>): string {
+    return ctx.resource ?? ctx.mcpUrl
+}
+
 export type DiscoveredMetadata = {
     authorizationEndpoint: string
     tokenEndpoint: string
@@ -347,7 +353,7 @@ export function buildAuthorizeUrl(metadata: DiscoveredMetadata, ctx: OAuthContex
         state,
         code_challenge: challenge,
         code_challenge_method: 'S256',
-        resource: ctx.resource ?? ctx.mcpUrl,
+        resource: oauthResource(ctx),
     })
     const scope = metadata.scopesSupported?.join(' ')
     if (scope) params.set('scope', scope)
@@ -363,7 +369,7 @@ export async function exchangeCode(ctx: OAuthContext, code: string): Promise<Exc
         redirect_uri: ctx.redirectUri,
         client_id: ctx.clientId,
         code_verifier: ctx.verifier,
-        resource: ctx.resource ?? ctx.mcpUrl,
+        resource: oauthResource(ctx),
     })
     const clientSecret = clientSecretFor(ctx)
     if (clientSecret) body.set('client_secret', clientSecret)
