@@ -33,12 +33,17 @@ import type { PanelProps, Success, TilesData, View } from './views'
 
 type Header = TilesHeader
 
-// A page reached from another page goes back to it rather than to the home.
+// A page reached from another page goes back to it rather than to the home. The cancellation is reached
+// from the home and from Manage plan, and goes back to the one it was opened from.
 const PARENT: Partial<Record<View, View>> = { usage: 'credits', card: 'payment', business: 'payment', cancelFlow: 'cancel' }
 
-function depthOf(view: View, cancelDepth: number): number {
+type CancelOrigin = 'home' | 'plan'
+
+function depthOf(view: View, cancelDepth: number, cancelFrom: CancelOrigin): number {
+    const cancelPageDepth = cancelFrom === 'plan' ? 2 : 1
     if (view === 'home') return 0
-    if (view === 'cancelFlow') return 2 + cancelDepth
+    if (view === 'cancel') return cancelPageDepth
+    if (view === 'cancelFlow') return cancelPageDepth + 1 + cancelDepth
     return PARENT[view] ? 2 : 1
 }
 
@@ -95,6 +100,7 @@ export function BillingTilesDialog({ state, initialView = 'home', onChanged }: {
     const [view, setView] = useState<View>(initialView)
     const [success, setSuccess] = useState<Success | null>(null)
     const [cancelHeader, setCancelHeader] = useState<CancelFlowHeader | null>(null)
+    const [cancelFrom, setCancelFrom] = useState<CancelOrigin>('home')
     const [reloads, setReloads] = useState(0)
     const [openedAt] = useState(() => Date.now())
     const trialEndsAt = state.status === 'trialing' ? (workspace?.trial_ends_at ?? null) : null
@@ -116,9 +122,10 @@ export function BillingTilesDialog({ state, initialView = 'home', onChanged }: {
 
     const go = (next: View) => {
         if (next === 'cancelFlow') setCancelHeader(null)
+        if (next === 'cancel' && view !== 'cancelFlow') setCancelFrom(view === 'plan' ? 'plan' : 'home')
         setView(next)
     }
-    const back = () => go(PARENT[view] ?? 'home')
+    const back = () => go(view === 'cancel' ? cancelFrom : (PARENT[view] ?? 'home'))
     const done = async (next: Success) => {
         await refreshWorkspace()
         await onChanged()
@@ -132,9 +139,11 @@ export function BillingTilesDialog({ state, initialView = 'home', onChanged }: {
     }
 
     const homeHeader = useHomeHeader(state, data.trialDaysLeft)
-    const pageHeader = usePageHeader(view === 'home' ? 'plan' : view === 'cancelFlow' ? 'cancel' : view, state)
+    const viewHeader = usePageHeader(view === 'home' ? 'plan' : view === 'cancelFlow' ? 'cancel' : view, state)
+    const planHeader = usePageHeader('plan', state)
+    const pageHeader = view === 'cancel' && cancelFrom === 'plan' ? { ...viewHeader, backLabel: planHeader.title } : viewHeader
     const stepKey = success ? 'success' : view
-    const depth = success ? depthOf(view, 0) + 1 : depthOf(view, cancelHeader?.depth ?? 0)
+    const depth = success ? depthOf(view, 0, cancelFrom) + 1 : depthOf(view, cancelHeader?.depth ?? 0, cancelFrom)
     // The cancellation's steps bring their own header; until the first one is read, the page's.
     const header: Header & { key: string; onBack?: () => void } =
         success || view === 'home'
