@@ -26,12 +26,14 @@ vi.mock('@/lib/vault/install', () => ({
 }))
 vi.mock('@/lib/vault/tokens', () => ({ deleteConnectorToken: vi.fn(async () => {}) }))
 vi.mock('@/lib/engine/client', async importOriginal => ({ EngineRequestError: (await importOriginal<typeof import('@/lib/engine/client')>()).EngineRequestError, supportsVault: vi.fn(async () => true) }))
-vi.mock('@/lib/engine/vault-client', () => ({ getVaultItem: vi.fn(async () => ({ id: 'item-1', agentIds: ['engine-agent'] })), patchVaultItem: vi.fn(), createVaultItem: vi.fn(), detachVaultItem: vi.fn() }))
+vi.mock('@/lib/engine/vault-client', () => ({ getVaultItem: vi.fn(async () => ({ id: 'item-1', agentIds: ['engine-agent'] })), patchVaultItem: vi.fn(), createVaultItem: vi.fn(), detachVaultItem: vi.fn(), listVaultItems: vi.fn(async () => []) }))
 vi.mock('./vault.service', async () => ({
     VaultUnavailableError: (await vi.importActual<typeof import('./vault.service')>('./vault.service')).VaultUnavailableError,
     rethrowConflict: (await vi.importActual<typeof import('./vault.service')>('./vault.service')).rethrowConflict,
     vaultContext: vi.fn(async () => ({ actor: { kind: 'user', userId: 'user-1', workspaceId: 7 }, byEngineId: new Map() })),
     assertCanChangeItem: vi.fn(async () => {}),
+    canChangeItem: vi.fn(async () => true),
+    lendVaultEntry: vi.fn(),
 }))
 vi.mock('@/lib/services/registry', async importOriginal => ({
     ...(await importOriginal<typeof import('@/lib/services/registry')>()),

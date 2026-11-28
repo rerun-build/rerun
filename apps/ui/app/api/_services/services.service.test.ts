@@ -37,6 +37,7 @@ vi.mock('@/lib/engine/vault-client', async importOriginal => ({
     patchVaultItem: vi.fn(),
     updateVaultItemEnv: vi.fn(),
     deleteVaultItem: vi.fn(),
+    listVaultItems: vi.fn(async () => []),
 }))
 vi.mock('@/lib/vault/install', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/vault/install')>()), compileIntoVault: vi.fn() }))
 vi.mock('@/app/api/_services/vault.service', async importOriginal => ({
