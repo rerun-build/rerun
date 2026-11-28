@@ -96,12 +96,12 @@
     },
     "security": {
         "twoStep": "İki adımlı doğrulama",
-        "hint": "E-posta, Google veya Apple girişinden sonra {brand} bir adım daha ister. Bir yöntem seçin ya da ikisini birden kullanın.",
+        "hint": "Girişten sonra bir adım daha.",
         "on": "Açık",
         "remove": "Kaldır",
         "app": {
             "title": "Kimlik doğrulama uygulaması",
-            "description": "1Password, Google Authenticator veya Authy'den 6 haneli bir kod.",
+            "description": "Uygulamanızdan 6 haneli bir kod.",
             "added": "Eklenme: {date}",
             "setUp": "Kur",
             "removeTitle": "Kimlik doğrulama uygulaması kaldırılsın mı?",
@@ -109,7 +109,7 @@
         },
         "passkeys": {
             "title": "Geçiş anahtarları",
-            "description": "Touch ID, Face ID, Windows Hello, Android veya bir güvenlik anahtarı.",
+            "description": "Touch ID, Face ID veya bir güvenlik anahtarı.",
             "add": "Ekle",
             "addInBrowser": "Geçiş anahtarını tarayıcınızdan ekleyin: bu uygulama Touch ID'ye veya Windows Hello'ya erişemez.",
             "notHere": "Geçiş anahtarları bu adreste kullanılamıyor.",
@@ -123,7 +123,7 @@
         "lastMethod": "Bu son yönteminiz: iki adımlı doğrulama kapanır ve yedek kodlarınız artık çalışmaz.",
         "backup": {
             "title": "Yedek kodlar",
-            "description": "Kalan: {left, number} / {total, number}. Elinizde başka bir yöntem olmadığında her kod hesabınızı bir kez açar.",
+            "description": "Kalan: {left, number} / {total, number}.",
             "newCodes": "Yeni kodlar",
             "newTitle": "Yeni yedek kodlar oluşturulsun mu?",
             "newDescription": "Kaydettiğiniz kodlar artık çalışmaz."

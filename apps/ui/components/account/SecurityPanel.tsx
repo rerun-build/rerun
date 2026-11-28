@@ -1,15 +1,16 @@
 'use client'
 
 import type { SecurityPasskey, SecuritySession, SecurityState } from '@/app/api/_actions/two-step.actions'
+import { PasskeyDeviceLogo } from '@/components/account/PasskeyDeviceLogo'
 import { ConfirmDialog } from '@/components/dialogs/ConfirmDialog'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
-import { PanelRow } from '@/components/ui/panel-row'
+import { PANEL_CARD, PanelRow } from '@/components/ui/panel-row'
 import { SkeletonPanelRows } from '@/components/ui/skeleton'
-import { TooltipDisabledReason } from '@/components/ui/tooltip'
+import { TooltipDisabledReason, TooltipLabeled } from '@/components/ui/tooltip'
 import { BACKUP_CODE_COUNT } from '@/lib/auth/two-step/record'
 import type { SessionDevice } from '@/lib/auth/two-step/devices'
-import { KeyIcon, LockKeyholeIcon, MonitorIcon, PencilIcon, ShieldCheckIcon, Smartphone, Trash2Icon } from '@/lib/icons'
+import { KeyIcon, LockKeyholeIcon, MonitorIcon, PencilIcon, PlusIcon, ShieldCheckIcon, Smartphone, Trash2Icon } from '@/lib/icons'
 import { shortDate, timeAgo } from '@rerun/i18n/format'
 import { Badge, PanelSection } from '@rerun/ui/primitives'
 import { useLocale, useTranslations } from 'next-intl'
@@ -58,28 +59,47 @@ function RemoveMethod({ title, lastMethod, busy, onConfirm, children }: { title:
     )
 }
 
-function PasskeyRow({ passkey, lastMethod, busy, onRename, onRemove }: { passkey: SecurityPasskey; lastMethod: boolean; busy: boolean; onRename: () => void; onRemove: () => void }) {
-    const t = useTranslations('account.security.passkeys')
+// Hidden on a phone, where the row's own button already says the method is on and the title needs the room.
+function OnBadge() {
+    const t = useTranslations('account.security')
+    return (
+        <Badge size="xs" tone="green" className="max-sm:hidden">
+            {t('on')}
+        </Badge>
+    )
+}
+
+function PasskeyItem({ passkey, lastMethod, busy, onRename, onRemove }: { passkey: SecurityPasskey; lastMethod: boolean; busy: boolean; onRename: () => void; onRemove: () => void }) {
+    const t = useTranslations('account.security')
     const locale = useLocale()
     const added = shortDate(passkey.createdAt, locale)
+    const removeLabel = t('passkeys.removeTitle', { name: passkey.name })
     return (
-        <PanelRow
-            leading={<Icon icon={KeyIcon} size="sm" />}
-            title={passkey.name}
-            description={passkey.lastUsedAt ? t('used', { added, used: timeAgo(passkey.lastUsedAt, locale) }) : t('neverUsed', { added })}
-            actions={
-                <>
-                    <Button type="button" variant="ghost" size="icon-sm" aria-label={t('rename')} onClick={onRename}>
+        <li className="flex items-center gap-3 border-t border-border py-2.5 ps-3 pe-3 sm:ps-14">
+            <PasskeyDeviceLogo name={passkey.name} />
+            <div className="flex min-w-0 flex-1 flex-col">
+                <span className="truncate text-sm">{passkey.name}</span>
+                <span className="truncate text-xs text-muted-foreground">
+                    {passkey.lastUsedAt ? t('passkeys.used', { added, used: timeAgo(passkey.lastUsedAt, locale) }) : t('passkeys.neverUsed', { added })}
+                </span>
+            </div>
+            <div className="flex shrink-0 items-center gap-1">
+                <TooltipLabeled label={t('passkeys.rename')}>
+                    <Button type="button" variant="ghost" size="icon-sm" aria-label={t('passkeys.rename')} onClick={onRename}>
                         <PencilIcon />
                     </Button>
-                    <RemoveMethod title={t('removeTitle', { name: passkey.name })} lastMethod={lastMethod} busy={busy} onConfirm={onRemove}>
-                        <Button type="button" variant="ghost" size="icon-sm" aria-label={t('removeTitle', { name: passkey.name })} loading={busy}>
-                            <Trash2Icon />
-                        </Button>
-                    </RemoveMethod>
-                </>
-            }
-        />
+                </TooltipLabeled>
+                <TooltipLabeled label={t('remove')}>
+                    <span className="inline-flex">
+                        <RemoveMethod title={removeLabel} lastMethod={lastMethod} busy={busy} onConfirm={onRemove}>
+                            <Button type="button" variant="ghost" size="icon-sm" aria-label={removeLabel} loading={busy}>
+                                <Trash2Icon />
+                            </Button>
+                        </RemoveMethod>
+                    </span>
+                </TooltipLabeled>
+            </div>
+        </li>
     )
 }
 
@@ -91,16 +111,13 @@ function SessionRow({ session, busy, onSignOut }: { session: SecuritySession; bu
         <PanelRow
             leading={<Icon icon={isPhone(session.device) ? Smartphone : MonitorIcon} size="sm" />}
             title={deviceLabel(session.device)}
-            meta={
+            description={session.activeNow || !session.lastActiveAt ? t('activeNow') : timeAgo(session.lastActiveAt, locale)}
+            actions={
                 session.current ? (
                     <Badge size="xs" tone="brand">
                         {t('thisDevice')}
                     </Badge>
-                ) : undefined
-            }
-            description={session.activeNow || !session.lastActiveAt ? t('activeNow') : timeAgo(session.lastActiveAt, locale)}
-            actions={
-                session.current ? undefined : (
+                ) : (
                     <Button type="button" variant="outline" size="sm" loading={busy} onClick={onSignOut}>
                         {t('signOut')}
                     </Button>
@@ -133,21 +150,17 @@ export function SecurityPanel({ security, addPasskeyUnavailable, busy = null, on
                 <PanelRow
                     leading={<Icon icon={LockKeyholeIcon} size="sm" />}
                     title={t('app.title')}
-                    meta={
-                        app ? (
-                            <Badge size="xs" tone="green">
-                                {t('on')}
-                            </Badge>
-                        ) : undefined
-                    }
                     description={app ? t('app.added', { date: shortDate(app.createdAt, locale) }) : t('app.description')}
                     actions={
                         app ? (
-                            <RemoveMethod title={t('app.removeTitle')} lastMethod={methodCount === 1} busy={busy === app.id} onConfirm={() => onRemoveMethod(app.id)}>
-                                <Button type="button" variant="outline" size="sm" loading={busy === app.id}>
-                                    {t('remove')}
-                                </Button>
-                            </RemoveMethod>
+                            <>
+                                <OnBadge />
+                                <RemoveMethod title={t('app.removeTitle')} lastMethod={methodCount === 1} busy={busy === app.id} onConfirm={() => onRemoveMethod(app.id)}>
+                                    <Button type="button" variant="outline" size="sm" className="ms-1" loading={busy === app.id}>
+                                        {t('remove')}
+                                    </Button>
+                                </RemoveMethod>
+                            </>
                         ) : (
                             <Button type="button" variant="outline" size="sm" loading={busy === 'app'} onClick={onSetUpApp}>
                                 {t('app.setUp')}
@@ -155,32 +168,32 @@ export function SecurityPanel({ security, addPasskeyUnavailable, busy = null, on
                         )
                     }
                 />
-                <PanelRow
-                    leading={<Icon icon={KeyIcon} size="sm" />}
-                    title={t('passkeys.title')}
-                    meta={
-                        passkeys.length ? (
-                            <Badge size="xs" tone="green">
-                                {passkeys.length}
-                            </Badge>
-                        ) : undefined
-                    }
-                    description={t('passkeys.description')}
-                    actions={
-                        <TooltipDisabledReason reason={addPasskeyUnavailable}>
-                            <Button type="button" variant="outline" size="sm" disabled={!!addPasskeyUnavailable} loading={busy === 'passkey'} onClick={onAddPasskey}>
-                                {t('passkeys.add')}
-                            </Button>
-                        </TooltipDisabledReason>
-                    }
-                />
-                {passkeys.length > 0 && (
-                    <div className="space-y-2 ps-4">
-                        {passkeys.map(passkey => (
-                            <PasskeyRow key={passkey.id} passkey={passkey} lastMethod={methodCount === 1} busy={busy === passkey.id} onRename={() => onRenamePasskey(passkey)} onRemove={() => onRemoveMethod(passkey.id)} />
-                        ))}
-                    </div>
-                )}
+                <div className={PANEL_CARD}>
+                    <PanelRow
+                        className="border-0 bg-transparent"
+                        leading={<Icon icon={KeyIcon} size="sm" />}
+                        title={t('passkeys.title')}
+                        description={t('passkeys.description')}
+                        actions={
+                            <>
+                                {passkeys.length > 0 && <OnBadge />}
+                                <TooltipDisabledReason reason={addPasskeyUnavailable}>
+                                    <Button type="button" variant="outline" size="sm" className="ms-1" disabled={!!addPasskeyUnavailable} loading={busy === 'passkey'} onClick={onAddPasskey}>
+                                        <PlusIcon />
+                                        {t('passkeys.add')}
+                                    </Button>
+                                </TooltipDisabledReason>
+                            </>
+                        }
+                    />
+                    {passkeys.length > 0 && (
+                        <ul>
+                            {passkeys.map(passkey => (
+                                <PasskeyItem key={passkey.id} passkey={passkey} lastMethod={methodCount === 1} busy={busy === passkey.id} onRename={() => onRenamePasskey(passkey)} onRemove={() => onRemoveMethod(passkey.id)} />
+                            ))}
+                        </ul>
+                    )}
+                </div>
                 {on && backupCodesLeft !== null && (
                     <PanelRow
                         leading={<Icon icon={ShieldCheckIcon} size="sm" />}

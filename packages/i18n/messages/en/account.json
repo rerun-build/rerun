@@ -8,7 +8,7 @@
         "delete.consequences.signIn.title": "Heading of what happens to sign-in once the account is deleted.",
         "delete.submit": "Button that opens the final confirmation.",
         "signIn.linkError.failed": "Toast after linking a sign-in provider to the account failed. {provider} is Google or Apple.",
-        "security.hint": "Help line of the Security tab when no second step is set up. {brand} is the product name.",
+        "security.hint": "Help line of the Security tab when no second step is set up.",
         "security.passkeys.used": "Under a passkey's name. {added} is a short date (\"Nov 12\"), {used} a time in words (\"3 days ago\", \"yesterday\").",
         "security.sessions.device.browserOn": "A signed-in session. {browser} is a browser brand (Chrome, Safari), {os} a system (macOS, Windows).",
         "security.sessions.device.desktopOn": "{brand} is the product name, {os} a system (macOS, Windows).",
@@ -112,12 +112,12 @@
     },
     "security": {
         "twoStep": "Two-step verification",
-        "hint": "After your email, Google or Apple, {brand} asks for one more step. Pick one method or both.",
+        "hint": "One more step after you sign in.",
         "on": "On",
         "remove": "Remove",
         "app": {
             "title": "Authenticator app",
-            "description": "A 6-digit code from 1Password, Google Authenticator or Authy.",
+            "description": "A 6-digit code from your app.",
             "added": "Added {date}",
             "setUp": "Set up",
             "removeTitle": "Remove the authenticator app?",
@@ -125,7 +125,7 @@
         },
         "passkeys": {
             "title": "Passkeys",
-            "description": "Touch ID, Face ID, Windows Hello, Android or a security key.",
+            "description": "Touch ID, Face ID or a security key.",
             "add": "Add",
             "addInBrowser": "Add a passkey from your browser: this app cannot reach Touch ID or Windows Hello.",
             "notHere": "Passkeys are not available on this address.",
@@ -139,7 +139,7 @@
         "lastMethod": "This is your last method: two-step verification turns off, and your backup codes stop working.",
         "backup": {
             "title": "Backup codes",
-            "description": "{left, number} of {total, number} left. Each one opens your account once, when no other method is at hand.",
+            "description": "{left, number} of {total, number} left.",
             "newCodes": "New codes",
             "newTitle": "Make new backup codes?",
             "newDescription": "The codes you saved stop working."

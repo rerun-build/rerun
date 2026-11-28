@@ -96,12 +96,12 @@
     },
     "security": {
         "twoStep": "Verificação em duas etapas",
-        "hint": "Depois do seu e-mail, Google ou Apple, o {brand} pede mais uma etapa. Escolha um método ou os dois.",
+        "hint": "Mais uma etapa depois de entrar.",
         "on": "Ativada",
         "remove": "Remover",
         "app": {
             "title": "App autenticador",
-            "description": "Um código de 6 dígitos do 1Password, Google Authenticator ou Authy.",
+            "description": "Um código de 6 dígitos do seu app.",
             "added": "Adicionado em {date}",
             "setUp": "Configurar",
             "removeTitle": "Remover o app autenticador?",
@@ -109,7 +109,7 @@
         },
         "passkeys": {
             "title": "Chaves de acesso",
-            "description": "Touch ID, Face ID, Windows Hello, Android ou uma chave de segurança.",
+            "description": "Touch ID, Face ID ou uma chave de segurança.",
             "add": "Adicionar",
             "addInBrowser": "Adicione uma chave de acesso pelo seu navegador: este app não consegue acessar o Touch ID nem o Windows Hello.",
             "notHere": "As chaves de acesso não estão disponíveis neste endereço.",
@@ -123,7 +123,7 @@
         "lastMethod": "Este é seu último método: a verificação em duas etapas é desativada e seus códigos de backup param de funcionar.",
         "backup": {
             "title": "Códigos de backup",
-            "description": "Restam {left, number} de {total, number}. Cada um abre sua conta uma vez, quando nenhum outro método está à mão.",
+            "description": "Restam {left, number} de {total, number}.",
             "newCodes": "Novos códigos",
             "newTitle": "Gerar novos códigos de backup?",
             "newDescription": "Os códigos que você salvou param de funcionar."

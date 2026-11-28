@@ -96,12 +96,12 @@
     },
     "security": {
         "twoStep": "التحقق بخطوتين",
-        "hint": "بعد بريدك الإلكتروني أو Google أو Apple، يطلب {brand} خطوة إضافية. اختر طريقة واحدة أو كلتيهما.",
+        "hint": "خطوة إضافية بعد تسجيل الدخول.",
         "on": "مفعّل",
         "remove": "إزالة",
         "app": {
             "title": "تطبيق المصادقة",
-            "description": "رمز من 6 أرقام من 1Password أو Google Authenticator أو Authy.",
+            "description": "رمز من 6 أرقام من تطبيقك.",
             "added": "أُضيف في {date}",
             "setUp": "إعداد",
             "removeTitle": "إزالة تطبيق المصادقة؟",
@@ -109,7 +109,7 @@
         },
         "passkeys": {
             "title": "مفاتيح المرور",
-            "description": "Touch ID أو Face ID أو Windows Hello أو Android أو مفتاح أمان.",
+            "description": "Touch ID أو Face ID أو مفتاح أمان.",
             "add": "إضافة",
             "addInBrowser": "أضف مفتاح مرور من متصفحك: لا يستطيع هذا التطبيق الوصول إلى Touch ID أو Windows Hello.",
             "notHere": "مفاتيح المرور غير متاحة على هذا العنوان.",
@@ -123,7 +123,7 @@
         "lastMethod": "هذه آخر طريقة لديك: سيتوقف التحقق بخطوتين، ولن تعمل رموزك الاحتياطية بعد الآن.",
         "backup": {
             "title": "الرموز الاحتياطية",
-            "description": "تبقّى {left, number} من {total, number}. يفتح كل رمز حسابك مرة واحدة، عندما لا تتوفر لديك طريقة أخرى.",
+            "description": "تبقّى {left, number} من {total, number}.",
             "newCodes": "رموز جديدة",
             "newTitle": "إنشاء رموز احتياطية جديدة؟",
             "newDescription": "ستتوقف الرموز التي حفظتها عن العمل."
