@@ -76,6 +76,24 @@ describe('connection registry', () => {
         expect(all.find(c => c.id === 'a')).toBe(a)
     })
 
+    it('hands the same instance to first reads that arrive together, as the boot list and the scheduler do', async () => {
+        await connection('a')
+        const [first, second, all] = await Promise.all([getConnection('a'), getConnection('a'), listConnections()])
+        expect(second).toBe(first)
+        expect(all.find(c => c.id === 'a')).toBe(first)
+        expect(await getConnection('a')).toBe(first)
+    })
+
+    it('reads a connection again once a failed read is fixed on disk', async () => {
+        await mkdir(connectionDir('a'), { recursive: true })
+        await writeFile(connectionConfigPath('a'), '{ not json')
+        await writeFile(connectionEnvPath('a'), '')
+        await expect(getConnection('a')).rejects.toThrow()
+
+        await connection('a', 'ANTHROPIC_API_KEY=fixed')
+        expect((await getConnection('a')).env.ANTHROPIC_API_KEY).toBe('fixed')
+    })
+
     it('leaves out a connection it cannot read, for a provider a newer engine knows, instead of failing the list', async () => {
         await connection('a')
         await mkdir(connectionDir('b'), { recursive: true })
