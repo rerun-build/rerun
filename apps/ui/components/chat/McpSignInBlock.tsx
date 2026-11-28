@@ -2,7 +2,7 @@
 
 import { BorderBeam } from '@rerun/ui'
 import { useTranslations } from 'next-intl'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 import { McpOAuthAuthorize } from '@/components/agent/McpOAuthAuthorize'
 import { CustomMcpStatusBadge } from '@/components/services/CustomMcpStatusBadge'
@@ -38,17 +38,30 @@ export function McpSignInBlock({ agentId, name, reason, onDone, onSkip, inline }
     // An OAuth result can be delivered twice within one render, so the latch answering the agent is a ref.
     const submittedRef = useRef(false)
     const refetched = useRef(false)
+    const opened = useRef(false)
+    const probedOnOpen = useRef(false)
 
     const server = connectors.custom.find(s => s.name === name)
     const status = statuses.get(name)
-    const connected = status?.status === 'connected'
+    const connected = !loading && status?.status === 'connected'
+
+    // The statuses are probed once per page: a read made before a token expired still says connected,
+    // and answering the agent "connected" on it sent it straight back to "needs sign-in" (RER-401).
+    // Probing again before the first paint keeps Continue off the card until a fresh answer lands.
+    useLayoutEffect(() => {
+        if (opened.current) return
+        opened.current = true
+        if (loading) return
+        probedOnOpen.current = true
+        refreshMcpServerStatuses(agentId)
+    }, [agentId, loading])
 
     // The agent registered the server moments ago, so both stores can predate it.
     useEffect(() => {
         if (refetched.current || !connectors.loaded || loading || (server && status)) return
         refetched.current = true
         invalidateConnectorServices(agentId)
-        refreshMcpServerStatuses(agentId)
+        if (!probedOnOpen.current) refreshMcpServerStatuses(agentId)
     }, [agentId, connectors.loaded, loading, server, status])
 
     const answer = (send: () => void) => {
