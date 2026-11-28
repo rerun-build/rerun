@@ -62,7 +62,7 @@ sequenceDiagram
   participant R as Rerun
   participant M as Your machine
   S->>R: POST /api/t/{agentId}/{slug}/{token}
-  alt passive visit
+  alt passive visit (GET only)
     R-->>S: 204, no run
   else wrong URL, trigger off, no answer from the machine
     R-->>S: 404
@@ -87,13 +87,13 @@ That last row is deliberate. A malformed slug, a missing token, an unknown or sw
 
 ## Passive visits
 
-Link unfurlers, prefetchers, clipboard managers and browsers touch URLs without anyone meaning to call them. Rerun answers those with `204` and never starts a run, whatever the method, before it even reads the body. A request counts as a passive visit when:
+Link unfurlers, prefetchers, clipboard managers and browsers touch URLs without anyone meaning to call them, and they only ever send `GET`. Rerun answers those with `204` and never starts a run, before it even reads the body. A `GET` request counts as a passive visit when:
 
 - its `User-Agent` is a bot or a link previewer: Slack, Discord, Twitter, Facebook, WhatsApp, Telegram, LinkedIn, Reddit, Skype, Bing, Embedly, iframely, Quick Look, Raycast, Paste, Maccy, or anything that calls itself a bot, a crawler, a spider, a preview or an unfurler
 - it carries a prefetch, prerender or preview intent in `Sec-Purpose`, `Purpose`, `X-Purpose` or `X-Moz`
 - it is a browser navigation: a `Sec-Fetch-Dest` header with any value other than `empty`, which is what opening the URL in a tab sends
 
-A server-to-server webhook sends none of these, so it goes through. Pasting a trigger URL into a chat or opening it in a browser is still a leak, but it will not fire your coworker by itself. A `fetch()` from a web page sends `Sec-Fetch-Dest: empty` and does fire it.
+A `POST`, `PUT`, `PATCH` or `DELETE` always goes through to your coworker, whatever its `User-Agent`: chat platforms such as Slack and Mattermost call themselves bots when they send a real webhook or a slash command. A server-to-server `GET` goes through as long as it sends none of the signals above: a caller that names itself a bot has to use another method. Pasting a trigger URL into a chat or opening it in a browser is still a leak, but it will not fire your coworker by itself. A `fetch()` from a web page sends `Sec-Fetch-Dest: empty` and does fire it.
 
 ## Limits
 

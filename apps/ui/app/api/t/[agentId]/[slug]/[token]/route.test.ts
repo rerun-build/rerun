@@ -68,6 +68,13 @@ describe('/api/t/[agentId]/[slug]/[token]', () => {
         expect(fireTrigger).not.toHaveBeenCalled()
     })
 
+    it.each(['Mattermost-Bot/1.1', 'Slackbot 1.0 (+https://api.slack.com/robots)'])('fires a POST from %s, a server that calls itself a bot', async userAgent => {
+        const response = await POST(request({ body: '{"text":"marathon test"}', headers: { 'user-agent': userAgent, 'content-type': 'application/json' } }), context())
+
+        expect(response.status).toBe(202)
+        expect(fireTrigger).toHaveBeenCalledOnce()
+    })
+
     it('refuses a body over the size limit with 413 before resolving the agent', async () => {
         const response = await POST(request({ body: 'x'.repeat(MAX_TRIGGER_BODY_BYTES + 1) }), context())
 
