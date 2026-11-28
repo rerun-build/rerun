@@ -503,6 +503,7 @@
     "vaultMcpTarget": "请为服务器提供地址或命令",
     "vaultKeysUnknown": "此 Vault 条目包含其他密钥。请在 Vault 中更改。",
     "vaultHeaderValueMissing": "请填写此服务器读取的每个密钥。",
+    "vaultCoworkerNotFound": "未找到同事：{id}",
     "saveAnswerFailed": "我们无法保存该内容，请重试。",
     "notYourCompanySite": "{domain} 不是您公司的网站。请输入您自己的网站，或跳过。",
     "computerNameInvalid": "请为电脑设置 1 到 100 个字符的名称。",

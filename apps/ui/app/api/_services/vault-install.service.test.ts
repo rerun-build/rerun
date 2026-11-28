@@ -20,10 +20,13 @@ vi.mock('@/lib/net/public-fetch', () => ({ fetchPublic: vi.fn() }))
 vi.mock('./vault.service', async () => ({
     rethrowConflict: (await vi.importActual<typeof import('./vault.service')>('./vault.service')).rethrowConflict,
     requireAdmin: (await vi.importActual<typeof import('./vault.service')>('./vault.service')).requireAdmin,
-    vaultContext: vi.fn(async (actor?: unknown) => ({ actor: actor ?? { kind: 'user', userId: 'user-1', workspaceId: 7 }, conn: {}, coworkers: [{ id: 'alice', engineAgentId: 'e-alice', name: 'Alice', spaceId: 'box' }], byEngineId: new Map() })),
+    vaultContext: vi.fn(async (actor?: unknown) => {
+        const alice = { id: 'alice', engineAgentId: 'e-alice', name: 'Alice', spaceId: 'box' }
+        return { actor: actor ?? { kind: 'user', userId: 'user-1', workspaceId: 7 }, conn: {}, coworkers: [alice], byEngineId: new Map([[alice.engineAgentId, alice]]) }
+    }),
     assertCanAdd: vi.fn(async () => {}),
     assertCanChangeItem: vi.fn(async () => {}),
-    assertManagesCoworker: vi.fn(async (_actor: unknown, coworker: unknown) => coworker),
+    assertManagesCoworker: vi.fn(async (ctx: { coworkers: { id: string }[] }, id: string) => ctx.coworkers.find(c => c.id === id)),
     shareVaultEntry: vi.fn(async (id: string) => ({ id, sharedWithAll: true })),
 }))
 
@@ -339,6 +342,13 @@ describe('saveSecretsToVault', () => {
         await saveSecretsToVault({ name: 'OpenAI key', agentIds: ['alice'] }, { OPENAI_API_KEY: 'sk-1' }, ACTOR)
         expect(createVaultItem).toHaveBeenCalledWith({}, expect.objectContaining({ kind: 'secret', name: 'OpenAI key', env: { OPENAI_API_KEY: 'sk-1' }, agentIds: ['e-alice'] }))
         expect(shareVaultEntry).not.toHaveBeenCalled()
+    })
+
+    it('lends it to a coworker the Chief of Staff names by the id the engine knows it by', async () => {
+        vi.mocked(assertManagesCoworker).mockResolvedValueOnce({ id: 'alice', engineAgentId: 'e-alice', name: 'Alice', spaceId: 'box' })
+        await saveSecretsToVault({ name: 'Base44 Tech PAT', agentIds: ['e-alice'] }, { BASE44_TECH_TOKEN: 't' }, ACTOR)
+        expect(assertManagesCoworker).toHaveBeenCalledWith(expect.objectContaining({ actor: ACTOR }), 'e-alice')
+        expect(createVaultItem).toHaveBeenCalledWith({}, expect.objectContaining({ kind: 'secret', name: 'Base44 Tech PAT', agentIds: ['e-alice'] }))
     })
 
     it('gives it to every coworker when asked', async () => {

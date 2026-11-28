@@ -48,7 +48,7 @@ function resultOf(item: VaultItemSummary, manifestMethods: AuthMethodSummary[]):
 export async function addVaultService(input: AddVaultServiceInput, actor?: Actor): Promise<VaultAddResult> {
     const ctx = await vaultContext(actor)
     await assertCanAdd(ctx.actor)
-    const coworkers = await Promise.all((input.agentIds ?? []).map(id => assertManagesCoworker(ctx.actor, ctx.coworkers.find(c => c.id === id))))
+    const coworkers = await Promise.all((input.agentIds ?? []).map(id => assertManagesCoworker(ctx, id)))
     const manifest = await loadManifest(input.slug)
     if (!manifest) throw new Error(`Service not found: ${input.slug}`)
     const method = getMethod(manifest, input.authMethodId)
@@ -158,7 +158,7 @@ async function addVaultSecrets(input: { name: string; env: Record<string, string
     const ctx = await vaultContext(actor)
     await assertCanAdd(ctx.actor)
     if (input.sharedWithAll) requireAdmin(ctx.actor)
-    const coworkers = await Promise.all((input.agentIds ?? []).map(id => assertManagesCoworker(ctx.actor, ctx.coworkers.find(c => c.id === id))))
+    const coworkers = await Promise.all((input.agentIds ?? []).map(id => assertManagesCoworker(ctx, id)))
     const createdBy = signerIdOf(ctx.actor)
     return rethrowConflict(ctx, () =>
         createVaultItem(ctx.conn, {
@@ -234,7 +234,7 @@ export async function addVaultMcp(input: AddVaultMcpInput, actor?: Actor): Promi
     const ctx = await vaultContext(actor)
     await assertCanAdd(ctx.actor)
     if (input.sharedWithAll) requireAdmin(ctx.actor)
-    const coworkers = await Promise.all((input.agentIds ?? []).map(id => assertManagesCoworker(ctx.actor, ctx.coworkers.find(c => c.id === id))))
+    const coworkers = await Promise.all((input.agentIds ?? []).map(id => assertManagesCoworker(ctx, id)))
     const url = input.url?.trim()
     const command = input.command?.trim()
     if (!url === !command) throw new AccessDeniedError('vaultMcpTarget')

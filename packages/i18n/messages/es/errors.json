@@ -503,6 +503,7 @@
     "vaultMcpTarget": "Dale al servidor una dirección o un comando",
     "vaultKeysUnknown": "Esta entrada del Vault contiene otras claves. Cámbialas en el Vault.",
     "vaultHeaderValueMissing": "Rellena cada clave que lee este servidor.",
+    "vaultCoworkerNotFound": "Coworker no encontrado: {id}",
     "saveAnswerFailed": "No pudimos guardar eso. Inténtalo de nuevo.",
     "notYourCompanySite": "{domain} no es el sitio de tu empresa. Escribe el tuyo, o sáltalo.",
     "computerNameInvalid": "Pon a la computadora un nombre de 1 a 100 caracteres.",

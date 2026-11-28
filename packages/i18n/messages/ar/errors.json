@@ -503,6 +503,7 @@
     "vaultMcpTarget": "أعطِ الخادم عنوانًا أو أمرًا",
     "vaultKeysUnknown": "يحتوي إدخال Vault هذا على مفاتيح أخرى. غيّرها في Vault.",
     "vaultHeaderValueMissing": "املأ كل مفتاح يقرؤه هذا الخادم.",
+    "vaultCoworkerNotFound": "الزميل غير موجود: {id}",
     "saveAnswerFailed": "تعذّر علينا حفظ ذلك. أعد المحاولة.",
     "notYourCompanySite": "{domain} ليس موقع شركتك. أدخل موقعك، أو تخطَّ.",
     "computerNameInvalid": "أعطِ الجهاز اسمًا من 1 إلى 100 حرف.",

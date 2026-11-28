@@ -85,13 +85,17 @@ export async function assertCanAdd(actor: Actor): Promise<void> {
     if (spaces !== 'all' && spaces.size === 0) throw new AccessDeniedError('vaultManageOnly')
 }
 
-export async function assertManagesCoworker(actor: Actor, coworker: VaultCoworker | undefined): Promise<VaultCoworker> {
-    if (!coworker) throw new AuthorizationError('coworkerNotFound')
-    const spaces = await manageableSpaceIds(actor)
+// A coworker is named by the hub's id (list_vault, the app) or by its engine id: the Chief of Staff's own
+// tools (call_agent, its coworker databases) list it under that one.
+export async function assertManagesCoworker(ctx: Pick<VaultContext, 'actor' | 'coworkers' | 'byEngineId'>, id: string): Promise<VaultCoworker> {
+    const coworker = ctx.coworkers.find(c => c.id === id) ?? ctx.byEngineId.get(id)
+    const notFound = new AuthorizationError('vaultCoworkerNotFound', { id })
+    if (!coworker) throw notFound
+    const spaces = await manageableSpaceIds(ctx.actor)
     if (spaces !== 'all' && !spaces.has(coworker.spaceId)) {
-        const visible = await visibleSpaceIds(actor)
+        const visible = await visibleSpaceIds(ctx.actor)
         if (visible === 'all' || visible.has(coworker.spaceId)) throw new AccessDeniedError()
-        throw new AuthorizationError('coworkerNotFound')
+        throw notFound
     }
     return coworker
 }
@@ -198,7 +202,7 @@ export async function listVault(actor?: Actor): Promise<VaultListing> {
 
 export async function attachVaultEntry(itemId: string, agentId: string, actor?: Actor): Promise<VaultItemSummary> {
     const ctx = await vaultContext(actor)
-    const coworker = await assertManagesCoworker(ctx.actor, ctx.coworkers.find(c => c.id === agentId))
+    const coworker = await assertManagesCoworker(ctx, agentId)
     const item = await readItem(ctx, itemId)
     try {
         return await lendVaultEntry(ctx, item, coworker.engineAgentId)
@@ -295,7 +299,7 @@ function neverSignedIn(item: VaultItemSummary): boolean {
 
 export async function detachVaultEntry(itemId: string, agentId: string, actor?: Actor): Promise<VaultItemSummary> {
     const ctx = await vaultContext(actor)
-    const coworker = await assertManagesCoworker(ctx.actor, ctx.coworkers.find(c => c.id === agentId))
+    const coworker = await assertManagesCoworker(ctx, agentId)
     const item = await readItem(ctx, itemId)
     const detached = await detachVaultItem(ctx.conn, itemId, coworker.engineAgentId)
     if (isRegistryItem(item) && !detached.sharedWithAll) await dropMigrationCopy(ctx.conn, coworker.engineAgentId, vaultRegistryKey(item), item)
