@@ -17,7 +17,7 @@ let workspaceRow: unknown
 
 beforeEach(() => {
     keyRow = { id: 'k1', workspace_id: 5, revoked_at: null, created_by_user_id: 'u1', expires_at: null, scope: 'account', bound_agent_id: null }
-    workspaceRow = { subscription_status: 'active', is_sandbox: false, api_access: true }
+    workspaceRow = { subscription_status: 'active', is_sandbox: false }
     db = fakeSupabase((table, calls) => {
         if (writeMethodOf(calls)) return undefined
         if (table === 'api_keys') return { data: keyRow }
@@ -75,7 +75,7 @@ describe('authenticateApiKey', () => {
     })
 
     it('stamps the activity of a sandbox, at most once an hour', async () => {
-        workspaceRow = { subscription_status: 'active', is_sandbox: true, api_access: true }
+        workspaceRow = { subscription_status: 'active', is_sandbox: true }
         await authenticateApiKey(generateApiKey())
         await authenticateApiKey(generateApiKey())
         await Promise.resolve()
@@ -104,7 +104,7 @@ describe('authenticateApiKey', () => {
     })
 
     it('refuses a key once the workspace plan is cancelled', async () => {
-        workspaceRow = { subscription_status: 'canceled', is_sandbox: false, api_access: true }
+        workspaceRow = { subscription_status: 'canceled', is_sandbox: false }
         await expect(authenticateApiKey(generateApiKey())).resolves.toBeNull()
         const lookup = db.chainsOn('workspaces')[0]
         expect(lookup.filter(call => call.method === 'eq').map(call => call.args)).toEqual([['id', 5]])
@@ -112,7 +112,7 @@ describe('authenticateApiKey', () => {
     })
 
     it('accepts a key on a workspace still in its trial', async () => {
-        workspaceRow = { subscription_status: 'trialing', is_sandbox: false, api_access: true }
+        workspaceRow = { subscription_status: 'trialing', is_sandbox: false }
         await expect(authenticateApiKey(generateApiKey())).resolves.toEqual(LIVE)
     })
 
@@ -122,16 +122,8 @@ describe('authenticateApiKey', () => {
     })
 
     it('keeps accepting the key of a sandbox, whatever its plan says', async () => {
-        workspaceRow = { subscription_status: 'canceled', is_sandbox: true, api_access: true }
+        workspaceRow = { subscription_status: 'canceled', is_sandbox: true }
         await expect(authenticateApiKey(generateApiKey())).resolves.toEqual(LIVE)
-    })
-
-    it('refuses every key of a workspace whose tier leaves the API out, import keys included', async () => {
-        workspaceRow = { subscription_status: 'active', is_sandbox: false, api_access: false }
-        await expect(authenticateApiKey(generateApiKey())).resolves.toBeNull()
-        keyRow = { ...(keyRow as object), scope: 'agent_import', bound_agent_id: 'agent-1' }
-        await expect(authenticateApiKey(generateApiKey())).resolves.toBeNull()
-        expect(db.writes('api_keys')).toEqual([])
     })
 
     it('refuses a key past its expiry, and keeps one that has time left', async () => {

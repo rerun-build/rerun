@@ -101,8 +101,6 @@ export type WorkspaceLimitColumns = {
     max_seats: number | null
     model_access: ModelAccess
     custom_integrations: boolean
-    // False closes the API and the MCP server: what the first lifetime tier sells.
-    api_access: boolean
     rerun_budget_micros: number
 }
 
@@ -116,7 +114,6 @@ export function baseLimitsToColumns(): WorkspaceLimitColumns {
         max_seats: null,
         model_access: 'best',
         custom_integrations: true,
-        api_access: true,
         rerun_budget_micros: BASE_PLAN.creditUsd * MICROS_PER_USD,
     }
 }
@@ -153,43 +150,10 @@ export function organizationLimitsToColumns(): WorkspaceLimitColumns {
     return { ...baseLimitsToColumns(), rerun_budget_micros: 0 }
 }
 
-export type LifetimeTierId = 1 | 2 | 3
-
-export type LifetimeTier = {
-    id: LifetimeTierId
-    priceUsd: number
-    // Null = unlimited.
-    seats: number | null
-    apiAccess: boolean
-    // How many workspaces one purchase covers.
-    workspaces: number
-    prioritySupport: boolean
-}
-
-// What AppSumo sells. Independent of the plan: either lifetime plan can be on any tier. A lifetime
-// workspace without a tier has no restriction, like every one sold before the tiers.
-export const LIFETIME_TIERS: readonly LifetimeTier[] = [
-    { id: 1, priceUsd: 119, seats: 3, apiAccess: false, workspaces: 1, prioritySupport: false },
-    { id: 2, priceUsd: 249, seats: null, apiAccess: true, workspaces: 1, prioritySupport: false },
-    { id: 3, priceUsd: 449, seats: null, apiAccess: true, workspaces: 3, prioritySupport: true },
-]
-
-// workspaces.lifetime_tier is a plain smallint column: an unknown value reads as no tier.
-export function lifetimeTier(tier: number | null | undefined): LifetimeTier | null {
-    return LIFETIME_TIERS.find(({ id }) => id === tier) ?? null
-}
-
-export type LifetimeTierColumns = Pick<WorkspaceLimitColumns, 'max_seats' | 'api_access'> & { lifetime_tier: LifetimeTierId | null }
-
-export function lifetimeTierToColumns(tier: LifetimeTierId | null): LifetimeTierColumns {
-    const limits = lifetimeTier(tier)
-    return { lifetime_tier: tier, max_seats: limits?.seats ?? null, api_access: limits?.apiAccess ?? true }
-}
-
-// What a lifetime code buys for good: unlimited coworkers on its machine, and no Rerun credit, so
-// its coworkers run on the buyer's own AI key or subscription. The tier sets the rest.
-export function lifetimeLimitsToColumns(tier: LifetimeTierId | null): WorkspaceLimitColumns & LifetimeTierColumns {
-    return { max_agents: null, model_access: 'best', custom_integrations: true, rerun_budget_micros: 0, ...lifetimeTierToColumns(tier) }
+// What a lifetime code buys for good: unlimited coworkers and seats on its machine, and no Rerun
+// credit, so its coworkers run on the buyer's own AI key or subscription.
+export function lifetimeLimitsToColumns(): WorkspaceLimitColumns {
+    return { max_agents: null, max_seats: null, model_access: 'best', custom_integrations: true, rerun_budget_micros: 0 }
 }
 
 // workspaces.model_access is a plain text column, so a stored value can be anything.

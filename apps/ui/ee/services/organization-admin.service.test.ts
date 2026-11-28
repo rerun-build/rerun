@@ -61,7 +61,6 @@ const direct = (overrides: Record<string, unknown> = {}) =>
         renewal_reminder_user_id: null,
         model_access: 'best',
         custom_integrations: true,
-        api_access: true,
         rerun_budget_micros: credits(1000),
         rerun_used_micros: credits(300),
         rerun_topup_micros: credits(500),

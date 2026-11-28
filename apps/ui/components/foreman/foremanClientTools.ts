@@ -23,7 +23,7 @@ type ToolOutput = { ok: true; note?: string } | { ok: false; error: string }
 // session lives in a React context, so the caller reads it and hands it over.
 // `vaultOpen`: the workspace menu opens the Vault only on an active plan or trial.
 // `managed`: an organization runs the workspace and handles its plan.
-export type ForemanClientGates = { apiEntitled: boolean; apiLocked: boolean; isSandbox: boolean; isAdmin: boolean; vaultOpen: boolean; managed?: boolean }
+export type ForemanClientGates = { apiEntitled: boolean; isSandbox: boolean; isAdmin: boolean; vaultOpen: boolean; managed?: boolean }
 
 function unknownTab(requested: string, labels: Record<string, string>, noun = 'tab'): string {
     const choices = Object.entries(labels).map(([id, label]) => `${id} ("${label}")`)
@@ -69,9 +69,6 @@ export function runForemanClientTool(name: ForemanClientToolName, input: unknown
             if (!panel) return { ok: false, error: unknownTab(requested, SETTINGS_PANEL_LABELS, 'panel') }
             if ((panel === 'workspace' || panel === 'api_keys') && !gates.isAdmin) {
                 return { ok: false, error: `Only an admin of the workspace can open the ${SETTINGS_PANEL_LABELS[panel]} panel, and this user is a member. Say so, and suggest they ask an admin.` }
-            }
-            if (panel === 'api_keys' && gates.apiLocked) {
-                return { ok: false, error: 'API keys and the MCP client are not included in the AppSumo tier of this workspace. Say so, without offering the billing panel: no subscription opens them.' }
             }
             if (gates.managed && panel === 'billing') {
                 return { ok: false, error: 'This workspace has no billing panel: its plan, its credits and its payments are handled by the team that runs it. Say so in one line.' }

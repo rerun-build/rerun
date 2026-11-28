@@ -7,7 +7,7 @@ import { requireAdminContext, requireWorkspaceContext, type WorkspaceContext } f
 import type { Database } from '@/app/api/database.types'
 import { appOriginOf } from '@/lib/app-origin'
 import { getBrand } from '@/lib/brand/server'
-import { isApiLocked, isWorkspaceApiEntitled } from '@rerun/cloud/billing'
+import { isWorkspaceApiEntitled } from '@rerun/cloud/billing'
 import { isManagedWorkspace } from '@/lib/workspace/managed'
 import { apiKeyPrefix, generateApiKey, hashApiKey } from '@/lib/mcp/api-keys'
 import { mcpAccountUrl } from '@/lib/mcp/connect'
@@ -83,7 +83,6 @@ export async function listApiKeysAction(): Promise<ActionResult<{ keys: ApiKeyVi
 export async function createApiKeyAction(rawName: string): Promise<ActionResult<{ key: string }>> {
     try {
         const ctx = await requireAdminContext(API_KEYS_ADMIN_ONLY)
-        if (isApiLocked(ctx.workspace)) return failure('apiNotIncluded')
         if (!isWorkspaceApiEntitled(ctx.workspace)) {
             return failure(isManagedWorkspace(ctx.workspace) ? 'managedWorkspacePaused' : 'apiNeedsSubscription')
         }
@@ -120,7 +119,6 @@ export async function createImportKeyAction(sourceId: ImportSourceId, requestedS
     try {
         if (!isImportSourceId(sourceId)) return failure('unknownSource')
         const ctx = await requireWorkspaceContext()
-        if (isApiLocked(ctx.workspace)) return failure('importNotIncluded')
         if (!isWorkspaceApiEntitled(ctx.workspace)) {
             return failure(isManagedWorkspace(ctx.workspace) ? 'managedWorkspacePaused' : 'importNeedsSubscription')
         }

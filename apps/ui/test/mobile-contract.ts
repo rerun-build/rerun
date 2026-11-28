@@ -84,8 +84,6 @@ export const CONTRACT_WORKSPACE = {
     max_seats: 5,
     model_access: 'all',
     custom_integrations: true,
-    api_access: true,
-    lifetime_tier: null,
     subscription_status: 'active',
     current_period_end: '2026-12-19T09:00:00.000Z',
     trial_ends_at: null,

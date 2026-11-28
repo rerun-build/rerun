@@ -140,7 +140,7 @@ describe('a managed workspace put away by its organization', () => {
 
     it('has no upgrade pill, no billing command and a closed API panel', async () => {
         expect(await draw(createElement(UpgradePill))).toBe('')
-        const gates = { isSandbox: false, managed: true, apiPausedReason: 'paused', workspaceAdmin: true, apiEntitled: false, apiLocked: false, needsMachineReason: 'paused', assistantReady: false, hasChangelog: false, darkTheme: false, supportAvailable: true }
+        const gates = { isSandbox: false, managed: true, apiPausedReason: 'paused', workspaceAdmin: true, apiEntitled: false, needsMachineReason: 'paused', assistantReady: false, hasChangelog: false, darkTheme: false, supportAvailable: true }
         const commands = buildControlCommands(gates)
         expect(commands.map(command => command.id)).not.toContain('billing')
         expect(commands.find(command => command.id === 'api_keys')).toMatchObject({ paid: false, disabledReason: 'paused' })

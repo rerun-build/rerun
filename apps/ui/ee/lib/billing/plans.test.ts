@@ -7,10 +7,7 @@ import {
     isClaudePlanOffered,
     isLifetimePlan,
     isModelAccess,
-    LIFETIME_TIERS,
     lifetimeLimitsToColumns,
-    lifetimeTier,
-    lifetimeTierToColumns,
     perMonthCents,
     planDiscountCents,
     planPriceCents,
@@ -20,7 +17,7 @@ import {
 
 describe('baseLimitsToColumns', () => {
     it('gives the plan its own five dollars of monthly credit, with unlimited coworkers and seats', () => {
-        expect(baseLimitsToColumns()).toEqual({ max_agents: null, max_seats: null, model_access: 'best', custom_integrations: true, api_access: true, rerun_budget_micros: 5 * MICROS_PER_USD })
+        expect(baseLimitsToColumns()).toEqual({ max_agents: null, max_seats: null, model_access: 'best', custom_integrations: true, rerun_budget_micros: 5 * MICROS_PER_USD })
     })
 })
 
@@ -83,30 +80,9 @@ describe('isLifetimePlan', () => {
     })
 })
 
-describe('lifetime tiers', () => {
-    it('caps the first tier at three seats, without the API, and opens both on the next ones', () => {
-        expect(lifetimeTierToColumns(1)).toEqual({ lifetime_tier: 1, max_seats: 3, api_access: false })
-        expect(lifetimeTierToColumns(2)).toEqual({ lifetime_tier: 2, max_seats: null, api_access: true })
-        expect(lifetimeTierToColumns(3)).toEqual({ lifetime_tier: 3, max_seats: null, api_access: true })
-    })
-
-    it('restricts nothing without a tier', () => {
-        expect(lifetimeTierToColumns(null)).toEqual({ lifetime_tier: null, max_seats: null, api_access: true })
-    })
-
-    it('covers three workspaces on the third tier only', () => {
-        expect(LIFETIME_TIERS.map(tier => tier.workspaces)).toEqual([1, 1, 3])
-        expect(LIFETIME_TIERS.map(tier => tier.prioritySupport)).toEqual([false, false, true])
-    })
-
-    it('keeps coworkers unlimited and the Rerun credit at zero on every tier', () => {
-        for (const tier of [null, 1, 2, 3] as const) expect(lifetimeLimitsToColumns(tier)).toMatchObject({ max_agents: null, rerun_budget_micros: 0, lifetime_tier: tier })
-    })
-
-    it('reads an unknown stored value as no tier', () => {
-        expect(lifetimeTier(9)).toBeNull()
-        expect(lifetimeTier(null)).toBeNull()
-        expect(lifetimeTier(2)?.priceUsd).toBe(249)
+describe('lifetimeLimitsToColumns', () => {
+    it('keeps coworkers and seats unlimited and the Rerun credit at zero', () => {
+        expect(lifetimeLimitsToColumns()).toEqual({ max_agents: null, max_seats: null, model_access: 'best', custom_integrations: true, rerun_budget_micros: 0 })
     })
 })
 

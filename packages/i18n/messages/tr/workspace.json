@@ -25,7 +25,6 @@
         "sandboxArchived": "Sandbox'ınız yeniden etkinleştirildiğinde kullanılabilir",
         "sandboxNone": "Uzman sandbox'ının kendine ait bir ayarı yok",
         "adminsOnly": "Yalnızca yöneticiler",
-        "apiNotIncluded": "AppSumo paketine dahil değil",
         "sandboxSingleBox": "Bir sandbox'ta tek bir Box bulunur"
     }
 }

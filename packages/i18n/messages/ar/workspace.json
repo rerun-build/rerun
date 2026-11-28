@@ -25,7 +25,6 @@
         "sandboxArchived": "متاح بعد إعادة تفعيل بيئة الاختبار",
         "sandboxNone": "بيئة اختبار الخبير لا تملك ذلك",
         "adminsOnly": "للمسؤولين فقط",
-        "apiNotIncluded": "غير مشمول في فئة AppSumo الخاصة بك",
         "sandboxSingleBox": "بيئة الاختبار لها Box واحد فقط"
     }
 }

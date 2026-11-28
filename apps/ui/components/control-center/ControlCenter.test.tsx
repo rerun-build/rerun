@@ -29,7 +29,7 @@ vi.mock('@/hooks/useBoxAccess', () => ({ useBoxViewer: () => null, useManageable
 vi.mock('@/hooks/useIsTemplateAuthor', () => ({ useIsTemplateAuthor: () => false }))
 vi.mock('@/hooks/useWorkspaceAccess', () => ({ useWorkspaceAccess: () => ({ needsMachineReason: null }) }))
 vi.mock('@/supabase/session/SessionProvider', () => ({ useIsWorkspaceAdmin: () => true, useSession: () => ({ workspace: { id: 7 }, session: null }) }))
-vi.mock('@rerun/cloud/billing', async importOriginal => ({ ...(await importOriginal<object>()), isApiLocked: () => false, isWorkspaceApiEntitled: () => true }))
+vi.mock('@rerun/cloud/billing', async importOriginal => ({ ...(await importOriginal<object>()), isWorkspaceApiEntitled: () => true }))
 
 const { ControlCenter } = await import('./ControlCenter')
 const { ControlCenterPanel } = await import('./ControlCenterView')

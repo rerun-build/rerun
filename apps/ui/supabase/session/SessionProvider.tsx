@@ -37,8 +37,6 @@ type Workspace = Pick<
     | 'max_seats'
     | 'model_access'
     | 'custom_integrations'
-    | 'api_access'
-    | 'lifetime_tier'
     | 'subscription_status'
     | 'current_period_end'
     | 'trial_ends_at'

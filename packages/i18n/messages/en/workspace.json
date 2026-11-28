@@ -33,7 +33,6 @@
         "sandboxArchived": "Available once your sandbox is reactivated",
         "sandboxNone": "The expert sandbox has none of its own",
         "adminsOnly": "Admins only",
-        "apiNotIncluded": "Not included in your AppSumo tier",
         "sandboxSingleBox": "A sandbox has a single Box"
     }
 }

@@ -3,12 +3,11 @@
 // `@rerun/cloud/billing` with these, and runs the same in both builds:
 //
 //   vi.mock('@rerun/cloud/billing', async importOriginal => ({ ...(await importOriginal<object>()), ...CLOUD_ENTITLEMENTS }))
-type WorkspacePlan = { subscription_status: string | null; is_sandbox: boolean; api_access: boolean }
+type WorkspacePlan = { subscription_status: string | null; is_sandbox: boolean }
 
 const ENTITLED_STATUSES = new Set(['active', 'trialing', 'past_due'])
 
 const isSubscriptionEntitled = (status: string | null | undefined) => ENTITLED_STATUSES.has(status ?? '')
-const isApiLocked = (workspace: Pick<WorkspacePlan, 'is_sandbox' | 'api_access'>) => !workspace.is_sandbox && !workspace.api_access
 const isPaidSubscription = (status: string | null | undefined) => isSubscriptionEntitled(status) && status !== 'trialing'
 
 export const CLOUD_ENTITLEMENTS = {
@@ -16,8 +15,7 @@ export const CLOUD_ENTITLEMENTS = {
     isSubscriptionEntitled,
     isMachineEntitled: (status: string | null | undefined) => status === 'active' || status === 'trialing',
     isPaidSubscription,
-    isApiLocked,
-    isWorkspaceApiEntitled: (workspace: WorkspacePlan) => !isApiLocked(workspace) && (workspace.is_sandbox || isSubscriptionEntitled(workspace.subscription_status)),
+    isWorkspaceApiEntitled: (workspace: WorkspacePlan) => workspace.is_sandbox || isSubscriptionEntitled(workspace.subscription_status),
     activeAgentLimitFor: (maxAgents: number | null, status: string | null | undefined) => (isSubscriptionEntitled(status) ? maxAgents : 0),
 }
 

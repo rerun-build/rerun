@@ -12,7 +12,7 @@ vi.mock('@/stores/template-flow.store', () => ({ useTemplateFlowStore: { getStat
 
 const { runForemanClientTool } = await import('./foremanClientTools')
 
-const admin = { apiEntitled: true, apiLocked: false, isSandbox: false, isAdmin: true, vaultOpen: true }
+const admin = { apiEntitled: true, isSandbox: false, isAdmin: true, vaultOpen: true }
 const member = { ...admin, isAdmin: false }
 
 describe('open_settings', () => {
@@ -34,16 +34,6 @@ describe('open_settings', () => {
         expect(runForemanClientTool('open_settings', { panel: 'ai_providers' }, member).ok).toBe(true)
         expect(runForemanClientTool('open_settings', { panel: 'api_keys' }, admin).ok).toBe(true)
         expect(mocks.openWorkspacePanel.mock.calls.map(call => call[0])).toEqual(['members', 'ai_providers', 'api_keys'])
-    })
-})
-
-describe('open_settings on a tier without the API', () => {
-    it('keeps the API keys shut and does not offer billing', () => {
-        vi.clearAllMocks()
-        const out = runForemanClientTool('open_settings', { panel: 'api_keys' }, { ...admin, apiEntitled: false, apiLocked: true })
-        expect(out.ok ? '' : out.error).toContain('not included in the AppSumo tier')
-        expect(mocks.openWorkspacePanel).not.toHaveBeenCalled()
-        expect(mocks.openBilling).not.toHaveBeenCalled()
     })
 })
 

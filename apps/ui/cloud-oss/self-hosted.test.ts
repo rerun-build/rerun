@@ -26,7 +26,7 @@ describe('the self-hosted side of @rerun/cloud', () => {
             expect(isMachineEntitled(status)).toBe(true)
             expect(isPaidSubscription(status)).toBe(true)
         }
-        expect(isWorkspaceApiEntitled({ subscription_status: null, is_sandbox: true, api_access: true })).toBe(true)
+        expect(isWorkspaceApiEntitled({ subscription_status: null, is_sandbox: true })).toBe(true)
         expect(activeAgentLimitFor(null, 'canceled')).toBeNull()
         expect(activeAgentLimitFor(4, null)).toBe(4)
     })

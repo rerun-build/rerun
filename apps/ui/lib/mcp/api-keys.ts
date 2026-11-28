@@ -66,7 +66,7 @@ export async function authenticateApiKey(token: string): Promise<AuthenticatedAp
     if (!data || data.revoked_at) return null
     if (data.expires_at && Date.parse(data.expires_at) <= Date.now()) return null
 
-    const { data: workspace } = await selectMaybeSingle(supabase, 'workspaces', ['subscription_status', 'is_sandbox', 'api_access'] as const, { id: data.workspace_id })
+    const { data: workspace } = await selectMaybeSingle(supabase, 'workspaces', ['subscription_status', 'is_sandbox'] as const, { id: data.workspace_id })
     if (!workspace || !isWorkspaceApiEntitled(workspace)) return null
 
     // Best-effort freshness marker: never let it fail or slow down the call it authenticates. Every

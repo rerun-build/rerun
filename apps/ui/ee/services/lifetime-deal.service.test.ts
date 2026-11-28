@@ -119,7 +119,7 @@ describe('refundLifetimePurchase', () => {
 
     beforeEach(() => {
         revoked = [{ id: 'code_1', uses: 0 }]
-        db = fakeSupabase(table => (table === 'invitation_codes' ? { data: revoked } : table === 'invitation_redemptions' ? { data: [{ workspace_id: 7 }] } : undefined))
+        db = fakeSupabase(table => (table === 'invitation_codes' ? { data: revoked } : table === 'invitation_redemptions' ? { data: { workspace_id: 7 } } : undefined))
         vi.mocked(createServiceRoleClient).mockReturnValue(db.client)
         vi.mocked(stripe.checkout.sessions.list).mockResolvedValue({ data: [SESSION] } as never)
         vi.spyOn(console, 'error').mockImplementation(() => {})
@@ -142,7 +142,7 @@ describe('refundLifetimePurchase', () => {
         revoked = [{ id: 'code_1', uses: 1 }]
         await refundLifetimePurchase(CHARGE as never)
         expect(db.writes('workspaces')).toEqual([])
-        expect(console.error).toHaveBeenCalledWith(expect.stringContaining('refunded after its code was redeemed'), { session: 'cs_test_1', workspaceIds: [7] })
+        expect(console.error).toHaveBeenCalledWith(expect.stringContaining('refunded after its code was redeemed'), { session: 'cs_test_1', workspaceId: 7 })
     })
 
     it('changes nothing on a partial refund', async () => {

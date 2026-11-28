@@ -25,7 +25,6 @@
         "sandboxArchived": "沙盒重新啟用後即可使用",
         "sandboxNone": "專家沙盒沒有自己的設定",
         "adminsOnly": "僅限管理員",
-        "apiNotIncluded": "您的 AppSumo 方案不包含此功能",
         "sandboxSingleBox": "沙盒只能有一個 Box"
     }
 }

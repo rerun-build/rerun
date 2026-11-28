@@ -25,7 +25,6 @@
         "sandboxArchived": "Disponible une fois votre sandbox réactivée",
         "sandboxNone": "La sandbox d'expert n'en a pas",
         "adminsOnly": "Réservé aux admins",
-        "apiNotIncluded": "Non inclus dans votre tier AppSumo",
         "sandboxSingleBox": "Une sandbox n'a qu'une seule Box"
     }
 }

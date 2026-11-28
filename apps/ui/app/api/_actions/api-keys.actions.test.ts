@@ -25,11 +25,11 @@ function database(resolve: (table: string, calls: readonly SupabaseCall[]) => { 
     return db
 }
 
-function signedIn(workspace: { subscription_status: string | null; is_sandbox: boolean; api_access?: boolean }) {
+function signedIn(workspace: { subscription_status: string | null; is_sandbox: boolean }) {
     mocks.getServerSession.mockImplementation(
         sessionWithMembership({
             user: { id: 'user-1', workspace_id: WORKSPACE_ID },
-            workspace: { id: WORKSPACE_ID, name: 'Acme', api_access: true, ...workspace },
+            workspace: { id: WORKSPACE_ID, name: 'Acme', ...workspace },
             session: { id: 'user-1', email: 'me@acme.test' },
             workspaceRefused: false,
         }),
@@ -56,15 +56,6 @@ describe('createApiKeyAction', () => {
         const result = await createApiKeyAction('CI')
 
         expect(result.ok).toBe(false)
-        expect(db.writes('api_keys')).toHaveLength(0)
-    })
-
-    it('refuses a workspace whose tier leaves the API out, without asking it to subscribe', async () => {
-        signedIn({ subscription_status: 'active', is_sandbox: false, api_access: false })
-        const db = database()
-
-        await expect(createApiKeyAction('CI')).resolves.toMatchObject({ ok: false, code: 'apiNotIncluded' })
-        await expect(createImportKeyAction('openclaw')).resolves.toMatchObject({ ok: false, code: 'importNotIncluded' })
         expect(db.writes('api_keys')).toHaveLength(0)
     })
 

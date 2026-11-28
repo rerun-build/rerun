@@ -198,7 +198,6 @@ const ATTACH_COLUMNS = [
     'max_seats',
     'model_access',
     'custom_integrations',
-    'api_access',
     'rerun_budget_micros',
     'rerun_used_micros',
     'rerun_topup_micros',

@@ -43,7 +43,6 @@ export type ControlGates = {
     apiPausedReason?: string | null
     workspaceAdmin: boolean
     apiEntitled: boolean
-    apiLocked: boolean
     needsMachineReason: string | null
     assistantReady: boolean
     hasChangelog: boolean
@@ -52,14 +51,14 @@ export type ControlGates = {
 }
 
 // Why a command is disabled, in the reader's language. The English is for the tests and the labs.
-export type ControlReasons = { sandbox: string; admin: string; singleBox: string; apiLocked: string }
+export type ControlReasons = { sandbox: string; admin: string; singleBox: string }
 
-const ENGLISH_REASONS: ControlReasons = { sandbox: 'The expert sandbox has none of its own', admin: 'Admins only', singleBox: 'A sandbox has a single Box', apiLocked: 'Not included in your AppSumo tier' }
+const ENGLISH_REASONS: ControlReasons = { sandbox: 'The expert sandbox has none of its own', admin: 'Admins only', singleBox: 'A sandbox has a single Box' }
 
 export function buildControlCommands(gates: ControlGates, reasons: ControlReasons = ENGLISH_REASONS): ControlCommand[] {
     const sandboxReason = gates.isSandbox ? reasons.sandbox : null
     const adminReason = sandboxReason ?? (gates.workspaceAdmin ? null : reasons.admin)
-    const apiReason = gates.apiLocked ? reasons.apiLocked : gates.workspaceAdmin ? (gates.apiPausedReason ?? null) : reasons.admin
+    const apiReason = gates.workspaceAdmin ? (gates.apiPausedReason ?? null) : reasons.admin
     const command = (id: ControlCommandId, group: ControlCommandGroup, label: string, keywords: string[], disabledReason: string | null = null, paid = false): ControlCommand => ({ id, group, label, keywords, disabledReason, paid })
 
     const commands: (ControlCommand | false)[] = [
@@ -75,7 +74,7 @@ export function buildControlCommands(gates: ControlGates, reasons: ControlReason
         command('members', 'settings', 'Members', ['invite', 'team', 'seats', 'people', 'roles'], sandboxReason),
         BILLING_ENABLED && !gates.managed && command('billing', 'settings', 'Billing', ['plan', 'subscription', 'invoices', 'payment', 'upgrade', 'credits'], adminReason),
         command('ai_providers', 'settings', 'AI providers', ['models', 'claude', 'chatgpt', 'grok', 'openai', 'anthropic', 'api key', 'subscription']),
-        command('api_keys', 'settings', 'API keys & MCP', ['token', 'developer', 'mcp client'], apiReason, !gates.apiEntitled && !gates.apiLocked && !gates.managed),
+        command('api_keys', 'settings', 'API keys & MCP', ['token', 'developer', 'mcp client'], apiReason, !gates.apiEntitled && !gates.managed),
         command('company_brain', 'settings', 'Company Brain', ['knowledge', 'wiki', 'pages', 'context']),
         command('shared_files', 'settings', 'Shared files', ['folder', 'documents', 'uploads']),
         command('account', 'settings', 'Account', ['profile', 'email', 'password', 'sign-in', 'avatar']),
