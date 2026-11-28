@@ -23,7 +23,8 @@ async function handle(req: Request, ctx: Params): Promise<Response> {
     const { agentId, slug, token } = await ctx.params
     if (!SLUG_RE.test(slug) || !token) return notFound()
 
-    if (isPassiveVisit(req.headers)) {
+    // Link previews, prefetches and tabs only ever GET.
+    if (req.method === 'GET' && isPassiveVisit(req.headers)) {
         console.info(`[trigger] ${agentId}/${slug} not fired: passive visit from "${req.headers.get('user-agent') ?? 'unknown'}"`)
         return new Response(null, { status: 204 })
     }
