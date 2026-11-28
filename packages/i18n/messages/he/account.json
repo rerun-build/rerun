@@ -96,12 +96,12 @@
     },
     "security": {
         "twoStep": "אימות דו-שלבי",
-        "hint": "אחרי האימייל, Google או Apple, {brand} מבקשת שלב נוסף. אפשר לבחור שיטה אחת או את שתיהן.",
+        "hint": "שלב נוסף אחרי ההתחברות.",
         "on": "פעיל",
         "remove": "להסיר",
         "app": {
             "title": "אפליקציית אימות",
-            "description": "קוד בן 6 ספרות מ-1Password, מ-Google Authenticator או מ-Authy.",
+            "description": "קוד בן 6 ספרות מהאפליקציה.",
             "added": "נוספה ב-{date}",
             "setUp": "להגדיר",
             "removeTitle": "להסיר את אפליקציית האימות?",
@@ -109,7 +109,7 @@
         },
         "passkeys": {
             "title": "מפתחות גישה",
-            "description": "Touch ID, Face ID, Windows Hello, Android או מפתח אבטחה.",
+            "description": "Touch ID, Face ID או מפתח אבטחה.",
             "add": "להוסיף",
             "addInBrowser": "צריך להוסיף מפתח גישה מהדפדפן: לאפליקציה הזו אין גישה ל-Touch ID או ל-Windows Hello.",
             "notHere": "מפתחות גישה אינם זמינים בכתובת הזו.",
@@ -123,7 +123,7 @@
         "lastMethod": "זו השיטה האחרונה שלך: האימות הדו-שלבי יכובה, וקודי הגיבוי שלך יפסיקו לעבוד.",
         "backup": {
             "title": "קודי גיבוי",
-            "description": "נותרו {left, number} מתוך {total, number}. כל קוד פותח את החשבון שלך פעם אחת, כשאין שיטה אחרת בהישג יד.",
+            "description": "נותרו {left, number} מתוך {total, number}.",
             "newCodes": "קודים חדשים",
             "newTitle": "ליצור קודי גיבוי חדשים?",
             "newDescription": "הקודים ששמרת יפסיקו לעבוד."

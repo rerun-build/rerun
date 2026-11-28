@@ -96,12 +96,12 @@
     },
     "security": {
         "twoStep": "两步验证",
-        "hint": "在邮箱、Google 或 Apple 之后，{brand} 会再要求一步验证。选择一种方式，或两种都用。",
+        "hint": "登录后再验证一步。",
         "on": "已开启",
         "remove": "移除",
         "app": {
             "title": "身份验证器应用",
-            "description": "来自 1Password、Google Authenticator 或 Authy 的 6 位验证码。",
+            "description": "来自您的应用的 6 位验证码。",
             "added": "添加于 {date}",
             "setUp": "设置",
             "removeTitle": "移除身份验证器应用？",
@@ -109,7 +109,7 @@
         },
         "passkeys": {
             "title": "通行密钥",
-            "description": "Touch ID、Face ID、Windows Hello、Android 或安全密钥。",
+            "description": "Touch ID、Face ID 或安全密钥。",
             "add": "添加",
             "addInBrowser": "请在浏览器中添加通行密钥：此应用无法调用 Touch ID 或 Windows Hello。",
             "notHere": "此地址不支持通行密钥。",
@@ -123,7 +123,7 @@
         "lastMethod": "这是您最后一种验证方式：两步验证将关闭，您的备用码也将失效。",
         "backup": {
             "title": "备用码",
-            "description": "剩余 {left, number} 个，共 {total, number} 个。每个备用码可在没有其他方式时登录您的账号一次。",
+            "description": "剩余 {left, number} 个，共 {total, number} 个。",
             "newCodes": "生成新备用码",
             "newTitle": "生成新的备用码？",
             "newDescription": "您已保存的备用码将失效。"

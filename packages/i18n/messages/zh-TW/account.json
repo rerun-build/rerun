@@ -96,12 +96,12 @@
     },
     "security": {
         "twoStep": "兩步驟驗證",
-        "hint": "在電子郵件、Google 或 Apple 之後，{brand} 會再多要求一個步驟。請選擇一種方式，或兩種都用。",
+        "hint": "登入後再驗證一步。",
         "on": "已開啟",
         "remove": "移除",
         "app": {
             "title": "驗證器應用程式",
-            "description": "由 1Password、Google Authenticator 或 Authy 產生的 6 位數驗證碼。",
+            "description": "來自您的 App 的 6 位數驗證碼。",
             "added": "新增於 {date}",
             "setUp": "設定",
             "removeTitle": "要移除驗證器應用程式嗎？",
@@ -109,7 +109,7 @@
         },
         "passkeys": {
             "title": "密碼金鑰",
-            "description": "Touch ID、Face ID、Windows Hello、Android 或安全金鑰。",
+            "description": "Touch ID、Face ID 或安全金鑰。",
             "add": "新增",
             "addInBrowser": "請從瀏覽器新增密碼金鑰：這個應用程式無法使用 Touch ID 或 Windows Hello。",
             "notHere": "這個網址無法使用密碼金鑰。",
@@ -123,7 +123,7 @@
         "lastMethod": "這是您最後一種驗證方式：兩步驟驗證將會關閉，您的備用碼也會失效。",
         "backup": {
             "title": "備用碼",
-            "description": "剩下 {left, number} 組，共 {total, number} 組。在沒有其他方式可用時，每組備用碼可登入您的帳號一次。",
+            "description": "剩下 {left, number} 組，共 {total, number} 組。",
             "newCodes": "產生新備用碼",
             "newTitle": "要產生新的備用碼嗎？",
             "newDescription": "您已儲存的備用碼將會失效。"

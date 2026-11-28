@@ -96,12 +96,12 @@
     },
     "security": {
         "twoStep": "Verificación en dos pasos",
-        "hint": "Después de tu email, Google o Apple, {brand} pide un paso más. Elige un método o los dos.",
+        "hint": "Un paso más después de iniciar sesión.",
         "on": "Activada",
         "remove": "Quitar",
         "app": {
             "title": "App de autenticación",
-            "description": "Un código de 6 dígitos de 1Password, Google Authenticator o Authy.",
+            "description": "Un código de 6 dígitos desde tu app.",
             "added": "Añadida el {date}",
             "setUp": "Configurar",
             "removeTitle": "¿Quitar la app de autenticación?",
@@ -109,7 +109,7 @@
         },
         "passkeys": {
             "title": "Llaves de acceso",
-            "description": "Touch ID, Face ID, Windows Hello, Android o una llave de seguridad.",
+            "description": "Touch ID, Face ID o una llave de seguridad.",
             "add": "Añadir",
             "addInBrowser": "Añade una llave de acceso desde tu navegador: esta app no puede acceder a Touch ID ni a Windows Hello.",
             "notHere": "Las llaves de acceso no están disponibles en esta dirección.",
@@ -123,7 +123,7 @@
         "lastMethod": "Es tu último método: la verificación en dos pasos se desactiva y tus códigos de respaldo dejan de funcionar.",
         "backup": {
             "title": "Códigos de respaldo",
-            "description": "Quedan {left, number} de {total, number}. Cada uno abre tu cuenta una vez, cuando no tienes otro método a mano.",
+            "description": "Quedan {left, number} de {total, number}.",
             "newCodes": "Nuevos códigos",
             "newTitle": "¿Generar nuevos códigos de respaldo?",
             "newDescription": "Los códigos que guardaste dejan de funcionar."

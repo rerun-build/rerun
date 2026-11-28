@@ -96,12 +96,12 @@
     },
     "security": {
         "twoStep": "Bestätigung in zwei Schritten",
-        "hint": "Nach deiner E-Mail, Google oder Apple fragt {brand} nach einem weiteren Schritt. Wähle eine Methode oder beide.",
+        "hint": "Ein weiterer Schritt nach der Anmeldung.",
         "on": "An",
         "remove": "Entfernen",
         "app": {
             "title": "Authenticator-App",
-            "description": "Ein 6-stelliger Code aus 1Password, Google Authenticator oder Authy.",
+            "description": "Ein 6-stelliger Code aus deiner App.",
             "added": "Hinzugefügt am {date}",
             "setUp": "Einrichten",
             "removeTitle": "Authenticator-App entfernen?",
@@ -109,7 +109,7 @@
         },
         "passkeys": {
             "title": "Passkeys",
-            "description": "Touch ID, Face ID, Windows Hello, Android oder ein Sicherheitsschlüssel.",
+            "description": "Touch ID, Face ID oder ein Sicherheitsschlüssel.",
             "add": "Hinzufügen",
             "addInBrowser": "Füge einen Passkey in deinem Browser hinzu: Diese App kann Touch ID und Windows Hello nicht erreichen.",
             "notHere": "Passkeys sind unter dieser Adresse nicht verfügbar.",
@@ -123,7 +123,7 @@
         "lastMethod": "Das ist deine letzte Methode: Die Bestätigung in zwei Schritten wird ausgeschaltet und deine Backup-Codes funktionieren nicht mehr.",
         "backup": {
             "title": "Backup-Codes",
-            "description": "{left, number} von {total, number} übrig. Jeder Code öffnet dein Konto einmal, wenn keine andere Methode zur Hand ist.",
+            "description": "{left, number} von {total, number} übrig.",
             "newCodes": "Neue Codes",
             "newTitle": "Neue Backup-Codes erstellen?",
             "newDescription": "Die Codes, die du gespeichert hast, funktionieren nicht mehr."

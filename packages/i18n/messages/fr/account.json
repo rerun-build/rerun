@@ -96,12 +96,12 @@
     },
     "security": {
         "twoStep": "Validation en deux étapes",
-        "hint": "Après votre e-mail, Google ou Apple, {brand} demande une étape de plus. Choisissez une méthode ou les deux.",
+        "hint": "Une étape de plus après la connexion.",
         "on": "Activée",
         "remove": "Supprimer",
         "app": {
             "title": "Application d'authentification",
-            "description": "Un code à 6 chiffres de 1Password, Google Authenticator ou Authy.",
+            "description": "Un code à 6 chiffres depuis votre app.",
             "added": "Ajoutée le {date}",
             "setUp": "Configurer",
             "removeTitle": "Supprimer l'application d'authentification ?",
@@ -109,7 +109,7 @@
         },
         "passkeys": {
             "title": "Clés d'accès",
-            "description": "Touch ID, Face ID, Windows Hello, Android ou une clé de sécurité.",
+            "description": "Touch ID, Face ID ou une clé de sécurité.",
             "add": "Ajouter",
             "addInBrowser": "Ajoutez une clé d'accès depuis votre navigateur : cette app ne peut pas accéder à Touch ID ni à Windows Hello.",
             "notHere": "Les clés d'accès ne sont pas disponibles sur cette adresse.",
@@ -123,7 +123,7 @@
         "lastMethod": "C'est votre dernière méthode : la validation en deux étapes se désactive et vos codes de secours ne fonctionnent plus.",
         "backup": {
             "title": "Codes de secours",
-            "description": "{left, number} sur {total, number} restants. Chacun ouvre votre compte une fois, quand aucune autre méthode n'est sous la main.",
+            "description": "{left, number} sur {total, number} restants.",
             "newCodes": "Nouveaux codes",
             "newTitle": "Générer de nouveaux codes de secours ?",
             "newDescription": "Les codes que vous avez enregistrés ne fonctionneront plus."
