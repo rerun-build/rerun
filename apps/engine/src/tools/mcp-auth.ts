@@ -22,6 +22,8 @@ export type StoredToken = {
     tokenEndpoint?: string
     clientId?: string
     clientSecret?: string
+    // RFC 8707 resource indicator, sent again on every refresh: BrowserAct answers invalid_target without it.
+    resource?: string
     obtainedAt: number
 }
 
@@ -132,6 +134,7 @@ async function refreshWithEndpoint(token: StoredToken): Promise<RefreshOutcome> 
         const body = new URLSearchParams({ grant_type: 'refresh_token', refresh_token: token.refreshToken })
         if (token.clientId) body.set('client_id', token.clientId)
         if (token.clientSecret) body.set('client_secret', token.clientSecret)
+        if (token.resource) body.set('resource', token.resource)
         const res = await fetch(token.tokenEndpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -144,6 +147,7 @@ async function refreshWithEndpoint(token: StoredToken): Promise<RefreshOutcome> 
             next.tokenEndpoint = token.tokenEndpoint
             next.clientId = token.clientId
             next.clientSecret = token.clientSecret
+            next.resource = token.resource
             return { token: next }
         }
         logRefreshRefused(res, data)

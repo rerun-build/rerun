@@ -292,6 +292,8 @@ export const mcpTokenSchema = z.object({
     tokenEndpoint: z.string().optional(),
     clientId: z.string().optional(),
     clientSecret: z.string().optional(),
+    // The RFC 8707 resource the sign-in named: some authorization servers refuse a refresh without it.
+    resource: z.string().optional(),
     obtainedAt: z.number().optional(),
 })
 
