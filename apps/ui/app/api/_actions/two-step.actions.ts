@@ -15,7 +15,7 @@ import { PASSKEY_MAX, PASSKEY_NAME_MAX, type StoredPasskey, type TwoStepRecord }
 import { enrollRecoveryFactor } from '@/lib/auth/two-step/recovery'
 import { opensSecret } from '@/lib/auth/two-step/seal'
 import { readTwoStep, writeTwoStep, writeTwoStepFlag } from '@/lib/auth/two-step/store'
-import { failure, failureOf, type ActionFailure } from '@/lib/i18n/action-error'
+import { AppError, failure, failureOf, type ActionFailure } from '@/lib/i18n/action-error'
 import { createClient } from '@/supabase/server'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { getAuthUser, getSigningInAccount } from '@/supabase/session/getServerSession'
@@ -40,6 +40,16 @@ async function requireConfirmedSession() {
     const client = await createClient()
     if ((await sessionLevel(client)) !== 'aal2') return { account, client, confirmed: false as const }
     return { account, client, confirmed: true as const }
+}
+
+// Removing a factor drops every session it raised back to aal1, and a verified factor goes from an aal2
+// session only: removed one after the other with the person's client, the second is refused when the
+// first raised the session. The service role removes them in any order and checks no level itself: a
+// method of the person's goes once the session's token says aal2, the hub's own recovery factors from any
+// session (a first passkey sets two-step up from aal1).
+async function deleteFactor(userId: string, factorId: string) {
+    const { error } = await createServiceRoleClient().auth.admin.mfa.deleteFactor({ userId, id: factorId })
+    if (error) throw new Error(error.message)
 }
 
 // `auth.sessions` keeps its times without a zone, in UTC.
@@ -91,8 +101,9 @@ function securityOf(account: User, record: TwoStepRecord, sessions: SecuritySess
 }
 
 // `codes` when this load finished a setup that was cut short (its method confirmed, then no flag, no
-// recovery factor or no codes): shown once, like at the end of a setup. A recovery factor whose secret
-// no longer opens (sealed under a key this server lost) is made again here, the backup codes kept.
+// recovery factor or no codes): shown once, like at the end of a setup. A recovery factor that no longer
+// works (its secret sealed under a key this server lost, or the factor itself gone from the account) is
+// made again here, the backup codes kept.
 export async function getSecurityAction(): Promise<ActionResult<{ security: SecurityState; codes: string[] | null }>> {
     try {
         const account = await requireAccount()
@@ -100,16 +111,23 @@ export async function getSecurityAction(): Promise<ActionResult<{ security: Secu
         let current = record
         let codes: string[] | null = null
         const unfinished = !hasTwoStep(account.app_metadata) || !record.recovery || !record.codes?.length
-        const sealedAway = !!record.recovery && !opensSecret(record.recovery.sealedSecret)
-        if ((unfinished || sealedAway) && methodCount(ownMethods(account, record))) {
+        const recoveryLost = !!record.recovery && !recoveryWorks(account, record.recovery)
+        if ((unfinished || recoveryLost) && methodCount(ownMethods(account, record))) {
             const client = await createClient()
             if ((await sessionLevel(client)) === 'aal2') {
                 if (unfinished) {
                     codes = await turnOnTwoStep(client, account, record)
                     current = await readTwoStep(account.id)
                 } else {
-                    current = { ...record, recovery: await ensureRecovery(client, account, record) }
-                    await writeTwoStep(account.id, current)
+                    // A repair refused (a token still at aal2 on a session the auth server dropped to
+                    // aal1) leaves the tab as it is: it is where the person removes a method.
+                    try {
+                        const repaired = { ...record, recovery: await ensureRecovery(client, account, record) }
+                        await writeTwoStep(account.id, repaired)
+                        current = repaired
+                    } catch (err) {
+                        console.warn('[two-step] recovery factor not repaired', err)
+                    }
                 }
             }
         }
@@ -120,13 +138,17 @@ export async function getSecurityAction(): Promise<ActionResult<{ security: Secu
     }
 }
 
-// The recovery factor the hub signs in with, kept as long as its secret still opens. A secret sealed
-// under a key this server no longer has is replaced, along with any factor left under that name.
+function recoveryWorks(account: User, recovery: NonNullable<TwoStepRecord['recovery']>): boolean {
+    return opensSecret(recovery.sealedSecret) && (account.factors ?? []).some(factor => factor.id === recovery.factorId && factor.status === 'verified')
+}
+
+// The recovery factor the hub signs in with, kept as long as it works. One that does not is replaced,
+// along with any factor left under that name.
 async function ensureRecovery(client: Awaited<ReturnType<typeof createClient>>, account: User, record: TwoStepRecord): Promise<NonNullable<TwoStepRecord['recovery']>> {
     const kept = record.recovery
-    if (kept && opensSecret(kept.sealedSecret) && (account.factors ?? []).some(factor => factor.id === kept.factorId && factor.status === 'verified')) return kept
+    if (kept && recoveryWorks(account, kept)) return kept
     for (const factor of account.factors ?? []) {
-        if (factor.friendly_name === TWO_STEP_RECOVERY_FACTOR_NAME) await client.auth.mfa.unenroll({ factorId: factor.id })
+        if (factor.friendly_name === TWO_STEP_RECOVERY_FACTOR_NAME) await deleteFactor(account.id, factor.id)
     }
     return enrollRecoveryFactor(client)
 }
@@ -148,7 +170,7 @@ async function turnOnTwoStep(client: Awaited<ReturnType<typeof createClient>>, a
 // aal2. The first method turns two-step on. When that fails, the method goes again, so the account is
 // left as the error says, without a method the sign-in would not ask for.
 export async function finishTwoStepSetupAction(params: { factorId: string }): Promise<ActionResult<{ codes: string[] | null }>> {
-    let firstMethod: { client: Awaited<ReturnType<typeof createClient>> } | null = null
+    let firstMethod: { client: Awaited<ReturnType<typeof createClient>>; userId: string } | null = null
     try {
         const { account, client, confirmed } = await requireConfirmedSession()
         if (!confirmed) return failure('twoStepConfirmFirst')
@@ -159,21 +181,24 @@ export async function finishTwoStepSetupAction(params: { factorId: string }): Pr
         const record = await readTwoStep(account.id)
         if (hasTwoStep(current.app_metadata) && record.recovery && record.codes?.length) return { ok: true, codes: null }
 
-        firstMethod = hasTwoStep(current.app_metadata) ? null : { client }
+        firstMethod = hasTwoStep(current.app_metadata) ? null : { client, userId: account.id }
         return { ok: true, codes: await turnOnTwoStep(client, current, record) }
     } catch (err) {
-        if (firstMethod) await undoFirstMethod(firstMethod.client, params.factorId)
+        if (firstMethod) await undoFirstMethod(firstMethod.client, firstMethod.userId, params.factorId)
         return failureOf(err, 'twoStepSetupFailed')
     }
 }
 
-// The recovery factor first, while the method still keeps the session at aal2.
-async function undoFirstMethod(client: Awaited<ReturnType<typeof createClient>>, factorId: string) {
+async function deleteRecoveryFactors(client: Awaited<ReturnType<typeof createClient>>, userId: string) {
     const { data } = await client.auth.mfa.listFactors()
     for (const factor of data?.all ?? []) {
-        if (factor.friendly_name === TWO_STEP_RECOVERY_FACTOR_NAME) await client.auth.mfa.unenroll({ factorId: factor.id }).catch(() => {})
+        if (factor.friendly_name === TWO_STEP_RECOVERY_FACTOR_NAME) await deleteFactor(userId, factor.id).catch(() => {})
     }
-    await client.auth.mfa.unenroll({ factorId }).catch(() => {})
+}
+
+async function undoFirstMethod(client: Awaited<ReturnType<typeof createClient>>, userId: string, factorId: string) {
+    await deleteRecoveryFactors(client, userId)
+    await deleteFactor(userId, factorId).catch(() => {})
 }
 
 // A passkey is set up on the hub's own address only. On an account with two-step already on, from a
@@ -225,10 +250,7 @@ export async function finishPasskeySetupAction(params: { response: RegistrationR
 }
 
 async function undoFirstPasskey(client: Awaited<ReturnType<typeof createClient>>, userId: string, passkeyId: string) {
-    const { data } = await client.auth.mfa.listFactors()
-    for (const factor of data?.all ?? []) {
-        if (factor.friendly_name === TWO_STEP_RECOVERY_FACTOR_NAME) await client.auth.mfa.unenroll({ factorId: factor.id }).catch(() => {})
-    }
+    await deleteRecoveryFactors(client, userId)
     const record = await readTwoStep(userId)
     await writeTwoStep(userId, { ...record, passkeys: (record.passkeys ?? []).filter(passkey => passkey.id !== passkeyId) }).catch(() => {})
     await writeTwoStepFlag(userId, false).catch(() => {})
@@ -262,19 +284,12 @@ export async function removeTwoStepMethodAction(params: { methodId: string }): P
         if (!isApp && !methods.passkeys.some(passkey => passkey.id === params.methodId)) return failure('twoStepNotYours')
 
         const last = methodCount(methods) === 1
-        // The recovery factor goes first, while the method still keeps the session at aal2: Supabase
-        // removes a verified factor only from such a session.
         if (last) {
             for (const factor of account.factors ?? []) {
-                if (factor.friendly_name !== TWO_STEP_RECOVERY_FACTOR_NAME && factor.id !== record.recovery?.factorId) continue
-                const { error: recoveryError } = await client.auth.mfa.unenroll({ factorId: factor.id })
-                if (recoveryError) throw new Error(recoveryError.message)
+                if (factor.friendly_name === TWO_STEP_RECOVERY_FACTOR_NAME || factor.id === record.recovery?.factorId) await deleteFactor(account.id, factor.id)
             }
         }
-        if (isApp) {
-            const { error } = await client.auth.mfa.unenroll({ factorId: params.methodId })
-            if (error) throw new Error(error.message)
-        }
+        if (isApp) await deleteFactor(account.id, params.methodId)
 
         if (!last) {
             if (!isApp) await writeTwoStep(account.id, { ...record, passkeys: methods.passkeys.filter(passkey => passkey.id !== params.methodId) })
@@ -285,7 +300,9 @@ export async function removeTwoStepMethodAction(params: { methodId: string }): P
         await client.auth.refreshSession()
         return { ok: true }
     } catch (err) {
-        return failureOf(err, 'twoStepRemoveFailed')
+        if (err instanceof AppError) return failureOf(err)
+        console.warn('[two-step] method not removed', err)
+        return failure('twoStepRemoveFailed')
     }
 }
 
