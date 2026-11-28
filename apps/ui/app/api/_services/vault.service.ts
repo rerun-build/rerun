@@ -213,7 +213,7 @@ export async function attachVaultEntry(itemId: string, agentId: string, actor?: 
     }
 }
 
-async function lendVaultEntry(ctx: VaultContext, item: VaultItemSummary, engineAgentId: string): Promise<VaultItemSummary> {
+export async function lendVaultEntry(ctx: VaultContext, item: VaultItemSummary, engineAgentId: string): Promise<VaultItemSummary> {
     const twins = isRegistryItem(item) && item.status === 'active' ? await detachPendingTwins(ctx, item, engineAgentId) : []
     try {
         const attached = await rethrowConflict(ctx, () => attachVaultItem(ctx.conn, item.id, engineAgentId))

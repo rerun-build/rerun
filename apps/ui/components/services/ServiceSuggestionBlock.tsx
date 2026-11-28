@@ -189,6 +189,8 @@ export function ServiceSuggestionCard({ agentId, services, onDone, inline, defau
     // Bumped on every reset so the config form remounts: it reads its initial step from props
     // once, at mount, and never re-derives it.
     const [resetSeq, setResetSeq] = useState(0)
+    // The key each card installed: another account of the app is `slug@id`, and a reconnect goes back to it.
+    const [installedKeys, setInstalledKeys] = useState<Record<string, string>>({})
     const [swapping, setSwapping] = useState<string | null>(null)
     const [swapError, setSwapError] = useState<string | null>(null)
     const [openSlugs, setOpenSlugs] = useState<Set<string>>(() => new Set(defaultOpen ? services.map(c => c.slug) : []))
@@ -248,7 +250,7 @@ export function ServiceSuggestionCard({ agentId, services, onDone, inline, defau
         if (locked || resetting) return
         setResetting(s.slug)
         setResetError(null)
-        const res = await driver.reset(agentId, s.slug)
+        const res = await driver.reset(agentId, installedKeys[s.slug] ?? s.slug)
         setResetting(null)
         if (!res.ok) {
             setResetError(errorText(res))
@@ -378,10 +380,13 @@ export function ServiceSuggestionCard({ agentId, services, onDone, inline, defau
                             slug={s.slug}
                             name={s.name}
                             authMethods={s.authMethods}
+                            instanceKey={installedKeys[s.slug]}
+                            newInstance={!installedKeys[s.slug] && vaultAccounts.length > 0 && !s.installStatus}
                             initialMethodId={s.installedMethodId}
                             initialAuthTarget={authTarget}
                             autoConnect={autoConnect?.slug === s.slug ? autoConnect : undefined}
-                            onInstalled={() => {
+                            onInstalled={key => {
+                                setInstalledKeys(keys => ({ ...keys, [s.slug]: key }))
                                 const next = { ...statuses, [s.slug]: 'connected' as CardStatus }
                                 setStatuses(next)
                                 advance(next)

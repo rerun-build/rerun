@@ -1,13 +1,14 @@
+import type { VaultItemSummary } from '@rerun/contracts'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { compileService, decompileService } from '@/lib/services/compiler'
 import { type RegistryEntry, readOwnRegistry, readRegistry, removeRegistryEntry } from '@/lib/services/registry'
 import { compileIntoVault } from '@/lib/vault/install'
-import { createVaultItem, detachVaultItem, getVaultItem, patchVaultItem } from '@/lib/engine/vault-client'
+import { attachVaultItem, createVaultItem, detachVaultItem, getVaultItem, listVaultItems, patchVaultItem } from '@/lib/engine/vault-client'
 import { deleteConnectorToken } from '@/lib/vault/tokens'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase } from '@/test/supabase-fake'
-import { assertCanChangeItem } from './vault.service'
+import { assertCanChangeItem, canChangeItem, lendVaultEntry, vaultContext } from './vault.service'
 import { supportsVault } from '@/lib/engine/client'
 import { installService, resetServiceConnection, uninstallService } from './services.service'
 
@@ -24,12 +25,21 @@ vi.mock('@/lib/vault/install', () => ({
 }))
 vi.mock('@/lib/vault/tokens', () => ({ deleteConnectorToken: vi.fn(async () => {}) }))
 vi.mock('@/lib/engine/client', async importOriginal => ({ EngineRequestError: (await importOriginal<typeof import('@/lib/engine/client')>()).EngineRequestError, supportsVault: vi.fn(async () => true) }))
-vi.mock('@/lib/engine/vault-client', () => ({ getVaultItem: vi.fn(async () => ({ id: 'item-1', agentIds: ['engine-agent'] })), patchVaultItem: vi.fn(), createVaultItem: vi.fn(), detachVaultItem: vi.fn() }))
+vi.mock('@/lib/engine/vault-client', () => ({
+    getVaultItem: vi.fn(async () => ({ id: 'item-1', agentIds: ['engine-agent'] })),
+    patchVaultItem: vi.fn(),
+    createVaultItem: vi.fn(),
+    detachVaultItem: vi.fn(),
+    listVaultItems: vi.fn(async () => []),
+    attachVaultItem: vi.fn(async (_conn: unknown, id: string, engineAgentId: string) => ({ id, agentIds: [engineAgentId] })),
+}))
 vi.mock('./vault.service', async () => ({
     VaultUnavailableError: (await vi.importActual<typeof import('./vault.service')>('./vault.service')).VaultUnavailableError,
     rethrowConflict: (await vi.importActual<typeof import('./vault.service')>('./vault.service')).rethrowConflict,
     vaultContext: vi.fn(async () => ({ actor: { kind: 'user', userId: 'user-1', workspaceId: 7 }, byEngineId: new Map() })),
     assertCanChangeItem: vi.fn(async () => {}),
+    canChangeItem: vi.fn(async () => true),
+    lendVaultEntry: vi.fn(async (_ctx: unknown, item: VaultItemSummary, engineAgentId: string) => ({ ...item, agentIds: [...item.agentIds, engineAgentId] })),
 }))
 vi.mock('@/lib/services/registry', async importOriginal => ({
     ...(await importOriginal<typeof import('@/lib/services/registry')>()),
@@ -53,6 +63,7 @@ const entry = (over: Partial<RegistryEntry> = {}): RegistryEntry => ({ status: '
 beforeEach(() => {
     vi.clearAllMocks()
     vi.mocked(readRegistry).mockResolvedValue({ services: {} })
+    vi.mocked(listVaultItems).mockResolvedValue([])
     vi.mocked(createServiceRoleClient).mockReturnValue(fakeSupabase(table => (table === 'services' ? { data: { manifest: MANIFEST, enabled: true } } : undefined)).client)
 })
 
@@ -123,6 +134,140 @@ describe('installService on a box that keeps a Vault', () => {
         await installService('agent-1', 'linear', {}, 'app')
         expect(compileService).toHaveBeenCalled()
         expect(compileIntoVault).not.toHaveBeenCalled()
+    })
+})
+
+const vaultItem = (over: Partial<VaultItemSummary> = {}): VaultItemSummary => ({
+    id: 'held',
+    kind: 'service',
+    slug: 'linear',
+    name: 'Linear',
+    status: 'active',
+    authMethodId: 'oauth',
+    config: {},
+    mcpServers: [{ name: 'linear', transport: 'http', url: 'https://mcp.linear.test', args: [], env: {}, headers: {} }],
+    skills: [],
+    envKeys: [],
+    tokens: [],
+    agentIds: [],
+    sharedWithAll: false,
+    createdBy: 'user-1',
+    createdAt: '2026-11-25T21:38:54.411Z',
+    updatedAt: '2026-11-25T21:38:54.411Z',
+    ...over,
+})
+
+describe('installService on an app the Vault already holds (RER-438)', () => {
+    it('takes back the entry a coworker left in the Vault rather than making another one', async () => {
+        vi.mocked(listVaultItems).mockResolvedValue([vaultItem({ id: 'orphan', authMethodId: 'key', envKeys: ['LINEAR_TOKEN'] })])
+        await installService('agent-1', 'linear', { TOKEN: 'new' }, 'key')
+        expect(compileIntoVault).toHaveBeenCalledWith(expect.objectContaining({ itemId: 'orphan', engineAgentId: 'engine-agent' }))
+        expect(createVaultItem).not.toHaveBeenCalled()
+    })
+
+    it('lends an account the Vault already has connected, with no second sign-in', async () => {
+        vi.mocked(listVaultItems).mockResolvedValue([vaultItem({ id: 'shared', agentIds: ['other-agent'] })])
+        const result = await installService('agent-1', 'linear', {}, 'oauth')
+        expect(result).toMatchObject({ status: 'installed', key: 'linear', toolNames: ['linear'] })
+        expect(lendVaultEntry).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ id: 'shared' }), 'engine-agent')
+        expect(compileIntoVault).not.toHaveBeenCalled()
+        expect(createVaultItem).not.toHaveBeenCalled()
+    })
+
+    it('lends a connected account even when the install had nothing typed yet', async () => {
+        vi.mocked(listVaultItems).mockResolvedValue([vaultItem({ id: 'shared', authMethodId: 'key', agentIds: ['other-agent'] })])
+        const result = await installService('agent-1', 'linear', {}, 'key')
+        expect(result.status).toBe('installed')
+        expect(lendVaultEntry).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ id: 'shared' }), 'engine-agent')
+        expect(patchVaultItem).not.toHaveBeenCalled()
+        expect(createVaultItem).not.toHaveBeenCalled()
+    })
+
+    it('keeps a connected entry other coworkers use as it is: a typed key makes an entry of its own', async () => {
+        vi.mocked(listVaultItems).mockResolvedValue([vaultItem({ id: 'shared', authMethodId: 'key', agentIds: ['other-agent'] })])
+        await installService('agent-1', 'linear', { TOKEN: 'new' }, 'key')
+        expect(compileIntoVault).toHaveBeenCalledWith(expect.objectContaining({ itemId: null }))
+        expect(lendVaultEntry).not.toHaveBeenCalled()
+    })
+
+    it('keeps a connected entry other coworkers use as it is when another sign-in is picked', async () => {
+        vi.mocked(listVaultItems).mockResolvedValue([vaultItem({ id: 'shared', authMethodId: 'key', envKeys: ['LINEAR_TOKEN'], agentIds: ['other-agent'] })])
+        await installService('agent-1', 'linear', {}, 'oauth')
+        expect(compileIntoVault).toHaveBeenCalledWith(expect.objectContaining({ itemId: null }))
+        expect(lendVaultEntry).not.toHaveBeenCalled()
+    })
+
+    it('declares an app waiting for its owner without touching the connected entry other coworkers use', async () => {
+        vi.mocked(listVaultItems).mockResolvedValue([vaultItem({ id: 'shared', authMethodId: 'key', agentIds: ['other-agent'] })])
+        const result = await installService('agent-1', 'linear', {}, undefined, undefined, { pending: true })
+        expect(result.status).toBe('needs_config')
+        expect(patchVaultItem).not.toHaveBeenCalled()
+        expect(createVaultItem).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ status: 'needs_config', agentIds: ['engine-agent'] }))
+    })
+
+    it('makes an entry of its own when the caller may not change the waiting one', async () => {
+        vi.mocked(listVaultItems).mockResolvedValue([vaultItem({ id: 'waiting', status: 'needs_config', authMethodId: 'key', agentIds: ['other-agent'] })])
+        vi.mocked(canChangeItem).mockResolvedValueOnce(false)
+        await installService('agent-1', 'linear', { TOKEN: 'new' }, 'key')
+        expect(compileIntoVault).toHaveBeenCalledWith(expect.objectContaining({ itemId: null }))
+    })
+
+    it('lends a connected entry nobody uses any more when nothing is typed', async () => {
+        vi.mocked(listVaultItems).mockResolvedValue([vaultItem({ id: 'orphan' })])
+        const result = await installService('agent-1', 'linear', {}, 'oauth')
+        expect(result.status).toBe('installed')
+        expect(lendVaultEntry).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ id: 'orphan' }), 'engine-agent')
+    })
+
+    it('never reuses an entry of the Vault for an install that asks for its own', async () => {
+        vi.mocked(listVaultItems).mockResolvedValue([vaultItem({ id: 'shared', agentIds: ['other-agent'] })])
+        await installService('agent-1', 'linear', {}, 'oauth', undefined, { ownEntry: true })
+        expect(listVaultItems).not.toHaveBeenCalled()
+        expect(compileIntoVault).toHaveBeenCalledWith(expect.objectContaining({ itemId: null }))
+        expect(lendVaultEntry).not.toHaveBeenCalled()
+    })
+
+    it('configures in place an entry still waiting for its sign-in, and attaches the coworker to it', async () => {
+        vi.mocked(listVaultItems).mockResolvedValue([vaultItem({ id: 'waiting', status: 'needs_config', authMethodId: 'key' })])
+        await installService('agent-1', 'linear', {}, 'key')
+        expect(patchVaultItem).toHaveBeenCalledWith(expect.anything(), 'waiting', { status: 'needs_config', authMethodId: 'key' })
+        expect(attachVaultItem).toHaveBeenCalledWith(expect.anything(), 'waiting', 'engine-agent')
+        expect(createVaultItem).not.toHaveBeenCalled()
+    })
+
+    it('prefers the connected account the most coworkers use', async () => {
+        vi.mocked(listVaultItems).mockResolvedValue([
+            vaultItem({ id: 'orphan', status: 'needs_auth' }),
+            vaultItem({ id: 'one', agentIds: ['a'] }),
+            vaultItem({ id: 'many', agentIds: ['a', 'b'] }),
+        ])
+        await installService('agent-1', 'linear', {}, 'oauth')
+        expect(lendVaultEntry).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ id: 'many' }), 'engine-agent')
+    })
+
+    it('leaves another account of the app, another app and an entry shared with everyone alone', async () => {
+        vi.mocked(listVaultItems).mockResolvedValue([vaultItem({ id: 'second', instanceId: 'k3x9ab' }), vaultItem({ id: 'other-app', slug: 'notion' }), vaultItem({ id: 'all', sharedWithAll: true })])
+        await installService('agent-1', 'linear', {}, 'oauth')
+        expect(compileIntoVault).toHaveBeenCalledWith(expect.objectContaining({ itemId: null }))
+        expect(lendVaultEntry).not.toHaveBeenCalled()
+    })
+
+    it('still gives another account asked for its own entry', async () => {
+        const manifest = { ...MANIFEST, authMethods: [oauthMethod, keyMethod, composioMethod] }
+        vi.mocked(createServiceRoleClient).mockReturnValue(fakeSupabase(table => (table === 'services' ? { data: { manifest, enabled: true } } : undefined)).client)
+        vi.mocked(listVaultItems).mockResolvedValue([vaultItem({ id: 'shared', agentIds: ['other-agent'] })])
+        await installService('agent-1', 'linear', {}, 'oauth', undefined, { newInstance: true })
+        expect(compileIntoVault).toHaveBeenCalledWith(expect.objectContaining({ itemId: null }))
+        expect(lendVaultEntry).not.toHaveBeenCalled()
+    })
+
+    it("never lets a coworker's own call help itself to an account of the Vault", async () => {
+        vi.mocked(listVaultItems).mockResolvedValue([vaultItem({ id: 'shared', agentIds: ['other-agent'] })])
+        vi.mocked(vaultContext).mockResolvedValueOnce({ actor: { kind: 'workspace', workspaceId: 7 }, byEngineId: new Map() } as never)
+        await installService('agent-1', 'linear', {}, 'oauth')
+        expect(compileIntoVault).toHaveBeenCalledWith(expect.objectContaining({ itemId: null }))
+        expect(lendVaultEntry).not.toHaveBeenCalled()
+        expect(listVaultItems).not.toHaveBeenCalled()
     })
 })
 

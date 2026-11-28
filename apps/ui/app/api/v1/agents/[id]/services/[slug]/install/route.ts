@@ -8,7 +8,9 @@ export const dynamic = 'force-dynamic'
 
 // A `needs_auth` result comes back with its sign-in URL already minted, so the app opens the
 // in-app browser without a second round trip.
+// `ownEntry`: the iPhone app's "New account" lands here without saying so, and its Vault accounts are
+// lent through their own call.
 export const POST = apiRoute(mobileApi.installService, { auth: 'member' }, async ({ req, ctx, params, body }) => {
-    const result = await installService(params.id, serviceKeyParam(params), body.values, body.authMethodId, actorFromContext(ctx))
+    const result = await installService(params.id, serviceKeyParam(params), body.values, body.authMethodId, actorFromContext(ctx), { ownEntry: true })
     return toInstallResultView(result, req, ctx, params.id)
 })

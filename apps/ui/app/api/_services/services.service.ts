@@ -8,11 +8,12 @@ import { isAppSlug } from '@rerun/cloud/apps'
 import { arePaidAppsOffered, isOrganizationPlan } from '@/ee/lib/billing/plans'
 import { agentConnections, heldAccountsSignedOut } from '@/lib/apps/connections'
 import { deleteConnectedAccount } from '@/lib/composio/client'
-import { getVaultItem, patchVaultItem, createVaultItem, deleteVaultItem, detachVaultItem, updateVaultItemEnv } from '@/lib/engine/vault-client'
+import { attachVaultItem, getVaultItem, listVaultItems, patchVaultItem, createVaultItem, deleteVaultItem, detachVaultItem, updateVaultItemEnv } from '@/lib/engine/vault-client'
 import { deleteConnectorToken } from '@/lib/vault/tokens'
 import { VAULT_METHOD_KINDS, compileIntoVault } from '@/lib/vault/install'
 import { decompileMigrationCopy } from '@/lib/vault/copies'
-import { assertCanChangeItem, rethrowConflict, vaultContext, type VaultContext } from '@/app/api/_services/vault.service'
+import { isRegistryItem, vaultRegistryKey } from '@/lib/vault/registry-view'
+import { assertCanChangeItem, canChangeItem, lendVaultEntry, rethrowConflict, vaultContext, type VaultContext } from '@/app/api/_services/vault.service'
 import { AccessDeniedError } from '@/app/api/_auth/access'
 import { getMcpServerStatuses, supportsVault } from '@/lib/engine/client'
 import { AppError } from '@/lib/i18n/action-error'
@@ -450,13 +451,14 @@ export async function getServiceDetails(agentId: string, slugOrKey: string, acto
 // several: anywhere else it is ignored and the base account is (re)installed.
 // `pending` leaves the app waiting for its owner even when nothing is missing: an app declared
 // through the API with several ways to connect is theirs to choose.
+// `ownEntry` never borrows nor takes back an entry the Vault already holds for other coworkers.
 export async function installService(
     agentId: string,
     slugOrKey: string,
     values: Record<string, string> = {},
     authMethodId?: string,
     actor?: Actor,
-    opts?: { newInstance?: boolean; pending?: boolean },
+    opts?: { newInstance?: boolean; pending?: boolean; ownEntry?: boolean },
 ): Promise<InstallResult> {
     const manifest = await loadManifest(slugOrKey)
     if (!manifest) throw new Error(`Service not found: ${slugOrKey}`)
@@ -469,7 +471,11 @@ export async function installService(
     const key = instance?.key ?? manifest.slug
     const method = getMethod(manifest, authMethodId)
     const missing = missingRequiredInputs(method, values)
-    const vault = await vaultInstallTarget(agentId, key, method.kind, actor)
+    const vault = await vaultInstallTarget(agentId, key, method, values, Boolean(opts?.ownEntry), actor)
+    if (vault?.lend) {
+        const item = await lendVaultEntry(vault.ctx, vault.lend, vault.engineAgentId)
+        return { status: 'installed', key, slug: manifest.slug, name: manifest.name, toolNames: item.mcpServers.map(server => server.name), message: `${manifest.name} installed. Its tools become available on your next turn.` }
+    }
     if (missing.length > 0 || opts?.pending) {
         if (vault) await rethrowConflict(vault.ctx, () => markVaultNeedsConfig(vault, manifest, method.id, instance))
         else await markServiceNeedsConfig(agentId, key, method.id, actor, instance ? { instanceId: instance.instanceId, label: instance.label } : undefined)
@@ -538,24 +544,47 @@ async function refuseRejectedKey({ agentId, key, manifest, method, instance, fre
     throw new AppError('serviceKeyRejected', { name: manifest.name })
 }
 
-type VaultInstallTarget = { conn: EngineConnection; engineAgentId: string; itemId: string | null; createdBy: string | null; ctx: VaultContext }
+// `lend`: an account of the Vault the coworker borrows as it is. `joining`: `itemId` is an entry of the
+// Vault the coworker did not hold, configured in place and attached to it.
+type VaultInstallTarget = { conn: EngineConnection; engineAgentId: string; itemId: string | null; createdBy: string | null; ctx: VaultContext; lend?: VaultItemSummary; joining?: boolean }
+
+// The entries of this account the coworker does not hold yet. A connected one is lent as it is when the
+// install brings nothing; one other coworkers use is never compiled again from here, or a typo in a key
+// would disconnect them. Only an entry still waiting on its sign-in, or a connected one nobody uses any
+// more given a new value, is taken back. Another account of the app has a key of its own.
+async function vaultEntryToReuse(conn: EngineConnection, engineAgentId: string, key: string, authMethodId: string, values: Record<string, string>): Promise<{ lend?: VaultItemSummary; join?: VaultItemSummary }> {
+    const typed = Object.values(values).some(value => value.trim())
+    const candidates = (await listVaultItems(conn))
+        .filter(item => isRegistryItem(item) && vaultRegistryKey(item) === key && !item.sharedWithAll && !item.agentIds.includes(engineAgentId))
+        .sort((a, b) => b.agentIds.length - a.agentIds.length || b.updatedAt.localeCompare(a.updatedAt))
+    const lend = typed ? undefined : candidates.find(item => item.status === 'active' && item.authMethodId === authMethodId)
+    return { lend, join: lend ? undefined : candidates.find(item => item.status !== 'active' || (typed && item.agentIds.length === 0)) }
+}
 
 // Where an install goes. The Vault item the coworker already draws this account from, which only
 // someone allowed to change it for every coworker using it may compile again. A new account goes to
 // the Vault when the box keeps one, unless the coworker already holds the app
 // in its own folder (it is reconfigured where it is) or its sign-in is one the Vault does not hold yet.
-async function vaultInstallTarget(agentId: string, key: string, methodKind: string, actor?: Actor): Promise<VaultInstallTarget | null> {
+// A person connecting an app the Vault already holds reuses its entry. A coworker's own call never
+// does: it would hand itself an account nobody gave it. Nor does `ownEntry`.
+async function vaultInstallTarget(agentId: string, key: string, method: AuthMethod, values: Record<string, string>, ownEntry: boolean, actor?: Actor): Promise<VaultInstallTarget | null> {
     const { conn, engineAgentId } = await resolveAgentTarget(agentId, 'manage', actor)
     // A box without a Vault takes the path it always took, with no read more than the capability.
     if (!(await supportsVault(conn))) return null
     const entry = (await readRegistry(conn, engineAgentId)).services[key]
     if (entry && !entry.vaultItemId) return null
-    if (!entry && !VAULT_METHOD_KINDS.has(methodKind)) return null
+    if (!entry && !VAULT_METHOD_KINDS.has(method.kind)) return null
     // An entry of the Vault is never compiled into a sign-in the Vault does not hold yet.
-    if (entry?.vaultItemId && !VAULT_METHOD_KINDS.has(methodKind)) throw new AccessDeniedError('vaultMethodUnsupported')
+    if (entry?.vaultItemId && !VAULT_METHOD_KINDS.has(method.kind)) throw new AccessDeniedError('vaultMethodUnsupported')
     const ctx = await vaultContext(actor)
     const createdBy = signerIdOf(ctx.actor)
-    if (!entry?.vaultItemId) return { conn, engineAgentId, itemId: null, createdBy, ctx }
+    if (!entry?.vaultItemId) {
+        if (ctx.actor.kind === 'workspace' || ownEntry) return { conn, engineAgentId, itemId: null, createdBy, ctx }
+        const { lend, join } = await vaultEntryToReuse(conn, engineAgentId, key, method.id, values)
+        if (lend) return { conn, engineAgentId, itemId: null, createdBy, ctx, lend }
+        const joining = !!join && (await canChangeItem(ctx.actor, join, ctx, engineAgentId))
+        return { conn, engineAgentId, itemId: joining ? join.id : null, createdBy, ctx, joining }
+    }
     await assertCanChangeItem(ctx.actor, await getVaultItem(conn, entry.vaultItemId), ctx, engineAgentId)
     return { conn, engineAgentId, itemId: entry.vaultItemId, createdBy, ctx }
 }
@@ -563,6 +592,7 @@ async function vaultInstallTarget(agentId: string, key: string, methodKind: stri
 async function markVaultNeedsConfig(target: VaultInstallTarget, manifest: ServiceManifest, authMethodId: string, instance: ServiceInstanceSeed | null): Promise<void> {
     if (target.itemId) {
         await patchVaultItem(target.conn, target.itemId, { status: 'needs_config', authMethodId })
+        if (target.joining) await attachVaultItem(target.conn, target.itemId, target.engineAgentId)
         return
     }
     await createVaultItem(target.conn, {

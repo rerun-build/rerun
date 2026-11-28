@@ -116,14 +116,21 @@ The [Chief of Staff](/chief-of-staff) manages the Vault for you. Ask it "what is
 
 ## From a coworker
 
-Apps you install from a coworker's **Apps** tab go to the Vault too, switched on for that coworker only. So do the apps a coworker is given when it is created, or that an AI assistant attaches to it through the [Rerun API](/api/introduction): they wait in the Vault until you connect them, unless they need nothing to connect. Paid apps stay with the coworker. Open the Vault to hand them to other coworkers.
+Apps you install for a coworker, from its **Apps** tab or from a suggestion in the chat, go to the Vault too, without a second card for an app the Vault already holds:
+
+- An account of the app already connected in the Vault is lent to the coworker as it is, with no new sign-in.
+- Another way to connect, or a key you type, gives the coworker an entry of its own: the account the other coworkers use does not change.
+- An entry still waiting on its sign-in, or connected but used by no coworker any more, is taken back and set up for the coworker, as long as you may change it.
+- Otherwise the app gets a new entry, switched on for that coworker only.
+
+The apps a coworker is given when it is created, or that an AI assistant attaches to it through the [Rerun API](/api/introduction), follow the same rules: an account already connected is lent at once, the others wait in the Vault until you connect them, unless they need nothing to connect. Paid apps stay with the coworker. Open the Vault to hand them to other coworkers.
 
 In a coworker's **Apps** tab:
 
-- An app, server or secret lent by the Vault is a tile under **Installed**, like the coworker's own apps. **Remove** in its menu only takes it away from that coworker: it stays in the Vault, for the other coworkers and for later. An entry shared with every coworker cannot be removed there: **Every coworker gets it from the Vault. Change it there.**
+- An app, server or secret lent by the Vault is a tile under **Installed**, like the coworker's own apps. **Remove** in its menu only takes it away from that coworker: it stays in the Vault, for the other coworkers and for later, and installing the app again gives the coworker that same entry. An entry shared with every coworker cannot be removed there: **Every coworker gets it from the Vault. Change it there.**
 - **Vault** lists every entry the coworker does not have yet, each with **Add**.
 
-When a coworker suggests an app in the chat and the Vault already holds an account of it, the card offers **Use** that account in one click, or **New account**.
+When a coworker suggests an app in the chat and the Vault already holds an account of it, the card offers **Use** that account in one click, or **New account**, which connects another account of the app, kept in the Vault as an entry of its own.
 
 The [iPhone app](/iphone-app) offers the same: in that card, in the card of an app the coworker added, and on an app of a coworker's **Apps** screen that needs a sign-in. The coworker gets the account at once and the conversation goes on. Only a member who manages the coworker's Box can lend it an account; the others see why under the button. A coworker whose own copy of the app still waits on its sign-in drops that copy when it is lent an account, so the app reads as connected. The copy leaves the Vault too when no other coworker holds it and nobody ever signed in to it; otherwise it stays there for an admin to delete.
 
