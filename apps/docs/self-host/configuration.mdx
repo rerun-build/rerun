@@ -136,6 +136,8 @@ Each one switches a feature on. Empty means the feature is off, and the rest of 
 | `COMPOSIO_USER_NAMESPACE` | `local` | Keeps the connected accounts of several installs apart when they share one Composio project. |
 | `BRAVE_SEARCH_API_KEY` | empty | Web search for the coworkers, through the [Brave Search API](https://brave.com/search/api). |
 | `KEIROLABS_API_KEY` | empty | Web search for the coworkers, through [Keirolabs](https://keirolabs.cloud). One of the two keys is enough; with both set, Brave answers. |
+| `WEB_SEARCH_PROVIDER` | empty | Set to `keenable` to search the web without any key, through [Keenable](https://keenable.ai). It is opt-in: the queries your coworkers search leave your install for Keenable, and it then answers instead of Brave and Keirolabs. |
+| `KEENABLE_API_KEY` | empty | Optional, with `WEB_SEARCH_PROVIDER=keenable`. Lifts Keenable's rate limit, which is per IP address without a key. |
 | `FIRECRAWL_API_KEY` | empty | Reading websites through [Firecrawl](https://firecrawl.dev), including your company site when the Chief of Staff builds the Brain. |
 | `RERUN_FIRECRAWL_BASE_URL` | `https://api.firecrawl.dev` | Another Firecrawl address, for a Firecrawl you host. |
 | `APIFY_TOKEN` | empty | LinkedIn and Google Maps research during onboarding, through [Apify](https://apify.com). |

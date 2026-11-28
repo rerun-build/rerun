@@ -219,7 +219,7 @@ The share link starts with `RERUN_HUB_BASE_URL`, and docker compose does not set
 
 ## Web search does not work
 
-Coworkers search the web through Brave or Keirolabs. Set `BRAVE_SEARCH_API_KEY` or `KEIROLABS_API_KEY` and run `docker compose up -d`.
+Coworkers search the web through Brave or Keirolabs. Set `BRAVE_SEARCH_API_KEY` or `KEIROLABS_API_KEY` and run `docker compose up -d`. To search without a key, set `WEB_SEARCH_PROVIDER=keenable`; a search that fails with 429 has hit Keenable's per-IP rate limit, which `KEENABLE_API_KEY` lifts.
 
 ## An engine misbehaves after an update
 

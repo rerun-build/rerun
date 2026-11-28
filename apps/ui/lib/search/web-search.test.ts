@@ -1,19 +1,24 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { searchBrave } from '@/lib/search/brave'
+import { searchKeenable } from '@/lib/search/keenable'
 import { searchKeirolabs } from '@/lib/search/keirolabs'
 
 import { searchTheWeb } from './web-search'
 
 vi.mock('@/lib/search/brave', () => ({ searchBrave: vi.fn() }))
+vi.mock('@/lib/search/keenable', () => ({ searchKeenable: vi.fn() }))
 vi.mock('@/lib/search/keirolabs', () => ({ searchKeirolabs: vi.fn() }))
 
 const BRAVE = { status: 200, ok: true, results: [{ title: 'Brave', url: 'https://brave.test', snippet: '' }] }
+const KEENABLE = { status: 200, ok: true, results: [{ title: 'Keenable', url: 'https://keenable.test', snippet: '' }] }
 const KEIROLABS = { status: 200, ok: true, results: [{ title: 'Keirolabs', url: 'https://keirolabs.test', snippet: '' }] }
 
 describe('searchTheWeb', () => {
     beforeEach(() => {
         vi.clearAllMocks()
+        delete process.env.WEB_SEARCH_PROVIDER
+        vi.mocked(searchKeenable).mockResolvedValue(KEENABLE)
         vi.mocked(searchBrave).mockResolvedValue(null)
         vi.mocked(searchKeirolabs).mockResolvedValue(null)
     })
@@ -43,5 +48,19 @@ describe('searchTheWeb', () => {
 
         await expect(searchTheWeb('rerun', 20)).resolves.toEqual({ status: 429, ok: false, results: [] })
         expect(searchKeirolabs).not.toHaveBeenCalled()
+    })
+
+    it('never searches with Keenable unless it is chosen', async () => {
+        await expect(searchTheWeb('rerun', 20)).resolves.toBeNull()
+        expect(searchKeenable).not.toHaveBeenCalled()
+    })
+
+    it('searches with Keenable when WEB_SEARCH_PROVIDER says so, whatever keys are set', async () => {
+        process.env.WEB_SEARCH_PROVIDER = 'keenable'
+        vi.mocked(searchBrave).mockResolvedValue(BRAVE)
+
+        await expect(searchTheWeb('rerun', 20)).resolves.toEqual(KEENABLE)
+        expect(searchKeenable).toHaveBeenCalledWith('rerun', 20)
+        expect(searchBrave).not.toHaveBeenCalled()
     })
 })
