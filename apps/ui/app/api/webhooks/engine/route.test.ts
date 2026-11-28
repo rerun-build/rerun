@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { resolveWorkspaceMemberEmail, resolveWorkspaceOwner } from '@/app/api/_services/workspace-owner.service'
 import { ensureSessionRow } from '@/app/api/_services/chat.service'
-import { alertSignedOutAccounts, closeReconnectedAccounts } from '@/app/api/_services/ai-account-alert.service'
+import { alertSignedOutAccounts, closeReconnectedAccounts, releaseSignedOutSessions } from '@/app/api/_services/ai-account-alert.service'
 import { pushNotification, sendNotificationEmail } from '@rerun/cloud/email'
 import { loadPresence } from '@/app/api/_services/presence.service'
 import { captureServer } from '@rerun/analytics/server'
@@ -22,7 +22,7 @@ vi.mock('@/app/api/_services/chat.service', () => ({ ensureSessionRow: vi.fn() }
 vi.mock('@/app/api/_services/presence.service', () => ({ loadPresence: vi.fn().mockResolvedValue([]) }))
 vi.mock('@rerun/cloud/email', () => ({ sendNotificationEmail: vi.fn(), BANNER_WARM_INLINE_MS: 0, alertBanner: vi.fn(async () => undefined), emailPortrait: vi.fn(async () => undefined), buildUnsubscribeUrl: (userId: string) => `https://app.rerun.build/unsubscribe?u=${userId}`, pushNotification: vi.fn() }))
 vi.mock('@/lib/og/alert-crew', () => ({ coworkerAlertBoard: vi.fn(async () => null) }))
-vi.mock('@/app/api/_services/ai-account-alert.service', () => ({ alertSignedOutAccounts: vi.fn(), closeReconnectedAccounts: vi.fn() }))
+vi.mock('@/app/api/_services/ai-account-alert.service', () => ({ alertSignedOutAccounts: vi.fn(), closeReconnectedAccounts: vi.fn(), releaseSignedOutSessions: vi.fn() }))
 vi.mock('@rerun/cloud/engines', () => ({ claimPoolEngine: vi.fn() }))
 const afterTasks = vi.hoisted(() => [] as Promise<unknown>[])
 vi.mock('next/server', async importOriginal => ({ ...(await importOriginal<typeof import('next/server')>()), after: (task: () => Promise<unknown>) => void afterTasks.push(task()) }))
@@ -541,6 +541,13 @@ describe('POST /api/webhooks/engine', () => {
             await afterResponse()
 
             expect(closeReconnectedAccounts).toHaveBeenCalledWith(WORKSPACE_ID)
+        })
+
+        it('releases the conversations the refused account stopped once it is connected again, for its provider', async () => {
+            await POST(request({ event: 'box.connection.connected', kind: 'info', agentId: null, message: 'claude', timestamp: '2026-11-24T10:00:00.000Z' }))
+            await afterResponse()
+
+            expect(releaseSignedOutSessions).toHaveBeenCalledWith(WORKSPACE_ID, 'claude')
         })
 
         it('stores a heads-up of the Chief of Staff for the member whose thread it ran in, and pushes it under its name', async () => {
