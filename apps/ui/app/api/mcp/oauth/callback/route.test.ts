@@ -100,8 +100,17 @@ describe('GET /api/mcp/oauth/callback', () => {
         const html = await res.text()
         expect(html).toContain('mcp-oauth-success')
         expect(html).toContain('"serverName":"acme"')
-        expect(putMcpToken).toHaveBeenCalledWith({ baseUrl: 'https://engine.test', apiKey: null }, 'engine-agent', 'acme', expect.objectContaining({ accessToken: 'access', refreshToken: 'refresh' }))
+        expect(putMcpToken).toHaveBeenCalledWith({ baseUrl: 'https://engine.test', apiKey: null }, 'engine-agent', 'acme', expect.objectContaining({ accessToken: 'access', refreshToken: 'refresh', resource: CONTEXT.mcpUrl }))
         expect(deletesStateCookie(res)).toBe(true)
+    })
+
+    // BrowserAct (RER-401) refuses a refresh that does not name the resource its sign-in named.
+    it('hands the engine the resource the server advertised, for its refreshes to name it again', async () => {
+        withContext({ ...CONTEXT, mcpUrl: 'https://mcp.acme.test/mcp/', resource: 'https://mcp.acme.test/mcp' })
+
+        await callback({ code: 'code-1', state: STATE })
+
+        expect(putMcpToken).toHaveBeenCalledWith(expect.anything(), 'engine-agent', 'acme', expect.objectContaining({ resource: 'https://mcp.acme.test/mcp' }))
     })
 
     it('reports the error the provider sent back without exchanging anything', async () => {
@@ -399,7 +408,7 @@ describe('GET /api/mcp/oauth/callback with a Vault', () => {
             const res = await callback({ code: 'code-1', state: STATE })
 
             expect(await res.text()).toContain('mcp-oauth-success')
-            expect(putVaultToken).toHaveBeenCalledWith(expect.anything(), 'item-1', 'acme', expect.objectContaining({ accessToken: 'access', tokenEndpoint: CONTEXT.tokenEndpoint }))
+            expect(putVaultToken).toHaveBeenCalledWith(expect.anything(), 'item-1', 'acme', expect.objectContaining({ accessToken: 'access', tokenEndpoint: CONTEXT.tokenEndpoint, resource: CONTEXT.mcpUrl }))
             expect(putMcpToken).not.toHaveBeenCalled()
             expect(deletesStateCookie(res)).toBe(true)
         })
