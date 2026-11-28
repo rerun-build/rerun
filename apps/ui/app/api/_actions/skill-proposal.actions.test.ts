@@ -43,7 +43,7 @@ describe('the skill proposals of a conversation with the Chief of Staff', () => 
     it('lets a workspace admin decide one, touching no coworker session', async () => {
         expect(await decideSkillProposalAction('conversation-1', 'p1', 'accept')).toEqual({ success: true, proposal })
         expect(mocks.resolveAgentTarget).toHaveBeenCalledWith('cos-row', 'manage')
-        expect(mocks.decideSkillProposal).toHaveBeenCalledWith(conn, 'foreman', 'p1', 'accept')
+        expect(mocks.decideSkillProposal).toHaveBeenCalledWith(conn, 'foreman', 'p1', 'accept', undefined)
         expect(mocks.decideCoworkerSkillProposal).not.toHaveBeenCalled()
     })
 
@@ -67,7 +67,18 @@ describe('the skill proposals of a conversation with the Chief of Staff', () => 
         expect(mocks.listSkillProposals).toHaveBeenCalledWith(conn, 'e1', 's1')
         mocks.decideCoworkerSkillProposal.mockResolvedValue(proposal)
         expect(await decideSkillProposalAction('session-1', 'p1', 'accept')).toEqual({ success: true, proposal })
-        expect(mocks.decideCoworkerSkillProposal).toHaveBeenCalledWith({ agentId: 'agent-1', conn, engineAgentId: 'e1', engineSessionId: 's1' }, 'session-1', 'p1', 'accept')
+        expect(mocks.decideCoworkerSkillProposal).toHaveBeenCalledWith({ agentId: 'agent-1', conn, engineAgentId: 'e1', engineSessionId: 's1' }, 'session-1', 'p1', 'accept', undefined, undefined)
         expect(mocks.clearForemanSkillProposalAttention).not.toHaveBeenCalled()
+    })
+
+    it('hands the engine the model the conversation is set to', async () => {
+        const pick = { connectionId: 'codex-1', model: 'gpt-6-sol' }
+        await decideSkillProposalAction('conversation-1', 'p1', 'accept', pick)
+        expect(mocks.decideSkillProposal).toHaveBeenCalledWith(conn, 'foreman', 'p1', 'accept', pick)
+
+        mocks.getSessionEngineContext.mockResolvedValue({ agentId: 'agent-1', conn, engineAgentId: 'e1', engineSessionId: 's1' })
+        mocks.decideCoworkerSkillProposal.mockResolvedValue(proposal)
+        await decideSkillProposalAction('session-1', 'p1', 'accept', pick)
+        expect(mocks.decideCoworkerSkillProposal).toHaveBeenCalledWith({ agentId: 'agent-1', conn, engineAgentId: 'e1', engineSessionId: 's1' }, 'session-1', 'p1', 'accept', undefined, pick)
     })
 })

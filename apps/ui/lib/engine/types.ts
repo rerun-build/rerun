@@ -174,6 +174,9 @@ export type EngineSkillWithSource = EngineSkill & { fromConnector: boolean }
 export type EngineSkillSummary = z.infer<typeof engineSkillSummarySchema>
 export type EngineSkillFilePayload = SkillFilePayload
 export type EngineSkillProposal = SkillProposal
+// The model a conversation is set to, carried by the accept of a skill proposal: the job writes on it
+// when the subscription the proposal was made on is out.
+export type EngineModelPick = { connectionId: string; model: string }
 export type EngineProvider = Provider
 export type EngineVerbosity = Verbosity
 export type EngineSchedule = Schedule

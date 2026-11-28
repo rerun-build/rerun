@@ -1,6 +1,7 @@
 'use client'
 
-import { reasoningEffortSchema, type ReasoningEffort } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, reasoningEffortSchema, type ReasoningEffort } from '@rerun/contracts'
+import type { EngineModelPick } from '@/lib/engine/types'
 import { useCallback, useSyncExternalStore } from 'react'
 
 // The model picked in a conversation, sent as a per-message override. Kept in localStorage and
@@ -108,6 +109,13 @@ function subscribe(agentId: string, conversationId: string | undefined, listener
 // For a transport building its body at send time, outside of any render.
 export function readAgentModel(agentId: string, conversationId?: string): ModelSelection {
     return getSnapshot(agentId, conversationId)
+}
+
+// What accepting a skill proposal carries, read at the click: nothing while the conversation follows
+// the coworker. The Chief of Staff's pick covers the agent, as everywhere else.
+export function readModelPick(agentId: string, conversationId: string): EngineModelPick | undefined {
+    const { connectionId, model } = readAgentModel(agentId, agentId === FOREMAN_AGENT_ID ? undefined : conversationId)
+    return connectionId && model ? { connectionId, model } : undefined
 }
 
 // The first message of a new chat opened its session: the pick made before it moves there. General's

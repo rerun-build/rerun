@@ -7,6 +7,7 @@ import { decideSkillProposalAction, listSkillProposalsAction } from '@/app/api/_
 import { nextPinnedIds, RELEASE_DELAY_MS, settledPinnedIds } from '@rerun/contracts'
 import type { EngineSkillProposal } from '@/lib/engine/types'
 import { onPageShownOrHidden } from '@/lib/desktop-shell/attention'
+import { readModelPick } from '@/hooks/useAgentModel'
 
 // The writing job is bounded on the engine (a timeout, and a sweep on restart), so the poll can
 // follow it to the end: quick at first, then relaxed for the minutes a CLI provider can take.
@@ -47,7 +48,7 @@ function reload(current: Loaded, sessionId: string, proposals: Map<string, Engin
  * hands the row back to the transcript at once, since the writing runs in the background, and a
  * dismissal is released a beat later. The two never show the same proposal at once.
  */
-export function useSkillProposals(sessionId: string | null, runStatus: string) {
+export function useSkillProposals(agentId: string, sessionId: string | null, runStatus: string) {
     const [loaded, setLoaded] = useState<Loaded>(EMPTY)
     const [pendingId, setPendingId] = useState<string | null>(null)
     const errorText = useErrorText()
@@ -134,7 +135,7 @@ export function useSkillProposals(sessionId: string | null, runStatus: string) {
             if (!sessionId) return
             setPendingId(proposalId)
             try {
-                const result = await decideSkillProposalAction(sessionId, proposalId, decision)
+                const result = await decideSkillProposalAction(sessionId, proposalId, decision, decision === 'accept' ? readModelPick(agentId, sessionId) : undefined)
                 if (result.error) toast.error(errorText(result))
                 if (!result.proposal) return void refresh()
                 const proposal = result.proposal
@@ -143,7 +144,7 @@ export function useSkillProposals(sessionId: string | null, runStatus: string) {
                 setPendingId(null)
             }
         },
-        [sessionId, refresh, errorText]
+        [agentId, sessionId, refresh, errorText]
     )
 
     return { proposals, pinned, pinnedIds, decide, pendingId, refresh, seed }

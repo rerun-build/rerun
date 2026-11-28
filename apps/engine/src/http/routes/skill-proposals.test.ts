@@ -7,9 +7,11 @@ process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-proposal-route
 process.env.RERUN_API_KEY = ''
 
 const applied: string[] = []
+const picks = new Map<string, unknown>()
 vi.mock('../../skills/apply-proposal.js', () => ({
-    applySkillProposal: async (_agent: unknown, row: { id: string }) => {
+    applySkillProposal: async (_agent: unknown, row: { id: string }, picked?: unknown) => {
         applied.push(row.id)
+        picks.set(row.id, picked)
     },
 }))
 
@@ -61,6 +63,19 @@ describe('skill proposal routes', () => {
         expect(res.status).toBe(202)
         expect((await getSkillProposal(id, row.id))?.status).toBe('accepted')
         expect(applied).toContain(row.id)
+    })
+
+    it('hands the job the model the conversation is set to', async () => {
+        const row = await proposal()
+        const picked = { connectionId: 'codex-1', model: 'gpt-5.5' }
+        await app.request(`/agents/${id}/skill-proposals/${row.id}/accept`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(picked) })
+        expect(picks.get(row.id)).toEqual(picked)
+    })
+
+    it('runs the job with no model when the click carries none', async () => {
+        const row = await proposal()
+        await app.request(`/agents/${id}/skill-proposals/${row.id}/accept`, { method: 'POST' })
+        expect(picks.get(row.id)).toBeUndefined()
     })
 
     it('runs the job once however many times the row is clicked', async () => {

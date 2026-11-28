@@ -1,7 +1,11 @@
 import { z } from 'zod'
-import { connectorSkillReadOnlyError } from '@rerun/contracts'
-import { modelFor } from '../agents/providers.js'
-import { isUsable, resolveRunModel } from '../agents/availability.js'
+import { connectorSkillReadOnlyError, RERUN_CONNECTION_ID } from '@rerun/contracts'
+import { modelFor, type ModelOverride } from '../agents/providers.js'
+import { isUsable, resolveRunModel, type RunModel } from '../agents/availability.js'
+import { pickBackup } from '../agents/backups.js'
+import { armPlanLimitLatch, isPlanLimitLatched } from '../connections/plan-limits.js'
+import { isBudgetLatched } from '../runtime/budget-latch.js'
+import { classifyProviderError, RUN_ERROR_CODES } from '../runtime/provider-errors.js'
 import { ensureCliAuth } from '../connections/cli-auth.js'
 import { syncCodexAuth } from '../connections/codex-auth.js'
 import { generateStructured } from '../agents/structured.js'
@@ -69,15 +73,71 @@ async function agentForProposal(agent: LoadedAgent, row: SkillProposalRow): Prom
     return { ...agent, resolved }
 }
 
-export async function applySkillProposal(agent: LoadedAgent, row: SkillProposalRow): Promise<void> {
-    const writer = await agentForProposal(agent, row).catch(() => agent)
+const isOut = (run: RunModel): boolean => Boolean(run.connection && run.connection.id !== RERUN_CONNECTION_ID && isPlanLimitLatched(run.connection.id))
+
+// The Rerun credit is spent only when someone asked for it: by picking it in the conversation, or as
+// the last resort of the backups. A coworker merely following a Rerun workspace default did not.
+function takesOver(run: RunModel, spentId: string, rerunAsked: boolean): boolean {
+    const id = run.connection?.id
+    if (!id || id === spentId || !isUsable(run.connection, run.model)) return false
+    return id === RERUN_CONNECTION_ID ? rerunAsked && !isBudgetLatched() : !isPlanLimitLatched(id)
+}
+
+// A subscription out of its window fails the job within seconds, the same way it fails a chat run:
+// the model picked in the conversation since, then the coworker's own pair, then the backups a run
+// moves to.
+async function freeWriter(agent: LoadedAgent, writer: LoadedAgent, picked: LoadedAgent | null): Promise<LoadedAgent> {
+    if (!isOut(writer.resolved)) return writer
+    const spentId = writer.resolved.connection!.id
+    if (picked && takesOver(picked.resolved, spentId, true)) return picked
+    if (takesOver(agent.resolved, spentId, false)) return agent
+    const backup = await pickBackup(new Set([spentId]))
+    return backup ? { ...agent, resolved: backup } : writer
+}
+
+async function pickedWriter(agent: LoadedAgent, picked: ModelOverride | undefined): Promise<LoadedAgent | null> {
+    if (!picked?.model) return null
+    const resolved = await resolveRunModel(agent, { connectionId: picked.connectionId, model: picked.model }).catch(() => null)
+    return resolved ? { ...agent, resolved } : null
+}
+
+async function draftOn(writer: LoadedAgent, row: SkillProposalRow, abortSignal: AbortSignal): Promise<Awaited<ReturnType<typeof draft>>> {
     const { provider, connection } = writer.resolved
     let release = () => {}
     try {
+        release = await ensureCliAuth(provider, connection)
+        return await draft(writer, row, abortSignal)
+    } finally {
+        release()
+        if (provider === 'codex') await syncCodexAuth(connection).catch(() => {})
+    }
+}
+
+// The job may be the first call to meet the limit: it latches the subscription as a run would and
+// carries on once on the next free model, so the next proposal does not knock on the same door.
+async function draftOrMoveOn(agent: LoadedAgent, writer: LoadedAgent, picked: LoadedAgent | null, row: SkillProposalRow, abortSignal: AbortSignal): Promise<Awaited<ReturnType<typeof draft>>> {
+    try {
+        return await draftOn(writer, row, abortSignal)
+    } catch (err) {
+        const { provider, connection } = writer.resolved
+        if (!connection || connection.id === RERUN_CONNECTION_ID || abortSignal.aborted || classifyProviderError(provider, err) !== RUN_ERROR_CODES.usageLimit) throw err
+        armPlanLimitLatch(connection.id)
+        const next = await freeWriter(agent, writer, picked)
+        if (next === writer) throw err
+        logger.warn({ agent: agent.id, proposal: row.id, from: `${connection.id}:${writer.resolved.model}`, to: `${next.resolved.connection?.id}:${next.resolved.model}` }, 'subscription limit reached, writing the skill on another model')
+        return draftOn(next, row, abortSignal)
+    }
+}
+
+// `picked` is the model the conversation is set to now, which the accept click carries: it may have
+// moved off the subscription the proposal was made on.
+export async function applySkillProposal(agent: LoadedAgent, row: SkillProposalRow, picked?: ModelOverride): Promise<void> {
+    try {
         if (row.mode === 'edit' && (!row.slug || !skillExists(agent.id, row.slug))) throw new Error('That skill no longer exists.')
 
-        release = await ensureCliAuth(provider, connection)
-        const { name, description, body, slug } = await draft(writer, row, AbortSignal.timeout(APPLY_TIMEOUT_MS))
+        const pickedAgent = await pickedWriter(agent, picked)
+        const writer = await freeWriter(agent, await agentForProposal(agent, row).catch(() => agent), pickedAgent)
+        const { name, description, body, slug } = await draftOrMoveOn(agent, writer, pickedAgent, row, AbortSignal.timeout(APPLY_TIMEOUT_MS))
         const service = (await connectorSkillOwners(agent.id)).get(slug)
         if (service) throw new Error(connectorSkillReadOnlyError(slug, service))
 
@@ -87,8 +147,5 @@ export async function applySkillProposal(agent: LoadedAgent, row: SkillProposalR
         const error = err instanceof Error ? err.message : String(err)
         logger.warn({ err: error, agent: agent.id, proposal: row.id }, 'skill proposal apply failed')
         await transitionSkillProposal(agent.id, row.id, ['accepted'], 'failed', { error })
-    } finally {
-        release()
-        if (provider === 'codex') await syncCodexAuth(connection).catch(() => {})
     }
 }

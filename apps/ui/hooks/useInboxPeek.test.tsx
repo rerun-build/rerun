@@ -8,7 +8,8 @@ vi.mock('@/app/api/_actions/session.actions', () => ({ peekPendingRequestAction:
 vi.mock('@/app/api/_actions/foreman-conversation.actions', () => ({ peekForemanPendingRequestAction: mocks.peekForemanPendingRequestAction }))
 vi.mock('@/lib/chat/send-session-message', () => ({ sendSessionMessage: mocks.sendSessionMessage, sendForemanThreadMessage: mocks.sendForemanThreadMessage }))
 vi.mock('@/lib/notifications/open-conversation', () => ({ resolveSessionId: async () => null }))
-vi.mock('@/hooks/useAgentModel', () => ({ readAgentModel: () => ({}) }))
+const pick = { connectionId: 'codex-1', model: 'gpt-6-sol' }
+vi.mock('@/hooks/useAgentModel', () => ({ readAgentModel: () => ({}), readModelPick: () => pick }))
 vi.mock('@/app/api/_actions/skill-proposal.actions', () => ({ decideSkillProposalAction: mocks.decideSkillProposalAction }))
 
 const { FOREMAN_AGENT_ID } = await import('@rerun/contracts')
@@ -97,7 +98,7 @@ describe('useInboxPeek', () => {
         await act(async () => {
             outcome = await seen.decide('proposal-1', 'dismiss')
         })
-        expect(mocks.decideSkillProposalAction).toHaveBeenCalledWith('session-1', 'proposal-1', 'dismiss')
+        expect(mocks.decideSkillProposalAction).toHaveBeenCalledWith('session-1', 'proposal-1', 'dismiss', undefined)
         expect(outcome).toEqual({ proposal: { id: 'proposal-1', status: 'dismissed' } })
     })
 
@@ -121,5 +122,6 @@ describe('useInboxPeek', () => {
             outcome = await seen.decide('proposal-1', 'accept')
         })
         expect(outcome).toBe('failed')
+        expect(mocks.decideSkillProposalAction).toHaveBeenCalledWith('session-1', 'proposal-1', 'accept', pick)
     })
 })

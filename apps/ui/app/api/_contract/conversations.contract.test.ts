@@ -446,7 +446,7 @@ describe('a conversation in the mobile app', () => {
             const { POST } = await import('@/app/api/v1/conversations/[id]/skill-proposals/route')
             const decided = await expectContract(mobileApi.decideSkillProposal, await callRoute(POST, mobileApi.decideSkillProposal, { params: { id: BAKERIES }, body: { proposalId: 'prop-qualify', decision: 'accept' } }))
             expect(decided).toEqual({ proposal: { ...proposal, status: 'accepted' } })
-            expect(engine.decideSkillProposal).toHaveBeenCalledWith(expect.objectContaining({ apiKey: 'key' }), 'scout', 'prop-qualify', 'accept')
+            expect(engine.decideSkillProposal).toHaveBeenCalledWith(expect.objectContaining({ apiKey: 'key' }), 'scout', 'prop-qualify', 'accept', undefined)
             expect(state.db?.writes('sessions')).toEqual([
                 {
                     method: 'update',

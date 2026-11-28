@@ -9,10 +9,15 @@ process.env.RERUN_DATA_DIR = dataDir
 process.env.RERUN_HUB_BASE_URL = 'https://hub.example.com'
 process.env.RERUN_API_KEY = 'hub-key'
 
-const draft = { value: { name: 'Publishing', description: 'How posts go out', body: 'Draft, review, publish.\n\nEvery post ends with a CTA.' } as unknown, fail: false }
+const draft = { value: { name: 'Publishing', description: 'How posts go out', body: 'Draft, review, publish.\n\nEvery post ends with a CTA.' } as unknown, fail: false, failOnceWith: null as string | null }
 
 vi.mock('../agents/structured.js', () => ({
     generateStructured: async () => {
+        if (draft.failOnceWith) {
+            const message = draft.failOnceWith
+            draft.failOnceWith = null
+            throw new Error(message)
+        }
         if (draft.fail) throw new Error('model is down')
         return draft.value
     },
@@ -47,9 +52,12 @@ const { SKILL_STYLE } = await import('./style.js')
 const { insertSkillProposal, getSkillProposal, transitionSkillProposal } = await import('../db/repos/skill-proposals.js')
 const { skillsDir, skillDir, connectionsDir } = await import('../config/paths.js')
 const { rm } = await import('node:fs/promises')
-const { DEFAULT_CONNECTION_MODELS, CONNECTION_TOKEN_KEY, agentConfigSchema } = await import('@rerun/contracts')
+const { DEFAULT_CONNECTION_MODELS, CONNECTION_TOKEN_KEY, RERUN_CONNECTION_ID, agentConfigSchema } = await import('@rerun/contracts')
+const { armBudgetLatch, clearBudgetLatch } = await import('../runtime/budget-latch.js')
 const { createConnection, ensureRerunConnection } = await import('../connections/store.js')
 const { resolveConfiguredModel } = await import('../agents/availability.js')
+const { armPlanLimitLatch, isPlanLimitLatched } = await import('../connections/plan-limits.js')
+const { clearBoxBackups, writeBoxBackups } = await import('../connections/backups.js')
 
 const id = 'applier'
 const agent = { id, resolved: { connection: null, provider: 'rerun', model: 'rerun-max' } } as any
@@ -80,6 +88,7 @@ beforeEach(() => {
     calls.cliAuth = []
     calls.codexSync = []
     draft.fail = false
+    draft.failOnceWith = null
     draft.value = { name: 'Publishing', description: 'How posts go out', body: 'Draft, review, publish.\n\nEvery post ends with a CTA.' }
 })
 
@@ -140,8 +149,10 @@ describe('applySkillProposal', () => {
 // The agent follows the box default, which is the keyless Rerun connection, while the user chats
 // on a subscription picked in the composer: the case where the Rerun budget is spent.
 describe('the model the skill is written with', () => {
+    // Every connection gets a fresh id, so a latch armed in one test never reaches the next.
     beforeEach(async () => {
         await rm(connectionsDir(), { recursive: true, force: true })
+        await clearBoxBackups()
     })
 
     async function rerunAgent() {
@@ -210,6 +221,161 @@ describe('the model the skill is written with', () => {
 
         expect(calls.writtenBy[0]).toBe(agent.resolved)
         expect(calls.cliAuth).toEqual([{ provider: 'rerun', connection: agent.resolved.connection.id }])
+    })
+
+    async function agentOn(connectionId: string, provider: 'claude' | 'codex', model: string) {
+        const config = agentConfigSchema.parse({ name: 'applier', connectionId, provider, model })
+        return { id, config, soul: '', install: '', env: {}, resolved: await resolveConfiguredModel(config) } as any
+    }
+
+    it('writes on the first free backup when the subscription the conversation ran on is out', async () => {
+        await ensureRerunConnection()
+        const spent = await subscription('claude')
+        const backup = await subscription('codex')
+        const backupModel = DEFAULT_CONNECTION_MODELS.codex[0]!
+        await writeBoxBackups({ backups: [{ connectionId: backup.id, model: backupModel }], rerunCreditLastResort: false })
+        armPlanLimitLatch(spent.id)
+        const agent = await agentOn(spent.id, 'claude', 'claude-haiku-5-5')
+        const row = await accepted({ mode: 'create', slug: null, title: 'Spent Claude' }, { connectionId: spent.id, provider: 'claude', model: 'claude-haiku-5-5' })
+
+        await applySkillProposal(agent, row)
+
+        expect(calls.writtenBy[0]).toMatchObject({ provider: 'codex', model: backupModel })
+        expect(calls.writtenBy[0].connection.id).toBe(backup.id)
+        expect(calls.cliAuth).toEqual([{ provider: 'codex', connection: backup.id }])
+        expect((await getSkillProposal(id, row.id))?.status).toBe('applied')
+    })
+
+    it('writes on the model the coworker was moved to since, when the proposal subscription is out', async () => {
+        await ensureRerunConnection()
+        const spent = await subscription('claude')
+        const moved = await subscription('codex')
+        const movedModel = DEFAULT_CONNECTION_MODELS.codex[0]!
+        armPlanLimitLatch(spent.id)
+        const agent = await agentOn(moved.id, 'codex', movedModel)
+        const row = await accepted({ mode: 'create', slug: null, title: 'Moved' }, { connectionId: spent.id, provider: 'claude', model: 'claude-haiku-5-5' })
+
+        await applySkillProposal(agent, row)
+
+        expect(calls.writtenBy[0]).toBe(agent.resolved)
+        expect(calls.writtenBy[0].connection.id).toBe(moved.id)
+    })
+
+    it('keeps the proposal subscription when no backup is free, so the row says why', async () => {
+        await ensureRerunConnection()
+        const spent = await subscription('claude')
+        armPlanLimitLatch(spent.id)
+        const agent = await agentOn(spent.id, 'claude', 'claude-haiku-5-5')
+        const row = await accepted({ mode: 'create', slug: null, title: 'Nowhere to go' }, { connectionId: spent.id, provider: 'claude', model: 'claude-haiku-5-5' })
+
+        await applySkillProposal(agent, row)
+
+        expect(calls.writtenBy).toHaveLength(1)
+        expect(calls.writtenBy[0].connection.id).toBe(spent.id)
+    })
+
+    it('goes to a backup rather than the Rerun credit when the coworker only follows a Rerun default', async () => {
+        const agent = await rerunAgent()
+        const spent = await subscription('claude')
+        const backup = await subscription('codex')
+        await writeBoxBackups({ backups: [{ connectionId: backup.id, model: DEFAULT_CONNECTION_MODELS.codex[0]! }], rerunCreditLastResort: false })
+        armPlanLimitLatch(spent.id)
+        const row = await accepted({ mode: 'create', slug: null, title: 'Rerun default' }, { connectionId: spent.id, provider: 'claude', model: 'claude-haiku-5-5' })
+
+        await applySkillProposal(agent, row)
+
+        expect(calls.writtenBy.map(run => run.connection.id)).toEqual([backup.id])
+    })
+
+    it('never spends the Rerun credit of a default the coworker follows when no backup is free', async () => {
+        const agent = await rerunAgent()
+        const spent = await subscription('claude')
+        armPlanLimitLatch(spent.id)
+        const row = await accepted({ mode: 'create', slug: null, title: 'Rerun default, no backup' }, { connectionId: spent.id, provider: 'claude', model: 'claude-haiku-5-5' })
+
+        await applySkillProposal(agent, row)
+
+        expect(calls.writtenBy.map(run => run.connection.id)).toEqual([spent.id])
+    })
+
+    it('writes on the model picked in the conversation since, when the proposal subscription is out', async () => {
+        const agent = await rerunAgent()
+        const spent = await subscription('claude')
+        const picked = await subscription('codex')
+        const pickedModel = DEFAULT_CONNECTION_MODELS.codex[0]!
+        armPlanLimitLatch(spent.id)
+        const row = await accepted({ mode: 'create', slug: null, title: 'Picked' }, { connectionId: spent.id, provider: 'claude', model: 'claude-haiku-5-5' })
+
+        await applySkillProposal(agent, row, { connectionId: picked.id, model: pickedModel })
+
+        expect(calls.writtenBy[0]).toMatchObject({ provider: 'codex', model: pickedModel })
+        expect(calls.writtenBy[0].connection.id).toBe(picked.id)
+        expect((await getSkillProposal(id, row.id))?.status).toBe('applied')
+    })
+
+    it('skips a pick still on the spent subscription and goes to a backup', async () => {
+        const agent = await rerunAgent()
+        const spent = await subscription('claude')
+        const backup = await subscription('codex')
+        await writeBoxBackups({ backups: [{ connectionId: backup.id, model: DEFAULT_CONNECTION_MODELS.codex[0]! }], rerunCreditLastResort: false })
+        armPlanLimitLatch(spent.id)
+        const row = await accepted({ mode: 'create', slug: null, title: 'Same pick' }, { connectionId: spent.id, provider: 'claude', model: 'claude-haiku-5-5' })
+
+        await applySkillProposal(agent, row, { connectionId: spent.id, model: 'claude-opus-5-5' })
+
+        expect(calls.writtenBy.map(run => run.connection.id)).toEqual([backup.id])
+    })
+
+    it('skips the Rerun credit picked in the conversation once its budget is spent', async () => {
+        const agent = await rerunAgent()
+        const spent = await subscription('claude')
+        armPlanLimitLatch(spent.id)
+        armBudgetLatch()
+        const row = await accepted({ mode: 'create', slug: null, title: 'Rerun spent' }, { connectionId: spent.id, provider: 'claude', model: 'claude-haiku-5-5' })
+
+        try {
+            await applySkillProposal(agent, row, { connectionId: RERUN_CONNECTION_ID, model: agent.resolved.model })
+        } finally {
+            clearBudgetLatch()
+        }
+
+        expect(calls.writtenBy.map(run => run.connection.id)).toEqual([spent.id])
+    })
+
+    it('writes on the model the coworker was moved to in the same click when the job finds out the limit', async () => {
+        await ensureRerunConnection()
+        const spent = await subscription('claude')
+        const moved = await subscription('codex')
+        draft.failOnceWith = "You've hit your session limit · resets 3pm"
+        const agent = await agentOn(moved.id, 'codex', DEFAULT_CONNECTION_MODELS.codex[0]!)
+        const row = await accepted({ mode: 'create', slug: null, title: 'Moved, found out' }, { connectionId: spent.id, provider: 'claude', model: 'claude-haiku-5-5' })
+
+        await applySkillProposal(agent, row)
+
+        expect(calls.writtenBy.map(run => run.connection.id)).toEqual([spent.id, moved.id])
+        expect((await getSkillProposal(id, row.id))?.status).toBe('applied')
+    })
+
+    it('latches a subscription the job is the first to find out and carries on once on a backup', async () => {
+        await ensureRerunConnection()
+        const spent = await subscription('claude')
+        const backup = await subscription('codex')
+        const backupModel = DEFAULT_CONNECTION_MODELS.codex[0]!
+        await writeBoxBackups({ backups: [{ connectionId: backup.id, model: backupModel }], rerunCreditLastResort: false })
+        draft.failOnceWith = "You've hit your weekly limit · resets Nov 30"
+        const agent = await agentOn(spent.id, 'claude', 'claude-haiku-5-5')
+        const row = await accepted({ mode: 'create', slug: null, title: 'Found out' }, { connectionId: spent.id, provider: 'claude', model: 'claude-haiku-5-5' })
+
+        await applySkillProposal(agent, row)
+
+        expect(calls.writtenBy.map(run => run.connection.id)).toEqual([spent.id, backup.id])
+        expect(calls.cliAuth).toEqual([
+            { provider: 'claude', connection: spent.id },
+            { provider: 'codex', connection: backup.id },
+        ])
+        expect(calls.codexSync).toEqual([backup.id])
+        expect(isPlanLimitLatched(spent.id)).toBe(true)
+        expect((await getSkillProposal(id, row.id))?.status).toBe('applied')
     })
 })
 

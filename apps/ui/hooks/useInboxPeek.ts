@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { peekForemanPendingRequestAction } from '@/app/api/_actions/foreman-conversation.actions'
 import { peekPendingRequestAction } from '@/app/api/_actions/session.actions'
 import { decideSkillProposalAction } from '@/app/api/_actions/skill-proposal.actions'
-import { readAgentModel } from '@/hooks/useAgentModel'
+import { readAgentModel, readModelPick } from '@/hooks/useAgentModel'
 import type { PendingRequestPeek } from '@/lib/chat/pending-request-peek'
 import { sendForemanThreadMessage, sendSessionMessage } from '@/lib/chat/send-session-message'
 import { resolveSessionId } from '@/lib/notifications/open-conversation'
@@ -69,10 +69,10 @@ export function useInboxPeek({ agentId, sessionId, engineSessionId }: InboxPeekT
     const decide = useCallback(
         async (proposalId: string, decision: SkillProposalDecision): Promise<PeekDecisionOutcome> => {
             if (peek.state !== 'ready' || peek.peek.proposal?.id !== proposalId) return 'stale'
-            const result = await decideSkillProposalAction(peek.sessionId, proposalId, decision)
+            const result = await decideSkillProposalAction(peek.sessionId, proposalId, decision, decision === 'accept' ? readModelPick(agentId, peek.sessionId) : undefined)
             return result.proposal ? { proposal: result.proposal } : 'failed'
         },
-        [peek]
+        [agentId, peek]
     )
 
     return { peek, answer, decide }
