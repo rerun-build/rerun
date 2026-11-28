@@ -30,6 +30,22 @@ describe('cleanDockState', () => {
         expect(cleanDockState({ coworkers: [coworker] })).toEqual({ coworkers: [{ ...coworker, mood: 'waiting' }], createBlockedReason: null })
         expect(cleanDockState(null)).toBeNull()
     })
+
+    it('keeps the look a coworker was given, so its buddy on the dock wears the same as on the board', () => {
+        const look = { eyes: 'heart', mouth: 'cat', color: '#00B862', material: 'fluffy' }
+        expect(cleanDockState({ coworkers: [{ ...coworker, look }] })?.coworkers[0].look).toEqual({ ...look, color: '#00b862' })
+    })
+
+    it('keeps eyes and a material this build does not know: the page served by the hub draws them', () => {
+        const look = { eyes: 'laser', mouth: 'cat', color: '#00b862', material: 'velvet' }
+        expect(cleanDockState({ coworkers: [{ ...coworker, look }] })?.coworkers[0].look).toEqual(look)
+    })
+
+    it('drops a look that is not one and keeps the coworker', () => {
+        for (const look of [{ eyes: 'Not an eye', mouth: 'cat', color: '#00b862' }, { eyes: 'heart', color: '#00b862' }, { eyes: 'heart', mouth: 'cat', color: 'red' }, 'fluffy', null]) {
+            expect(cleanDockState({ coworkers: [{ ...coworker, look }] })?.coworkers).toEqual([coworker])
+        }
+    })
 })
 
 describe('cleanRects', () => {

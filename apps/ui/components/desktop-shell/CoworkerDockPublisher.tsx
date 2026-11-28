@@ -46,7 +46,7 @@ function Publisher() {
         if (onEngine) for (const item of items) pending.set(item.agentId, (pending.get(item.agentId) ?? 0) + inboxCount([item]))
         return sidebarSections(agents, spaces)
             .flatMap(section => section.members)
-            .map(agent => ({ id: agent.id, name: agent.name, mood: buddyMoodOfStatus(agent.status, !!agent.disabledAt), pending: pending.get(agent.id) ?? 0 }))
+            .map(agent => ({ id: agent.id, name: agent.name, mood: buddyMoodOfStatus(agent.status, !!agent.disabledAt), pending: pending.get(agent.id) ?? 0, ...(agent.look && { look: agent.look }) }))
     }, [agents, spaces, items, onEngine])
 
     const foreman = useMemo(() => (foremanVisible ? foremanDockEntry({ feed: foremanFeed, activity: foremanActivity, name: foremanName }) : null), [foremanVisible, foremanFeed, foremanActivity, foremanName])

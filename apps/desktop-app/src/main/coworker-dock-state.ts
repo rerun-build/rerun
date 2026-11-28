@@ -1,4 +1,4 @@
-import { COWORKER_DOCK_MAX_NOTES, COWORKER_DOCK_MOODS, type CoworkerDockCoworker, type CoworkerDockMood, type CoworkerDockNote, type CoworkerDockRect, type CoworkerDockState } from '@rerun/contracts'
+import { COWORKER_DOCK_MAX_NOTES, COWORKER_DOCK_MOODS, type CoworkerDockCoworker, type CoworkerDockMood, type CoworkerDockNote, type CoworkerDockRect, type CoworkerDockState, type CoworkerLook } from '@rerun/contracts'
 
 // What the pages send the shell, read without Electron: anything a page publishes is bounded and
 // typed before the dock window sees it.
@@ -15,15 +15,31 @@ function optionalText(value: unknown, max: number): string | null {
     return typeof value === 'string' && value ? value.slice(0, max) : null
 }
 
+const LOOK_PART = /^[a-z]{1,20}$/
+const LOOK_COLOR = /^#[0-9a-fA-F]{6}$/
+
+// Bounded and typed only: eyes, a mouth or a material added after this build ships are still ones the
+// dock's page, served by the hub, knows how to draw.
+function cleanLook(raw: unknown): CoworkerLook | null {
+    if (!raw || typeof raw !== 'object') return null
+    const { eyes, mouth, color, material } = raw as Record<string, unknown>
+    const part = (value: unknown) => typeof value === 'string' && LOOK_PART.test(value)
+    if (!part(eyes) || !part(mouth) || typeof color !== 'string' || !LOOK_COLOR.test(color)) return null
+    if (material !== undefined && !part(material)) return null
+    return { eyes, mouth, color: color.toLowerCase(), ...(material !== undefined ? { material } : {}) } as CoworkerLook
+}
+
 function cleanCoworker(raw: unknown): CoworkerDockCoworker | null {
     if (!raw || typeof raw !== 'object') return null
-    const { id, name, mood, pending } = raw as Record<string, unknown>
+    const { id, name, mood, pending, look: rawLook } = raw as Record<string, unknown>
     if (typeof id !== 'string' || !id) return null
+    const look = cleanLook(rawLook)
     return {
         id: id.slice(0, 100),
         name: String(name ?? '').slice(0, 200),
         mood: (COWORKER_DOCK_MOODS as readonly string[]).includes(String(mood)) ? (mood as CoworkerDockMood) : 'idle',
         pending: Math.max(0, Math.min(9999, Math.floor(Number(pending)) || 0)),
+        ...(look ? { look } : {}),
     }
 }
 
