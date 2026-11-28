@@ -73,9 +73,27 @@ describe('reconcileInterruptedRuns', () => {
         expect((completion?.metadata as Record<string, unknown>).errorCode).toBe('engine_restarted')
     })
 
-    // A box that was down for days would otherwise announce every run it ever interrupted, one
-    // notification and one email per conversation.
-    it('repairs an old run without announcing it', async () => {
+    // An engine killed with a call_agent chain in flight had 31 runs open; the hub heard of the 20
+    // newest only, and the 11 others kept their conversations "working" on every board (RER-416).
+    it('tells the hub about every run a restart interrupted, however many were in flight', async () => {
+        const sessionIds: string[] = []
+        for (let i = 0; i < 25; i++) {
+            const session = await createSession(id, `in flight ${i}`)
+            await startRun(id, session.id)
+            sessionIds.push(session.id)
+        }
+
+        const result = await reconcileInterruptedRuns()
+
+        expect(result).toMatchObject({ runs: 25, notified: 25 })
+        for (const sessionId of sessionIds) {
+            expect(sent.find(n => n.sessionId === sessionId)).toMatchObject({ kind: 'error', metadata: { errorCode: 'engine_restarted' } })
+        }
+    })
+
+    // A box that was down for days would otherwise put every run it ever interrupted in the inbox.
+    // The hub still hears of it, as a stop, so its conversation does not stay "working".
+    it('closes an old run quietly instead of announcing it', async () => {
         const session = await createSession(id, 'ancient')
         const run = await startRun(id, session.id)
         await backdate(run.id, new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString())
@@ -85,7 +103,8 @@ describe('reconcileInterruptedRuns', () => {
         expect(result.runs).toBe(1)
         expect(result.notified).toBe(0)
         expect((await getRun(id, run.id))?.status).toBe('error')
-        expect(sent).toHaveLength(0)
+        expect(sent).toHaveLength(1)
+        expect(sent[0]).toMatchObject({ runId: run.id, sessionId: session.id, metadata: { status: 'cancelled' } })
     })
 
     // The foreman is not in the agent index, so it has to be named for its runs to be repaired.
