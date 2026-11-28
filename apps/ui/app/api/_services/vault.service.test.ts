@@ -168,9 +168,22 @@ describe('attaching', () => {
         expect(attachVaultItem).toHaveBeenCalledWith(conn, 'item-1', 'e-alice')
     })
 
+    // The Chief of Staff's own tools (call_agent, its coworker databases) name coworkers by their engine id.
+    it('attaches a coworker named by the id the engine knows it by', async () => {
+        await attachVaultEntry('item-1', 'e-alice', managerOfA)
+        expect(attachVaultItem).toHaveBeenCalledWith(conn, 'item-1', 'e-alice')
+    })
+
+    it('names the coworker it cannot find', async () => {
+        const refusal = await attachVaultEntry('item-1', 'ghost', admin).catch(err => err)
+        expect(refusal).toMatchObject({ code: 'vaultCoworkerNotFound', params: { id: 'ghost' }, message: 'Coworker not found: ghost' })
+        expect(attachVaultItem).not.toHaveBeenCalled()
+    })
+
     it('refuses a coworker of a Box the caller only uses, and hides one it cannot see', async () => {
         await expect(attachVaultEntry('item-1', 'bob', managerOfA)).rejects.toMatchObject({ name: 'AccessDeniedError' })
-        await expect(attachVaultEntry('item-1', 'carol', managerOfA)).rejects.toMatchObject({ code: 'coworkerNotFound' })
+        await expect(attachVaultEntry('item-1', 'carol', managerOfA)).rejects.toMatchObject({ code: 'vaultCoworkerNotFound', params: { id: 'carol' } })
+        await expect(attachVaultEntry('item-1', 'e-carol', managerOfA)).rejects.toMatchObject({ code: 'vaultCoworkerNotFound', params: { id: 'e-carol' } })
         await expect(detachVaultEntry('item-1', 'bob', user)).rejects.toMatchObject({ name: 'AccessDeniedError' })
         expect(attachVaultItem).not.toHaveBeenCalled()
         expect(detachVaultItem).not.toHaveBeenCalled()
@@ -402,7 +415,7 @@ describe('the foreman in the Vault', () => {
 
     it('sits in no Box, so nobody but an admin sees it or attaches to it', async () => {
         expect((await listVault(managerOfA)).coworkers.map(c => c.id)).not.toContain('foreman')
-        await expect(attachVaultEntry('item-1', 'foreman', managerOfA)).rejects.toMatchObject({ code: 'coworkerNotFound' })
+        await expect(attachVaultEntry('item-1', 'foreman', managerOfA)).rejects.toMatchObject({ code: 'vaultCoworkerNotFound', params: { id: 'foreman' } })
         expect(attachVaultItem).not.toHaveBeenCalled()
     })
 
@@ -416,7 +429,7 @@ describe('the foreman in the Vault', () => {
     it('is not there on a box whose foreman keeps nothing of its own', async () => {
         vi.mocked(supportsForemanCoworker).mockResolvedValue(false)
         expect((await listVault(admin)).coworkers.map(c => c.id)).toEqual(['alice', 'bob', 'carol'])
-        await expect(attachVaultEntry('item-1', 'foreman', admin)).rejects.toMatchObject({ code: 'coworkerNotFound' })
+        await expect(attachVaultEntry('item-1', 'foreman', admin)).rejects.toMatchObject({ code: 'vaultCoworkerNotFound', params: { id: 'foreman' } })
     })
 })
 

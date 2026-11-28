@@ -503,6 +503,7 @@
     "vaultMcpTarget": "יש לתת לשרת כתובת או פקודה",
     "vaultKeysUnknown": "הפריט הזה ב-Vault מכיל מפתחות אחרים. אפשר לשנות אותם ב-Vault.",
     "vaultHeaderValueMissing": "יש למלא כל מפתח שהשרת הזה קורא.",
+    "vaultCoworkerNotFound": "העמית לא נמצא: {id}",
     "saveAnswerFailed": "לא הצלחנו לשמור את זה. יש לנסות שוב.",
     "notYourCompanySite": "{domain} אינו האתר של החברה שלך. יש להזין את האתר שלך, או לדלג.",
     "computerNameInvalid": "יש לתת למחשב שם באורך 1 עד 100 תווים.",

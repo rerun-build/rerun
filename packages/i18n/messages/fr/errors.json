@@ -503,6 +503,7 @@
     "vaultMcpTarget": "Donnez au serveur une adresse ou une commande",
     "vaultKeysUnknown": "Cette entrée du Vault contient d'autres clés. Modifiez-les dans le Vault.",
     "vaultHeaderValueMissing": "Remplissez chaque clé que ce serveur lit.",
+    "vaultCoworkerNotFound": "Coworker introuvable : {id}",
     "saveAnswerFailed": "Impossible d'enregistrer cette réponse. Réessayez.",
     "notYourCompanySite": "{domain} n'est pas le site de votre entreprise. Saisissez le vôtre, ou passez.",
     "computerNameInvalid": "Donnez à l'ordinateur un nom de 1 à 100 caractères.",
