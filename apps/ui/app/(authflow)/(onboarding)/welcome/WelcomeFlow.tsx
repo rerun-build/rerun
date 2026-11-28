@@ -4,6 +4,7 @@ import { claimWelcomeEngineAction, finishWelcomeAction, welcomeEngineAnswersActi
 import { finishWelcomeTeamAction, saveWelcomeSectorAction, saveWelcomeViewAction } from '@/app/api/_actions/welcome.actions'
 import { OnboardingPage } from '@/components/onboarding/OnboardingPage'
 import { LazyMembersPanel, LazyProofPanel, LazyShowcase, LazyTeamPanel, LazyViewPanel } from '@/components/onboarding/panels/LazyPanels'
+import { WelcomeSignOutButton } from '@/components/onboarding/WelcomeSignOutButton'
 import { WelcomeWorkspaceSwitcher } from '@/components/onboarding/WelcomeWorkspaceSwitcher'
 import { EngineWaitlistDialog } from '@/components/dialogs/EngineWaitlistDialog'
 import { EngineStep, type EngineProgress } from '@/components/onboarding/welcome/EngineStep'
@@ -209,10 +210,16 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, starterRoles
     const waitlistUp = waitlisted && (step === 'trial' || step === 'engine')
     // Someone who created this workspace by mistake goes back to the one they were in, from any step.
     const switcher = canSwitchWorkspace ? <WelcomeWorkspaceSwitcher /> : undefined
+    const corner = (
+        <div className="flex w-full min-w-0 items-center gap-2">
+            {switcher}
+            <WelcomeSignOutButton />
+        </div>
+    )
 
     return (
         <>
-            <OnboardingPage stepKey={askPhone ? 'phone' : step} direction={direction} corner={switcher} hideLogo={step === 'engine' && !askPhone} progress={askPhone || question === -1 ? undefined : { index: question, count: QUESTIONS.length }} panel={panel}>
+            <OnboardingPage stepKey={askPhone ? 'phone' : step} direction={direction} corner={corner}hideLogo={step === 'engine' && !askPhone} progress={askPhone || question === -1 ? undefined : { index: question, count: QUESTIONS.length }} panel={panel}>
                 {content}
             </OnboardingPage>
             <EngineWaitlistDialog open={waitlistUp} corner={switcher} />
