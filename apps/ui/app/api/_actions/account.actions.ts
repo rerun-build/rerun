@@ -57,9 +57,9 @@ export async function updateMyNameAction(params: { name: string }): Promise<Acti
     }
 }
 
-// Saved on the account for the emails and notifications it receives, and mirrored in a cookie so
-// this device reads it without a query. The cookie sits on `.rerun.build`, where the landing reads it
-// too. `null` goes back to following the browser.
+// Saved on the account, which the app, the emails and the notifications read, and mirrored in a cookie
+// on `.rerun.build` for the pages that open without a session (the landing, the sign-in). `null` goes
+// back to following the browser.
 export async function updateMyLocaleAction(params: { locale: Locale | typeof PSEUDO_LOCALE | null }): Promise<ActionResult> {
     try {
         const account = await requireAccount()
