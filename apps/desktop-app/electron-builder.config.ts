@@ -43,7 +43,9 @@ const config: Configuration = {
     productName: identity.productName,
     copyright: 'Copyright © Rerun. AGPL-3.0.',
     directories: { output: `release/${channel}`, buildResources: 'resources' },
-    files: ['out/**/*', 'package.json'],
+    // `resources` is the buildResources folder, never packed on its own: the main process loads the
+    // tray icons from `app.asar/resources/tray` (a `?asset` import of electron-vite's public folder).
+    files: ['out/**/*', 'resources/tray/*.png', 'package.json'],
     extraMetadata: { productName: identity.productName },
     asar: true,
     // Only the updater is a runtime dependency; everything else is bundled by electron-vite.
