@@ -37,6 +37,7 @@ import { CoworkerVaultAvailable, useCoworkerVault, useVaultIcons } from '@/compo
 import { useCatalogServices } from '@/hooks/useCatalogServices'
 import { AppTileCard, AppsHeading, TILE_GRID, TileSkeletons, type TileHandlers } from '@/components/agent/AppTiles'
 import { type AppTile, groupTiles, takenSlugs, tileMatches, toTiles, vaultEntryMatches } from '@/components/agent/apps-tab'
+import { usePaidAppsStore } from '@/stores/paid-apps.store'
 
 type AgentPanelServicesProps = {
     agentId: string
@@ -172,9 +173,11 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
         setConnectorServices(agentId, services, customServers)
     }, [agentId, resetBrowse])
 
+    // A paid app's account reconnected or signed out in its own window moves the status of its tile.
+    const paidAppsRevision = usePaidAppsStore(s => s.revision)
     useEffect(() => {
         load()
-    }, [load])
+    }, [load, paidAppsRevision])
 
     const coworkerVault = useCoworkerVault(agentId, revision, load, setError)
 
@@ -345,7 +348,8 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
 
     const tileHandlers: TileHandlers = {
         onSignIn: tile => {
-            if (tile.kind === 'app') void onInstall(tile.key)
+            // A paid app's accounts are picked, and a signed-out one is reconnected, in its account picker.
+            if (tile.kind === 'app') void (tile.service.app ? onReconnect(tile.key) : onInstall(tile.key))
             // The sign-in window opens inside the click, before anything is fetched, or the browser blocks it.
             if (tile.kind === 'mcp') setCustomStep({ kind: 'connect', server: tile.server, popup: openPendingSignInPopup(tile.server.displayName, tServices('signInPopup.connecting', { name: tile.server.displayName })) })
         },

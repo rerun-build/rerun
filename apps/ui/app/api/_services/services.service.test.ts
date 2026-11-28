@@ -9,7 +9,7 @@ import { type RegistryEntry, type ServiceRegistry, readRegistry, removeRegistryE
 import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { syncAppConnector } from '@rerun/cloud/apps.server'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
-import { fakeSupabase } from '@/test/supabase-fake'
+import { type SupabaseResolver, fakeSupabase, tableResolver } from '@/test/supabase-fake'
 import { searchDocs } from '@/lib/foreman/search-docs'
 import { fetchPublic } from '@/lib/net/public-fetch'
 import { RERUN_BRAND } from '@rerun/contracts'
@@ -108,25 +108,25 @@ function useRegistry(reg: ServiceRegistry) {
     vi.mocked(readRegistry).mockResolvedValue(reg)
 }
 
+const catalog: SupabaseResolver = (table, calls) => {
+    if (table === 'agents') return workspacePlan ? { data: { workspace_id: 1 } } : undefined
+    if (table === 'workspaces') return { data: { plan: workspacePlan } }
+    if (table !== 'services') return undefined
+    const slug = eqSlug(calls)
+    if (typeof slug === 'string') return { data: MANIFESTS[slug] ? { manifest: MANIFESTS[slug], enabled: true } : null }
+    return {
+        data: [
+            { slug: 'gmail', name: 'Gmail', icon: null, category: 'productivity', summary: '', manifest: MANIFESTS.gmail, verified: true },
+            { slug: 'notion', name: 'Notion', icon: null, category: 'productivity', summary: '', manifest: { slug: 'notion', name: 'Notion' }, verified: true },
+            { slug: 'whatsapp-pro', name: 'WhatsApp Pro', icon: null, category: 'communication', summary: '', manifest: MANIFESTS['whatsapp-pro'], verified: true },
+        ],
+    }
+}
+
 beforeEach(() => {
     vi.clearAllMocks()
     workspacePlan = null
-    vi.mocked(createServiceRoleClient).mockReturnValue(
-        fakeSupabase((table, calls) => {
-            if (table === 'agents') return workspacePlan ? { data: { workspace_id: 1 } } : undefined
-            if (table === 'workspaces') return { data: { plan: workspacePlan } }
-            if (table !== 'services') return undefined
-            const slug = eqSlug(calls)
-            if (typeof slug === 'string') return { data: MANIFESTS[slug] ? { manifest: MANIFESTS[slug], enabled: true } : null }
-            return {
-                data: [
-                    { slug: 'gmail', name: 'Gmail', icon: null, category: 'productivity', summary: '', manifest: MANIFESTS.gmail, verified: true },
-                    { slug: 'notion', name: 'Notion', icon: null, category: 'productivity', summary: '', manifest: { slug: 'notion', name: 'Notion' }, verified: true },
-                    { slug: 'whatsapp-pro', name: 'WhatsApp Pro', icon: null, category: 'communication', summary: '', manifest: MANIFESTS['whatsapp-pro'], verified: true },
-                ],
-            }
-        }).client,
-    )
+    vi.mocked(createServiceRoleClient).mockReturnValue(fakeSupabase(catalog).client)
 })
 
 describe('installService', () => {
@@ -352,6 +352,58 @@ describe('installedFromRegistry', () => {
             ['notion', 'notion', undefined],
         ])
         expect(rows[1].instanceId).toBe('k3x9ab')
+    })
+})
+
+// The coworker's own registry keeps the status its last pick wrote; the accounts it holds are read live,
+// by the list, the details and the search alike.
+describe('a paid app whose accounts are signed out', () => {
+    const whatsapp = { appSlug: 'whatsapp', serverName: 'whatsapp_pro', accountLabel: 'Jake Dorow' }
+    const account = (id: string, status: string) => ({ id, workspace_id: 7, label: id, status })
+    const bound = (connection_id: string) => ({ agent_id: 'agent', app_slug: 'whatsapp', connection_id, created_at: connection_id })
+
+    function holding(connections: object[]) {
+        const accounts = tableResolver({ agents: [{ id: 'agent', workspace_id: 7 }], app_connections: connections, app_connection_agents: connections.map(c => bound((c as { id: string }).id)) })
+        const supabase = fakeSupabase((table, calls) => (table === 'services' ? catalog(table, calls) : accounts(table, calls)))
+        vi.mocked(createServiceRoleClient).mockReturnValue(supabase.client)
+        return supabase
+    }
+
+    const statusOf = async (key: string) => (await listInstalledServices('agent')).services.find(service => service.key === key)?.status
+
+    beforeEach(() => useRegistry({ services: { 'whatsapp-pro': entry({ app: whatsapp }), gmail: entry() } }))
+
+    it('says sign in when every account the coworker holds is signed out', async () => {
+        holding([account('jake', 'needs_reconnect')])
+        expect(await statusOf('whatsapp-pro')).toBe('needs_auth')
+    })
+
+    it('stays active while one account still works, or one is only paused', async () => {
+        holding([account('jake', 'needs_reconnect'), account('ada', 'connected')])
+        expect(await statusOf('whatsapp-pro')).toBe('active')
+        holding([account('bea', 'paused')])
+        expect(await statusOf('whatsapp-pro')).toBe('active')
+    })
+
+    it('says sign in in the details the coworker and the chat card read', async () => {
+        holding([account('jake', 'needs_reconnect')])
+        expect(await getServiceDetails('agent', 'whatsapp-pro')).toMatchObject({ installStatus: 'needs_auth', installed: false })
+        holding([account('jake', 'needs_reconnect'), account('ada', 'connected')])
+        expect(await getServiceDetails('agent', 'whatsapp-pro')).toMatchObject({ installStatus: 'active', installed: true })
+    })
+
+    it('says sign in in the search the coworker reads', async () => {
+        holding([account('jake', 'connecting')])
+        const { results } = await searchServices('agent')
+        expect(results.find(result => result.slug === 'whatsapp-pro')).toMatchObject({ installStatus: 'needs_auth', installed: false })
+        expect(results.find(result => result.slug === 'gmail')).toMatchObject({ installStatus: 'active' })
+    })
+
+    it('reads no account for an app that is not a paid one', async () => {
+        useRegistry({ services: { gmail: entry() } })
+        const supabase = holding([account('jake', 'needs_reconnect')])
+        expect(await statusOf('gmail')).toBe('active')
+        expect(supabase.chainsOn('app_connection_agents')).toHaveLength(0)
     })
 })
 
