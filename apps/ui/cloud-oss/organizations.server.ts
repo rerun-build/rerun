@@ -28,6 +28,11 @@ export async function isServedHostname(_hostname: string): Promise<boolean> {
     return false
 }
 
+// The domains of the organizations the edge serves, besides their default addresses.
+export async function servedDomainHostnames(): Promise<string[]> {
+    return []
+}
+
 export type InvitedSignIn = { organizationId: string; brand: Brand; email: string; ip: string; locale: Locale }
 export type InvitedSignInOutcome = 'asked' | 'too_many'
 

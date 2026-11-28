@@ -1,5 +1,6 @@
 import { isServedHostname } from '@rerun/cloud/organizations.server'
-import { createHash, timingSafeEqual } from 'node:crypto'
+
+import { isEdge } from '@/app/api/edge/_lib/edge-key'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,13 +18,6 @@ function refusedTooMany(now: number): boolean {
         refusals = 0
     }
     return refusals >= MAX_REFUSALS_PER_MINUTE
-}
-
-const digest = (value: string): Buffer => createHash('sha256').update(value).digest()
-
-function isEdge(given: string | null): boolean {
-    const key = process.env.ORGANIZATION_EDGE_KEY
-    return !!key && !!given && timingSafeEqual(digest(given), digest(key))
 }
 
 const answer = (status: 200 | 404 | 429) => new Response(null, { status, headers: { 'Cache-Control': 'no-store' } })
