@@ -7,16 +7,21 @@ import type { LoadedConnection } from './types.js'
 
 // One instance per connection, shared by every agent pointing at it. Deliberate: a token refresh
 // mutates this single object, so the whole box sees the fresh credential at once instead of each
-// agent carrying its own copy and racing to rotate it.
-const cache = new Map<string, LoadedConnection>()
+// agent carrying its own copy and racing to rotate it. The read is cached, not its result: two first
+// reads at once (the boot's and the scheduler's) would otherwise build two objects, and a Claude
+// refresh on one would leave the other with a refresh token Anthropic has already spent.
+const cache = new Map<string, Promise<LoadedConnection>>()
 
 export async function getConnection(id: string): Promise<LoadedConnection> {
     const cached = cache.get(id)
     if (cached) return cached
     if (!connectionExists(id)) throw notFound('connection')
-    const connection = await loadConnectionFromDisk(id)
-    cache.set(id, connection)
-    return connection
+    const loading = loadConnectionFromDisk(id)
+    cache.set(id, loading)
+    loading.catch(() => {
+        if (cache.get(id) === loading) cache.delete(id)
+    })
+    return loading
 }
 
 const unreadable = new Set<string>()
